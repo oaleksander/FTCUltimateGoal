@@ -10,7 +10,7 @@ public class Tele_test extends WoENrobot{
         //initRobot();
         forceInitRobot();
         startRobot();
-        odometry.start();
+        //odometry.start();
         autoManipulator.start();
         while(opModeIsActive())
         {

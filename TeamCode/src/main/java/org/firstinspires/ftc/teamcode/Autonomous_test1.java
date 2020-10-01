@@ -9,11 +9,10 @@ public class Autonomous_test1 extends WoENrobot {
 
         forceInitRobot();
         AutoTransitioner.transitionOnStop(this, "Teleop COMPETITION");
-        startOpenCV();
+        //startOpenCV();
         startRobot();
-        odometry.start();
+        //odometry.start();
 /*------------------------------------------------------------------------------------------------*/
-        getSkystonePosition();
         sleep(1000);
         //Pos(20,-15,0);
 /*------------------------------------------------------------------------------------------------*/
