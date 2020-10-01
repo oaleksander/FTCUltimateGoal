@@ -14,16 +14,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.opencv.core.Core;
-import org.opencv.core.Mat;
-import org.opencv.core.MatOfPoint;
-import org.opencv.core.Point;
-import org.opencv.core.Scalar;
-import org.opencv.imgproc.Imgproc;
-import org.openftc.easyopencv.OpenCvCamera;
-import org.openftc.easyopencv.OpenCvCameraFactory;
-import org.openftc.easyopencv.OpenCvCameraRotation;
-import org.openftc.easyopencv.OpenCvPipeline;
+
 import org.openftc.revextensions2.ExpansionHubEx;
 import org.openftc.revextensions2.ExpansionHubMotor;
 import org.openftc.revextensions2.RevBulkData;
@@ -43,6 +34,7 @@ import static java.lang.Math.toRadians;
 import static org.firstinspires.ftc.teamcode.WoENmath.cosFromSin;
 
 public class WoENrobot extends LinearOpMode {
+
 
     /* Public OpMode members. */
     public ElapsedTime Runtime = new ElapsedTime();
@@ -79,36 +71,34 @@ public class WoENrobot extends LinearOpMode {
     private static int valLeft = -1;
     private static int valRight = -1;
 
-    private static float rectHeight = .6f/8f;
-    private static float rectWidth = 1.5f/8f;
+    private static float rectHeight = .6f / 8f;
+    private static float rectWidth = 1.5f / 8f;
 
-    private static float offsetX = 0f/8f;//changing this moves the three rects and the three circles left or right, range : (-2, 2) not inclusive
-    private static float offsetY = 0f/8f;//changing this moves the three rects and circles up or down, range: (-4, 4) not inclusive
+    private static float offsetX = 0f / 8f;//changing this moves the three rects and the three circles left or right, range : (-2, 2) not inclusive
+    private static float offsetY = 0f / 8f;//changing this moves the three rects and circles up or down, range: (-4, 4) not inclusive
 
-    private static float[] midPos = {4f/8f+offsetX, 4f/8f+offsetY};//0 = col, 1 = row
-    private static float[] leftPos = {2f/8f+offsetX, 4f/8f+offsetY};
-    private static float[] rightPos = {6f/8f+offsetX, 4f/8f+offsetY};
+    private static float[] midPos = {4f / 8f + offsetX, 4f / 8f + offsetY};//0 = col, 1 = row
+    private static float[] leftPos = {2f / 8f + offsetX, 4f / 8f + offsetY};
+    private static float[] rightPos = {6f / 8f + offsetX, 4f / 8f + offsetY};
     //moves all rectangles right or left by amount. units are in ratio to monitor
 
     private final int rows = 640;
     private final int cols = 480;
 
-    OpenCvCamera phoneCam;
-
     public static int randomvariable;
 
     /* local OpMode members. */
-    private ElapsedTime period  = new ElapsedTime();
+    private ElapsedTime period = new ElapsedTime();
 
 
-    public static final double     odometryWheelDiameterCm   = 4.8 ;
-    public static final double     odometryCountsPerCM  = (1440) / (odometryWheelDiameterCm  * PI);
-    public static final double     odometryCMPerCounts  =  (odometryWheelDiameterCm  * PI) / 1440;
-    public static final float     odometerYcenterOffset = 13;
+    public static final double odometryWheelDiameterCm = 4.8;
+    public static final double odometryCountsPerCM = (1440) / (odometryWheelDiameterCm * PI);
+    public static final double odometryCMPerCounts = (odometryWheelDiameterCm * PI) / 1440;
+    public static final float odometerYcenterOffset = 13;
     public static double maxDriveSpeed = 1;
     public static double minDriveSpeed = 0.1;
     public static boolean drive0Brake = false;
-   // public static final double odometerXcenterOffset = 0;
+    // public static final double odometerXcenterOffset = 0;
 
     public static final int liftEncoderMin = 0;
     public static final int liftEncoderMax = 4200;
@@ -127,7 +117,8 @@ public class WoENrobot extends LinearOpMode {
 
     /* Constructor */
     @Override
-    public void runOpMode() {}
+    public void runOpMode() {
+    }
 
 
     private double robotEstimatedHeading;
@@ -142,7 +133,7 @@ public class WoENrobot extends LinearOpMode {
     private boolean stopLiftControl = false;
 
     public static final double kP_distance = 0.0011, kD_distance = 0.000022;
-    public static final double minError_distance = 5*odometryCountsPerCM;
+    public static final double minError_distance = 5 * odometryCountsPerCM;
 
     public static final double kP_angle = 0.0, kD_angle = 0;
     public static final double minError_angle = Math.toRadians(3);
@@ -202,13 +193,11 @@ public class WoENrobot extends LinearOpMode {
     }
 
 
-
-
     boolean doGrabStone = false;
 
     Thread autoManipulator = new Thread(new Runnable() {
         public void run() {
-            while(opModeIsActive()&& !stopManipulatorControl) {
+            while (opModeIsActive() && !stopManipulatorControl) {
                 if (doGrabStone) {
                     intakeMotorPowers(0, 0);
                     grabBrick(true, true);
@@ -231,47 +220,41 @@ public class WoENrobot extends LinearOpMode {
                     }
                 }
             }
-            if(stopManipulatorControl)
+            if (stopManipulatorControl)
                 stopManipulatorControl = false;
         }
-        });
+    });
 
 
     boolean doSlideForward = false;
 
     Thread slideControl = new Thread(new Runnable() {
         public void run() {
-            while(opModeIsActive()&& !stopSlideControl)
-            {
-                if(doSlideForward) {
-                    if(!limitSwitchRear.getState())
-                    {
+            while (opModeIsActive() && !stopSlideControl) {
+                if (doSlideForward) {
+                    if (!limitSwitchRear.getState()) {
                         slideMotorPowers(-1);
-                    }
-                    else
-                    {
+                    } else {
                         slideMotorPowers(0);
                     }
 
                 } else {
-                    if(!limitSwitchFront.getState())
-                    {
+                    if (!limitSwitchFront.getState()) {
                         slideMotorPowers(1);
-                    }
-                    else
-                    {
+                    } else {
                         slideMotorPowers(0);
                     }
                 }
             }
-            if(stopSlideControl)
+            if (stopSlideControl)
                 stopSlideControl = false;
         }
     });
 
     public static int liftTarget = 0;
+
     public void liftManipulator(int target_cm) {
-        if(!liftControl.isAlive()) {
+        if (!liftControl.isAlive()) {
             liftControl.start();
         }
         liftTarget = target_cm;
@@ -279,42 +262,51 @@ public class WoENrobot extends LinearOpMode {
 
     Thread liftControl = new Thread(new Runnable() {
         public void run() {
-            while(opModeIsActive()&& !stopLiftControl)
-            {
+            while (opModeIsActive() && !stopLiftControl) {
 
 
                 sleep(10);
             }
             stopLiftMotors();
-            if(stopLiftControl)
+            if (stopLiftControl)
                 stopLiftControl = false;
         }
     });
 
 
-    public double returnXCoordinate(){ return robotGlobalXCoordinatePosition*odometryCMPerCounts; }
+    public double returnXCoordinate() {
+        return robotGlobalXCoordinatePosition * odometryCMPerCounts;
+    }
 
     /**
      * Returns the robot's global y coordinate
+     *
      * @return global y coordinate
      */
-    public double returnYCoordinate(){ return robotGlobalYCoordinatePosition*odometryCMPerCounts; }
+    public double returnYCoordinate() {
+        return robotGlobalYCoordinatePosition * odometryCMPerCounts;
+    }
 
     /**
      * Returns the robot's global orientation
+     *
      * @return global orientation, in degrees
      */
-    public double returnOrientation(){ return Math.toDegrees(robotEstimatedHeading); }
+    public double returnOrientation() {
+        return Math.toDegrees(robotEstimatedHeading);
+    }
 
-    public double returnIncrementalOrientation(){ return Math.toDegrees(integratedAngle); }
+    public double returnIncrementalOrientation() {
+        return Math.toDegrees(integratedAngle);
+    }
 
-    public void startRobot()
-    {
+    public void startRobot() {
         waitForStart();
         Runtime.reset();
         telemetry.addData("Status", "Running");
         telemetry.update();
     }
+
     public void initRobot() {
         if (!robotIsInitialized) {
             forceInitRobot();
@@ -330,11 +322,12 @@ public class WoENrobot extends LinearOpMode {
     }
 
     private static final boolean defaultNames = true;
+
     public void forceInitRobot() {
         telemetry.addData("Status", "Initializing...");
         telemetry.update();
 
-        if(defaultNames) {
+        if (defaultNames) {
 
             imuLeft = hardwareMap.get(BNO055IMU.class, "imuLeft");
             imuRight = hardwareMap.get(BNO055IMU.class, "imuRight");
@@ -398,7 +391,7 @@ public class WoENrobot extends LinearOpMode {
 
         initializeGyroscopes();
 
-        grabBrick(true,false);
+        grabBrick(true, false);
         grabFoundation(false);
 
         stopAllMotors();
@@ -411,176 +404,7 @@ public class WoENrobot extends LinearOpMode {
         telemetry.update();
     }
 
-    public void startOpenCV()
-    {
-        cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        phoneCam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
-        phoneCam.openCameraDevice();
-        phoneCam.setPipeline(new StageSwitchingPipeline());
-        phoneCam.startStreaming(rows, cols, OpenCvCameraRotation.UPRIGHT);
-    }
-    public void openCVtelemetry()
-    {
-        telemetry.addData("Values", valLeft+"   "+valMid+"   "+valRight);
-        telemetry.addData("Position", getSkystonePosition());
-        telemetry.update();
-        sleep(10);
-    }
-    public int getSkystonePosition()
-    {
-        int result = 2;
-        if(valLeft == 0)
-            result = 1;
-        else if(valMid == 0)
-            result = 2;
-        else if(valRight == 0)
-            result = 3;
-        stopOpenCV();
-        telemetry.addData("Skystone position", result);
-        telemetry.update();
-        return result;
-    }
-    public void stopOpenCV()
-    {
-        phoneCam.stopStreaming();
-        phoneCam.closeCameraDevice();
-    }
-    static class StageSwitchingPipeline extends OpenCvPipeline
-    {
-        Mat yCbCrChan2Mat = new Mat();
-        Mat thresholdMat = new Mat();
-        Mat all = new Mat();
-        List<MatOfPoint> contoursList = new ArrayList<>();
-
-        enum Stage
-        {//color difference. greyscale
-            detection,//includes outlines
-            THRESHOLD,//b&w
-            RAW_IMAGE,//displays raw view
-        }
-
-        private openCVsample.StageSwitchingPipeline.Stage stageToRenderToViewport = openCVsample.StageSwitchingPipeline.Stage.detection;
-        private openCVsample.StageSwitchingPipeline.Stage[] stages = openCVsample.StageSwitchingPipeline.Stage.values();
-
-        @Override
-        public void onViewportTapped()
-        {
-            /*
-             * Note that this method is invoked from the UI thread
-             * so whatever we do here, we must do quickly.
-             */
-
-            int currentStageNum = stageToRenderToViewport.ordinal();
-
-            int nextStageNum = currentStageNum + 1;
-
-            if(nextStageNum >= stages.length)
-            {
-                nextStageNum = 0;
-            }
-
-            stageToRenderToViewport = stages[nextStageNum];
-        }
-
-        @Override
-        public Mat processFrame(Mat input)
-        {
-            contoursList.clear();
-            /*
-             * This pipeline finds the contours of yellow blobs such as the Gold Mineral
-             * from the Rover Ruckus game.
-             */
-
-            //color diff cb.
-            //lower cb = more blue = skystone = white
-            //higher cb = less blue = yellow stone = grey
-            Imgproc.cvtColor(input, yCbCrChan2Mat, Imgproc.COLOR_RGB2YCrCb);//converts rgb to ycrcb
-            Core.extractChannel(yCbCrChan2Mat, yCbCrChan2Mat, 2);//takes cb difference and stores
-
-            //b&w
-            Imgproc.threshold(yCbCrChan2Mat, thresholdMat, 102, 255, Imgproc.THRESH_BINARY_INV);
-
-            //outline/contour
-            Imgproc.findContours(thresholdMat, contoursList, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
-            yCbCrChan2Mat.copyTo(all);//copies mat object
-            //Imgproc.drawContours(all, contoursList, -1, new Scalar(255, 0, 0), 3, 8);//draws blue contours
-
-
-            //get values from frame
-            double[] pixMid = thresholdMat.get((int)(input.rows()* midPos[1]), (int)(input.cols()* midPos[0]));//gets value at circle
-            valMid = (int)pixMid[0];
-
-            double[] pixLeft = thresholdMat.get((int)(input.rows()* leftPos[1]), (int)(input.cols()* leftPos[0]));//gets value at circle
-            valLeft = (int)pixLeft[0];
-
-            double[] pixRight = thresholdMat.get((int)(input.rows()* rightPos[1]), (int)(input.cols()* rightPos[0]));//gets value at circle
-            valRight = (int)pixRight[0];
-
-            //create three points
-            Point pointMid = new Point((int)(input.cols()* midPos[0]), (int)(input.rows()* midPos[1]));
-            Point pointLeft = new Point((int)(input.cols()* leftPos[0]), (int)(input.rows()* leftPos[1]));
-            Point pointRight = new Point((int)(input.cols()* rightPos[0]), (int)(input.rows()* rightPos[1]));
-
-            //draw circles on those points
-            Imgproc.circle(all, pointMid,5, new Scalar( 255, 0, 0 ),1 );//draws circle
-            Imgproc.circle(all, pointLeft,5, new Scalar( 255, 0, 0 ),1 );//draws circle
-            Imgproc.circle(all, pointRight,5, new Scalar( 255, 0, 0 ),1 );//draws circle
-
-            //draw 3 rectangles
-            Imgproc.rectangle(//1-3
-                    all,
-                    new Point(
-                            input.cols()*(leftPos[0]-rectWidth/2),
-                            input.rows()*(leftPos[1]-rectHeight/2)),
-                    new Point(
-                            input.cols()*(leftPos[0]+rectWidth/2),
-                            input.rows()*(leftPos[1]+rectHeight/2)),
-                    new Scalar(0, 255, 0), 3);
-            Imgproc.rectangle(//3-5
-                    all,
-                    new Point(
-                            input.cols()*(midPos[0]-rectWidth/2),
-                            input.rows()*(midPos[1]-rectHeight/2)),
-                    new Point(
-                            input.cols()*(midPos[0]+rectWidth/2),
-                            input.rows()*(midPos[1]+rectHeight/2)),
-                    new Scalar(0, 255, 0), 3);
-            Imgproc.rectangle(//5-7
-                    all,
-                    new Point(
-                            input.cols()*(rightPos[0]-rectWidth/2),
-                            input.rows()*(rightPos[1]-rectHeight/2)),
-                    new Point(
-                            input.cols()*(rightPos[0]+rectWidth/2),
-                            input.rows()*(rightPos[1]+rectHeight/2)),
-                    new Scalar(0, 255, 0), 3);
-
-            switch (stageToRenderToViewport)
-            {
-                case THRESHOLD:
-                {
-                    return thresholdMat;
-                }
-
-                case detection:
-                {
-                    return all;
-                }
-
-                case RAW_IMAGE:
-                {
-                    return input;
-                }
-
-                default:
-                {
-                    return input;
-                }
-            }
-        }
-
-    }
-    public void setMotorDirections(){
+    public void setMotorDirections() {
         driveFrontLeft.setDirection(DcMotor.Direction.FORWARD);
         driveFrontRight.setDirection(DcMotor.Direction.REVERSE);
         driveRearLeft.setDirection(DcMotor.Direction.FORWARD);
@@ -595,8 +419,9 @@ public class WoENrobot extends LinearOpMode {
         odometerYintakeR.setDirection(DcMotor.Direction.REVERSE);
         odometerXintakeL.setDirection(DcMotor.Direction.FORWARD);
     }
-    public void setMotor0PowerBehaviors(){
-        if(drive0Brake) {
+
+    public void setMotor0PowerBehaviors() {
+        if (drive0Brake) {
             driveFrontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             driveFrontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             driveRearLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -617,8 +442,7 @@ public class WoENrobot extends LinearOpMode {
 
     }
 
-    public void initializeGyroscopes()
-    {
+    public void initializeGyroscopes() {
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         imuLeft.initialize(parameters);
         imuRight.initialize(parameters);
@@ -627,22 +451,21 @@ public class WoENrobot extends LinearOpMode {
         imuRightAngleOffset = -imuRight.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS).firstAngle;
     }
 
-    float getAngle()
-    {
+    float getAngle() {
         float leftAngle = radiansWrap(-imuLeft.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS).firstAngle - imuLeftAngleOffset);
         float rightAngle = radiansWrap(-imuRight.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS).firstAngle - imuRightAngleOffset);
-        if(abs(leftAngle - rightAngle)>Math.PI)
-            rightAngle+=2*PI*signum(leftAngle - rightAngle);
-        return (leftAngle+rightAngle)/2;
+        if (abs(leftAngle - rightAngle) > Math.PI)
+            rightAngle += 2 * PI * signum(leftAngle - rightAngle);
+        return (leftAngle + rightAngle) / 2;
     }
-    private float radiansWrap(float angle)
-    {
-        if(angle>Math.PI) angle -= 2*Math.PI;
-        if(angle<-Math.PI) angle += 2*Math.PI;
+
+    private float radiansWrap(float angle) {
+        if (angle > Math.PI) angle -= 2 * Math.PI;
+        if (angle < -Math.PI) angle += 2 * Math.PI;
         return angle;
     }
-    private void resetOdometryEncoders()
-    {
+
+    private void resetOdometryEncoders() {
         driveFrontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         driveFrontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         driveRearLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -655,8 +478,7 @@ public class WoENrobot extends LinearOpMode {
 
     }
 
-    private void resetLiftEncoders()
-    {
+    private void resetLiftEncoders() {
         liftL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         liftR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
@@ -664,184 +486,187 @@ public class WoENrobot extends LinearOpMode {
         liftR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
-    void resetDriveEncoders()
-    {
+    void resetDriveEncoders() {
         odometerYintakeR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         odometerXintakeL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         odometerYintakeR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         odometerXintakeL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
-    public void stopAllMotors()
-    {
+
+    public void stopAllMotors() {
         stopMoveMotors();
         stopLiftMotors();
         stopIntakeMotors();
         stopSlideMotors();
     }
 
-    public void grabBrick(boolean front, boolean rear)
-    {
-        brickGrabberFront.setPosition(front?brickGrabberFront_Close:brickGrabberFront_Open);
-        brickGrabberRear.setPosition(rear?brickGrabberRear_Close:brickGrabberRear_Open);
+    public void grabBrick(boolean front, boolean rear) {
+        brickGrabberFront.setPosition(front ? brickGrabberFront_Close : brickGrabberFront_Open);
+        brickGrabberRear.setPosition(rear ? brickGrabberRear_Close : brickGrabberRear_Open);
     }
-    public void grabFoundation(boolean grab)
-    {
-        foundationHookL.setPosition(grab?foundationHookL_Close:foundationHookL_Open);
-        foundationHookR.setPosition(grab?foundationHookR_Close:foundationHookR_Open);
+
+    public void grabFoundation(boolean grab) {
+        foundationHookL.setPosition(grab ? foundationHookL_Close : foundationHookL_Open);
+        foundationHookR.setPosition(grab ? foundationHookR_Close : foundationHookR_Open);
     }
-    void stopMoveMotors()
-    {
-        driveMotorPowers(0,0,0,0);
+
+    void stopMoveMotors() {
+        driveMotorPowers(0, 0, 0, 0);
     }
-    private void driveMotorPowers(double frontLeft, double frontRight, double rearLeft, double rearRight)
-    {
-        driveFrontLeft.setPower(clip(abs(frontLeft), minDriveSpeed, maxDriveSpeed)*signum(frontLeft));
-        driveFrontRight.setPower(clip(abs(frontRight), minDriveSpeed, maxDriveSpeed)*signum(frontRight));
-        driveRearLeft.setPower(clip(abs(rearLeft), minDriveSpeed, maxDriveSpeed)*signum(rearLeft));
-        driveRearRight.setPower(clip(abs(rearRight), minDriveSpeed, maxDriveSpeed)*signum(rearRight));
+
+    private void driveMotorPowers(double frontLeft, double frontRight, double rearLeft, double rearRight) {
+        driveFrontLeft.setPower(clip(abs(frontLeft), minDriveSpeed, maxDriveSpeed) * signum(frontLeft));
+        driveFrontRight.setPower(clip(abs(frontRight), minDriveSpeed, maxDriveSpeed) * signum(frontRight));
+        driveRearLeft.setPower(clip(abs(rearLeft), minDriveSpeed, maxDriveSpeed) * signum(rearLeft));
+        driveRearRight.setPower(clip(abs(rearRight), minDriveSpeed, maxDriveSpeed) * signum(rearRight));
     }
-    private void stopLiftMotors()
-    {
-        liftMotorPowers(0,0);
+
+    private void stopLiftMotors() {
+        liftMotorPowers(0, 0);
     }
-    public void liftMotorPowers(double left, double right)
-    {
+
+    public void liftMotorPowers(double left, double right) {
         liftL.setPower(left);
         liftR.setPower(right);
     }
 
-    private void stopIntakeMotors()
-    {
-        intakeMotorPowers(0,0);
+    private void stopIntakeMotors() {
+        intakeMotorPowers(0, 0);
     }
 
-    public void intakeMotorPowers(double powerL, double powerR)
-    {
+    public void intakeMotorPowers(double powerL, double powerR) {
         odometerYintakeR.setPower(powerR);
         odometerXintakeL.setPower(powerL);
     }
 
-    private void stopSlideMotors()
-    {
+    private void stopSlideMotors() {
         slideMotorPowers(0);
     }
 
-    private void slideMotorPowers(double power)
-    {
+    private void slideMotorPowers(double power) {
         slideFront.setPower(power);
         slideRear.setPower(power);
     }
 
-    void tankTurn(double speed)
-    {
+    void tankTurn(double speed) {
         tankMove(speed, -speed);
     }
 
-    void tankMove(double speed)
-    {
+    void tankMove(double speed) {
         tankMove(speed, speed);
     }
 
 
-    private void tankMove(double speedL, double speedR)
-    {
+    private void tankMove(double speedL, double speedR) {
         speedL = Range.clip(speedL, -1.0, 1.0);
         speedR = Range.clip(speedR, -1.0, 1.0);
 
         driveMotorPowers(speedL, speedR, speedL, speedR);
     }
 
-    void omniMove(double heading, double speed, double turn)
-    {
+    void omniMove(double heading, double speed, double turn) {
         heading = Math.toRadians(heading);
-        turn  = Range.clip(turn, -1.0, 1.0);
+        turn = Range.clip(turn, -1.0, 1.0);
         speed = Range.clip(speed, -1.0, 1.0);
-        double frontways = speed*cos(heading);
-        double sideways  = speed*sin(heading);
+        double frontways = speed * cos(heading);
+        double sideways = speed * sin(heading);
 
-        omniMoveYX(frontways,sideways,turn);
+        omniMoveYX(frontways, sideways, turn);
     }
-    void omniMove(double heading, double speed)
-    {
+
+    void omniMove(double heading, double speed) {
         heading = Math.toRadians(heading);
         speed = Range.clip(speed, -1.0, 1.0);
-        omniMoveYX(speed*cos(heading),speed*sin(heading));
+        omniMoveYX(speed * cos(heading), speed * sin(heading));
     }
-    void omniMoveYX(double frontways, double sideways)
-    {
 
-        double LFRR = frontways+sideways;
-        double RFLR = frontways-sideways;
+    void omniMoveYX(double frontways, double sideways) {
 
-        if(abs(LFRR)>1.0 || abs(RFLR) > 1.0)
-        {
+        double LFRR = frontways + sideways;
+        double RFLR = frontways - sideways;
+
+        if (abs(LFRR) > 1.0 || abs(RFLR) > 1.0) {
             LFRR /= max(abs(LFRR), abs(RFLR));
             RFLR /= max(abs(LFRR), abs(RFLR));
         }
 
-        driveMotorPowers(LFRR,RFLR,RFLR,LFRR);
+        driveMotorPowers(LFRR, RFLR, RFLR, LFRR);
 
     }
-    void omniMoveYX(double frontways, double sideways, double turn){
+
+    void omniMoveYX(double frontways, double sideways, double turn) {
 
 
+        double FrontLeft = frontways + sideways + turn;
+        double FrontRight = frontways - sideways - turn;
+        double RearLeft = frontways - sideways + turn;
+        double RearRight = frontways + sideways - turn;
 
-        double FrontLeft  = frontways+sideways+turn;
-        double FrontRight = frontways-sideways-turn;
-        double RearLeft   = frontways-sideways+turn;
-        double RearRight  = frontways+sideways-turn;
-
-        if(abs(FrontLeft)>1.0 || abs(FrontRight) > 1.0 || abs(RearLeft) > 1.0 || abs(RearRight) > 1.0)
-        {
-            double maxabs = max(max(abs(FrontLeft), abs(FrontRight)),max(abs(RearLeft), abs(RearRight)));
-            FrontLeft  /= maxabs;
+        if (abs(FrontLeft) > 1.0 || abs(FrontRight) > 1.0 || abs(RearLeft) > 1.0 || abs(RearRight) > 1.0) {
+            double maxabs = max(max(abs(FrontLeft), abs(FrontRight)), max(abs(RearLeft), abs(RearRight)));
+            FrontLeft /= maxabs;
             FrontRight /= maxabs;
-            RearLeft   /= maxabs;
-            RearRight  /= maxabs;
+            RearLeft /= maxabs;
+            RearRight /= maxabs;
         }
 
 
-        driveMotorPowers(FrontLeft,FrontRight,RearLeft,RearRight);
+        driveMotorPowers(FrontLeft, FrontRight, RearLeft, RearRight);
     }
 
-    public void setMaxDriveSpeed(double value)
-    {
-        maxDriveSpeed = clip(abs(value),0,1);
+    public void setMaxDriveSpeed(double value) {
+        maxDriveSpeed = clip(abs(value), 0, 1);
     }
 
-    public void setMinDriveSpeed(double value)
-    {
-        minDriveSpeed = clip(abs(value),0,1);
+    public void setMinDriveSpeed(double value) {
+        minDriveSpeed = clip(abs(value), 0, 1);
     }
 
-    public static double angleTransformPI(double angle)
-    {
-        while (angle>PI) angle -= PI*2;
-        while (angle<-PI) angle += PI*2;
+    public static double angleTransformPI(double angle) {
+        while (angle > PI) angle -= PI * 2;
+        while (angle < -PI) angle += PI * 2;
         return angle;
     }
 
+
+    Odometry odometry = new Odometry();
+
     public class Odometry extends Thread
     {
-        HardwareMap hwMap =  null;
+        HardwareMap hwMap = null;
         ExpansionHubMotor odometerYL, odometerYR, odometerX;
         RevBulkData bulkData;
         ExpansionHubEx expansionHub;
         Point worldPosition;
         double worldHeading;
 
+        ElapsedTime uptime;
+
+        private boolean doStop = false;
+
+        public synchronized void doStop() {
+            this.doStop = true;
+        }
+
+        private synchronized boolean keepRunning() {
+            return !this.doStop;
+        }
+
+        @Override
         public void run() {
-            stopOdometry = false;
+            uptime.reset();
             bulkData = expansionHub.getBulkInputData();
-            double Y_old = (double)(bulkData.getMotorCurrentPosition(odometerYL)+bulkData.getMotorCurrentPosition(odometerYR))/2.0;
-            double X_old = (double)bulkData.getMotorCurrentPosition(odometerX);
-            while (opModeIsActive() && !stopOdometry) {
+            double Y_old = (double) (bulkData.getMotorCurrentPosition(odometerYL) + bulkData.getMotorCurrentPosition(odometerYR)) / 2.0;
+            double X_old = (double) bulkData.getMotorCurrentPosition(odometerX);
+            while (opModeIsActive() && keepRunning()) {
+
+
                 bulkData = expansionHub.getBulkInputData();
 
                 //Get Current Positions
-                double currentY = (double)(bulkData.getMotorCurrentPosition(odometerYL)+bulkData.getMotorCurrentPosition(odometerYR))/2.0;
-                double currentX = (double)bulkData.getMotorCurrentPosition(odometerX);
+                double currentY = (double) (bulkData.getMotorCurrentPosition(odometerYL) + bulkData.getMotorCurrentPosition(odometerYR)) / 2.0;
+                double currentX = (double) bulkData.getMotorCurrentPosition(odometerX);
                 double newWorldHeading = 0;
 
                 double deltaAngle = newWorldHeading - worldHeading; ////
@@ -878,14 +703,18 @@ public class WoENrobot extends LinearOpMode {
                 Y_old = currentY;
                 X_old = currentX;
                 worldHeading = newWorldHeading;
+
+                try {
+                    Thread.sleep(0);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
             }
-            if (stopOdometry)
-                stopOdometry = false;
         }
 
-        public Odometry(HardwareMap ahwMap, Point startingPoint, double startingHeading) {
+        public Odometry(HardwareMap ahwMap) {
             hwMap = ahwMap;
-            worldHeading = toRadians(startingHeading);
             expansionHub = hwMap.get(ExpansionHubEx.class, "Expansion Hub 1");
             odometerYL = (ExpansionHubMotor) hardwareMap.dcMotor.get("odometerYLauncherL");
             odometerYR = (ExpansionHubMotor) hardwareMap.dcMotor.get("odometerYLauncherR");
@@ -898,7 +727,7 @@ public class WoENrobot extends LinearOpMode {
          * @return global x coordinate
          */
         public Point getRobotCoordinate() {
-            Point centeredPoint = WorldPosition;
+            Point centeredPoint = worldPosition;
             centeredPoint.y += 0;
             centeredPoint.x += 0;
             return centeredPoint;
@@ -912,8 +741,8 @@ public class WoENrobot extends LinearOpMode {
 
         private double getRobotHeading(AngleUnit unit) {
             double angle = 0;
-            if(unit == AngleUnit.DEGREES)
-            angle = Math.toDegrees(angle);
+            if (unit == AngleUnit.DEGREES)
+                angle = Math.toDegrees(angle);
             return angle;
         }
     }
