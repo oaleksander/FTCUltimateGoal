@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -15,6 +15,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 
+import org.firstinspires.ftc.teamcode.math.Pose2D;
 import org.openftc.revextensions2.ExpansionHubEx;
 import org.openftc.revextensions2.ExpansionHubMotor;
 import org.openftc.revextensions2.RevBulkData;
@@ -31,7 +32,6 @@ import static java.lang.Math.signum;
 import static java.lang.Math.sin;
 import static java.lang.Math.toDegrees;
 import static java.lang.Math.toRadians;
-import static org.firstinspires.ftc.teamcode.WoENmath.cosFromSin;
 
 public class WoENrobot extends LinearOpMode {
 
@@ -39,13 +39,13 @@ public class WoENrobot extends LinearOpMode {
     /* Public OpMode members. */
     public ElapsedTime Runtime = new ElapsedTime();
     public static boolean robotIsInitialized = false;
-    public static DcMotor driveFrontLeft = null;
-    public static DcMotor driveFrontRight = null;
-    public static DcMotor driveRearLeft = null;
-    public static DcMotor driveRearRight = null;
+    public static DcMotorEx driveFrontLeft = null;
+    public static DcMotorEx driveFrontRight = null;
+    public static DcMotorEx driveRearLeft = null;
+    public static DcMotorEx driveRearRight = null;
 
-    public static DcMotor liftL = null;
-    public static DcMotor liftR = null;
+    public static DcMotorEx liftL = null;
+    public static DcMotorEx liftR = null;
 
     public static CRServo slideFront = null;
     public static CRServo slideRear = null;
@@ -56,8 +56,8 @@ public class WoENrobot extends LinearOpMode {
     public static Servo foundationHookL = null;
     public static Servo foundationHookR = null;
 
-    public static DcMotor odometerYintakeR = null;
-    public static DcMotor odometerXintakeL = null;
+    public static DcMotorEx odometerYintakeR = null;
+    public static DcMotorEx odometerXintakeL = null;
 
     public static BNO055IMU imuLeft;
     public static BNO055IMU imuRight;
@@ -123,7 +123,7 @@ public class WoENrobot extends LinearOpMode {
 
     private double robotEstimatedHeading;
     private double robotGlobalXCoordinatePosition = 0, robotGlobalYCoordinatePosition = 0;
-    private Point WorldPosition;
+    private Pose2D WorldPosition;
     private float integratedAngle = 0;
 
     private boolean stopOdometry = false;
@@ -332,13 +332,13 @@ public class WoENrobot extends LinearOpMode {
             imuLeft = hardwareMap.get(BNO055IMU.class, "imuLeft");
             imuRight = hardwareMap.get(BNO055IMU.class, "imuRight");
 
-            driveFrontLeft = hardwareMap.get(DcMotor.class, "driveFrontLeft");
-            driveFrontRight = hardwareMap.get(DcMotor.class, "driveFrontRight");
-            driveRearLeft = hardwareMap.get(DcMotor.class, "driveRearLeft");
-            driveRearRight = hardwareMap.get(DcMotor.class, "driveRearRight");
+            driveFrontLeft = hardwareMap.get(DcMotorEx.class, "driveFrontLeft");
+            driveFrontRight = hardwareMap.get(DcMotorEx.class, "driveFrontRight");
+            driveRearLeft = hardwareMap.get(DcMotorEx.class, "driveRearLeft");
+            driveRearRight = hardwareMap.get(DcMotorEx.class, "driveRearRight");
 
-            liftL = hardwareMap.get(DcMotor.class, "liftL");
-            liftR = hardwareMap.get(DcMotor.class, "liftR");
+            liftL = hardwareMap.get(DcMotorEx.class, "liftL");
+            liftR = hardwareMap.get(DcMotorEx.class, "liftR");
 
             slideFront = hardwareMap.get(CRServo.class, "slideFront");
             slideRear = hardwareMap.get(CRServo.class, "slideRear");
@@ -349,8 +349,8 @@ public class WoENrobot extends LinearOpMode {
             foundationHookL = hardwareMap.get(Servo.class, "foundationHookL");
             foundationHookR = hardwareMap.get(Servo.class, "foundationHookR");
 
-            odometerYintakeR = hardwareMap.get(DcMotor.class, "odometerYintakeR");
-            odometerXintakeL = hardwareMap.get(DcMotor.class, "odometerXintakeL");
+            odometerYintakeR = hardwareMap.get(DcMotorEx.class, "odometerYintakeR");
+            odometerXintakeL = hardwareMap.get(DcMotorEx.class, "odometerXintakeL");
 
             limitSwitchFront = hardwareMap.get(DigitalChannel.class, "limitSwitchFront");
             limitSwitchRear = hardwareMap.get(DigitalChannel.class, "limitSwitchRear");
@@ -359,13 +359,13 @@ public class WoENrobot extends LinearOpMode {
             imuLeft = hardwareMap.get(BNO055IMU.class, "imuLeft");
             imuRight = hardwareMap.get(BNO055IMU.class, "imuRight");
 
-            driveFrontLeft = hardwareMap.get(DcMotor.class, "driveFrontLeft");
-            driveFrontRight = hardwareMap.get(DcMotor.class, "driveFrontRight");
-            driveRearLeft = hardwareMap.get(DcMotor.class, "driveRearLeft");
-            driveRearRight = hardwareMap.get(DcMotor.class, "driveRearRight");
+            driveFrontLeft = hardwareMap.get(DcMotorEx.class, "driveFrontLeft");
+            driveFrontRight = hardwareMap.get(DcMotorEx.class, "driveFrontRight");
+            driveRearLeft = hardwareMap.get(DcMotorEx.class, "driveRearLeft");
+            driveRearRight = hardwareMap.get(DcMotorEx.class, "driveRearRight");
 
-            liftL = hardwareMap.get(DcMotor.class, "liftL");
-            liftR = hardwareMap.get(DcMotor.class, "liftR");
+            liftL = hardwareMap.get(DcMotorEx.class, "liftL");
+            liftR = hardwareMap.get(DcMotorEx.class, "liftR");
 
             slideFront = hardwareMap.get(CRServo.class, "slideFront");
             slideRear = hardwareMap.get(CRServo.class, "slideRear");
@@ -376,8 +376,8 @@ public class WoENrobot extends LinearOpMode {
             foundationHookL = hardwareMap.get(Servo.class, "foundationHookL");
             foundationHookR = hardwareMap.get(Servo.class, "foundationHookR");
 
-            odometerYintakeR = hardwareMap.get(DcMotor.class, "odometerYintakeR");
-            odometerXintakeL = hardwareMap.get(DcMotor.class, "odometerXintakeL");
+            odometerYintakeR = hardwareMap.get(DcMotorEx.class, "odometerYintakeR");
+            odometerXintakeL = hardwareMap.get(DcMotorEx.class, "odometerXintakeL");
 
             limitSwitchFront = hardwareMap.get(DigitalChannel.class, "limitSwitchFront");
             limitSwitchRear = hardwareMap.get(DigitalChannel.class, "limitSwitchRear");
@@ -405,40 +405,40 @@ public class WoENrobot extends LinearOpMode {
     }
 
     public void setMotorDirections() {
-        driveFrontLeft.setDirection(DcMotor.Direction.FORWARD);
-        driveFrontRight.setDirection(DcMotor.Direction.REVERSE);
-        driveRearLeft.setDirection(DcMotor.Direction.FORWARD);
-        driveRearRight.setDirection(DcMotor.Direction.REVERSE);
+        driveFrontLeft.setDirection(DcMotorEx.Direction.FORWARD);
+        driveFrontRight.setDirection(DcMotorEx.Direction.REVERSE);
+        driveRearLeft.setDirection(DcMotorEx.Direction.FORWARD);
+        driveRearRight.setDirection(DcMotorEx.Direction.REVERSE);
 
-        liftL.setDirection(DcMotor.Direction.FORWARD);
-        liftR.setDirection(DcMotor.Direction.REVERSE);
+        liftL.setDirection(DcMotorEx.Direction.FORWARD);
+        liftR.setDirection(DcMotorEx.Direction.REVERSE);
 
-        slideFront.setDirection(DcMotor.Direction.FORWARD);
-        slideRear.setDirection(DcMotor.Direction.REVERSE);
+        slideFront.setDirection(DcMotorEx.Direction.FORWARD);
+        slideRear.setDirection(DcMotorEx.Direction.REVERSE);
 
-        odometerYintakeR.setDirection(DcMotor.Direction.REVERSE);
-        odometerXintakeL.setDirection(DcMotor.Direction.FORWARD);
+        odometerYintakeR.setDirection(DcMotorEx.Direction.REVERSE);
+        odometerXintakeL.setDirection(DcMotorEx.Direction.FORWARD);
     }
 
     public void setMotor0PowerBehaviors() {
         if (drive0Brake) {
-            driveFrontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            driveFrontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            driveRearLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            driveRearRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            driveFrontLeft.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+            driveFrontRight.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+            driveRearLeft.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+            driveRearRight.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         } else {
-            driveFrontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-            driveFrontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-            driveRearLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-            driveRearRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+            driveFrontLeft.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+            driveFrontRight.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+            driveRearLeft.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+            driveRearRight.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
 
         }
 
-        liftL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        liftR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        liftL.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        liftR.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
-        odometerYintakeR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        odometerXintakeL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        odometerYintakeR.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+        odometerXintakeL.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
 
     }
 
@@ -466,32 +466,32 @@ public class WoENrobot extends LinearOpMode {
     }
 
     private void resetOdometryEncoders() {
-        driveFrontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        driveFrontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        driveRearLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        driveRearRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        driveFrontLeft.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        driveFrontRight.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        driveRearLeft.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        driveRearRight.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
 
-        driveFrontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        driveFrontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        driveRearLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        driveRearRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        driveFrontLeft.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        driveFrontRight.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        driveRearLeft.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        driveRearRight.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
     }
 
     private void resetLiftEncoders() {
-        liftL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        liftR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        liftL.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        liftR.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
 
-        liftL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        liftR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        liftL.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        liftR.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
     }
 
     void resetDriveEncoders() {
-        odometerYintakeR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        odometerXintakeL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        odometerYintakeR.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        odometerXintakeL.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
 
-        odometerYintakeR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        odometerXintakeL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        odometerYintakeR.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        odometerXintakeL.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     public void stopAllMotors() {
@@ -631,121 +631,6 @@ public class WoENrobot extends LinearOpMode {
 
 
     Odometry odometry = new Odometry();
-
-    public class Odometry extends Thread
-    {
-        HardwareMap hwMap = null;
-        ExpansionHubMotor odometerYL, odometerYR, odometerX;
-        RevBulkData bulkData;
-        ExpansionHubEx expansionHub;
-        Point worldPosition;
-        double worldHeading;
-
-        ElapsedTime uptime;
-
-        private boolean doStop = false;
-
-        public synchronized void doStop() {
-            this.doStop = true;
-        }
-
-        private synchronized boolean keepRunning() {
-            return !this.doStop;
-        }
-
-        @Override
-        public void run() {
-            uptime.reset();
-            bulkData = expansionHub.getBulkInputData();
-            double Y_old = (double) (bulkData.getMotorCurrentPosition(odometerYL) + bulkData.getMotorCurrentPosition(odometerYR)) / 2.0;
-            double X_old = (double) bulkData.getMotorCurrentPosition(odometerX);
-            while (opModeIsActive() && keepRunning()) {
-
-
-                bulkData = expansionHub.getBulkInputData();
-
-                //Get Current Positions
-                double currentY = (double) (bulkData.getMotorCurrentPosition(odometerYL) + bulkData.getMotorCurrentPosition(odometerYR)) / 2.0;
-                double currentX = (double) bulkData.getMotorCurrentPosition(odometerX);
-                double newWorldHeading = 0;
-
-                double deltaAngle = newWorldHeading - worldHeading; ////
-
-                double deltaYodometer = currentY - Y_old;
-                double deltaXodometer = currentX - X_old;
-
-                double deltaPositionY = deltaYodometer;
-                double deltaPositionX = deltaXodometer;
-
-                if (deltaAngle != 0) {
-
-
-                    double sinDeltaAngle = sin(deltaAngle);
-                    double cosDeltaAngle = cosFromSin(sinDeltaAngle, deltaAngle);
-
-                    double yOdometerArcRadius = deltaYodometer / deltaAngle;
-                    double xOdometerArcRadius = deltaXodometer / deltaAngle;
-
-                    double yOdometerComponent = sinDeltaAngle * yOdometerArcRadius * cosDeltaAngle;
-                    double xOdometerComponent = sinDeltaAngle * xOdometerArcRadius * sinDeltaAngle;
-
-                    deltaPositionY = yOdometerComponent - xOdometerComponent;
-                    deltaPositionX = yOdometerComponent + xOdometerComponent;
-
-                }
-
-                double sinWorldAngle = sin(worldHeading);
-                double cosWorldAngle = cosFromSin(sinWorldAngle, worldHeading);
-
-                worldPosition.y += deltaPositionY * cosWorldAngle - deltaPositionX * sinWorldAngle;
-                worldPosition.x += deltaPositionY * sinWorldAngle + deltaPositionX * cosWorldAngle;
-
-                Y_old = currentY;
-                X_old = currentX;
-                worldHeading = newWorldHeading;
-
-                try {
-                    Thread.sleep(0);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
-            }
-        }
-
-        public Odometry(HardwareMap ahwMap) {
-            hwMap = ahwMap;
-            expansionHub = hwMap.get(ExpansionHubEx.class, "Expansion Hub 1");
-            odometerYL = (ExpansionHubMotor) hardwareMap.dcMotor.get("odometerYLauncherL");
-            odometerYR = (ExpansionHubMotor) hardwareMap.dcMotor.get("odometerYLauncherR");
-            odometerX  = (ExpansionHubMotor) hardwareMap.dcMotor.get("odometerXRingIntake");
-        }
-
-        /**
-         * Returns the robot's global x coordinate
-         *
-         * @return global x coordinate
-         */
-        public Point getRobotCoordinate() {
-            Point centeredPoint = worldPosition;
-            centeredPoint.y += 0;
-            centeredPoint.x += 0;
-            return centeredPoint;
-        }
-
-        /**
-         * Returns the robot's global orientation
-         *
-         * @return global orientation
-         */
-
-        private double getRobotHeading(AngleUnit unit) {
-            double angle = 0;
-            if (unit == AngleUnit.DEGREES)
-                angle = Math.toDegrees(angle);
-            return angle;
-        }
-    }
 
 }
 

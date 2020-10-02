@@ -1,134 +1,133 @@
 package org.firstinspires.ftc.teamcode;
-
-import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.teamcode.math.MathUtil;
+import org.firstinspires.ftc.teamcode.math.Pose2D;
 import org.openftc.revextensions2.ExpansionHubEx;
 import org.openftc.revextensions2.ExpansionHubMotor;
 import org.openftc.revextensions2.RevBulkData;
 
 import static java.lang.Math.sin;
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
-import static org.firstinspires.ftc.teamcode.WoENmath.cosFromSin;
+import static org.firstinspires.ftc.teamcode.math.MathUtil.cosFromSin;
 
 
-    public class Odometry extends Thread
-    {
-        HardwareMap hwMap = null;
-        ExpansionHubMotor odometerYL, odometerYR, odometerX;
-        RevBulkData bulkData;
-        ExpansionHubEx expansionHub;
-        Point worldPosition;
-        double worldHeading;
+public class Odometry extends Thread
+{
+    ExpansionHubMotor odometerYL, odometerYR, odometerX;
+    ExpansionHubEx expansionHub;
+    RevBulkData bulkData;
+    Pose2D worldPosition;
 
-        ElapsedTime uptime;
+    ElapsedTime uptime;
 
-        private boolean doStop = false;
+    private boolean doStop = false;
 
-        public synchronized void doStop() {
-            this.doStop = true;
-        }
+    public synchronized void doStop() {
+        this.doStop = true;
+    }
 
-        private synchronized boolean keepRunning() {
-            return !this.doStop;
-        }
+    private synchronized boolean keepRunning() {
+        return !this.doStop;
+    }
 
-        @Override
-        public void run() {
-            uptime.reset();
+    @Override
+    public void run() {
+        uptime.reset();
+        bulkData = expansionHub.getBulkInputData();
+        double Y_old = (double) (bulkData.getMotorCurrentPosition(odometerYL) + bulkData.getMotorCurrentPosition(odometerYR)) / 2.0;
+        double X_old = (double) bulkData.getMotorCurrentPosition(odometerX);
+        while (keepRunning()) {
+
+
             bulkData = expansionHub.getBulkInputData();
-            double Y_old = (double) (bulkData.getMotorCurrentPosition(odometerYL) + bulkData.getMotorCurrentPosition(odometerYR)) / 2.0;
-            double X_old = (double) bulkData.getMotorCurrentPosition(odometerX);
-            while (opModeIsActive() && keepRunning()) {
 
+            //Get Current Positions
+            double currentY = (double) (bulkData.getMotorCurrentPosition(odometerYL) + bulkData.getMotorCurrentPosition(odometerYR)) / 2.0;
+            double currentX = (double) bulkData.getMotorCurrentPosition(odometerX);
+            double newWorldHeading = 0;
 
-                bulkData = expansionHub.getBulkInputData();
+            double deltaAngle = newWorldHeading - worldPosition.heading; ////
 
-                //Get Current Positions
-                double currentY = (double) (bulkData.getMotorCurrentPosition(odometerYL) + bulkData.getMotorCurrentPosition(odometerYR)) / 2.0;
-                double currentX = (double) bulkData.getMotorCurrentPosition(odometerX);
-                double newWorldHeading = 0;
+            double deltaYodometer = currentY - Y_old;
+            double deltaXodometer = currentX - X_old;
 
-                double deltaAngle = newWorldHeading - worldHeading; ////
+            double deltaPositionY = deltaYodometer;
+            double deltaPositionX = deltaXodometer;
 
-                double deltaYodometer = currentY - Y_old;
-                double deltaXodometer = currentX - X_old;
+            if (deltaAngle != 0) {   //if deltaAngle = 0 radius of the arc is = Inf which causes model degeneracy
 
-                double deltaPositionY = deltaYodometer;
-                double deltaPositionX = deltaXodometer;
+                double sinDeltaAngle = sin(deltaAngle); //will calculate sin and cos only once to optimize resources
+                double cosDeltaAngle = MathUtil.cosFromSin(sinDeltaAngle, deltaAngle);
 
-                if (deltaAngle != 0) {
+                double yOdometerArcRadius = deltaYodometer / deltaAngle; //calculate arc in which robot had travelled
+                double xOdometerArcRadius = deltaXodometer / deltaAngle; //for each axis
 
+                double yOdometerComponent = sinDeltaAngle * yOdometerArcRadius * cosDeltaAngle; //complex analytical geometry kicks in
+                double xOdometerComponent = sinDeltaAngle * xOdometerArcRadius * sinDeltaAngle;
 
-                    double sinDeltaAngle = sin(deltaAngle);
-                    double cosDeltaAngle = cosFromSin(sinDeltaAngle, deltaAngle);
-
-                    double yOdometerArcRadius = deltaYodometer / deltaAngle;
-                    double xOdometerArcRadius = deltaXodometer / deltaAngle;
-
-                    double yOdometerComponent = sinDeltaAngle * yOdometerArcRadius * cosDeltaAngle;
-                    double xOdometerComponent = sinDeltaAngle * xOdometerArcRadius * sinDeltaAngle;
-
-                    deltaPositionY = yOdometerComponent - xOdometerComponent;
-                    deltaPositionX = yOdometerComponent + xOdometerComponent;
-
-                }
-
-                double sinWorldAngle = sin(worldHeading);
-                double cosWorldAngle = cosFromSin(sinWorldAngle, worldHeading);
-
-                worldPosition.y += deltaPositionY * cosWorldAngle - deltaPositionX * sinWorldAngle;
-                worldPosition.x += deltaPositionY * sinWorldAngle + deltaPositionX * cosWorldAngle;
-
-                Y_old = currentY;
-                X_old = currentX;
-                worldHeading = newWorldHeading;
-
-                try {
-                    Thread.sleep(0);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                deltaPositionY = yOdometerComponent - xOdometerComponent; //position change relative to the starting point (old)
+                deltaPositionX = yOdometerComponent + xOdometerComponent;
 
             }
-        }
 
-        public Odometry(HardwareMap ahwMap) {
-            hwMap = ahwMap;
-            expansionHub = hwMap.get(ExpansionHubEx.class, "Expansion Hub 1");
-            odometerYL = (ExpansionHubMotor) hardwareMap.dcMotor.get("odometerYLauncherL");
-            odometerYR = (ExpansionHubMotor) hardwareMap.dcMotor.get("odometerYLauncherR");
-            odometerX  = (ExpansionHubMotor) hardwareMap.dcMotor.get("odometerXRingIntake");
-        }
+            double sinWorldAngle = sin(worldPosition.heading);
+            double cosWorldAngle = cosFromSin(sinWorldAngle, worldPosition.heading);
 
-        /**
-         * Returns the robot's global x coordinate
-         *
-         * @return global x coordinate
-         */
-        public Point getRobotCoordinate() {
-            Point centeredPoint = worldPosition;
-            centeredPoint.y += 0;
-            centeredPoint.x += 0;
-            return centeredPoint;
-        }
 
-        /**
-         * Returns the robot's global orientation
-         *
-         * @return global orientation
-         */
+            worldPosition.y += deltaPositionY * cosWorldAngle - deltaPositionX * sinWorldAngle; //rotate delta position according to the old robot heading
+            worldPosition.x += deltaPositionY * sinWorldAngle + deltaPositionX * cosWorldAngle;
+            worldPosition.heading = newWorldHeading;
 
-        private double getRobotHeading(AngleUnit unit) {
-            double angle = 0;
-            if (unit == AngleUnit.DEGREES)
-                angle = Math.toDegrees(angle);
-            return angle;
+            Y_old = currentY;
+            X_old = currentX;
+
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
         }
     }
 
+    /**
+     * Class initializer
+     *
+     * @param expansionHub ExpansionHubEx to which odometers are attached
+     * @param odometerYL Left Y-axis encoder (looking from the top)
+     * @param odometerYR Right Y-axis encoder (looking from the top)
+     * @param odometerX X-axis encoder
+     *
+     */
+
+    public Odometry(ExpansionHubEx expansionHub, ExpansionHubMotor odometerYL, ExpansionHubMotor odometerYR, ExpansionHubMotor odometerX)
+    {
+        this.expansionHub = expansionHub;
+        this.odometerYL = odometerYL;
+        this.odometerYR = odometerYR;
+        this.odometerX = odometerX;
+    }
+
+    /**
+     * Returns the robot's global coordinate
+     *
+     * @return robot position in (x,y,heading) form
+     */
+    public Pose2D getRobotCoordinate() {
+        return worldPosition;
+    }
+
+    /**
+     * Returns the robot's global orientation
+     *
+     * @return global orientation
+     */
+
+    private double getRobotHeading(AngleUnit unit) {
+        double angle = 0;
+        if (unit == AngleUnit.DEGREES)
+            angle = Math.toDegrees(angle);
+        return angle;
+    }
 }
