@@ -14,7 +14,7 @@ public class MathUtil {
         }
     }
 
-    public static double angleTransform(double angle)
+    public static double angleWrap (double angle)
     {
         while (angle>PI) angle -= PI*2;
         while (angle<-PI) angle += PI*2;
