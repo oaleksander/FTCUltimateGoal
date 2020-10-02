@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.robot;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -110,11 +110,11 @@ public class Odometry extends Thread
     }
 
     /**
-     * Returns the robot's global coordinate
+     * Returns the robot's global coordinates
      *
      * @return robot position in (x,y,heading) form
      */
-    public Pose2D getRobotCoordinate() {
+    public Pose2D getRobotCoordinates() {
         return worldPosition;
     }
 
