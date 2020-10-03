@@ -27,5 +27,7 @@ dependencies {
 }
 
 dependencies {
+
+    implementation 'org.jetbrains:annotations-java5:15.0'
     implementation 'org.openftc:rev-extensions-2:1.2'
 }
