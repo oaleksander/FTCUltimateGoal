@@ -1,7 +1,11 @@
 package org.firstinspires.ftc.teamcode.robot;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpModeManager;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.internal.opmode.OpModeManagerImpl;
 import org.firstinspires.ftc.teamcode.math.MathUtil;
 import org.firstinspires.ftc.teamcode.math.Pose2D;
 import org.openftc.revextensions2.ExpansionHubEx;
@@ -94,19 +98,21 @@ public class Odometry extends Thread
     /**
      * Class initializer
      *
-     * @param expansionHub ExpansionHubEx to which odometers are attached
-     * @param odometerYL Left Y-axis encoder (looking from the top)
-     * @param odometerYR Right Y-axis encoder (looking from the top)
-     * @param odometerX X-axis encoder
-     *
      */
 
-    public Odometry(ExpansionHubEx expansionHub, ExpansionHubMotor odometerYL, ExpansionHubMotor odometerYR, ExpansionHubMotor odometerX)
+    public Odometry()
     {
-        this.expansionHub = expansionHub;
-        this.odometerYL = odometerYL;
-        this.odometerYR = odometerYR;
-        this.odometerX = odometerX;
+    }
+
+    public void initialize() {
+        assignNames();
+    }
+
+    private void assignNames() {
+        expansionHub = WoENrobot.getInstance().opMode.hardwareMap.get(ExpansionHubEx.class, "Expansion Hub 2");
+        odometerYL = (ExpansionHubMotor) WoENrobot.getInstance().opMode.hardwareMap.dcMotor.get("odometerYL");
+        odometerYR = (ExpansionHubMotor) WoENrobot.getInstance().opMode.hardwareMap.dcMotor.get("odometerYL");
+        odometerX = (ExpansionHubMotor) WoENrobot.getInstance().opMode.hardwareMap.dcMotor.get("odometerX");
     }
 
     /**

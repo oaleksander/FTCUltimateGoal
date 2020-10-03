@@ -1,37 +1,47 @@
 package org.firstinspires.ftc.teamcode.math;
 
+import org.jetbrains.annotations.NotNull;
+
+import static org.firstinspires.ftc.teamcode.math.MathUtil.angleWrap;
+
 public class Pose2D extends Vector2D implements Cloneable {
-    public double heading;
+    public double heading = 0;
 
     public Pose2D(double x, double y, double heading) {
         super(x, y);
-        this.heading = heading;
+        this.heading = angleWrap(heading);
     }
 
-    public Pose2D(Vector2D p, double heading) {
+    public Pose2D(@NotNull Vector2D p, double heading) {
         this(p.x, p.y, heading);
     }
 
-    public Pose2D add(Pose2D p2) {
+    public Pose2D add(@NotNull Pose2D p2) {
         return new Pose2D(x + p2.x, y + p2.y, heading + p2.heading);
     }
-    public Pose2D multiply(Pose2D p2) {
+    public Pose2D substract(@NotNull Pose2D p2) {
+        return new Pose2D(x - p2.x, y - p2.y, heading - p2.heading);
+    }
+    public Pose2D multiply(@NotNull Pose2D p2) {
         return new Pose2D(x * p2.x, y * p2.y, heading * p2.heading);
     }
-    public Pose2D divideBy(Pose2D p2) {
+    public Pose2D divideByPose(@NotNull Pose2D p2) {
         return new Pose2D(x / p2.x, y / p2.y, heading / p2.heading);
     }
-    public Pose2D minus(Pose2D p2) {
+    public Pose2D divideByDouble(@NotNull double d) {
+        return new Pose2D(x / d, y / d, heading / d);
+    }
+    public Pose2D minus(@org.jetbrains.annotations.NotNull Pose2D p2) {
         return new Pose2D(x - p2.x, y - p2.y, heading - p2.heading);
     }
     public Pose2D scale(double d) {return new Pose2D(x * d, y * d, heading * d);}
-    public void clampAbs(Pose2D p2) {
+    public void clampAbs(@NotNull Pose2D p2) {
         x = Math.copySign(minAbs(x, p2.x), x);
         y = Math.copySign(minAbs(y, p2.y), y);
         heading = Math.copySign(minAbs(heading, p2.heading), heading);
     }
 
-    public void applyFriction(Pose2D friction) {
+    public void applyFriction(@NotNull Pose2D friction) {
         x = reduceUpToZero(x, friction.x);
         y = reduceUpToZero(y, friction.y);
         heading = reduceUpToZero(heading, friction.heading);
