@@ -1,7 +1,9 @@
 package org.firstinspires.ftc.teamcode.robot;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
@@ -73,10 +75,10 @@ public class Drivetrain {
     }
 
     private void setMotorDirections() {
-        driveFrontLeft.setDirection(DcMotorEx.Direction.FORWARD);
-        driveFrontRight.setDirection(DcMotorEx.Direction.REVERSE);
-        driveRearLeft.setDirection(DcMotorEx.Direction.FORWARD);
-        driveRearRight.setDirection(DcMotorEx.Direction.REVERSE);
+        driveFrontLeft.setDirection(DcMotorEx.Direction.REVERSE);
+        driveFrontRight.setDirection(DcMotorEx.Direction.FORWARD);
+        driveRearLeft.setDirection(DcMotorEx.Direction.REVERSE);
+        driveRearRight.setDirection(DcMotorEx.Direction.FORWARD);
 
     }
 
@@ -85,6 +87,14 @@ public class Drivetrain {
         driveFrontRight.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
         driveRearLeft.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
         driveRearRight.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+    }
+
+    private void resetEncoders()
+    {
+        driveFrontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        driveFrontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        driveRearLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        driveRearRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 
     public void setMaxDriveSpeed(double value) {
