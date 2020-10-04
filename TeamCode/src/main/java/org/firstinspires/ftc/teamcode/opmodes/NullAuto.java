@@ -12,8 +12,11 @@ public class NullAuto extends LinearOpMode {
     public void runOpMode() {
 
         WoENrobot.getInstance().forceInitRobot(this);
+        WoENrobot.getInstance().tFdetector.initialize();
         AutoTransitioner.transitionOnStop(this, "Teleop COMPETITION");
+        WoENrobot.getInstance().tFdetectorThread.start();
         WoENrobot.getInstance().startRobot();
+        WoENrobot.getInstance().tFdetector.retrieveResult();
 /*------------------------------------------------------------------------------------------------*/
 // AUTO CODE GOES HERE
 /*------------------------------------------------------------------------------------------------*/

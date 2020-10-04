@@ -212,7 +212,6 @@ public class Drivetrain {
             //holonomicMoveFC(control);
 
             holonomicMove(0, 0, 0);
-
             WoENrobot.getInstance().opMode.telemetry.addData("y", control.y);
             WoENrobot.getInstance().opMode.telemetry.addData("x", control.x);
             WoENrobot.getInstance().opMode.telemetry.addData("a", control.heading);
