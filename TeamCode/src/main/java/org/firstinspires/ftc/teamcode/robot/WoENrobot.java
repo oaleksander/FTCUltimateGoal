@@ -46,6 +46,9 @@ public class WoENrobot{
 
     public static Odometry odometry = new Odometry();
     public static Drivetrain drivetrain = new Drivetrain();
+    public static TFdetector tFdetector = new TFdetector();
+    public static Thread tFdetectorThread = new Thread(tFdetector);
+
 
     private double robotEstimatedHeading;
     private double robotGlobalXCoordinatePosition = 0, robotGlobalYCoordinatePosition = 0;
@@ -79,6 +82,7 @@ public class WoENrobot{
         opMode.telemetry.addData("Status", "Initializing...");
         opMode.telemetry.update();
 
+        tFdetectorThread = new Thread(tFdetector);
         drivetrain.initialize();
         //odometry.initialize();
 

@@ -23,7 +23,7 @@ public class Odometry extends Thread
     RevBulkData bulkData;
     Pose2D worldPosition;
 
-    ElapsedTime uptime;
+    ElapsedTime uptime = new ElapsedTime();
 
     private boolean doStop = false;
 
