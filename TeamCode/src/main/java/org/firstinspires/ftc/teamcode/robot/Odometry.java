@@ -16,12 +16,12 @@ import static java.lang.Math.sin;
 import static org.firstinspires.ftc.teamcode.math.MathUtil.cosFromSin;
 
 
-public class Odometry extends Thread
+public class Odometry implements Runnable
 {
     ExpansionHubMotor odometerYL, odometerYR, odometerX;
     ExpansionHubEx expansionHub;
     RevBulkData bulkData;
-    Pose2D worldPosition;
+    Pose2D worldPosition = new Pose2D();
 
     ElapsedTime uptime = new ElapsedTime();
 
@@ -37,6 +37,7 @@ public class Odometry extends Thread
 
     @Override
     public void run() {
+        doStop = false;
         uptime.reset();
         bulkData = expansionHub.getBulkInputData();
         double Y_old = (double) (bulkData.getMotorCurrentPosition(odometerYL) + bulkData.getMotorCurrentPosition(odometerYR)) / 2.0;
