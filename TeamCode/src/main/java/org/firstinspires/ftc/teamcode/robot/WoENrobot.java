@@ -80,7 +80,7 @@ public class WoENrobot{
         opMode.telemetry.update();
 
         drivetrain.initialize();
-        odometry.initialize();
+        //odometry.initialize();
 
         stopAllMotors();
 
