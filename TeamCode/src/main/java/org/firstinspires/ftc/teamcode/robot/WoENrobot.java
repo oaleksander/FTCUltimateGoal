@@ -45,6 +45,7 @@ public class WoENrobot{
     public static boolean robotIsInitialized = false;
 
     public static Odometry odometry = new Odometry();
+    public static Thread odometryThread = new Thread(odometry);
     public static Drivetrain drivetrain = new Drivetrain();
     public static TFdetector tFdetector = new TFdetector();
     public static Thread tFdetectorThread = new Thread(tFdetector);
@@ -58,6 +59,8 @@ public class WoENrobot{
     public void startRobot() {
         opMode.waitForStart();
         Runtime.reset();
+        if(!odometryThread.isAlive())
+            odometryThread.start();
         opMode.telemetry.addData("Status", "Running");
         opMode.telemetry.update();
     }
@@ -82,9 +85,18 @@ public class WoENrobot{
         opMode.telemetry.addData("Status", "Initializing...");
         opMode.telemetry.update();
 
-        tFdetectorThread = new Thread(tFdetector);
+        if (tFdetectorThread .getState() != Thread.State.NEW)
+        {
+            tFdetector.doStop();
+            tFdetectorThread = new Thread(tFdetector);
+        }
+        if (odometryThread .getState() != Thread.State.NEW)
+        {
+            odometry.doStop();
+            odometryThread = new Thread(odometry);
+        }
         drivetrain.initialize();
-        //odometry.initialize();
+        odometry.initialize();
 
         stopAllMotors();
 
