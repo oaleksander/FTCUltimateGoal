@@ -17,6 +17,11 @@ public class Vector2D implements Comparable {
         double newY = x * Math.sin(angle) + y * Math.cos(angle);
         return new Vector2D(newX, newY);
     }
+    public Vector2D rotatedCW(double angle) {
+        double newX = x * Math.cos(angle) + y * Math.sin(angle);
+        double newY = - x * Math.sin(angle) + y * Math.cos(angle);
+        return new Vector2D(newX, newY);
+    }
 
     public Vector2D add(@NotNull Vector2D p) {
         return new Vector2D(this.x + p.x, this.y + p.y);
@@ -27,6 +32,9 @@ public class Vector2D implements Comparable {
 
     public double atan() {
         return Math.atan2(y, x);
+    }
+    public double acot() {
+        return MathUtil.angleWrap(Math.PI/2 - Math.atan2(y, x));
     }
 
     public double radius() {
