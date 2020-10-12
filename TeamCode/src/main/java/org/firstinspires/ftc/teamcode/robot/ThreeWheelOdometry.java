@@ -1,29 +1,26 @@
 package org.firstinspires.ftc.teamcode.robot;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpModeManager;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.internal.opmode.OpModeManagerImpl;
 import org.firstinspires.ftc.teamcode.math.MathUtil;
 import org.firstinspires.ftc.teamcode.math.Pose2D;
+import org.firstinspires.ftc.teamcode.math.Vector2D;
 import org.openftc.revextensions2.ExpansionHubEx;
 import org.openftc.revextensions2.ExpansionHubMotor;
 import org.openftc.revextensions2.RevBulkData;
 
+import static java.lang.Math.cos;
 import static java.lang.Math.sin;
 import static org.firstinspires.ftc.teamcode.math.MathUtil.cosFromSin;
 
-
-public class Odometry extends Thread
+public class ThreeWheelOdometry implements Runnable
 {
     ExpansionHubMotor odometerYL, odometerYR, odometerX;
     ExpansionHubEx expansionHub;
     RevBulkData bulkData;
-    Pose2D worldPosition;
+    Pose2D worldPosition = new Pose2D();
 
-    ElapsedTime uptime;
+    ElapsedTime uptime = new ElapsedTime();
 
     private boolean doStop = false;
 
@@ -37,6 +34,7 @@ public class Odometry extends Thread
 
     @Override
     public void run() {
+        doStop = false;
         uptime.reset();
         bulkData = expansionHub.getBulkInputData();
         double Y_old = (double) (bulkData.getMotorCurrentPosition(odometerYL) + bulkData.getMotorCurrentPosition(odometerYR)) / 2.0;
@@ -51,37 +49,23 @@ public class Odometry extends Thread
             double currentX = (double) bulkData.getMotorCurrentPosition(odometerX);
             double newWorldHeading = 0;
 
-            double deltaAngle = newWorldHeading - worldPosition.heading; ////
+            double deltaWorldHeading = newWorldHeading - worldPosition.heading; ////
 
             double deltaYodometer = currentY - Y_old;
             double deltaXodometer = currentX - X_old;
 
-            double deltaPositionY = deltaYodometer;
-            double deltaPositionX = deltaXodometer;
+            Vector2D deltaPosition = new Vector2D(deltaXodometer, deltaYodometer);
 
-            if (deltaAngle != 0) {   //if deltaAngle = 0 radius of the arc is = Inf which causes model degeneracy
+            if (deltaWorldHeading != 0) {   //if deltaAngle = 0 radius of the arc is = Inf which causes model degeneracy
 
-                double sinDeltaAngle = sin(deltaAngle); //will calculate sin and cos only once to optimize resources
-                double cosDeltaAngle = MathUtil.cosFromSin(sinDeltaAngle, deltaAngle);
+                double arcAngle = deltaPosition.acot();
+                double arcRadius = arcAngle/deltaWorldHeading;
 
-                double yOdometerArcRadius = deltaYodometer / deltaAngle; //calculate arc in which robot had travelled
-                double xOdometerArcRadius = deltaXodometer / deltaAngle; //for each axis
-
-                double yOdometerComponent = sinDeltaAngle * yOdometerArcRadius * cosDeltaAngle; //complex analytical geometry kicks in
-                double xOdometerComponent = sinDeltaAngle * xOdometerArcRadius * sinDeltaAngle;
-
-                deltaPositionY = yOdometerComponent - xOdometerComponent; //position change relative to the starting point (old)
-                deltaPositionX = yOdometerComponent + xOdometerComponent;
+                deltaPosition = new Vector2D(arcRadius*(1-cos(arcAngle)),arcRadius*sin(arcAngle)).rotatedCW(arcAngle);
 
             }
 
-            double sinWorldAngle = sin(worldPosition.heading);
-            double cosWorldAngle = cosFromSin(sinWorldAngle, worldPosition.heading);
-
-
-            worldPosition.y += deltaPositionY * cosWorldAngle - deltaPositionX * sinWorldAngle; //rotate delta position according to the old robot heading
-            worldPosition.x += deltaPositionY * sinWorldAngle + deltaPositionX * cosWorldAngle;
-            worldPosition.heading = newWorldHeading;
+           worldPosition = worldPosition.add(new Pose2D(deltaPosition.rotatedCW(worldPosition.heading), deltaWorldHeading));
 
             Y_old = currentY;
             X_old = currentX;
@@ -100,7 +84,7 @@ public class Odometry extends Thread
      *
      */
 
-    public Odometry()
+    public ThreeWheelOdometry()
     {
     }
 

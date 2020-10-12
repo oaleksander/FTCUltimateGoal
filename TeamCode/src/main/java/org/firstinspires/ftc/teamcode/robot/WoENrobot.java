@@ -1,29 +1,14 @@
 package org.firstinspires.ftc.teamcode.robot;
 
-import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
-
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 
 import org.firstinspires.ftc.teamcode.math.Pose2D;
-import org.openftc.revextensions2.ExpansionHubEx;
-import org.openftc.revextensions2.ExpansionHubMotor;
 
 import static com.qualcomm.robotcore.util.Range.clip;
-import static java.lang.Math.PI;
 import static java.lang.Math.abs;
-import static java.lang.Math.cos;
 import static java.lang.Math.max;
 import static java.lang.Math.signum;
-import static java.lang.Math.sin;
-import static java.lang.Math.toDegrees;
-import static java.lang.Math.toRadians;
-import static org.firstinspires.ftc.teamcode.math.MathUtil.angleWrap;
 
 public class WoENrobot{
 
@@ -44,8 +29,12 @@ public class WoENrobot{
     public static ElapsedTime Runtime = new ElapsedTime();
     public static boolean robotIsInitialized = false;
 
-    public static Odometry odometry = new Odometry();
+    public static ThreeWheelOdometry_ex odometry = new ThreeWheelOdometry_ex();
+    public static Thread odometryThread = new Thread(odometry);
     public static Drivetrain drivetrain = new Drivetrain();
+    public static TFdetector tFdetector = new TFdetector();
+    public static Thread tFdetectorThread = new Thread(tFdetector);
+
 
     private double robotEstimatedHeading;
     private double robotGlobalXCoordinatePosition = 0, robotGlobalYCoordinatePosition = 0;
@@ -55,6 +44,8 @@ public class WoENrobot{
     public void startRobot() {
         opMode.waitForStart();
         Runtime.reset();
+        if(!odometryThread.isAlive())
+            odometryThread.start();
         opMode.telemetry.addData("Status", "Running");
         opMode.telemetry.update();
     }
@@ -79,8 +70,18 @@ public class WoENrobot{
         opMode.telemetry.addData("Status", "Initializing...");
         opMode.telemetry.update();
 
+        if (tFdetectorThread .getState() != Thread.State.NEW)
+        {
+            tFdetector.doStop();
+            tFdetectorThread = new Thread(tFdetector);
+        }
+        if (odometryThread .getState() != Thread.State.NEW)
+        {
+            odometry.doStop();
+            odometryThread = new Thread(odometry);
+        }
         drivetrain.initialize();
-        //odometry.initialize();
+        odometry.initialize();
 
         stopAllMotors();
 
