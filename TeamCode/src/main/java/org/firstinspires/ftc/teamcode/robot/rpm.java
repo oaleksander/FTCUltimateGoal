@@ -14,7 +14,7 @@ public void intrpm(){
     public void startrpm(double time) {
 rpmtime.reset();
 double x=0,timem=0,timex=0,cof=0,power=0;
-x=time/6000;
+x=6000/time;
         do {
            timex=rpmtime.milliseconds()-timem;
             timem=rpmtime.milliseconds();
