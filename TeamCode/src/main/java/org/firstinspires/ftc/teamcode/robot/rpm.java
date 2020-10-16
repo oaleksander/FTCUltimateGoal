@@ -4,24 +4,20 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-public class rpm extends LinearOpMode {
+public class rpm {
 public DcMotor rpm = null;
 public ElapsedTime rpmtime = null;
 public void runOpMode(){ }
 public void intrpm(){
-    rpm = hardwareMap.get(DcMotor.class, "rpm");
+    rpm = WoENrobot.getInstance().opMode.hardwareMap.get(DcMotor.class, "rpm");
 }
     public void startrpm(double time) {
 rpmtime.reset();
-double x=0,timem=0,timex=0,cof=0,power=0;
+double x=0;
 x=6000/time;
         do {
-           timex=rpmtime.milliseconds()-timem;
-            timem=rpmtime.milliseconds();
-            cof=timex*x;
-            power+=cof;
-            rpm.setPower(power/6000);
-        } while (rpmtime.milliseconds()<time && opModeIsActive());
+            rpm.setPower(rpmtime.milliseconds()*x/6000);
+        } while (rpmtime.milliseconds()<time && WoENrobot.getInstance().opMode.opModeIsActive());
         rpm.setPower(1);
     }
 }
