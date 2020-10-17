@@ -16,7 +16,7 @@ public class Pose2D extends Vector2D implements Cloneable {
     }
 
     public Pose2D(@NotNull Vector2D p, double heading) {
-        this(p.x, p.y, heading);
+        this(p.x, p.y, angleWrap(heading));
     }
 
     public Pose2D add(@NotNull Pose2D p2) {
