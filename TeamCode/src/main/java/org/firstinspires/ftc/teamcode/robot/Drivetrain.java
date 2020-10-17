@@ -46,11 +46,6 @@ public class Drivetrain {
 
     /* Drivetrain constatnts. */
 
-    public static final double odometryWheelDiameterCm = 4.8;
-    public static final double odometryCountsPerCM = (1440) / (odometryWheelDiameterCm * PI);
-    public static final double odometryCMPerCounts = (odometryWheelDiameterCm * PI) / 1440;
-    public static final float odometerYcenterOffsetCm = 13;
-    public static final float odometerXcenterOffsetCm = 2;
     public float imuLeftAngleOffset = 0;
     public float imuRightAngleOffset = 0;
 
@@ -64,6 +59,7 @@ public class Drivetrain {
         assignNames();
         setMotorDirections();
         setMotor0PowerBehaviors();
+        resetEncoders();
         stopMotors();
     }
 
@@ -95,6 +91,11 @@ public class Drivetrain {
         driveFrontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         driveRearLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         driveRearRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        
+        driveFrontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        driveFrontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        driveRearLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        driveRearRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     public void setMaxDriveSpeed(double value) {
@@ -161,7 +162,7 @@ public class Drivetrain {
         driveMotorPowers(FrontLeft, FrontRight, RearLeft, RearRight);
     }
 
-    void holonomicMovePolar(double heading, double speed, double turn) {
+    public void holonomicMovePolar(double heading, double speed, double turn) {
         turn = Range.clip(turn, -1.0, 1.0);
         speed = Range.clip(speed, -1.0, 1.0);
         double frontways = speed * cos(heading);
@@ -185,7 +186,7 @@ public class Drivetrain {
     }
 
     public static final double kP_distance = 0.0011, kD_distance = 0.000022;
-    public static final double minError_distance = 5 * odometryCountsPerCM;
+    public static final double minError_distance = 5; //odometryCountsPerCM;
 
     public static final double kP_angle = 0.0, kD_angle = 0;
     public static final double minError_angle = Math.toRadians(3);
@@ -216,7 +217,7 @@ public class Drivetrain {
             WoENrobot.getInstance().opMode.telemetry.addData("x", control.x);
             WoENrobot.getInstance().opMode.telemetry.addData("a", control.heading);
             WoENrobot.getInstance().opMode.telemetry.addData("ae", toDegrees(error.heading));
-            WoENrobot.getInstance().opMode.telemetry.addData("dist", odometryCMPerCounts * distanceError);
+            //WoENrobot.getInstance().opMode.telemetry.addData("dist", odometryCMPerCounts * distanceError);
             WoENrobot.getInstance().opMode.telemetry.update();
 
             errold = error;

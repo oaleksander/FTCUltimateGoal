@@ -29,7 +29,7 @@ public class WoENrobot{
     public static ElapsedTime Runtime = new ElapsedTime();
     public static boolean robotIsInitialized = false;
 
-    public static ThreeWheelOdometry_ex odometry = new ThreeWheelOdometry_ex();
+    public static ThreeWheelOdometry odometry = new ThreeWheelOdometry();
     public static Thread odometryThread = new Thread(odometry);
     public static Drivetrain drivetrain = new Drivetrain();
     public static TFdetector tFdetector = new TFdetector();
@@ -70,12 +70,12 @@ public class WoENrobot{
         opMode.telemetry.addData("Status", "Initializing...");
         opMode.telemetry.update();
 
-        if (tFdetectorThread .getState() != Thread.State.NEW)
+        if (tFdetectorThread.getState() != Thread.State.NEW)
         {
             tFdetector.doStop();
             tFdetectorThread = new Thread(tFdetector);
         }
-        if (odometryThread .getState() != Thread.State.NEW)
+        if (odometryThread.getState() != Thread.State.NEW)
         {
             odometry.doStop();
             odometryThread = new Thread(odometry);
