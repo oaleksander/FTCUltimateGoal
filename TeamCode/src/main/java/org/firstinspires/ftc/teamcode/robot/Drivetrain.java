@@ -252,10 +252,7 @@ public class Drivetrain {
                     error.y * kP_distance + differr.y * kD_distance,
                     error.heading * kP_angle + differr.heading * kP_angle);
 
-            if(WoENrobot.getInstance().opMode.gamepad1.b)
             holonomicMoveFC(control);
-            else
-            holonomicMove(0, 0, 0);
             WoENrobot.getInstance().opMode.telemetry.addData("y", control.y);
             WoENrobot.getInstance().opMode.telemetry.addData("x", control.x);
             WoENrobot.getInstance().opMode.telemetry.addData("a", control.heading);
@@ -266,6 +263,7 @@ public class Drivetrain {
             errold = error;
             distanceError = error.radius();
         }
+        holonomicMove(0,0,0);
     }
 
 
