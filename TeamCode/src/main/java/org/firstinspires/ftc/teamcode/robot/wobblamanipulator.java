@@ -14,8 +14,9 @@ public class wobblamanipulator {
         lever.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
     }
-    public void setposclose(double pos){
-        close.setPosition(pos);
+    public void setposclose(boolean dograb){
+        if (dograb) close.setPosition(0.5);
+        else close.setPosition(1);
     }
     static final double minerror = 30, maxspeed = 1, kofP = 0.004, kofd = 0.007;
     double power = 0,  P = 0, D = 0, errorOld = 0,error = 0, pos = 0;
