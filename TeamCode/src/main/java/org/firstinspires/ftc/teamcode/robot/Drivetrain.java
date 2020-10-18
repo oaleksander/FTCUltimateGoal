@@ -20,6 +20,7 @@ import static java.lang.Math.PI;
 import static java.lang.Math.abs;
 import static java.lang.Math.cos;
 import static java.lang.Math.max;
+import static java.lang.Math.min;
 import static java.lang.Math.rint;
 import static java.lang.Math.signum;
 import static java.lang.Math.sin;
@@ -50,7 +51,7 @@ public class Drivetrain {
     public float imuRightAngleOffset = 0;
 
     public static double maxDriveSpeed = 1;
-    public static double minDriveSpeed = 0.1;
+    public static double minDriveSpeed = 0.05;
 
     public Drivetrain() {
     }
@@ -71,10 +72,10 @@ public class Drivetrain {
     }
 
     private void setMotorDirections() {
-        driveFrontLeft.setDirection(DcMotorEx.Direction.REVERSE);
-        driveFrontRight.setDirection(DcMotorEx.Direction.FORWARD);
-        driveRearLeft.setDirection(DcMotorEx.Direction.REVERSE);
-        driveRearRight.setDirection(DcMotorEx.Direction.FORWARD);
+        driveFrontLeft.setDirection(DcMotorEx.Direction.FORWARD);
+        driveFrontRight.setDirection(DcMotorEx.Direction.REVERSE);
+        driveRearLeft.setDirection(DcMotorEx.Direction.FORWARD);
+        driveRearRight.setDirection(DcMotorEx.Direction.REVERSE);
 
     }
 
@@ -91,7 +92,7 @@ public class Drivetrain {
         driveFrontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         driveRearLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         driveRearRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        
+
         driveFrontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         driveFrontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         driveRearLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -106,11 +107,60 @@ public class Drivetrain {
         minDriveSpeed = clip(abs(value), 0, 1);
     }
 
+    double powerFrontLeft = 0;
+    double powerFrontRight = 0;
+    double powerRearLeft = 0;
+    double powerRearRight = 0;
+
+    double powerFrontLeft_old = powerFrontLeft;
+    double powerFrontRight_old = powerFrontRight;
+    double powerRearLeft_old = powerRearLeft;
+    double powerRearRight_old = powerRearRight;
+
+    ElapsedTime looptime = new ElapsedTime();
+    private double maxRampPerSec = 1/0.666;
+    // @Override
+    public void update() {
+        if(powerFrontLeft == 0)
+            powerFrontLeft_old = 0;
+        else
+            powerFrontLeft_old += min(abs(powerFrontLeft - powerFrontLeft_old), abs(looptime.seconds()*maxRampPerSec))*signum(powerFrontLeft - powerFrontLeft_old);
+        if(powerFrontRight == 0)
+            powerFrontRight_old = 0;
+        else
+            powerFrontRight_old += min(abs(powerFrontRight - powerFrontRight_old), abs(looptime.seconds()*maxRampPerSec))*signum(powerFrontRight - powerFrontRight_old);
+        if(powerRearLeft == 0)
+            powerRearLeft_old = 0;
+        else
+            powerRearLeft_old += min(abs(powerRearLeft - powerRearLeft_old), abs(looptime.seconds()*maxRampPerSec))*signum(powerRearLeft - powerRearLeft_old);
+        if(powerRearRight == 0)
+            powerRearRight_old = 0;
+        else
+            powerRearRight_old += min(abs(powerRearRight - powerRearRight_old), abs(looptime.seconds()*maxRampPerSec))*signum(powerRearRight - powerRearRight_old);
+
+        driveFrontLeft.setPower(powerFrontLeft_old);
+        driveFrontRight.setPower(powerFrontRight_old);
+        driveRearLeft.setPower(powerRearLeft_old);
+        driveRearRight.setPower(powerRearRight_old);
+
+        looptime.reset();
+    }
+
     public void driveMotorPowers(double frontLeft, double frontRight, double rearLeft, double rearRight) {
-        driveFrontLeft.setPower(clip(abs(frontLeft), minDriveSpeed, maxDriveSpeed) * signum(frontLeft));
-        driveFrontRight.setPower(clip(abs(frontRight), minDriveSpeed, maxDriveSpeed) * signum(frontRight));
-        driveRearLeft.setPower(clip(abs(rearLeft), minDriveSpeed, maxDriveSpeed) * signum(rearLeft));
-        driveRearRight.setPower(clip(abs(rearRight), minDriveSpeed, maxDriveSpeed) * signum(rearRight));
+
+        double maxabs = max(max(abs(frontLeft),abs(frontRight)),max(abs(rearLeft),abs(rearRight)));
+        if (maxabs>maxDriveSpeed)
+        {
+            frontLeft /= maxabs;
+            frontRight /= maxabs;
+            rearLeft /= maxabs;
+            rearRight /= maxabs;
+        }
+
+        powerFrontLeft = (clip(abs(frontLeft), minDriveSpeed, 1) * signum(frontLeft));
+        powerFrontRight = (clip(abs(frontRight), minDriveSpeed, 1) * signum(frontRight));
+        powerRearLeft = (clip(abs(rearLeft), minDriveSpeed, 1) * signum(rearLeft));
+        powerRearRight = (clip(abs(rearRight), minDriveSpeed, 1) * signum(rearRight));
     }
 
     public void stopMotors() {
@@ -151,14 +201,6 @@ public class Drivetrain {
         double RearLeft = frontways - sideways + turn;
         double RearRight = frontways + sideways - turn;
 
-        if (abs(FrontLeft) > 1.0 || abs(FrontRight) > 1.0 || abs(RearLeft) > 1.0 || abs(RearRight) > 1.0) {
-            double maxabs = max(max(abs(FrontLeft), abs(FrontRight)), max(abs(RearLeft), abs(RearRight)));
-            FrontLeft /= maxabs;
-            FrontRight /= maxabs;
-            RearLeft /= maxabs;
-            RearRight /= maxabs;
-        }
-
         driveMotorPowers(FrontLeft, FrontRight, RearLeft, RearRight);
     }
 
@@ -186,10 +228,10 @@ public class Drivetrain {
     }
 
     public static final double kP_distance = 0.011, kD_distance = 0.00022;
-    public static final double minError_distance = 5; //odometryCountsPerCM;
+    public static final double minError_distance = 10;
 
-    public static final double kP_angle = 0.0, kD_angle = 0;
-    public static final double minError_angle = Math.toRadians(3);
+    public static final double kP_angle = 0.5, kD_angle = 0;
+    public static final double minError_angle = Math.toRadians(4);
 
     public void Pos(@NotNull Pose2D target) {
 
@@ -208,16 +250,17 @@ public class Drivetrain {
             Pose2D control = new Pose2D(
                     error.x * kP_distance + differr.x * kD_distance,
                     error.y * kP_distance + differr.y * kD_distance,
-                    differr.heading * kP_angle + differr.heading * kP_angle);
+                    error.heading * kP_angle + differr.heading * kP_angle);
 
-            //holonomicMoveFC(control);
-
+            if(WoENrobot.getInstance().opMode.gamepad1.b)
+            holonomicMoveFC(control);
+            else
             holonomicMove(0, 0, 0);
             WoENrobot.getInstance().opMode.telemetry.addData("y", control.y);
             WoENrobot.getInstance().opMode.telemetry.addData("x", control.x);
             WoENrobot.getInstance().opMode.telemetry.addData("a", control.heading);
             WoENrobot.getInstance().opMode.telemetry.addData("ae", toDegrees(error.heading));
-            //WoENrobot.getInstance().opMode.telemetry.addData("dist", odometryCMPerCounts * distanceError);
+            WoENrobot.getInstance().opMode.telemetry.addData("dist",  distanceError);
             WoENrobot.getInstance().opMode.telemetry.update();
 
             errold = error;

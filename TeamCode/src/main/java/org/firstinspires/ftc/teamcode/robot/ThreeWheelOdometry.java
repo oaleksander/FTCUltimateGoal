@@ -19,10 +19,12 @@ import javax.crypto.spec.GCMParameterSpec;
 import static java.lang.Math.PI;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
+import static java.lang.Math.toRadians;
+import static java.lang.Thread.sleep;
 import static org.firstinspires.ftc.teamcode.math.MathUtil.angleWrap;
 import static org.firstinspires.ftc.teamcode.math.MathUtil.cosFromSin;
 
-public class ThreeWheelOdometry implements Runnable
+public class ThreeWheelOdometry
 {
     BNO055IMU imu;
     ExpansionHubMotor odometerYL, odometerYR, odometerX;
@@ -30,23 +32,13 @@ public class ThreeWheelOdometry implements Runnable
     public RevBulkData bulkData;
     public Pose2D worldPosition = new Pose2D();
 
-    ElapsedTime uptime = new ElapsedTime();
-
-    private boolean doStop = false;
-
-    public synchronized void doStop() {
-        this.doStop = true;
-    }
-
-    private synchronized boolean keepRunning() {
-        return !this.doStop;
-    }
+    ElapsedTime looptime = new ElapsedTime();
 
     public static final double odometryWheelDiameterCm = 4.8;
     public static final double odometryCountsPerCM = (1440) / (odometryWheelDiameterCm * PI);
     public static final double odometryCMPerCounts = (odometryWheelDiameterCm * PI) / 1440;
-    public static final float odometerYcenterOffsetCm = 13;
-    public static final float odometerXcenterOffsetCm = 2;
+    public static final double odometerYcenterOffset = 38.3633669516*odometryCountsPerCM*cos(toRadians(19.490773014))/2;
+    public static final double odometerXcenterOffset = 36.8862986805*odometryCountsPerCM*cos(toRadians(67.021303041))/2;
     public static final double yWheelPairRadiusCm = 18.1275;
     private static final double radiansPerEncoderDifference = (odometryCMPerCounts)/(yWheelPairRadiusCm*2);
 
@@ -54,27 +46,30 @@ public class ThreeWheelOdometry implements Runnable
         return (double)(L-R)*radiansPerEncoderDifference;
     }
 
+    float IMUoffset = 0;
     public void initIMU()
     {
         imu = WoENrobot.getInstance().opMode.hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(new BNO055IMU.Parameters());
+        IMUoffset = (float)getIMUheading();
     }
 
     public double getIMUheading(){
-        return -imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZXY, AngleUnit.RADIANS).firstAngle;
+        return angleWrap(-imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZXY, AngleUnit.RADIANS).firstAngle - IMUoffset);
     }
 
-    @Override
-    public void run() {
-        worldPosition = new Pose2D(0,0,0);
-        doStop = false;
-        uptime.reset();
-        bulkData = expansionHub.getBulkInputData();
-        int  YL_old = bulkData.getMotorCurrentPosition(odometerYL);
-        int  YR_old = -bulkData.getMotorCurrentPosition(odometerYR);
-        int  X_old  = bulkData.getMotorCurrentPosition(odometerX);
-        while (keepRunning()) {
+    int  YL_old = 0;
+    int  YR_old = 0;
+    int  X_old = 0;
 
+   // @Override
+    public void update()
+    {
+        update(worldPosition);
+    }
+    public synchronized void update(Pose2D initialPose) {
+
+            worldPosition = initialPose;
 
             bulkData = expansionHub.getBulkInputData();
 
@@ -87,31 +82,24 @@ public class ThreeWheelOdometry implements Runnable
             double deltaWorldHeading = angleWrap(calculatedHeading - worldPosition.heading);
 
             //double deltaYcomponent = (double)(deltaYL+deltaYR)/2.0;
-            double deltaYcomponent = (double)(deltaYL);
-            double deltaXcomponent = deltaX + deltaWorldHeading*0.0;
+            double deltaYcomponent = deltaYL - deltaWorldHeading*odometerYcenterOffset;
+            double deltaXcomponent = deltaX - deltaWorldHeading*odometerXcenterOffset;
 
             Vector2D deltaPosition = new Vector2D(deltaXcomponent, deltaYcomponent);
 
-            if (deltaWorldHeading != 0 && false) {   //if deltaAngle = 0 radius of the arc is = Inf which causes model degeneracy
+            /* if (deltaWorldHeading != 0 && false) {   //if deltaAngle = 0 radius of the arc is = Inf which causes model degeneracy
                 double arcAngle = deltaPosition.acot();
                 double arcRadius = deltaPosition.radius()/deltaWorldHeading;
 
                 deltaPosition = new Vector2D(arcRadius*(1-cos(arcAngle)),arcRadius*sin(arcAngle)).rotatedCW(arcAngle);
 
-            }
+            } */
             worldPosition = worldPosition.add(new Pose2D(deltaPosition.rotatedCW(worldPosition.heading+deltaWorldHeading/2), deltaWorldHeading));
 
             YL_old = bulkData.getMotorCurrentPosition(odometerYL);
             YR_old = -bulkData.getMotorCurrentPosition(odometerYR);
             X_old  = bulkData.getMotorCurrentPosition(odometerX);
 
-            try {
-                Thread.sleep(1);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-        }
     }
 
     /**
@@ -129,6 +117,10 @@ public class ThreeWheelOdometry implements Runnable
         odometerYL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         odometerYR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         odometerX.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        bulkData = expansionHub.getBulkInputData();
+        YL_old = bulkData.getMotorCurrentPosition(odometerYL);
+        YR_old = -bulkData.getMotorCurrentPosition(odometerYR);
+        X_old  = bulkData.getMotorCurrentPosition(odometerX);
     }
 
     private void assignNames() {
@@ -143,6 +135,11 @@ public class ThreeWheelOdometry implements Runnable
      *
      * @return robot position in (x,y,heading) form
      */
+    public void setRobotCoordinates(Pose2D coordinates)
+    {
+        IMUoffset = (float)(getIMUheading()-coordinates.heading);
+        this.update(new Pose2D(coordinates.x*odometryCountsPerCM, coordinates.y*odometryCountsPerCM, coordinates.heading));
+    }
     public Pose2D getRobotCoordinates() {
         Vector2D poseTranslation = new Vector2D(worldPosition.x*odometryCMPerCounts,worldPosition.y*odometryCMPerCounts
         ).add(new Vector2D(0,1).rotatedCW(worldPosition.heading));

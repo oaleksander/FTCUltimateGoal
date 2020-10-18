@@ -28,9 +28,7 @@ public class WoENrobot{
     /* Global runtime variables. */
     public static ElapsedTime Runtime = new ElapsedTime();
     public static boolean robotIsInitialized = false;
-
     public static ThreeWheelOdometry odometry = new ThreeWheelOdometry();
-    public static Thread odometryThread = new Thread(odometry);
     public static Drivetrain drivetrain = new Drivetrain();
     public static TFdetector tFdetector = new TFdetector();
     public static Thread tFdetectorThread = new Thread(tFdetector);
@@ -43,9 +41,8 @@ public class WoENrobot{
 
     public void startRobot() {
         opMode.waitForStart();
+        regulatorUpdater.start();
         Runtime.reset();
-        if(!odometryThread.isAlive())
-            odometryThread.start();
         opMode.telemetry.addData("Status", "Running");
         opMode.telemetry.update();
     }
@@ -57,6 +54,10 @@ public class WoENrobot{
             opMode.telemetry.update();
         } else {
             this.opMode = opMode;
+            if (regulatorUpdater.getState() != Thread.State.NEW)
+            {
+                regulatorUpdater = new Thread(updateRegulators);
+            }
             stopAllMotors();
             opMode.telemetry.addData("Status", "Already initialized, ready");
             opMode.telemetry.update();
@@ -75,10 +76,9 @@ public class WoENrobot{
             tFdetector.doStop();
             tFdetectorThread = new Thread(tFdetector);
         }
-        if (odometryThread.getState() != Thread.State.NEW)
+        if (regulatorUpdater.getState() != Thread.State.NEW)
         {
-            odometry.doStop();
-            odometryThread = new Thread(odometry);
+            regulatorUpdater = new Thread(updateRegulators);
         }
         drivetrain.initialize();
         odometry.initialize();
@@ -94,6 +94,17 @@ public class WoENrobot{
     {
         drivetrain.stopMotors();
     }
+
+
+    Runnable updateRegulators = () -> {
+        while(opMode.opModeIsActive()) {
+            odometry.update();
+            drivetrain.update();
+        }
+    };
+
+    private Thread regulatorUpdater = new Thread(updateRegulators);
+
   /*  public void initializeGyroscopes() {
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         imuLeft.initialize(parameters);
