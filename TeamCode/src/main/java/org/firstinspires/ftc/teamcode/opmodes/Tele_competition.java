@@ -6,12 +6,13 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.robot.WoENrobot;
 
 @TeleOp(name="TeleOp COMPETITION", group="Competition")
-public class                                                                                                                                                                                                                                                                     Tele_competition extends LinearOpMode {
+public class Tele_competition extends LinearOpMode {
     @Override
     public void runOpMode() {
 
         WoENrobot.getInstance().initRobot(this);
         WoENrobot.getInstance().startRobot();
+        boolean buttonAwasPressed = false;
         while(opModeIsActive())
         {
             double turn = 0;
@@ -31,7 +32,20 @@ public class                                                                    
                 x=-1;
             if (gamepad1.dpad_right)
                 x+=1;
-            WoENrobot.drivetrain.holonomicMove(y, x, turn);
+            if(gamepad1.x)
+                WoENrobot.wobbleManipulator.setposlever(0);
+            else if(gamepad1.y)
+                WoENrobot.wobbleManipulator.setposlever(490);
+            else if(gamepad1.b)
+                WoENrobot.wobbleManipulator.setposlever(720);
+            if(gamepad1.a) {
+                if(!buttonAwasPressed)
+                    WoENrobot.wobbleManipulator.setposclose(!WoENrobot.wobbleManipulator.isGrabbed);
+                buttonAwasPressed = true;
+            }
+            else
+                buttonAwasPressed = false;
+            WoENrobot.drivetrain.holonomicMove(-y, -x, turn);
         }
     }
 }

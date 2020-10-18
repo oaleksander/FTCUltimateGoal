@@ -11,11 +11,14 @@ import static java.lang.Math.toRadians;
 
 @TeleOp(name="Teleop TEST/PRACTICE", group="Debugging")
 public class Tele_test extends LinearOpMode {
+
+    boolean buttonAwasPressed = false;
     @Override
     public void runOpMode() {
 
         WoENrobot.getInstance().forceInitRobot(this);
         WoENrobot.getInstance().startRobot();
+        WoENrobot.odometry.setRobotCoordinates(new Pose2D(62.5, -156.5, toRadians(180)));
         while(opModeIsActive())
         {
             double turn = 0;
@@ -35,8 +38,20 @@ public class Tele_test extends LinearOpMode {
                 x=-1;
             if (gamepad1.dpad_right)
                 x+=1;
-            WoENrobot.wobbleManipulator.setposclose(gamepad1.x);
-            WoENrobot.drivetrain.holonomicMove(y, x, turn);
+            if(gamepad1.x)
+                WoENrobot.wobbleManipulator.setposlever(0);
+            else if(gamepad1.y)
+                WoENrobot.wobbleManipulator.setposlever(490);
+            else if(gamepad1.b)
+                WoENrobot.wobbleManipulator.setposlever(720);
+            if(gamepad1.a) {
+                if(!buttonAwasPressed)
+                WoENrobot.wobbleManipulator.setposclose(!WoENrobot.wobbleManipulator.isGrabbed);
+                buttonAwasPressed = true;
+            }
+            else
+                buttonAwasPressed = false;
+            WoENrobot.drivetrain.holonomicMove(-y, -x, turn);
             telemetry.addData("Status", "Running");
             telemetry.addLine("encoder")
                     .addData("FL", Drivetrain.driveFrontLeft.getCurrentPosition())

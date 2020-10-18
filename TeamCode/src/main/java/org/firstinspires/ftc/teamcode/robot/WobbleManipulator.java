@@ -1,25 +1,34 @@
 package org.firstinspires.ftc.teamcode.robot;
 
+import android.icu.lang.UCharacter;
+
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class WobbleManipulator {
 
-    public DcMotor lever = null;
+    public static DcMotorEx lever = null;
     public ElapsedTime levertime = new ElapsedTime();
-    public Servo close = null;
+    public static Servo close = null;
     public void initialize(){
-        lever = WoENrobot.getInstance().opMode.hardwareMap.get(DcMotor.class, "lever");
-        close = WoENrobot.getInstance().opMode.hardwareMap.get(Servo.class, "close");
+        lever = WoENrobot.getInstance().opMode.hardwareMap.get(DcMotorEx.class, "lever");
+        close = WoENrobot.getInstance().opMode.hardwareMap.get(Servo.class, "wobbleGrabber");
+        lever.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        lever.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        lever.setDirection(DcMotorSimple.Direction.REVERSE);
         lever.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
     }
+    public boolean isGrabbed = false;
     public void setposclose(boolean dograb){
+        isGrabbed = dograb;
         if (dograb) close.setPosition(0.5);
         else close.setPosition(1);
     }
-    static final double minerror = 30, maxspeed = 1, kofP = 0.004, kofd = 0.007;
+    static final double minerror = 30, maxspeed = 1, kofP = 0.001, kofd = 0.00001;
     double power = 0,  P = 0, D = 0, errorOld = 0,error = 0, pos = 0;
     public void update(){
         error = pos-lever.getCurrentPosition();
@@ -28,8 +37,13 @@ public class WobbleManipulator {
             D = (error - errorOld) * kofd;
             power = P + D;
             if (power > maxspeed) power = maxspeed;
-            if (power < maxspeed) power = -maxspeed;
+            if (power < -maxspeed) power = -maxspeed;
             lever.setPower(power);
+            /*WoENrobot.getInstance().opMode.telemetry.addData("err",error);
+            WoENrobot.getInstance().opMode.telemetry.addData("pow",power);
+            WoENrobot.getInstance().opMode.telemetry.addData("pos",pos);
+            WoENrobot.getInstance().opMode.telemetry.addData("enc",lever.getCurrentPosition());
+            WoENrobot.getInstance().opMode.telemetry.update(); */
             errorOld = error;
         }
         else

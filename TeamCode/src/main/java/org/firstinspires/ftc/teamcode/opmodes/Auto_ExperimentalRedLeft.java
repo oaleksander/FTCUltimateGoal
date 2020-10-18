@@ -9,8 +9,8 @@ import org.firstinspires.ftc.teamcode.robot.WoENrobot;
 
 import static java.lang.Math.toRadians;
 
-@Autonomous(name = "Auto Red Left")
-public class Auto_RedLeft extends LinearOpMode {
+@Autonomous(name = "Experimental Auto Red Right")
+public class Auto_ExperimentalRedLeft extends LinearOpMode {
     @Override
     public void runOpMode() {
 
@@ -29,20 +29,21 @@ public class Auto_RedLeft extends LinearOpMode {
         /*------------------------------------------------------------------------------------------------*/
         switch (WoENrobot.getInstance().tFdetector.retrieveResult()) {
             case 4:
-                WoENrobot.getInstance().drivetrain.Pos(new Pose2D(150, 126, toRadians(180)));
+                WoENrobot.getInstance().drivetrain.Pos(new Pose2D(150, 156, toRadians(180)));
                 break;
             case 1:
-                WoENrobot.getInstance().drivetrain.Pos(new Pose2D(91, 66, toRadians(180)));
+                WoENrobot.getInstance().drivetrain.Pos(new Pose2D(91, 96, toRadians(180)));
                 break;
             default:
-                WoENrobot.getInstance().drivetrain.Pos(new Pose2D(150, 6, toRadians(180)));
+                WoENrobot.getInstance().drivetrain.Pos(new Pose2D(150, 36, toRadians(180)));
         }
-        WoENrobot.getInstance().wobbleManipulator.setposlever(780);
-        WoENrobot.getInstance().delay(1200);
+
         WoENrobot.getInstance().wobbleManipulator.setposclose(false);
         WoENrobot.getInstance().delay(500);
+        WoENrobot.getInstance().drivetrain.Pos(new Pose2D(93.75, 145, toRadians(180)));
+        WoENrobot.getInstance().wobbleManipulator.setposlever(580);
+        WoENrobot.getInstance().delay(1000);
         WoENrobot.getInstance().drivetrain.Pos(new Pose2D(62.5, 25, toRadians(180)));
-        WoENrobot.getInstance().wobbleManipulator.setposlever(360);
         while (opModeIsActive()) {
             /*------------------------------------------------------------------------------------------------*/
 // FINISH LOOP CODE GOES HERE
