@@ -35,6 +35,7 @@ public class Tele_test extends LinearOpMode {
                 x=-1;
             if (gamepad1.dpad_right)
                 x+=1;
+            WoENrobot.wobbleManipulator.setposclose(gamepad1.x);
             WoENrobot.drivetrain.holonomicMove(y, x, turn);
             telemetry.addData("Status", "Running");
             telemetry.addLine("encoder")

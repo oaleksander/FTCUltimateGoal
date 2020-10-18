@@ -4,7 +4,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-public class wobblamanipulator {
+public class WobbleManipulator {
+
     public DcMotor lever = null;
     public ElapsedTime levertime = new ElapsedTime();
     public Servo close = null;

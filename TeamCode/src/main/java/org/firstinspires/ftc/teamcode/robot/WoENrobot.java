@@ -32,6 +32,7 @@ public class WoENrobot{
     public static Drivetrain drivetrain = new Drivetrain();
     public static TFdetector tFdetector = new TFdetector();
     public static Thread tFdetectorThread = new Thread(tFdetector);
+    public static WobbleManipulator wobbleManipulator = new WobbleManipulator();
 
 
     private double robotEstimatedHeading;
@@ -81,6 +82,7 @@ public class WoENrobot{
             regulatorUpdater = new Thread(updateRegulators);
         }
         drivetrain.initialize();
+        wobbleManipulator.initialize();
         odometry.initialize();
 
         stopAllMotors();
@@ -100,6 +102,7 @@ public class WoENrobot{
         while(opMode.opModeIsActive()) {
             odometry.update();
             drivetrain.update();
+            wobbleManipulator.update();
         }
     };
 
