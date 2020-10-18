@@ -181,11 +181,11 @@ public class Drivetrain {
     }
 
     public void holonomicMoveFC(@NotNull Pose2D move) {
-        Vector2D coordinates = new Vector2D(move.x, move.y).rotated(-WoENrobot.odometry.getRobotCoordinates().heading);
-        holonomicMove(coordinates.x, coordinates.y, move.heading);
+        Vector2D coordinates = new Vector2D(move.x, move.y).rotatedCW(-WoENrobot.odometry.getRobotCoordinates().heading);
+        holonomicMove(coordinates.y, coordinates.x, move.heading);
     }
 
-    public static final double kP_distance = 0.0011, kD_distance = 0.000022;
+    public static final double kP_distance = 0.011, kD_distance = 0.00022;
     public static final double minError_distance = 5; //odometryCountsPerCM;
 
     public static final double kP_angle = 0.0, kD_angle = 0;

@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.opmodes;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.math.Pose2D;
 import org.firstinspires.ftc.teamcode.robot.Drivetrain;
 import org.firstinspires.ftc.teamcode.robot.WoENrobot;
 
@@ -13,6 +14,7 @@ public class Tele_test extends LinearOpMode {
 
         WoENrobot.getInstance().forceInitRobot(this);
         WoENrobot.getInstance().startRobot();
+        WoENrobot.odometry.worldPosition = new Pose2D(0,0,0);
         while(opModeIsActive())
         {
             double turn = 0;
@@ -33,7 +35,12 @@ public class Tele_test extends LinearOpMode {
             if (gamepad1.dpad_right)
                 x+=1;
             double hypot = Math.hypot(y,x);
-            WoENrobot.drivetrain.holonomicMove(y*hypot, x*hypot, turn);
+            if(gamepad1.a)
+                WoENrobot.getInstance().drivetrain.holonomicMoveFC(new Pose2D(x*hypot,y*hypot,turn));
+            else
+            {
+                WoENrobot.drivetrain.holonomicMove(y*hypot, x*hypot, turn);
+            }
             telemetry.addData("Status", "Running");
             telemetry.addLine("encoder")
                     .addData("FL", Drivetrain.driveFrontLeft.getCurrentPosition())

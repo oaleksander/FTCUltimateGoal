@@ -1,9 +1,12 @@
 package org.firstinspires.ftc.teamcode.robot;
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.teamcode.math.MathUtil;
 import org.firstinspires.ftc.teamcode.math.Pose2D;
 import org.firstinspires.ftc.teamcode.math.Vector2D;
@@ -16,10 +19,12 @@ import javax.crypto.spec.GCMParameterSpec;
 import static java.lang.Math.PI;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
+import static org.firstinspires.ftc.teamcode.math.MathUtil.angleWrap;
 import static org.firstinspires.ftc.teamcode.math.MathUtil.cosFromSin;
 
 public class ThreeWheelOdometry implements Runnable
 {
+    BNO055IMU imu;
     ExpansionHubMotor odometerYL, odometerYR, odometerX;
     ExpansionHubEx expansionHub;
     public RevBulkData bulkData;
@@ -49,8 +54,19 @@ public class ThreeWheelOdometry implements Runnable
         return (double)(L-R)*radiansPerEncoderDifference;
     }
 
+    public void initIMU()
+    {
+        imu = WoENrobot.getInstance().opMode.hardwareMap.get(BNO055IMU.class, "imu");
+        imu.initialize(new BNO055IMU.Parameters());
+    }
+
+    public double getIMUheading(){
+        return -imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZXY, AngleUnit.RADIANS).firstAngle;
+    }
+
     @Override
     public void run() {
+        worldPosition = new Pose2D(0,0,0);
         doStop = false;
         uptime.reset();
         bulkData = expansionHub.getBulkInputData();
@@ -66,22 +82,24 @@ public class ThreeWheelOdometry implements Runnable
             int deltaYL = bulkData.getMotorCurrentPosition(odometerYL) - YL_old;
             int deltaYR = -bulkData.getMotorCurrentPosition(odometerYR) - YR_old;
             int deltaX  = bulkData.getMotorCurrentPosition(odometerX)  -  X_old;
-            double calculatedHeading = calculateHeading(bulkData.getMotorCurrentPosition(odometerYL),-bulkData.getMotorCurrentPosition(odometerYR));
-            double deltaWorldHeading = calculatedHeading - worldPosition.heading;
+            double calculatedHeading = getIMUheading();
+            //double calculatedHeading = calculateHeading(bulkData.getMotorCurrentPosition(odometerYL),-bulkData.getMotorCurrentPosition(odometerYR));
+            double deltaWorldHeading = angleWrap(calculatedHeading - worldPosition.heading);
 
-            double deltaYcomponent = (double)(deltaYL+deltaYR)/2.0;
+            //double deltaYcomponent = (double)(deltaYL+deltaYR)/2.0;
+            double deltaYcomponent = (double)(deltaYL);
             double deltaXcomponent = deltaX + deltaWorldHeading*0.0;
 
             Vector2D deltaPosition = new Vector2D(deltaXcomponent, deltaYcomponent);
 
-            if (deltaWorldHeading != 0) {   //if deltaAngle = 0 radius of the arc is = Inf which causes model degeneracy
+            if (deltaWorldHeading != 0 && false) {   //if deltaAngle = 0 radius of the arc is = Inf which causes model degeneracy
                 double arcAngle = deltaPosition.acot();
                 double arcRadius = deltaPosition.radius()/deltaWorldHeading;
 
                 deltaPosition = new Vector2D(arcRadius*(1-cos(arcAngle)),arcRadius*sin(arcAngle)).rotatedCW(arcAngle);
 
             }
-            worldPosition = worldPosition.add(new Pose2D(deltaPosition.rotatedCW(worldPosition.heading), deltaWorldHeading));
+            worldPosition = worldPosition.add(new Pose2D(deltaPosition.rotatedCW(worldPosition.heading+deltaWorldHeading/2), deltaWorldHeading));
 
             YL_old = bulkData.getMotorCurrentPosition(odometerYL);
             YR_old = -bulkData.getMotorCurrentPosition(odometerYR);
@@ -107,6 +125,7 @@ public class ThreeWheelOdometry implements Runnable
 
     public void initialize() {
         assignNames();
+        initIMU();
         odometerYL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         odometerYR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         odometerX.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
