@@ -118,7 +118,7 @@ public class Drivetrain {
     double powerRearRight_old = powerRearRight;
 
     ElapsedTime looptime = new ElapsedTime();
-    private double maxRampPerSec = 1/0.666;
+    private double maxRampPerSec = 1/0.25;
     // @Override
     public void update() {
         if(powerFrontLeft == 0)
@@ -227,20 +227,22 @@ public class Drivetrain {
         holonomicMove(coordinates.y, coordinates.x, move.heading);
     }
 
-    public static final double kP_distance = 0.011, kD_distance = 0.00022;
-    public static final double minError_distance = 10;
+    public static final double kP_distance = 0.015, kD_distance = 0.00034;
+    public static final double minImpact = 0.1;
+    public static final double minError_distance = 12;
 
-    public static final double kP_angle = 0.5, kD_angle = 0;
-    public static final double minError_angle = Math.toRadians(4);
+    public static final double kP_angle = 0.23, kD_angle = 0;
+    public static final double minError_angle = Math.toRadians(6);
 
     public void Pos(@NotNull Pose2D target) {
+
 
         Pose2D error = target.substract(WoENrobot.odometry.getRobotCoordinates());
         Pose2D errold = error;
         double distanceError = error.radius();
 
         ElapsedTime looptime = new ElapsedTime();
-        while (WoENrobot.getInstance().opMode.opModeIsActive() && (distanceError > minError_distance || abs(error.heading) > minError_angle)) {
+        while (WoENrobot.getInstance().opMode.opModeIsActive() && (distanceError > minError_distance || abs(error.heading) > minError_angle) && looptime.seconds()<4) {
 
             error = target.substract(WoENrobot.odometry.getRobotCoordinates());
 

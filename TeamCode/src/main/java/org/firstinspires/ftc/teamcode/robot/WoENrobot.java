@@ -40,6 +40,13 @@ public class WoENrobot{
     private Pose2D WorldPosition;
     private float integratedAngle = 0;
 
+
+    public void delay(double delay_ms)
+    {
+        ElapsedTime timer = new ElapsedTime();
+        timer.reset();
+                while(timer.milliseconds()<delay_ms && opMode.opModeIsActive());
+    }
     public void startRobot() {
         opMode.waitForStart();
         regulatorUpdater.start();
