@@ -7,6 +7,8 @@ import org.firstinspires.ftc.teamcode.math.Pose2D;
 import org.firstinspires.ftc.teamcode.robot.Drivetrain;
 import org.firstinspires.ftc.teamcode.robot.WoENrobot;
 
+import static java.lang.Math.toRadians;
+
 @TeleOp(name="Teleop TEST/PRACTICE", group="Debugging")
 public class Tele_test extends LinearOpMode {
     @Override
@@ -14,7 +16,6 @@ public class Tele_test extends LinearOpMode {
 
         WoENrobot.getInstance().forceInitRobot(this);
         WoENrobot.getInstance().startRobot();
-        WoENrobot.odometry.worldPosition = new Pose2D(0,0,0);
         while(opModeIsActive())
         {
             double turn = 0;
@@ -34,13 +35,7 @@ public class Tele_test extends LinearOpMode {
                 x=-1;
             if (gamepad1.dpad_right)
                 x+=1;
-            double hypot = Math.hypot(y,x);
-            if(gamepad1.a)
-                WoENrobot.getInstance().drivetrain.holonomicMoveFC(new Pose2D(x*hypot,y*hypot,turn));
-            else
-            {
-                WoENrobot.drivetrain.holonomicMove(y*hypot, x*hypot, turn);
-            }
+            WoENrobot.drivetrain.holonomicMove(y, x, turn);
             telemetry.addData("Status", "Running");
             telemetry.addLine("encoder")
                     .addData("FL", Drivetrain.driveFrontLeft.getCurrentPosition())
@@ -53,8 +48,7 @@ public class Tele_test extends LinearOpMode {
             telemetry.addLine("Control")
                     .addData("y", y)
                     .addData("x", x)
-                    .addData("turn", turn)
-                    .addData("hypot", hypot);
+                    .addData("turn", turn);
             try{
                 telemetry.addLine("odometry")
                         .addData("y", WoENrobot.odometry.getRobotCoordinates().y)

@@ -15,11 +15,23 @@ public class                                                                    
         while(opModeIsActive())
         {
             double turn = 0;
-            if(gamepad2.left_bumper) turn -=0.25;
+            double y = 0;
+            double x = 0;
+            if(gamepad1.left_bumper) turn -=0.25;
             else turn -= gamepad1.left_trigger;
-            if(gamepad2.right_bumper) turn +=0.25;
+            if(gamepad1.right_bumper) turn +=0.25;
             else turn += gamepad1.right_trigger;
-            WoENrobot.drivetrain.holonomicMove(-gamepad1.left_stick_y, gamepad1.left_stick_x, turn);
+            y=-gamepad1.left_stick_y;
+            x= gamepad1.left_stick_x;
+            if (gamepad1.dpad_up)
+                y+=1;
+            if (gamepad1.dpad_down)
+                y=-1;
+            if (gamepad1.dpad_left)
+                x=-1;
+            if (gamepad1.dpad_right)
+                x+=1;
+            WoENrobot.drivetrain.holonomicMove(y, x, turn);
         }
     }
 }
