@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.robot.WoENrobot;
 
 @TeleOp(name="TeleOp COMPETITION", group="Competition")
-public class Tele_competition extends LinearOpMode {
+public class                                                                                                                                                                                                                                                                     Tele_competition extends LinearOpMode {
     @Override
     public void runOpMode() {
 
