@@ -227,12 +227,12 @@ public class Drivetrain {
         holonomicMove(coordinates.y, coordinates.x, move.heading);
     }
 
-    public static final double kP_distance = 0.015, kD_distance = 0.00034;
+    public static final double kP_distance = 0.021, kD_distance = 0.00034;
     public static final double minImpact = 0.1;
-    public static final double minError_distance = 12;
+    public static final double minError_distance = 13;
 
-    public static final double kP_angle = 0.23, kD_angle = 0;
-    public static final double minError_angle = Math.toRadians(6);
+    public static final double kP_angle = 0.34, kD_angle = 0;
+    public static final double minError_angle = Math.toRadians(5.5);
 
     public void Pos(@NotNull Pose2D target) {
 

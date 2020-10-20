@@ -9,7 +9,7 @@ import org.firstinspires.ftc.teamcode.robot.WoENrobot;
 
 import static java.lang.Math.toRadians;
 
-@Autonomous(name = "Experimental Auto Red Right")
+@Autonomous(name = "Ring Auto Red Left")
 public class Auto_ExperimentalRedLeft extends LinearOpMode {
     @Override
     public void runOpMode() {
@@ -22,14 +22,14 @@ public class Auto_ExperimentalRedLeft extends LinearOpMode {
         WoENrobot.getInstance().startRobot();
         WoENrobot.getInstance().wobbleManipulator.setposclose(true);
         WoENrobot.getInstance().wobbleManipulator.setposlever(0);
-        WoENrobot.getInstance().drivetrain.Pos(new Pose2D(93.75, -142, toRadians(180)));
-        WoENrobot.getInstance().delay(2000);
+        WoENrobot.getInstance().drivetrain.Pos(new Pose2D(93.75, -135, toRadians(180)));
+        WoENrobot.getInstance().delay(1600);
         /*------------------------------------------------------------------------------------------------*/
 // AUTO CODE GOES HERE
         /*------------------------------------------------------------------------------------------------*/
         switch (WoENrobot.getInstance().tFdetector.retrieveResult()) {
             case 4:
-                WoENrobot.getInstance().drivetrain.Pos(new Pose2D(150, 156, toRadians(180)));
+                WoENrobot.getInstance().drivetrain.Pos(new Pose2D(150, 156, toRadians(90)));
                 break;
             case 1:
                 WoENrobot.getInstance().drivetrain.Pos(new Pose2D(91, 96, toRadians(180)));
@@ -39,10 +39,15 @@ public class Auto_ExperimentalRedLeft extends LinearOpMode {
         }
 
         WoENrobot.getInstance().wobbleManipulator.setposclose(false);
-        WoENrobot.getInstance().delay(500);
-        WoENrobot.getInstance().drivetrain.Pos(new Pose2D(93.75, 145, toRadians(180)));
-        WoENrobot.getInstance().wobbleManipulator.setposlever(580);
+        WoENrobot.getInstance().wobbleManipulator.setposlever(120);
+        WoENrobot.getInstance().delay(100);
+        WoENrobot.getInstance().wobbleManipulator.setposlever(0);
+        WoENrobot.getInstance().delay(100);
+        WoENrobot.getInstance().wobbleManipulator.setposlever(120);
+        WoENrobot.getInstance().drivetrain.Pos(new Pose2D(105, 150, toRadians(180)));
+        WoENrobot.getInstance().wobbleManipulator.setposlever(505);
         WoENrobot.getInstance().delay(1000);
+        WoENrobot.getInstance().wobbleManipulator.setposlever(470);
         WoENrobot.getInstance().drivetrain.Pos(new Pose2D(62.5, 25, toRadians(180)));
         while (opModeIsActive()) {
             /*------------------------------------------------------------------------------------------------*/
