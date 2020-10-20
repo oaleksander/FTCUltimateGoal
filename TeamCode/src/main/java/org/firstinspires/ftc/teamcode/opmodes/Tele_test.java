@@ -43,7 +43,7 @@ public class Tele_test extends LinearOpMode {
             else if(gamepad1.y)
                 WoENrobot.wobbleManipulator.setposlever(490);
             else if(gamepad1.b)
-                WoENrobot.wobbleManipulator.setposlever(720);
+                WoENrobot.wobbleManipulator.setposlever(700);
             if(gamepad1.a) {
                 if(!buttonAwasPressed)
                 WoENrobot.wobbleManipulator.setposclose(!WoENrobot.wobbleManipulator.isGrabbed);

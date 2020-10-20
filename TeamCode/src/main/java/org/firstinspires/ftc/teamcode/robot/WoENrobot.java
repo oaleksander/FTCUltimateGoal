@@ -75,6 +75,9 @@ public class WoENrobot{
     private static final boolean defaultNames = true;
 
     public void forceInitRobot(LinearOpMode opMode) {
+        odometry = new ThreeWheelOdometry();
+        drivetrain = new Drivetrain();
+        wobbleManipulator = new WobbleManipulator();
         this.opMode = opMode;
         opMode.telemetry.addData("Status", "Initializing...");
         opMode.telemetry.update();

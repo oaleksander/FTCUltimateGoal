@@ -22,14 +22,15 @@ public class WobbleManipulator {
         lever.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
     }
-    public boolean isGrabbed = false;
+    public static boolean isGrabbed = false;
     public void setposclose(boolean dograb){
         isGrabbed = dograb;
         if (dograb) close.setPosition(0.5);
         else close.setPosition(1);
     }
-    static final double minerror = 30, maxspeed = 1, kofP = 0.001, kofd = 0.00001;
-    double power = 0,  P = 0, D = 0, errorOld = 0,error = 0, pos = 0;
+    static final double minerror = 15, maxspeed = 1, kofP = 0.0015, kofd = 0.00001;
+    double power = 0,  P = 0, D = 0, errorOld = 0,error = 0;
+    static double pos = 0;
     public void update(){
         error = pos-lever.getCurrentPosition();
         if (Math.abs(error)>minerror) {
