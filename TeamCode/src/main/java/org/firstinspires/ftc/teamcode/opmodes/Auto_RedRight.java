@@ -18,8 +18,12 @@ public class Auto_RedRight extends LinearOpMode {
         WoENrobot.getInstance().tFdetector.initialize();
         AutoTransitioner.transitionOnStop(this, "Teleop COMPETITION");
         WoENrobot.getInstance().tFdetectorThread.start();
-        WoENrobot.getInstance().startRobot();
         WoENrobot.odometry.setRobotCoordinates(new Pose2D(125, -156.5, toRadians(180)));
+        WoENrobot.getInstance().startRobot();
+        WoENrobot.getInstance().wobbleManipulator.setposclose(true);
+        WoENrobot.getInstance().wobbleManipulator.setposlever(0);
+        WoENrobot.getInstance().drivetrain.Pos(new Pose2D(93.75, -142, toRadians(180)));
+        WoENrobot.getInstance().delay(2000);
         /*------------------------------------------------------------------------------------------------*/
 // AUTO CODE GOES HERE
         /*------------------------------------------------------------------------------------------------*/
@@ -33,8 +37,12 @@ public class Auto_RedRight extends LinearOpMode {
             default:
                 WoENrobot.getInstance().drivetrain.Pos(new Pose2D(150, 6, toRadians(180)));
         }
+        WoENrobot.getInstance().wobbleManipulator.setposlever(780);
+        WoENrobot.getInstance().delay(1200);
+        WoENrobot.getInstance().wobbleManipulator.setposclose(false);
+        WoENrobot.getInstance().delay(500);
         WoENrobot.getInstance().drivetrain.Pos(new Pose2D(125, 25, toRadians(180)));
-        WoENrobot.getInstance().drivetrain.Pos(new Pose2D(125, 25, toRadians(0)));
+        WoENrobot.getInstance().wobbleManipulator.setposlever(360);
         while (opModeIsActive()) {
             /*------------------------------------------------------------------------------------------------*/
 // FINISH LOOP CODE GOES HERE

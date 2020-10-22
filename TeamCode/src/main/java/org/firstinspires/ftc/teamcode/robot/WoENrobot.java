@@ -32,6 +32,7 @@ public class WoENrobot{
     public static Drivetrain drivetrain = new Drivetrain();
     public static TFdetector tFdetector = new TFdetector();
     public static Thread tFdetectorThread = new Thread(tFdetector);
+    public static WobbleManipulator wobbleManipulator = new WobbleManipulator();
 
 
     private double robotEstimatedHeading;
@@ -39,6 +40,13 @@ public class WoENrobot{
     private Pose2D WorldPosition;
     private float integratedAngle = 0;
 
+
+    public void delay(double delay_ms)
+    {
+        ElapsedTime timer = new ElapsedTime();
+        timer.reset();
+                while(timer.milliseconds()<delay_ms && opMode.opModeIsActive());
+    }
     public void startRobot() {
         opMode.waitForStart();
         regulatorUpdater.start();
@@ -67,6 +75,9 @@ public class WoENrobot{
     private static final boolean defaultNames = true;
 
     public void forceInitRobot(LinearOpMode opMode) {
+        odometry = new ThreeWheelOdometry();
+        drivetrain = new Drivetrain();
+        wobbleManipulator = new WobbleManipulator();
         this.opMode = opMode;
         opMode.telemetry.addData("Status", "Initializing...");
         opMode.telemetry.update();
@@ -81,6 +92,7 @@ public class WoENrobot{
             regulatorUpdater = new Thread(updateRegulators);
         }
         drivetrain.initialize();
+        wobbleManipulator.initialize();
         odometry.initialize();
 
         stopAllMotors();
@@ -100,6 +112,7 @@ public class WoENrobot{
         while(opMode.opModeIsActive()) {
             odometry.update();
             drivetrain.update();
+            wobbleManipulator.update();
         }
     };
 

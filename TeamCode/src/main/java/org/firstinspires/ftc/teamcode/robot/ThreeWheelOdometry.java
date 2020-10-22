@@ -46,7 +46,7 @@ public class ThreeWheelOdometry
         return (double)(L-R)*radiansPerEncoderDifference;
     }
 
-    float IMUoffset = 0;
+    static float IMUoffset = 0;
     public void initIMU()
     {
         imu = WoENrobot.getInstance().opMode.hardwareMap.get(BNO055IMU.class, "imu");
@@ -114,6 +114,7 @@ public class ThreeWheelOdometry
     public void initialize() {
         assignNames();
         initIMU();
+        WoENrobot.getInstance().delay(500);
         odometerYL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         odometerYR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         odometerX.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -137,7 +138,7 @@ public class ThreeWheelOdometry
      */
     public void setRobotCoordinates(Pose2D coordinates)
     {
-        IMUoffset = (float)(getIMUheading()-coordinates.heading);
+        IMUoffset = (float)angleWrap(getIMUheading()+IMUoffset-coordinates.heading);
         this.update(new Pose2D(coordinates.x*odometryCountsPerCM, coordinates.y*odometryCountsPerCM, coordinates.heading));
     }
     public Pose2D getRobotCoordinates() {
