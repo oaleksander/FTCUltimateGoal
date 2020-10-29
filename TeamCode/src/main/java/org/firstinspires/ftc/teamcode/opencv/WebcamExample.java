@@ -19,7 +19,7 @@
  * SOFTWARE.
  */
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.opencv;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -64,8 +64,6 @@ public class WebcamExample extends LinearOpMode
          * (while a streaming session is in flight) *IS* supported.
          */
         webcam.setPipeline(new SamplePipeline());
-        webcam.openCameraDevice();
-        webcam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
 
         /*
          * Open the connection to the camera device. New in v1.4.0 is the ability
@@ -76,7 +74,7 @@ public class WebcamExample extends LinearOpMode
          *
          * If you really want to open synchronously, the old method is still available.
          */
-       /* webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
+        webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
         {
             @Override
             public void onOpened()
@@ -96,10 +94,10 @@ public class WebcamExample extends LinearOpMode
                  * For a front facing camera, rotation is defined assuming the user is looking at the screen.
                  * For a rear facing camera or a webcam, rotation is defined assuming the camera is facing
                  * away from the user.
-                 */ /*
+                 */
                 webcam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
             }
-        }); */
+        });
 
         telemetry.addLine("Waiting for start");
         telemetry.update();
