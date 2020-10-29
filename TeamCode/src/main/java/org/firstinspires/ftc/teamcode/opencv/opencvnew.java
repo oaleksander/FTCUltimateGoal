@@ -33,7 +33,7 @@ import java.util.List;
     //0 = col, 1 = row
 
     @Override
-        public void runOpMode() throws InstantiationException{
+        public void runOpMode() {
            int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
             webcam = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
             webcam.openCameraDevice();
@@ -55,7 +55,7 @@ import java.util.List;
                 telemetry.addData("Values", valdown+ " "+valup);
                 telemetry.addData("Height", rows);
                 telemetry.addData("Width", cols);
-                telemetry.addData("", contoursList);
+                telemetry.addData("", StageSwitchingPipeline.contoursList);
                 telemetry.update();
                 sleep(100);
             }
@@ -64,7 +64,7 @@ import java.util.List;
             Mat all = new Mat();
             Mat yCbCrChan2Mat = new Mat();
             Mat thresholdMat = new Mat();
-            public List<MatOfPoint> contoursList = new ArrayList<>();
+            public static List<MatOfPoint> contoursList = new ArrayList<>();
             enum Stage
             {
                 detection,//includes outlines
