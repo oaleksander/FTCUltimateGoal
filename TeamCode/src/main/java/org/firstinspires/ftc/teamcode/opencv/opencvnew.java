@@ -45,6 +45,9 @@ import java.util.List;
             waitForStart();
 
             while (opModeIsActive()) {
+                telemetry.addData("Values", 0);
+                telemetry.addData("Height", rows);
+                telemetry.addData("Width", cols);
                 telemetry.update();
                 sleep(100);
             }
@@ -90,7 +93,6 @@ import java.util.List;
                 Imgproc.threshold(yCbCrChan2Mat, thresholdMat, 102, 255, Imgproc.THRESH_BINARY_INV);
                 Imgproc.findContours(thresholdMat, contoursList, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
                 yCbCrChan2Mat.copyTo(all);
-
 
                 return all;
             }
