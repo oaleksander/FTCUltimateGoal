@@ -33,7 +33,7 @@ import java.util.List;
     //0 = col, 1 = row
 
     @Override
-        public void runOpMode() {
+        public void runOpMode() throws InstantiationException{
            int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
             webcam = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
             webcam.openCameraDevice();
@@ -55,6 +55,7 @@ import java.util.List;
                 telemetry.addData("Values", valdown+ " "+valup);
                 telemetry.addData("Height", rows);
                 telemetry.addData("Width", cols);
+                telemetry.addData("", contoursList);
                 telemetry.update();
                 sleep(100);
             }
@@ -63,7 +64,7 @@ import java.util.List;
             Mat all = new Mat();
             Mat yCbCrChan2Mat = new Mat();
             Mat thresholdMat = new Mat();
-            List<MatOfPoint> contoursList = new ArrayList<>();
+            public List<MatOfPoint> contoursList = new ArrayList<>();
             enum Stage
             {
                 detection,//includes outlines
@@ -100,17 +101,38 @@ import java.util.List;
                 Imgproc.threshold(yCbCrChan2Mat, thresholdMat, 102, 255, Imgproc.THRESH_BINARY_INV);
                 Imgproc.findContours(thresholdMat, contoursList, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
                 yCbCrChan2Mat.copyTo(all);
-                double[] pixMid = thresholdMat.get((int)(input.rows()* downPos[1]), (int)(input.cols()* downPos[0]));//gets value at circle
+
+                /* double[] pixMid = thresholdMat.get((int)(input.rows()* downPos[1]), (int)(input.cols()* downPos[0]));//gets value at circle
                 valdown = (int)pixMid[0];
                 double[] pixLeft = thresholdMat.get((int)(input.rows()* upPos[1]), (int)(input.cols()* upPos[0]));//gets value at circle
                 valup = (int)pixLeft[0];
 
                 Point pointdown = new Point((int)(input.cols()* downPos[0]), (int)(input.rows()* downPos[1]));
                 Point pointup = new Point((int)(input.cols()* upPos[0]), (int)(input.rows()* upPos[1]));
-
                 Imgproc.circle(all, pointdown,5, new Scalar( 255, 0, 0 ),1 );//draws circle
                 Imgproc.circle(all, pointup,5, new Scalar( 255, 0, 0 ),1 );//draws circle
-                return all;
+                */switch (stageToRenderToViewport)
+                {
+                    case THRESHOLD:
+                    {
+                        return thresholdMat;
+                    }
+
+                    case detection:
+                    {
+                        return all;
+                    }
+
+                    case RAW_IMAGE:
+                    {
+                        return input;
+                    }
+                    default:
+                    {
+                        return thresholdMat;
+                    }
+                }
+                //return thresholdMat;
             }
             //
         }
