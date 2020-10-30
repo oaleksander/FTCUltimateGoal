@@ -11,14 +11,14 @@ public class MovTest extends LinearOpMode {
     @Override
     public void runOpMode() {
 
-        WoENrobot.getInstance().forceInitRobot(this);
-        WoENrobot.tFdetector.initialize();
+        WoENrobot.forceInitRobot(this);
+      //  WoENrobot.tFdetector.initialize();
         //AutoTransitioner.transitionOnStop(this, "Teleop COMPETITION");
-        WoENrobot.tFdetectorThread.start();
-        WoENrobot.getInstance().startRobot();
+     //   WoENrobot.tFdetectorThread.start();
+        WoENrobot.startRobot();
 
 /*------------------------------------------------------------------------------------------------*/
-        switch(WoENrobot.tFdetector.retrieveResult())
+    /*    switch(WoENrobot.tFdetector.retrieveResult())
         {
             case 4:
                 WoENrobot.drivetrain.Pos(new Pose2D(50,100,Math.toRadians(45)));
@@ -29,7 +29,7 @@ public class MovTest extends LinearOpMode {
             default:
                 WoENrobot.drivetrain.Pos(new Pose2D(0,1,Math.toRadians(0)));
                 break;
-        }
+        } */
 
 /*------------------------------------------------------------------------------------------------*/
         while(opModeIsActive())

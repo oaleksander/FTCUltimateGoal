@@ -16,8 +16,8 @@ public class Tele_test extends LinearOpMode {
     @Override
     public void runOpMode() {
 
-        WoENrobot.getInstance().forceInitRobot(this);
-        WoENrobot.getInstance().startRobot();
+        WoENrobot.forceInitRobot(this);
+        WoENrobot.startRobot();
         WoENrobot.odometry.setRobotCoordinates(new Pose2D(62.5, -156.5, toRadians(180)));
         while(opModeIsActive())
         {

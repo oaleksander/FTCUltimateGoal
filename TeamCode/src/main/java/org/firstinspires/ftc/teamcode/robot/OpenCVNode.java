@@ -1,9 +1,12 @@
-package org.firstinspires.ftc.teamcode.opencv;
+package org.firstinspires.ftc.teamcode.robot;
 
 
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.robot.Robot;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.robot.WoENrobot;
+import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
@@ -22,47 +25,57 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class opencvnew {
-    OpenCvCamera webcam;
+public class OpenCVNode implements RobotModule {
+    static OpenCvCamera webcam;
     private final int rows = 640;
     private final int cols = 480;
     StageSwitchingPipeline pipeline = new StageSwitchingPipeline();
-    //0 = col, 1 = row
-    public void initialize(){
-        int cameraMonitorViewId = WoENrobot.getInstance().opMode.hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", WoENrobot.getInstance().opMode.hardwareMap.appContext.getPackageName());
+
+    private LinearOpMode opMode = null;
+
+    public void setOpMode(LinearOpMode opMode) {
+        this.opMode = opMode;
+    }
+
+    public void initialize() {
+        int cameraMonitorViewId = opMode.hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", opMode.hardwareMap.appContext.getPackageName());
         webcam = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
         webcam.setPipeline(pipeline);
-        /*webcam.openCameraDevice();
-        webcam.startStreaming(rows, cols, OpenCvCameraRotation.UPRIGHT);*/
-        webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
-        {
+        webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
-            public void onOpened()
-            {
+            public void onOpened() {
                 webcam.startStreaming(rows, cols, OpenCvCameraRotation.UPRIGHT);
             }
         });
     }
-    public double getMean(){
-        return pipeline.getMean();
-    }
-    public double getAspectRatio(){
-        return pipeline.getAspectRatio();
-    }
-    public StageSwitchingPipeline.StackSize getStackSize(){
+
+
+    public StackSize getStackSize() {
         return pipeline.stackSize;
     }
-    public void stopcam(){
+
+    public void stopcam() {
         webcam.stopStreaming();
     }
+    public StackSize retrieveResult() {
+        StackSize stackSize = getStackSize();
+        webcam.stopStreaming();
+        return stackSize;
+    }
 
+    public double getMean() {
+        return pipeline.mean;
+    }
+
+    public double getAspectRatio() {
+        return pipeline.aspectRatio;
+    }
+    public enum StackSize {
+        ZERO,
+        ONE,
+        FOUR
+    }
     static class StageSwitchingPipeline extends OpenCvPipeline {
-
-        public enum StackSize {
-            ZERO,
-            ONE,
-            FOUR
-        }
 
         private volatile StackSize stackSize = StackSize.ZERO;
         private double mean = 0.0;
@@ -162,12 +175,6 @@ public class opencvnew {
             }//return all;
         }
 
-        public double getMean() {
-                return mean;
-        }
-        public double getAspectRatio() {
-            return aspectRatio;
-        }
     }
 }
 

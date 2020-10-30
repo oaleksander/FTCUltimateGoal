@@ -3,11 +3,12 @@ package org.firstinspires.ftc.teamcode.superclasses;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.robot.OpenCVNode;
 import org.firstinspires.ftc.teamcode.robot.WoENrobot;
 
 public class SimpleRobot {
     public static LinearOpMode opMode = null;
-    protected RobotModule[] activeAobotModules;
+    protected static RobotModule[] activeAobotModules;
 
     public static boolean robotIsInitialized = false;
 
@@ -20,7 +21,7 @@ public class SimpleRobot {
         while(timer.milliseconds()<delay_ms && opMode.opModeIsActive());
     }
 
-    public void startRobot() {
+    public static void startRobot() {
         opMode.waitForStart();
         regulatorUpdater.start();
         Runtime.reset();
@@ -28,7 +29,7 @@ public class SimpleRobot {
         opMode.telemetry.update();
     }
 
-    public void initRobot(LinearOpMode opMode) {
+    public static void initRobot(LinearOpMode opMode) {
         if (!robotIsInitialized) {
             forceInitRobot(opMode);
             opMode.telemetry.addData("Status", "Initialization successful");
@@ -50,7 +51,7 @@ public class SimpleRobot {
 
     private static final boolean defaultNames = true;
 
-    public void forceInitRobot(LinearOpMode opMode) {
+    public static void forceInitRobot(LinearOpMode opMode) {
         WoENrobot.opMode = opMode;
         for(RobotModule robotModule : activeAobotModules)
         {
@@ -71,7 +72,17 @@ public class SimpleRobot {
         opMode.telemetry.update();
     }
 
-    Runnable updateRegulators = () -> {
+    public static void SimpleInit(LinearOpMode opMode) {
+        WoENrobot.initRobot(opMode);
+        WoENrobot.startRobot();
+    }
+    public static void FullInit(LinearOpMode opMode) {
+        WoENrobot.forceInitRobot(opMode);
+        WoENrobot.startRobot();
+    }
+
+
+    static Runnable updateRegulators = () -> {
         while(opMode.opModeIsActive()) {
             for(RobotModule robotModule : activeAobotModules)
             {
@@ -81,5 +92,5 @@ public class SimpleRobot {
         opMode.telemetry.update();
     };
 
-    private Thread regulatorUpdater = new Thread(updateRegulators);
+    private static Thread regulatorUpdater = new Thread(updateRegulators);
 }
