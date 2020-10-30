@@ -15,27 +15,26 @@ public class TestPos extends LinearOpMode {
     public void runOpMode() {
 
         WoENrobot.forceInitRobot(this);
-      //  WoENrobot.tFdetector.initialize();
+        //  WoENrobot.tFdetector.initialize();
         AutoTransitioner.transitionOnStop(this, "Teleop COMPETITION");
-     //   WoENrobot.tFdetectorThread.start();
+        //   WoENrobot.tFdetectorThread.start();
         WoENrobot.startRobot();
-       // WoENrobot.tFdetector.retrieveResult();
-        WoENrobot.odometry.setRobotCoordinates(new Pose2D (0,0,0));
-/*------------------------------------------------------------------------------------------------*/
+        // WoENrobot.tFdetector.retrieveResult();
+        WoENrobot.odometry.setRobotCoordinates(new Pose2D(0, 0, 0));
+        /*------------------------------------------------------------------------------------------------*/
 // AUTO CODE GOES HERE
-/*------------------------------------------------------------------------------------------------*/
-        WoENrobot.drivetrain.Pos(new Pose2D(0,0, toRadians(0)));
-        WoENrobot.drivetrain.Pos(new Pose2D(0,0, toRadians(180)));
-        WoENrobot.drivetrain.Pos(new Pose2D(15,30, toRadians(180)));
-        WoENrobot.drivetrain.Pos(new Pose2D(15,30, toRadians(90)));
-        while(opModeIsActive())
-        {
+        /*------------------------------------------------------------------------------------------------*/
+        WoENrobot.drivetrain.Pos(new Pose2D(0, 0, toRadians(0)));
+        WoENrobot.drivetrain.Pos(new Pose2D(0, 0, toRadians(180)));
+        WoENrobot.drivetrain.Pos(new Pose2D(15, 30, toRadians(180)));
+        WoENrobot.drivetrain.Pos(new Pose2D(15, 30, toRadians(90)));
+        while (opModeIsActive()) {
 
-            WoENrobot.drivetrain.holonomicMove(0,0,0);
-/*------------------------------------------------------------------------------------------------*/
+            WoENrobot.drivetrain.holonomicMove(0, 0, 0);
+            /*------------------------------------------------------------------------------------------------*/
 // FINISH LOOP CODE GOES HERE
-/*------------------------------------------------------------------------------------------------*/
-            telemetry.addData("Status", "Program finished ("+getRuntime()+")");
+            /*------------------------------------------------------------------------------------------------*/
+            telemetry.addData("Status", "Program finished (" + getRuntime() + ")");
             telemetry.update();
         }
 

@@ -14,18 +14,16 @@ public class MathUtil {
         }
     }
 
-    public static double angleWrap(double angle)
-    {
-        while (angle>PI) angle -= PI*2;
-        while (angle<-PI) angle += PI*2;
+    public static double angleWrap(double angle) {
+        while (angle > PI) angle -= PI * 2;
+        while (angle < -PI) angle += PI * 2;
         return angle;
     }
 
-    public static double cosFromSin(double sin, double angle)
-    {
-        double cos = Math.sqrt(1-sin*sin);
-        angle = angle % (PI*2);
-        if ((angle>PI) && (angle<PI*2))
+    public static double cosFromSin(double sin, double angle) {
+        double cos = Math.sqrt(1 - sin * sin);
+        angle = angle % (PI * 2);
+        if ((angle > PI) && (angle < PI * 2))
             cos *= -1;
         return cos;
     }

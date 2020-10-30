@@ -42,14 +42,12 @@ import org.openftc.easyopencv.OpenCvPipeline;
  * the sample regions over the first 3 stones.
  */
 @TeleOp
-public class SkystoneDeterminationExample extends LinearOpMode
-{
+public class SkystoneDeterminationExample extends LinearOpMode {
     OpenCvInternalCamera phoneCam;
     SkystoneDeterminationPipeline pipeline;
 
     @Override
-    public void runOpMode()
-    {
+    public void runOpMode() {
         /**
          * NOTE: Many comments have been omitted from this sample for the
          * sake of conciseness. If you're just starting out with EasyOpenCv,
@@ -67,19 +65,16 @@ public class SkystoneDeterminationExample extends LinearOpMode
         // landscape orientation, though.
         phoneCam.setViewportRenderingPolicy(OpenCvCamera.ViewportRenderingPolicy.OPTIMIZE_VIEW);
 
-        phoneCam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
-        {
+        phoneCam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
-            public void onOpened()
-            {
-                phoneCam.startStreaming(320,240, OpenCvCameraRotation.SIDEWAYS_LEFT);
+            public void onOpened() {
+                phoneCam.startStreaming(320, 240, OpenCvCameraRotation.SIDEWAYS_LEFT);
             }
         });
 
         waitForStart();
 
-        while (opModeIsActive())
-        {
+        while (opModeIsActive()) {
             telemetry.addData("Analysis", pipeline.getAnalysis());
             telemetry.update();
 
@@ -88,33 +83,20 @@ public class SkystoneDeterminationExample extends LinearOpMode
         }
     }
 
-    public static class SkystoneDeterminationPipeline extends OpenCvPipeline
-    {
-        /*
-         * An enum to define the skystone position
-         */
-        public enum SkystonePosition
-        {
-            LEFT,
-            CENTER,
-            RIGHT
-        }
-
+    public static class SkystoneDeterminationPipeline extends OpenCvPipeline {
         /*
          * Some color constants
          */
         static final Scalar BLUE = new Scalar(0, 0, 255);
         static final Scalar GREEN = new Scalar(0, 255, 0);
-
         /*
          * The core values which define the location and size of the sample regions
          */
-        static final Point REGION1_TOPLEFT_ANCHOR_POINT = new Point(109,98);
-        static final Point REGION2_TOPLEFT_ANCHOR_POINT = new Point(181,98);
-        static final Point REGION3_TOPLEFT_ANCHOR_POINT = new Point(253,98);
+        static final Point REGION1_TOPLEFT_ANCHOR_POINT = new Point(109, 98);
+        static final Point REGION2_TOPLEFT_ANCHOR_POINT = new Point(181, 98);
+        static final Point REGION3_TOPLEFT_ANCHOR_POINT = new Point(253, 98);
         static final int REGION_WIDTH = 20;
         static final int REGION_HEIGHT = 20;
-
         /*
          * Points which actually define the sample region rectangles, derived from above values
          *
@@ -150,7 +132,6 @@ public class SkystoneDeterminationExample extends LinearOpMode
         Point region3_pointB = new Point(
                 REGION3_TOPLEFT_ANCHOR_POINT.x + REGION_WIDTH,
                 REGION3_TOPLEFT_ANCHOR_POINT.y + REGION_HEIGHT);
-
         /*
          * Working variables
          */
@@ -158,7 +139,6 @@ public class SkystoneDeterminationExample extends LinearOpMode
         Mat YCrCb = new Mat();
         Mat Cb = new Mat();
         int avg1, avg2, avg3;
-
         // Volatile since accessed by OpMode thread w/o synchronization
         private volatile SkystonePosition position = SkystonePosition.LEFT;
 
@@ -166,15 +146,13 @@ public class SkystoneDeterminationExample extends LinearOpMode
          * This function takes the RGB frame, converts to YCrCb,
          * and extracts the Cb channel to the 'Cb' variable
          */
-        void inputToCb(Mat input)
-        {
+        void inputToCb(Mat input) {
             Imgproc.cvtColor(input, YCrCb, Imgproc.COLOR_RGB2YCrCb);
             Core.extractChannel(YCrCb, Cb, 2);
         }
 
         @Override
-        public void init(Mat firstFrame)
-        {
+        public void init(Mat firstFrame) {
             /*
              * We need to call this in order to make sure the 'Cb'
              * object is initialized, so that the submats we make
@@ -197,8 +175,7 @@ public class SkystoneDeterminationExample extends LinearOpMode
         }
 
         @Override
-        public Mat processFrame(Mat input)
-        {
+        public Mat processFrame(Mat input) {
             /*
              * Overview of what we're doing:
              *
@@ -294,7 +271,7 @@ public class SkystoneDeterminationExample extends LinearOpMode
              * Now that we found the max, we actually need to go and
              * figure out which sample region that value was from
              */
-            if(max == avg1) // Was it from region 1?
+            if (max == avg1) // Was it from region 1?
             {
                 position = SkystonePosition.LEFT; // Record our analysis
 
@@ -308,8 +285,7 @@ public class SkystoneDeterminationExample extends LinearOpMode
                         region1_pointB, // Second point which defines the rectangle
                         GREEN, // The color the rectangle is drawn in
                         -1); // Negative thickness means solid fill
-            }
-            else if(max == avg2) // Was it from region 2?
+            } else if (max == avg2) // Was it from region 2?
             {
                 position = SkystonePosition.CENTER; // Record our analysis
 
@@ -323,8 +299,7 @@ public class SkystoneDeterminationExample extends LinearOpMode
                         region2_pointB, // Second point which defines the rectangle
                         GREEN, // The color the rectangle is drawn in
                         -1); // Negative thickness means solid fill
-            }
-            else if(max == avg3) // Was it from region 3?
+            } else if (max == avg3) // Was it from region 3?
             {
                 position = SkystonePosition.RIGHT; // Record our analysis
 
@@ -351,9 +326,17 @@ public class SkystoneDeterminationExample extends LinearOpMode
         /*
          * Call this from the OpMode thread to obtain the latest analysis
          */
-        public SkystonePosition getAnalysis()
-        {
+        public SkystonePosition getAnalysis() {
             return position;
+        }
+
+        /*
+         * An enum to define the skystone position
+         */
+        public enum SkystonePosition {
+            LEFT,
+            CENTER,
+            RIGHT
         }
     }
 }

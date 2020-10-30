@@ -11,8 +11,9 @@ public class Pose2D extends Vector2D implements Cloneable {
         super(x, y);
         this.heading = angleWrap(heading);
     }
+
     public Pose2D() {
-        this(0,0,0);
+        this(0, 0, 0);
     }
 
     public Pose2D(@NotNull Vector2D p, double heading) {
@@ -22,22 +23,31 @@ public class Pose2D extends Vector2D implements Cloneable {
     public Pose2D add(@NotNull Pose2D p2) {
         return new Pose2D(x + p2.x, y + p2.y, heading + p2.heading);
     }
+
     public Pose2D substract(@NotNull Pose2D p2) {
         return new Pose2D(x - p2.x, y - p2.y, heading - p2.heading);
     }
+
     public Pose2D multiply(@NotNull Pose2D p2) {
         return new Pose2D(x * p2.x, y * p2.y, heading * p2.heading);
     }
+
     public Pose2D divideByPose(@NotNull Pose2D p2) {
         return new Pose2D(x / p2.x, y / p2.y, heading / p2.heading);
     }
+
     public Pose2D divideByDouble(@NotNull double d) {
         return new Pose2D(x / d, y / d, heading / d);
     }
+
     public Pose2D minus(@org.jetbrains.annotations.NotNull Pose2D p2) {
         return new Pose2D(x - p2.x, y - p2.y, heading - p2.heading);
     }
-    public Pose2D scale(double d) {return new Pose2D(x * d, y * d, heading * d);}
+
+    public Pose2D scale(double d) {
+        return new Pose2D(x * d, y * d, heading * d);
+    }
+
     public void clampAbs(@NotNull Pose2D p2) {
         x = Math.copySign(minAbs(x, p2.x), x);
         y = Math.copySign(minAbs(y, p2.y), y);

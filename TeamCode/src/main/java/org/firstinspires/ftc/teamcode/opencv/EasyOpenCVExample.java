@@ -37,14 +37,12 @@ import org.openftc.easyopencv.OpenCvInternalCamera;
 import org.openftc.easyopencv.OpenCvPipeline;
 
 @TeleOp
-public class EasyOpenCVExample extends LinearOpMode
-{
+public class EasyOpenCVExample extends LinearOpMode {
     OpenCvInternalCamera phoneCam;
     SkystoneDeterminationPipeline pipeline;
 
     @Override
-    public void runOpMode()
-    {
+    public void runOpMode() {
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         phoneCam = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
@@ -56,19 +54,16 @@ public class EasyOpenCVExample extends LinearOpMode
         // landscape orientation, though.
         phoneCam.setViewportRenderingPolicy(OpenCvCamera.ViewportRenderingPolicy.OPTIMIZE_VIEW);
 
-        phoneCam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
-        {
+        phoneCam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
-            public void onOpened()
-            {
-                phoneCam.startStreaming(320,240, OpenCvCameraRotation.SIDEWAYS_LEFT);
+            public void onOpened() {
+                phoneCam.startStreaming(320, 240, OpenCvCameraRotation.SIDEWAYS_LEFT);
             }
         });
 
         waitForStart();
 
-        while (opModeIsActive())
-        {
+        while (opModeIsActive()) {
             telemetry.addData("Analysis", pipeline.getAnalysis());
             telemetry.addData("Position", pipeline.position);
             telemetry.update();
@@ -78,42 +73,26 @@ public class EasyOpenCVExample extends LinearOpMode
         }
     }
 
-    public static class SkystoneDeterminationPipeline extends OpenCvPipeline
-    {
-        /*
-         * An enum to define the skystone position
-         */
-        public enum RingPosition
-        {
-            FOUR,
-            ONE,
-            NONE
-        }
-
+    public static class SkystoneDeterminationPipeline extends OpenCvPipeline {
         /*
          * Some color constants
          */
         static final Scalar BLUE = new Scalar(0, 0, 255);
         static final Scalar GREEN = new Scalar(0, 255, 0);
-
         /*
          * The core values which define the location and size of the sample regions
          */
-        static final Point REGION1_TOPLEFT_ANCHOR_POINT = new Point(181,98);
-
+        static final Point REGION1_TOPLEFT_ANCHOR_POINT = new Point(181, 98);
         static final int REGION_WIDTH = 35;
         static final int REGION_HEIGHT = 25;
-
         final int FOUR_RING_THRESHOLD = 150;
         final int ONE_RING_THRESHOLD = 135;
-
         Point region1_pointA = new Point(
                 REGION1_TOPLEFT_ANCHOR_POINT.x,
                 REGION1_TOPLEFT_ANCHOR_POINT.y);
         Point region1_pointB = new Point(
                 REGION1_TOPLEFT_ANCHOR_POINT.x + REGION_WIDTH,
                 REGION1_TOPLEFT_ANCHOR_POINT.y + REGION_HEIGHT);
-
         /*
          * Working variables
          */
@@ -121,7 +100,6 @@ public class EasyOpenCVExample extends LinearOpMode
         Mat YCrCb = new Mat();
         Mat Cb = new Mat();
         int avg1;
-
         // Volatile since accessed by OpMode thread w/o synchronization
         private volatile RingPosition position = RingPosition.FOUR;
 
@@ -129,23 +107,20 @@ public class EasyOpenCVExample extends LinearOpMode
          * This function takes the RGB frame, converts to YCrCb,
          * and extracts the Cb channel to the 'Cb' variable
          */
-        void inputToCb(Mat input)
-        {
+        void inputToCb(Mat input) {
             Imgproc.cvtColor(input, YCrCb, Imgproc.COLOR_RGB2YCrCb);
             Core.extractChannel(YCrCb, Cb, 1);
         }
 
         @Override
-        public void init(Mat firstFrame)
-        {
+        public void init(Mat firstFrame) {
             inputToCb(firstFrame);
 
             region1_Cb = Cb.submat(new Rect(region1_pointA, region1_pointB));
         }
 
         @Override
-        public Mat processFrame(Mat input)
-        {
+        public Mat processFrame(Mat input) {
             inputToCb(input);
 
             avg1 = (int) Core.mean(region1_Cb).val[0];
@@ -158,11 +133,11 @@ public class EasyOpenCVExample extends LinearOpMode
                     2); // Thickness of the rectangle lines
 
             position = RingPosition.FOUR; // Record our analysis
-            if(avg1 > FOUR_RING_THRESHOLD){
+            if (avg1 > FOUR_RING_THRESHOLD) {
                 position = RingPosition.FOUR;
-            }else if (avg1 > ONE_RING_THRESHOLD){
+            } else if (avg1 > ONE_RING_THRESHOLD) {
                 position = RingPosition.ONE;
-            }else{
+            } else {
                 position = RingPosition.NONE;
             }
 
@@ -176,9 +151,17 @@ public class EasyOpenCVExample extends LinearOpMode
             return input;
         }
 
-        public int getAnalysis()
-        {
+        public int getAnalysis() {
             return avg1;
+        }
+
+        /*
+         * An enum to define the skystone position
+         */
+        public enum RingPosition {
+            FOUR,
+            ONE,
+            NONE
         }
     }
 }

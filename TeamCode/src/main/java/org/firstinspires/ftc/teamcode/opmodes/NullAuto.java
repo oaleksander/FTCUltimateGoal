@@ -12,20 +12,19 @@ public class NullAuto extends LinearOpMode {
     public void runOpMode() {
 
         WoENrobot.forceInitRobot(this);
-     //   WoENrobot.tFdetector.initialize();
+        //   WoENrobot.tFdetector.initialize();
         AutoTransitioner.transitionOnStop(this, "Teleop COMPETITION");
-      //  WoENrobot.tFdetectorThread.start();
+        //  WoENrobot.tFdetectorThread.start();
         WoENrobot.startRobot();
-     //   WoENrobot.tFdetector.retrieveResult();
-/*------------------------------------------------------------------------------------------------*/
+        //   WoENrobot.tFdetector.retrieveResult();
+        /*------------------------------------------------------------------------------------------------*/
 // AUTO CODE GOES HERE
-/*------------------------------------------------------------------------------------------------*/
-        while(opModeIsActive())
-        {
-/*------------------------------------------------------------------------------------------------*/
+        /*------------------------------------------------------------------------------------------------*/
+        while (opModeIsActive()) {
+            /*------------------------------------------------------------------------------------------------*/
 // FINISH LOOP CODE GOES HERE
-/*------------------------------------------------------------------------------------------------*/
-            telemetry.addData("Status", "Program finished ("+getRuntime()+")");
+            /*------------------------------------------------------------------------------------------------*/
+            telemetry.addData("Status", "Program finished (" + getRuntime() + ")");
             telemetry.update();
         }
     }

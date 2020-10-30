@@ -2,15 +2,10 @@ package org.firstinspires.ftc.teamcode.robot;
 
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.robot.Robot;
 
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.robot.WoENrobot;
 import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
-import org.opencv.core.MatOfPoint;
-import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
@@ -20,10 +15,6 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvInternalCamera;
 import org.openftc.easyopencv.OpenCvPipeline;
-
-import java.util.ArrayList;
-import java.util.List;
-
 
 public class OpenCVNode implements RobotModule {
     static OpenCvCamera webcam;
@@ -57,6 +48,7 @@ public class OpenCVNode implements RobotModule {
     public void stopcam() {
         webcam.stopStreaming();
     }
+
     public StackSize retrieveResult() {
         StackSize stackSize = getStackSize();
         webcam.stopStreaming();
@@ -70,29 +62,23 @@ public class OpenCVNode implements RobotModule {
     public double getAspectRatio() {
         return pipeline.aspectRatio;
     }
+
     public enum StackSize {
         ZERO,
         ONE,
         FOUR
     }
-    static class StageSwitchingPipeline extends OpenCvPipeline {
 
-        private volatile StackSize stackSize = StackSize.ZERO;
-        private double mean = 0.0;
-        private double aspectRatio = 0.0;
+    static class StageSwitchingPipeline extends OpenCvPipeline {
 
         Mat all = new Mat();
         Mat HSVMat = new Mat();
         Mat thresholdMat = new Mat();
-
-        enum Stage {
-            detection,//includes outlines
-            THRESHOLD,//b&w
-            RAW_IMAGE,//displays raw view
-        }
-
+        private volatile StackSize stackSize = StackSize.ZERO;
+        private double mean = 0.0;
+        private double aspectRatio = 0.0;
         private Stage stageToRenderToViewport = Stage.detection;
-        private Stage[] stages = Stage.values();
+        private final Stage[] stages = Stage.values();
 
         @Override
         public void onViewportTapped() {
@@ -115,7 +101,7 @@ public class OpenCVNode implements RobotModule {
         @Override
         public Mat processFrame(Mat input) {
             input.copyTo(all);
-            Imgproc.GaussianBlur(all,all,new Size(11, 11), 0);
+            Imgproc.GaussianBlur(all, all, new Size(11, 11), 0);
             Imgproc.cvtColor(all, HSVMat, Imgproc.COLOR_RGB2HSV);
 
             Core.inRange(HSVMat, new Scalar(7, (150 + Core.mean(HSVMat).val[1]) / 2, (100 + Core.mean(HSVMat).val[2]) / 2), new Scalar(17, 255, 255), thresholdMat);
@@ -152,6 +138,12 @@ public class OpenCVNode implements RobotModule {
                 }
 
             }//return all;
+        }
+
+        enum Stage {
+            detection,//includes outlines
+            THRESHOLD,//b&w
+            RAW_IMAGE,//displays raw view
         }
 
     }

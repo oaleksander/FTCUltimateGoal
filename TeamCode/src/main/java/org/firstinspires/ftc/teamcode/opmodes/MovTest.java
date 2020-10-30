@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.opmodes;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.math.Pose2D;
 import org.firstinspires.ftc.teamcode.robot.WoENrobot;
 
 @Autonomous(name = "Movement test")
@@ -12,12 +11,12 @@ public class MovTest extends LinearOpMode {
     public void runOpMode() {
 
         WoENrobot.forceInitRobot(this);
-      //  WoENrobot.tFdetector.initialize();
+        //  WoENrobot.tFdetector.initialize();
         //AutoTransitioner.transitionOnStop(this, "Teleop COMPETITION");
-     //   WoENrobot.tFdetectorThread.start();
+        //   WoENrobot.tFdetectorThread.start();
         WoENrobot.startRobot();
 
-/*------------------------------------------------------------------------------------------------*/
+        /*------------------------------------------------------------------------------------------------*/
     /*    switch(WoENrobot.tFdetector.retrieveResult())
         {
             case 4:
@@ -31,13 +30,12 @@ public class MovTest extends LinearOpMode {
                 break;
         } */
 
-/*------------------------------------------------------------------------------------------------*/
-        while(opModeIsActive())
-        {
-/*------------------------------------------------------------------------------------------------*/
+        /*------------------------------------------------------------------------------------------------*/
+        while (opModeIsActive()) {
+            /*------------------------------------------------------------------------------------------------*/
 // FINISH LOOP CODE GOES HERE
-/*------------------------------------------------------------------------------------------------*/
-            telemetry.addData("Status", "Program finished ("+getRuntime()+")");
+            /*------------------------------------------------------------------------------------------------*/
+            telemetry.addData("Status", "Program finished (" + getRuntime() + ")");
             telemetry.update();
         }
     }

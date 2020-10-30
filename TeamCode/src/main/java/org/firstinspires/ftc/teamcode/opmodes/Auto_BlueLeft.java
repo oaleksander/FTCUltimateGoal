@@ -1,11 +1,8 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.math.Pose2D;
-import org.firstinspires.ftc.teamcode.misc.AutoTransitioner;
-import org.firstinspires.ftc.teamcode.robot.OpenCVNode.StackSize;
 import org.firstinspires.ftc.teamcode.robot.WoENrobot;
 import org.firstinspires.ftc.teamcode.superclasses.BlueLeftAutonomous;
 
