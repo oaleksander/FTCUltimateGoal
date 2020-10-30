@@ -32,21 +32,18 @@ public class opencvnew extends LinearOpMode {
     public void runOpMode() {
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         webcam = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
-        webcam.openCameraDevice();
         StageSwitchingPipeline pipeline = new StageSwitchingPipeline();
-
         webcam.setPipeline(pipeline);
-        webcam.startStreaming(rows, cols, OpenCvCameraRotation.UPRIGHT);
-
-       /* webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
+        /*webcam.openCameraDevice();
+        webcam.startStreaming(rows, cols, OpenCvCameraRotation.UPRIGHT);*/
+        webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
         {
             @Override
             public void onOpened()
             {
-                   webcam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
+                webcam.startStreaming(rows, cols, OpenCvCameraRotation.UPRIGHT);
             }
         });
-*/
         waitForStart();
 
         while (opModeIsActive()) {
@@ -75,7 +72,6 @@ public class opencvnew extends LinearOpMode {
         Mat all = new Mat();
         Mat HSVMat = new Mat();
         Mat thresholdMat = new Mat();
-        List<MatOfPoint> contoursList = new ArrayList<>();
 
         enum Stage {
             detection,//includes outlines
@@ -106,18 +102,17 @@ public class opencvnew extends LinearOpMode {
 
         @Override
         public Mat processFrame(Mat input) {
-            Imgproc.resize(input, input, new Size(800, 600));
             input.copyTo(all);
             Imgproc.cvtColor(input, HSVMat, Imgproc.COLOR_RGB2HSV);
 
-            Core.inRange(HSVMat, new Scalar(7, (110 + Core.mean(HSVMat).val[1]) / 2, (50 + Core.mean(HSVMat).val[2]) / 2), new Scalar(17, 255, 255), thresholdMat);
-            Imgproc.erode(thresholdMat, thresholdMat, Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(45, 10)));
-            Imgproc.dilate(thresholdMat, thresholdMat, Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(45, 15)));
+            Core.inRange(HSVMat, new Scalar(7, (150 + Core.mean(HSVMat).val[1]) / 2, (100 + Core.mean(HSVMat).val[2]) / 2), new Scalar(17, 255, 255), thresholdMat);
+            //Core.inRange(HSVMat, new Scalar(7, (110 + Core.mean(HSVMat).val[1]) / 2, (50 + Core.mean(HSVMat).val[2]) / 2), new Scalar(17, 255, 255), thresholdMat);
+            Imgproc.erode(thresholdMat, thresholdMat, Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(35, 5)));
+            //Imgproc.erode(thresholdMat, thresholdMat, Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(45, 10)));
+            Imgproc.dilate(thresholdMat, thresholdMat, Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(35, 15)));
+            //Imgproc.dilate(thresholdMat, thresholdMat, Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(45, 15)));
 
             Rect rect = Imgproc.boundingRect(thresholdMat);
-
-            Imgproc.findContours(thresholdMat, contoursList, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
-            Imgproc.drawContours(all, contoursList, -1, new Scalar(0, 255, 0), 5);
 
             Imgproc.rectangle(all, rect, new Scalar(0, 0, 255), 2);
 
@@ -164,7 +159,8 @@ public class opencvnew extends LinearOpMode {
                 default: {
                     return thresholdMat;
                 }
-            }
+
+            }//return all;
         }
 
         public double getMean() {
