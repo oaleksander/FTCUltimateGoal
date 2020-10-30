@@ -115,14 +115,12 @@ public class OpenCVNode implements RobotModule {
         @Override
         public Mat processFrame(Mat input) {
             input.copyTo(all);
-            Imgproc.cvtColor(input, HSVMat, Imgproc.COLOR_RGB2HSV);
+            Imgproc.GaussianBlur(all,all,new Size(11, 11), 0);
+            Imgproc.cvtColor(all, HSVMat, Imgproc.COLOR_RGB2HSV);
 
             Core.inRange(HSVMat, new Scalar(7, (150 + Core.mean(HSVMat).val[1]) / 2, (100 + Core.mean(HSVMat).val[2]) / 2), new Scalar(17, 255, 255), thresholdMat);
-            //Core.inRange(HSVMat, new Scalar(7, (110 + Core.mean(HSVMat).val[1]) / 2, (50 + Core.mean(HSVMat).val[2]) / 2), new Scalar(17, 255, 255), thresholdMat);
             Imgproc.erode(thresholdMat, thresholdMat, Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(35, 5)));
-            //Imgproc.erode(thresholdMat, thresholdMat, Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(45, 10)));
             Imgproc.dilate(thresholdMat, thresholdMat, Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(35, 15)));
-            //Imgproc.dilate(thresholdMat, thresholdMat, Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(45, 15)));
 
             Rect rect = Imgproc.boundingRect(thresholdMat);
 
@@ -139,27 +137,7 @@ public class OpenCVNode implements RobotModule {
                 stackSize = StackSize.ZERO;
                 aspectRatio = 0.0;
             }
-
-
-               /* Core.extractChannel(yCbCrChan2Mat, yCbCrChan2Mat, 2);//takes cb difference and stores
-                Imgproc.threshold(yCbCrChan2Mat, thresholdMat, 102, 255, Imgproc.THRESH_BINARY_INV);
-                Imgproc.findContours(thresholdMat, contoursList, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
-               */// HSVMat.copyTo(all);
-
-                /* double[] pixMid = thresholdMat.get((int)(input.rows()* downPos[1]), (int)(input.cols()* downPos[0]));//gets value at circle
-                valdown = (int)pixMid[0];
-                double[] pixLeft = thresholdMat.get((int)(input.rows()* upPos[1]), (int)(input.cols()* upPos[0]));//gets value at circle
-                valup = (int)pixLeft[0];
-
-                Point pointdown = new Point((int)(input.cols()* downPos[0]), (int)(input.rows()* downPos[1]));
-                Point pointup = new Point((int)(input.cols()* upPos[0]), (int)(input.rows()* upPos[1]));
-                Imgproc.circle(all, pointdown,5, new Scalar( 255, 0, 0 ),1 );//draws circle
-                Imgproc.circle(all, pointup,5, new Scalar( 255, 0, 0 ),1 );//draws circle
-                */
             switch (stageToRenderToViewport) {
-                case THRESHOLD: {
-                    return thresholdMat;
-                }
 
                 case detection: {
                     return all;
@@ -168,6 +146,7 @@ public class OpenCVNode implements RobotModule {
                 case RAW_IMAGE: {
                     return input;
                 }
+                case THRESHOLD:
                 default: {
                     return thresholdMat;
                 }
