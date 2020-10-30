@@ -8,6 +8,7 @@ import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
+import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
@@ -21,25 +22,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 @TeleOp
-    public class opencvnew extends LinearOpMode {
-        OpenCvCamera webcam;
-    private static int valdown = -1;
-    private static int valup = -1;
-        private final int rows = 640;
-        private final int cols = 480;
-    private static float offsetX = 0f/8f;//changing this moves the three rects and the three circles left or right, range : (-2, 2) not inclusive
-    private static float offsetY = 0f/8f;
-    private static float[] downPos = {4f/8f+offsetX, 4f/8f+offsetY};
-    private static float[] upPos = {4f/8f+offsetX,3.5f/8f+offsetY};
+public class opencvnew extends LinearOpMode {
+    OpenCvCamera webcam;
+    private final int rows = 640;
+    private final int cols = 480;
     //0 = col, 1 = row
 
     @Override
-        public void runOpMode() {
-           int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-            webcam = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
-            webcam.openCameraDevice();
-             webcam.setPipeline(new opencvnew.StageSwitchingPipeline());
-            webcam.startStreaming(rows, cols, OpenCvCameraRotation.UPRIGHT);
+    public void runOpMode() {
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        webcam = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
+        webcam.openCameraDevice();
+        StageSwitchingPipeline pipeline = new StageSwitchingPipeline();
+
+        webcam.setPipeline(pipeline);
+        webcam.startStreaming(rows, cols, OpenCvCameraRotation.UPRIGHT);
 
        /* webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
         {
@@ -50,65 +47,97 @@ import java.util.List;
             }
         });
 */
-            waitForStart();
+        waitForStart();
 
-            while (opModeIsActive()) {
-                telemetry.addData("Values", valdown+ " "+valup);
-                telemetry.addData("Height", rows);
-                telemetry.addData("Width", cols);
-               // telemetry.addData("", StageSwitchingPipeline.contoursList);
-                telemetry.update();
-                sleep(100);
-            }
+        while (opModeIsActive()) {
+            telemetry.addData("Mean", pipeline.getMean());
+            telemetry.addData("AspectRatio", pipeline.getAspectRatio());
+            telemetry.addData("StackSize", pipeline.stackSize);
+            telemetry.addData("Height", rows);
+            telemetry.addData("Width", cols);
+            telemetry.update();
+            sleep(100);
         }
-        static class StageSwitchingPipeline extends OpenCvPipeline {
-            Mat all = new Mat();
-            Mat yCbCrChan2Mat = new Mat();
-            Mat thresholdMat = new Mat();
-            List<MatOfPoint> contoursList = new ArrayList<>();
-            enum Stage
-            {
-                detection,//includes outlines
-                THRESHOLD,//b&w
-                RAW_IMAGE,//displays raw view
+    }
+
+    static class StageSwitchingPipeline extends OpenCvPipeline {
+
+        public enum StackSize {
+            ZERO,
+            ONE,
+            FOUR
+        }
+
+        private volatile StackSize stackSize = StackSize.ZERO;
+        private double mean = 0.0;
+        private double aspectRatio = 0.0;
+
+        Mat all = new Mat();
+        Mat HSVMat = new Mat();
+        Mat thresholdMat = new Mat();
+        List<MatOfPoint> contoursList = new ArrayList<>();
+
+        enum Stage {
+            detection,//includes outlines
+            THRESHOLD,//b&w
+            RAW_IMAGE,//displays raw view
+        }
+
+        private Stage stageToRenderToViewport = Stage.detection;
+        private Stage[] stages = Stage.values();
+
+        @Override
+        public void onViewportTapped() {
+            /*
+             * Note that this method is invoked from the UI thread
+             * so whatever we do here, we must do quickly.
+             */
+
+            int currentStageNum = stageToRenderToViewport.ordinal();
+
+            int nextStageNum = currentStageNum + 1;
+
+            if (nextStageNum >= stages.length) {
+                nextStageNum = 0;
             }
-            private openCVsample.StageSwitchingPipeline.Stage stageToRenderToViewport = openCVsample.StageSwitchingPipeline.Stage.detection;
-            private openCVsample.StageSwitchingPipeline.Stage[] stages = openCVsample.StageSwitchingPipeline.Stage.values();
-            @Override
-            public void onViewportTapped()
-            {
-                /*
-                 * Note that this method is invoked from the UI thread
-                 * so whatever we do here, we must do quickly.
-                 */
 
-                int currentStageNum = stageToRenderToViewport.ordinal();
+            stageToRenderToViewport = stages[nextStageNum];
+        }
 
-                int nextStageNum = currentStageNum + 1;
+        @Override
+        public Mat processFrame(Mat input) {
+            Imgproc.resize(input, input, new Size(800, 600));
+            input.copyTo(all);
+            Imgproc.cvtColor(input, HSVMat, Imgproc.COLOR_RGB2HSV);
 
-                if(nextStageNum >= stages.length)
-                {
-                    nextStageNum = 0;
-                }
+            Core.inRange(HSVMat, new Scalar(7, (110 + Core.mean(HSVMat).val[1]) / 2, (50 + Core.mean(HSVMat).val[2]) / 2), new Scalar(17, 255, 255), thresholdMat);
+            Imgproc.erode(thresholdMat, thresholdMat, Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(45, 10)));
+            Imgproc.dilate(thresholdMat, thresholdMat, Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(45, 15)));
 
-                stageToRenderToViewport = stages[nextStageNum];
+            Rect rect = Imgproc.boundingRect(thresholdMat);
+
+            Imgproc.findContours(thresholdMat, contoursList, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
+            Imgproc.drawContours(all, contoursList, -1, new Scalar(0, 255, 0), 5);
+
+            Imgproc.rectangle(all, rect, new Scalar(0, 0, 255), 2);
+
+            mean = Core.mean(thresholdMat).val[0];
+
+            if (mean > 0.1) {
+                aspectRatio = (double) rect.width / (double) rect.height;
+                if (aspectRatio > 1.75)
+                    stackSize = StackSize.ONE;
+                else stackSize = StackSize.FOUR;
+            } else {
+                stackSize = StackSize.ZERO;
+                aspectRatio = 0.0;
             }
-
-            @Override
-            public Mat processFrame(Mat input)
-            {
-                Imgproc.cvtColor(input, yCbCrChan2Mat, Imgproc.COLOR_RGB2HSV);
-                Core.inRange(yCbCrChan2Mat,new Scalar(10,150,100),new Scalar(20,255,255),thresholdMat);
-                Imgproc.erode(thresholdMat,thresholdMat,Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(15,15)));
-                Imgproc.dilate(thresholdMat,thresholdMat,Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(30,30)));
-                Imgproc.findContours(thresholdMat, contoursList, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
-                Imgproc.drawContours(thresholdMat, contoursList, -1, new Scalar(0,255,0),30);
 
 
                /* Core.extractChannel(yCbCrChan2Mat, yCbCrChan2Mat, 2);//takes cb difference and stores
                 Imgproc.threshold(yCbCrChan2Mat, thresholdMat, 102, 255, Imgproc.THRESH_BINARY_INV);
                 Imgproc.findContours(thresholdMat, contoursList, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
-               */ yCbCrChan2Mat.copyTo(all);
+               */// HSVMat.copyTo(all);
 
                 /* double[] pixMid = thresholdMat.get((int)(input.rows()* downPos[1]), (int)(input.cols()* downPos[0]));//gets value at circle
                 valdown = (int)pixMid[0];
@@ -119,30 +148,31 @@ import java.util.List;
                 Point pointup = new Point((int)(input.cols()* upPos[0]), (int)(input.rows()* upPos[1]));
                 Imgproc.circle(all, pointdown,5, new Scalar( 255, 0, 0 ),1 );//draws circle
                 Imgproc.circle(all, pointup,5, new Scalar( 255, 0, 0 ),1 );//draws circle
-                */switch (stageToRenderToViewport)
-                {
-                    case THRESHOLD:
-                    {
-                        return thresholdMat;
-                    }
-
-                    case detection:
-                    {
-                        return all;
-                    }
-
-                    case RAW_IMAGE:
-                    {
-                        return input;
-                    }
-                    default:
-                    {
-                        return thresholdMat;
-                    }
+                */
+            switch (stageToRenderToViewport) {
+                case THRESHOLD: {
+                    return thresholdMat;
                 }
-                //return thresholdMat;
+
+                case detection: {
+                    return all;
+                }
+
+                case RAW_IMAGE: {
+                    return input;
+                }
+                default: {
+                    return thresholdMat;
+                }
             }
-            //
+        }
+
+        public double getMean() {
+                return mean;
+        }
+        public double getAspectRatio() {
+            return aspectRatio;
         }
     }
+}
 
