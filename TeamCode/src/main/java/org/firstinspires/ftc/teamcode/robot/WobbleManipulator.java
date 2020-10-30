@@ -1,28 +1,30 @@
 package org.firstinspires.ftc.teamcode.robot;
 
-import android.icu.lang.UCharacter;
-
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.robot.Robot;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
 
-public class WobbleManipulator implements RobotModule{
+public class WobbleManipulator implements RobotModule {
 
+    static final double minerror = 15, maxspeed = 1, kofP = 0.0015, kofd = 0.00001;
     public static DcMotorEx lever = null;
-    public ElapsedTime levertime = new ElapsedTime();
     public static Servo close = null;
-
+    public static boolean isGrabbed = false;
+    static double pos = 0;
+    public ElapsedTime levertime = new ElapsedTime();
+    double power = 0, P = 0, D = 0, errorOld = 0, error = 0;
     private LinearOpMode opMode = null;
-    public void setOpMode(LinearOpMode opMode) {this.opMode = opMode;}
 
-    public void initialize(){
+    public void setOpMode(LinearOpMode opMode) {
+        this.opMode = opMode;
+    }
+
+    public void initialize() {
         lever = opMode.hardwareMap.get(DcMotorEx.class, "lever");
         close = opMode.hardwareMap.get(Servo.class, "wobbleGrabber");
 
@@ -32,18 +34,16 @@ public class WobbleManipulator implements RobotModule{
         lever.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
     }
-    public static boolean isGrabbed = false;
-    public void setposclose(boolean dograb){
+
+    public void setposclose(boolean dograb) {
         isGrabbed = dograb;
         if (dograb) close.setPosition(0.5);
         else close.setPosition(1);
     }
-    static final double minerror = 15, maxspeed = 1, kofP = 0.0015, kofd = 0.00001;
-    double power = 0,  P = 0, D = 0, errorOld = 0,error = 0;
-    static double pos = 0;
-    public void update(){
-        error = pos-lever.getCurrentPosition();
-        if (Math.abs(error)>minerror) {
+
+    public void update() {
+        error = pos - lever.getCurrentPosition();
+        if (Math.abs(error) > minerror) {
             P = error * kofP;
             D = (error - errorOld) * kofd;
             power = P + D;
@@ -56,14 +56,13 @@ public class WobbleManipulator implements RobotModule{
             WoENrobot.getInstance().opMode.telemetry.addData("enc",lever.getCurrentPosition());
             WoENrobot.getInstance().opMode.telemetry.update(); */
             errorOld = error;
-        }
-        else
-        {
+        } else {
             lever.setPower(0);
         }
     }
-    public  void setposlever(double pos){
-        this.pos = pos;
+
+    public void setposlever(double pos) {
+        WobbleManipulator.pos = pos;
 
     }
 

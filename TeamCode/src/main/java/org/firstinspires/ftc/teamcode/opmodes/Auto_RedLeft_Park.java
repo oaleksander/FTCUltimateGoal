@@ -17,7 +17,7 @@ public class Auto_RedLeft_Park extends LinearOpMode {
         WoENrobot.forceInitRobot(this);
         //WoENrobot.tFdetector.initialize();
         AutoTransitioner.transitionOnStop(this, "Teleop COMPETITION");
-       // WoENrobot.tFdetectorThread.start();
+        // WoENrobot.tFdetectorThread.start();
         WoENrobot.odometry.setRobotCoordinates(new Pose2D(62.5, -156.5, toRadians(180)));
         WoENrobot.startRobot();
         WoENrobot.drivetrain.Pos(new Pose2D(62.5, 25, toRadians(180)));

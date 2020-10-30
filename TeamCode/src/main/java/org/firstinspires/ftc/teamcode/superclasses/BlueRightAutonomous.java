@@ -1,9 +1,8 @@
 package org.firstinspires.ftc.teamcode.superclasses;
 
-public class BlueRightAutonomous extends BlueAutonomous{
+public class BlueRightAutonomous extends BlueAutonomous {
     @Override
-    int getSideSign()
-    {
+    int getSideSign() {
         return 1;
     }
 }

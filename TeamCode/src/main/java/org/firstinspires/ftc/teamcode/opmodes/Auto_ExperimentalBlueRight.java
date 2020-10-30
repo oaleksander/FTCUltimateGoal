@@ -17,7 +17,7 @@ public class Auto_ExperimentalBlueRight extends LinearOpMode {
         WoENrobot.forceInitRobot(this);
         //WoENrobot.tFdetector.initialize();
         AutoTransitioner.transitionOnStop(this, "Teleop COMPETITION");
-     //   WoENrobot.tFdetectorThread.start();
+        //   WoENrobot.tFdetectorThread.start();
         WoENrobot.odometry.setRobotCoordinates(new Pose2D(-62.5, -156.5, toRadians(180)));
         WoENrobot.startRobot();
         WoENrobot.wobbleManipulator.setposclose(true);

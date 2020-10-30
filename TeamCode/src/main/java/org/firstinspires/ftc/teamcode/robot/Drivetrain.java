@@ -4,7 +4,6 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
@@ -12,61 +11,63 @@ import org.firstinspires.ftc.teamcode.math.Pose2D;
 import org.firstinspires.ftc.teamcode.math.Vector2D;
 import org.firstinspires.ftc.teamcode.superclasses.Odometry;
 import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
-import org.firstinspires.ftc.teamcode.superclasses.SimpleRobot;
 import org.jetbrains.annotations.NotNull;
 import org.openftc.revextensions2.ExpansionHubEx;
 import org.openftc.revextensions2.ExpansionHubMotor;
 
-import java.util.Vector;
-
 import static com.qualcomm.robotcore.util.Range.clip;
-import static java.lang.Math.PI;
 import static java.lang.Math.abs;
 import static java.lang.Math.cos;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
-import static java.lang.Math.rint;
 import static java.lang.Math.signum;
 import static java.lang.Math.sin;
 import static java.lang.Math.toDegrees;
-import static java.lang.Math.toRadians;
-import static org.firstinspires.ftc.teamcode.math.MathUtil.angleWrap;
 
 public class Drivetrain implements RobotModule {
 
+    public static final double kP_distance = 0.021, kD_distance = 0.00034;
+    public static final double minImpact = 0.1;
+    public static final double minError_distance = 13;
+    public static final double kP_angle = 0.34, kD_angle = 0;
+    public static final double minError_angle = Math.toRadians(5.5);
     /* Drivetrain hardware members. */
     public static ExpansionHubEx expansionHub1 = null;
     public static DcMotorEx driveFrontLeft = null;
     public static DcMotorEx driveFrontRight = null;
     public static DcMotorEx driveRearLeft = null;
     public static DcMotorEx driveRearRight = null;
-
     public static ExpansionHubEx expansionHub2 = null;
+
+    /* Drivetrain constatnts. */
     public static ExpansionHubMotor odometerYL = null;
     public static ExpansionHubMotor odometerYR = null;
     public static ExpansionHubMotor odometerX = null;
-
     public static BNO055IMU imuLeft;
     public static BNO055IMU imuRight;
-
-    /* Drivetrain constatnts. */
-
-    public float imuLeftAngleOffset = 0;
-    public float imuRightAngleOffset = 0;
-
     public static double maxDriveSpeed = 1;
     public static double minDriveSpeed = 0.05;
-
-
-
-    private Odometry odometry;
-
+    public float imuLeftAngleOffset = 0;
+    public float imuRightAngleOffset = 0;
+    double powerFrontLeft = 0;
+    double powerFrontRight = 0;
+    double powerRearLeft = 0;
+    double powerRearRight = 0;
+    double powerFrontLeft_old = powerFrontLeft;
+    double powerFrontRight_old = powerFrontRight;
+    double powerRearLeft_old = powerRearLeft;
+    double powerRearRight_old = powerRearRight;
+    ElapsedTime looptime = new ElapsedTime();
+    private final Odometry odometry;
+    private LinearOpMode opMode = null;
+    private final double maxRampPerSec = 1 / 0.25;
     public Drivetrain(Odometry odometry) {
         this.odometry = odometry;
     }
 
-    private LinearOpMode opMode = null;
-    public void setOpMode(LinearOpMode opMode) {this.opMode = opMode;}
+    public void setOpMode(LinearOpMode opMode) {
+        this.opMode = opMode;
+    }
 
     public void initialize() {
         assignNames();
@@ -97,16 +98,14 @@ public class Drivetrain implements RobotModule {
         driveRearRight.setZeroPowerBehavior(zeroPowerBehavior);
     }
 
-    private void setMode(DcMotorEx.RunMode runMode)
-    {
+    private void setMode(DcMotorEx.RunMode runMode) {
         driveFrontLeft.setMode(runMode);
         driveFrontRight.setMode(runMode);
         driveRearLeft.setMode(runMode);
         driveRearRight.setMode(runMode);
     }
 
-    private void resetEncoders()
-    {
+    private void resetEncoders() {
         setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
     }
 
@@ -118,35 +117,23 @@ public class Drivetrain implements RobotModule {
         minDriveSpeed = clip(abs(value), 0, 1);
     }
 
-    double powerFrontLeft = 0;
-    double powerFrontRight = 0;
-    double powerRearLeft = 0;
-    double powerRearRight = 0;
-
-    double powerFrontLeft_old = powerFrontLeft;
-    double powerFrontRight_old = powerFrontRight;
-    double powerRearLeft_old = powerRearLeft;
-    double powerRearRight_old = powerRearRight;
-
-    ElapsedTime looptime = new ElapsedTime();
-    private double maxRampPerSec = 1/0.25;
     public void update() {
-        if(powerFrontLeft == 0)
+        if (powerFrontLeft == 0)
             powerFrontLeft_old = 0;
         else
-            powerFrontLeft_old += min(abs(powerFrontLeft - powerFrontLeft_old), abs(looptime.seconds()*maxRampPerSec))*signum(powerFrontLeft - powerFrontLeft_old);
-        if(powerFrontRight == 0)
+            powerFrontLeft_old += min(abs(powerFrontLeft - powerFrontLeft_old), abs(looptime.seconds() * maxRampPerSec)) * signum(powerFrontLeft - powerFrontLeft_old);
+        if (powerFrontRight == 0)
             powerFrontRight_old = 0;
         else
-            powerFrontRight_old += min(abs(powerFrontRight - powerFrontRight_old), abs(looptime.seconds()*maxRampPerSec))*signum(powerFrontRight - powerFrontRight_old);
-        if(powerRearLeft == 0)
+            powerFrontRight_old += min(abs(powerFrontRight - powerFrontRight_old), abs(looptime.seconds() * maxRampPerSec)) * signum(powerFrontRight - powerFrontRight_old);
+        if (powerRearLeft == 0)
             powerRearLeft_old = 0;
         else
-            powerRearLeft_old += min(abs(powerRearLeft - powerRearLeft_old), abs(looptime.seconds()*maxRampPerSec))*signum(powerRearLeft - powerRearLeft_old);
-        if(powerRearRight == 0)
+            powerRearLeft_old += min(abs(powerRearLeft - powerRearLeft_old), abs(looptime.seconds() * maxRampPerSec)) * signum(powerRearLeft - powerRearLeft_old);
+        if (powerRearRight == 0)
             powerRearRight_old = 0;
         else
-            powerRearRight_old += min(abs(powerRearRight - powerRearRight_old), abs(looptime.seconds()*maxRampPerSec))*signum(powerRearRight - powerRearRight_old);
+            powerRearRight_old += min(abs(powerRearRight - powerRearRight_old), abs(looptime.seconds() * maxRampPerSec)) * signum(powerRearRight - powerRearRight_old);
 
         driveFrontLeft.setPower(powerFrontLeft_old);
         driveFrontRight.setPower(powerFrontRight_old);
@@ -158,9 +145,8 @@ public class Drivetrain implements RobotModule {
 
     public void driveMotorPowers(double frontLeft, double frontRight, double rearLeft, double rearRight) {
 
-        double maxabs = max(max(abs(frontLeft),abs(frontRight)),max(abs(rearLeft),abs(rearRight)));
-        if (maxabs>maxDriveSpeed)
-        {
+        double maxabs = max(max(abs(frontLeft), abs(frontRight)), max(abs(rearLeft), abs(rearRight)));
+        if (maxabs > maxDriveSpeed) {
             frontLeft /= maxabs;
             frontRight /= maxabs;
             rearLeft /= maxabs;
@@ -237,13 +223,6 @@ public class Drivetrain implements RobotModule {
         holonomicMove(coordinates.y, coordinates.x, move.heading);
     }
 
-    public static final double kP_distance = 0.021, kD_distance = 0.00034;
-    public static final double minImpact = 0.1;
-    public static final double minError_distance = 13;
-
-    public static final double kP_angle = 0.34, kD_angle = 0;
-    public static final double minError_angle = Math.toRadians(5.5);
-
     public void Pos(@NotNull Pose2D target) {
 
 
@@ -252,7 +231,7 @@ public class Drivetrain implements RobotModule {
         double distanceError = error.radius();
 
         ElapsedTime looptime = new ElapsedTime();
-        while (opMode.opModeIsActive() && (distanceError > minError_distance || abs(error.heading) > minError_angle) && looptime.seconds()<4) {
+        while (opMode.opModeIsActive() && (distanceError > minError_distance || abs(error.heading) > minError_angle) && looptime.seconds() < 4) {
 
             error = target.substract(WoENrobot.odometry.getRobotCoordinates());
 
@@ -269,13 +248,13 @@ public class Drivetrain implements RobotModule {
             opMode.telemetry.addData("x", control.x);
             opMode.telemetry.addData("a", control.heading);
             opMode.telemetry.addData("ae", toDegrees(error.heading));
-            opMode.telemetry.addData("dist",  distanceError);
+            opMode.telemetry.addData("dist", distanceError);
             opMode.telemetry.update();
 
             errold = error;
             distanceError = error.radius();
         }
-        holonomicMove(0,0,0);
+        holonomicMove(0, 0, 0);
     }
 
 

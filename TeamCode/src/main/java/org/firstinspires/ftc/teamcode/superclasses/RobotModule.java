@@ -8,11 +8,11 @@ public interface RobotModule {
 
     void initialize();
 
-    default void initialize(LinearOpMode opMode)
-    {
+    default void initialize(LinearOpMode opMode) {
         setOpMode(opMode);
         initialize();
     }
 
-    default void update() {}
+    default void update() {
+    }
 }

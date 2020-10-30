@@ -12,7 +12,7 @@ import org.firstinspires.ftc.robotcore.internal.opmode.OpModeManagerImpl;
  * after the autonomous period ends. To use AutoTransitioner, go to your OpMode/LinearOpMode,
  * and place the following line of code in your init() method or before your waitForStart()
  * (for OpMode and LinearOpMode, respectively):
- *      AutoTransitioner.transitionOnStop(this, "Robot Teleop");
+ * AutoTransitioner.transitionOnStop(this, "Robot Teleop");
  * Where 'Robot Teleop' is replaced with the NAME of your teleop program. See full documentation
  * on kno3.net/resources for more info.
  */
@@ -25,6 +25,16 @@ public class AutoTransitioner extends Thread {
 
     private AutoTransitioner() {
         this.start(); //Start the watcher thread
+    }
+
+    /**
+     * Setup the next transition
+     *
+     * @param onStop       The program you'll be transitioning from (usually 'this')
+     * @param transitionTo The name of the program you want to transition to
+     */
+    public static void transitionOnStop(OpMode onStop, String transitionTo) {
+        INSTANCE.setNewTransition(onStop, transitionTo);
     }
 
     @Override
@@ -59,14 +69,5 @@ public class AutoTransitioner extends Thread {
         this.onStop = null;
         this.transitionTo = null;
         this.opModeManager = null;
-    }
-
-    /**
-     * Setup the next transition
-     * @param onStop The program you'll be transitioning from (usually 'this')
-     * @param transitionTo The name of the program you want to transition to
-     */
-    public static void transitionOnStop(OpMode onStop, String transitionTo) {
-        INSTANCE.setNewTransition(onStop, transitionTo);
     }
 }

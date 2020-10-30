@@ -7,7 +7,6 @@ import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
-import org.firstinspires.ftc.robotcore.internal.opmode.OpModeManagerImpl;
 
 import java.util.List;
 
@@ -20,21 +19,21 @@ public class TFdetector implements Runnable {
 
     private static final String VUFORIA_KEY =
             "AYQyDib/////AAABmWoLWPk9RUbvpT7hIVtMz+KJ7Wgtz7khQCon2wk+3/Mt+oIFV0pwc6vrhxOD2hI8Vh9IvPuTzPC2zBiOYGLIrg9m4lskp19GIKC6mv4bGqkZC0aLiJWnW5SSZRC5inIVhz+PxiQVYqhTVUskF9/ab2xuAFxohYL2mqdxuZPGyqLvpqEwuWWKiecF3S2fkKeQ+3yyryRMQhSd648Tl1NzaRWWXsUDStrFLfCAp+K922bBJaquOpraQ6aP1vu/oPlu7fbxxAcJytVPX81ASdjyPd4gDPp/tYEPk/xs7avDKYvdnBUM/RKxmIVkiWtFuiA5ug2DHM3mPfxm0peM8+2kQVjbGQLRUJdKKmp/QBjCfVOp";
-
-    private VuforiaLocalizer vuforia;
-
-    private TFObjectDetector tfod;
-
     public int recognitionResult = 0;
+    public LinearOpMode opMode = null;
+    ElapsedTime uptime = new ElapsedTime();
+    private VuforiaLocalizer vuforia;
+    private TFObjectDetector tfod;
+    private boolean doStop = false;
+
+    public TFdetector(LinearOpMode opMode) {
+        this.opMode = opMode;
+    }
 
     public int retrieveResult() {
         this.doStop();
         return recognitionResult;
     }
-
-    ElapsedTime uptime = new ElapsedTime();
-
-    private boolean doStop = false;
 
     public synchronized void doStop() {
         this.doStop = true;
@@ -43,8 +42,6 @@ public class TFdetector implements Runnable {
     private synchronized boolean keepRunning() {
         return !this.doStop;
     }
-
-    public LinearOpMode opMode = null;
 
     @Override
     public void run() {
@@ -97,10 +94,6 @@ public class TFdetector implements Runnable {
         if (tfod != null) {
             tfod.activate();
         }
-    }
-
-    public TFdetector(LinearOpMode opMode) {
-        this.opMode = opMode;
     }
 
 }
