@@ -15,8 +15,6 @@ public class Auto_BlueLeft extends BlueLeftAutonomous {
     public void mainProgram() {
         WoENrobot.wobbleManipulator.setposclose(true);
         WoENrobot.wobbleManipulator.setposlever(0);
-        WoENrobot.drivetrain.Pos(new Pose2D(-93.75, -142, toRadians(180)));
-        WoENrobot.delay(2000);
         switch (WoENrobot.openCVNode.retrieveResult()) {
             case FOUR:
                 WoENrobot.drivetrain.Pos(new Pose2D(-150, 126, toRadians(180)));

@@ -25,6 +25,7 @@ public class AutonomousOpMode extends LinearOpMode {
 
     @Override
     public void runOpMode() {
+        new WoENrobot();
         WoENrobot.FullInitWithCV(this);
         WoENrobot.odometry.setRobotCoordinates(getStartPosition());
         mainProgram();

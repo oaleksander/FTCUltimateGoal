@@ -11,7 +11,7 @@ public class SimpleRobot {
     public static boolean robotIsInitialized = false;
 
     public static ElapsedTime Runtime = new ElapsedTime();
-    protected static RobotModule[] activeAobotModules;
+    protected static RobotModule[] activeAobotModules = {};
     static Runnable updateRegulators = () -> {
         while (opMode.opModeIsActive()) {
             for (RobotModule robotModule : activeAobotModules) {
@@ -54,8 +54,8 @@ public class SimpleRobot {
         }
     }
 
-    public static void forceInitRobot(LinearOpMode opMode) {
-        WoENrobot.opMode = opMode;
+    public static void forceInitRobot(LinearOpMode OpMode) {
+        opMode = OpMode;
         for (RobotModule robotModule : activeAobotModules) {
             robotModule.initialize(opMode);
         }
@@ -73,13 +73,13 @@ public class SimpleRobot {
         opMode.telemetry.update();
     }
 
-    public static void SimpleInit(LinearOpMode opMode) {
-        WoENrobot.initRobot(opMode);
-        WoENrobot.startRobot();
+    public static void SimpleInit(LinearOpMode OpMode) {
+        initRobot(opMode);
+        startRobot();
     }
 
-    public static void FullInit(LinearOpMode opMode) {
-        WoENrobot.forceInitRobot(opMode);
-        WoENrobot.startRobot();
+    public static void FullInit(LinearOpMode OpMode) {
+        forceInitRobot(opMode);
+        startRobot();
     }
 }
