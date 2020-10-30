@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.robot;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -9,6 +10,9 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.math.Pose2D;
 import org.firstinspires.ftc.teamcode.math.Vector2D;
+import org.firstinspires.ftc.teamcode.superclasses.Odometry;
+import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
+import org.firstinspires.ftc.teamcode.superclasses.SimpleRobot;
 import org.jetbrains.annotations.NotNull;
 import org.openftc.revextensions2.ExpansionHubEx;
 import org.openftc.revextensions2.ExpansionHubMotor;
@@ -28,7 +32,7 @@ import static java.lang.Math.toDegrees;
 import static java.lang.Math.toRadians;
 import static org.firstinspires.ftc.teamcode.math.MathUtil.angleWrap;
 
-public class Drivetrain {
+public class Drivetrain implements RobotModule {
 
     /* Drivetrain hardware members. */
     public static ExpansionHubEx expansionHub1 = null;
@@ -53,22 +57,30 @@ public class Drivetrain {
     public static double maxDriveSpeed = 1;
     public static double minDriveSpeed = 0.05;
 
-    public Drivetrain() {
+
+
+    private Odometry odometry;
+
+    public Drivetrain(Odometry odometry) {
+        this.odometry = odometry;
     }
+
+    private LinearOpMode opMode = null;
+    public void setOpMode(LinearOpMode opMode) {this.opMode = opMode;}
 
     public void initialize() {
         assignNames();
         setMotorDirections();
-        setMotor0PowerBehaviors();
-        resetEncoders();
+        setMotor0PowerBehaviors(DcMotorEx.ZeroPowerBehavior.FLOAT);
+        setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         stopMotors();
     }
 
     private void assignNames() {
-        driveFrontLeft = WoENrobot.getInstance().opMode.hardwareMap.get(DcMotorEx.class, "driveFrontLeft");
-        driveFrontRight = WoENrobot.getInstance().opMode.hardwareMap.get(DcMotorEx.class, "driveFrontRight");
-        driveRearLeft = WoENrobot.getInstance().opMode.hardwareMap.get(DcMotorEx.class, "driveRearLeft");
-        driveRearRight = WoENrobot.getInstance().opMode.hardwareMap.get(DcMotorEx.class, "driveRearRight");
+        driveFrontLeft = opMode.hardwareMap.get(DcMotorEx.class, "driveFrontLeft");
+        driveFrontRight = opMode.hardwareMap.get(DcMotorEx.class, "driveFrontRight");
+        driveRearLeft = opMode.hardwareMap.get(DcMotorEx.class, "driveRearLeft");
+        driveRearRight = opMode.hardwareMap.get(DcMotorEx.class, "driveRearRight");
     }
 
     private void setMotorDirections() {
@@ -76,27 +88,26 @@ public class Drivetrain {
         driveFrontRight.setDirection(DcMotorEx.Direction.REVERSE);
         driveRearLeft.setDirection(DcMotorEx.Direction.FORWARD);
         driveRearRight.setDirection(DcMotorEx.Direction.REVERSE);
-
     }
 
-    private void setMotor0PowerBehaviors() {
-        driveFrontLeft.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
-        driveFrontRight.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
-        driveRearLeft.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
-        driveRearRight.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+    private void setMotor0PowerBehaviors(DcMotorEx.ZeroPowerBehavior zeroPowerBehavior) {
+        driveFrontLeft.setZeroPowerBehavior(zeroPowerBehavior);
+        driveFrontRight.setZeroPowerBehavior(zeroPowerBehavior);
+        driveRearLeft.setZeroPowerBehavior(zeroPowerBehavior);
+        driveRearRight.setZeroPowerBehavior(zeroPowerBehavior);
+    }
+
+    private void setMode(DcMotorEx.RunMode runMode)
+    {
+        driveFrontLeft.setMode(runMode);
+        driveFrontRight.setMode(runMode);
+        driveRearLeft.setMode(runMode);
+        driveRearRight.setMode(runMode);
     }
 
     private void resetEncoders()
     {
-        driveFrontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        driveFrontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        driveRearLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        driveRearRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        driveFrontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        driveFrontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        driveRearLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        driveRearRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
     }
 
     public void setMaxDriveSpeed(double value) {
@@ -119,7 +130,6 @@ public class Drivetrain {
 
     ElapsedTime looptime = new ElapsedTime();
     private double maxRampPerSec = 1/0.25;
-    // @Override
     public void update() {
         if(powerFrontLeft == 0)
             powerFrontLeft_old = 0;
@@ -237,12 +247,12 @@ public class Drivetrain {
     public void Pos(@NotNull Pose2D target) {
 
 
-        Pose2D error = target.substract(WoENrobot.odometry.getRobotCoordinates());
+        Pose2D error = target.substract(odometry.getRobotCoordinates());
         Pose2D errold = error;
         double distanceError = error.radius();
 
         ElapsedTime looptime = new ElapsedTime();
-        while (WoENrobot.getInstance().opMode.opModeIsActive() && (distanceError > minError_distance || abs(error.heading) > minError_angle) && looptime.seconds()<4) {
+        while (opMode.opModeIsActive() && (distanceError > minError_distance || abs(error.heading) > minError_angle) && looptime.seconds()<4) {
 
             error = target.substract(WoENrobot.odometry.getRobotCoordinates());
 
@@ -255,12 +265,12 @@ public class Drivetrain {
                     error.heading * kP_angle + differr.heading * kP_angle);
 
             holonomicMoveFC(control);
-            WoENrobot.getInstance().opMode.telemetry.addData("y", control.y);
-            WoENrobot.getInstance().opMode.telemetry.addData("x", control.x);
-            WoENrobot.getInstance().opMode.telemetry.addData("a", control.heading);
-            WoENrobot.getInstance().opMode.telemetry.addData("ae", toDegrees(error.heading));
-            WoENrobot.getInstance().opMode.telemetry.addData("dist",  distanceError);
-            WoENrobot.getInstance().opMode.telemetry.update();
+            opMode.telemetry.addData("y", control.y);
+            opMode.telemetry.addData("x", control.x);
+            opMode.telemetry.addData("a", control.heading);
+            opMode.telemetry.addData("ae", toDegrees(error.heading));
+            opMode.telemetry.addData("dist",  distanceError);
+            opMode.telemetry.update();
 
             errold = error;
             distanceError = error.radius();
