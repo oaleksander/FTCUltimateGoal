@@ -2,20 +2,30 @@ package org.firstinspires.ftc.teamcode.robot;
 
 import android.icu.lang.UCharacter;
 
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.robot.Robot;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-public class WobbleManipulator {
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
+
+public class WobbleManipulator implements RobotModule{
 
     public static DcMotorEx lever = null;
     public ElapsedTime levertime = new ElapsedTime();
     public static Servo close = null;
+
+    private LinearOpMode opMode = null;
+    public void setOpMode(LinearOpMode opMode) {this.opMode = opMode;}
+
     public void initialize(){
-        lever = WoENrobot.getInstance().opMode.hardwareMap.get(DcMotorEx.class, "lever");
-        close = WoENrobot.getInstance().opMode.hardwareMap.get(Servo.class, "wobbleGrabber");
+        lever = opMode.hardwareMap.get(DcMotorEx.class, "lever");
+        close = opMode.hardwareMap.get(Servo.class, "wobbleGrabber");
+
         lever.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         lever.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         lever.setDirection(DcMotorSimple.Direction.REVERSE);
