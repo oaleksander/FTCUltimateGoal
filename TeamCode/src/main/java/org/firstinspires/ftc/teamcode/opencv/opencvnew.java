@@ -1,9 +1,9 @@
 package org.firstinspires.ftc.teamcode.opencv;
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.robot.WoENrobot;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
@@ -21,18 +21,16 @@ import org.openftc.easyopencv.OpenCvPipeline;
 import java.util.ArrayList;
 import java.util.List;
 
-@TeleOp
-public class opencvnew extends LinearOpMode {
+
+public class opencvnew {
     OpenCvCamera webcam;
     private final int rows = 640;
     private final int cols = 480;
+    StageSwitchingPipeline pipeline = new StageSwitchingPipeline();
     //0 = col, 1 = row
-
-    @Override
-    public void runOpMode() {
-        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+    public void initialize(){
+        int cameraMonitorViewId = WoENrobot.getInstance().opMode.hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", WoENrobot.getInstance().opMode.hardwareMap.appContext.getPackageName());
         webcam = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
-        StageSwitchingPipeline pipeline = new StageSwitchingPipeline();
         webcam.setPipeline(pipeline);
         /*webcam.openCameraDevice();
         webcam.startStreaming(rows, cols, OpenCvCameraRotation.UPRIGHT);*/
@@ -44,17 +42,18 @@ public class opencvnew extends LinearOpMode {
                 webcam.startStreaming(rows, cols, OpenCvCameraRotation.UPRIGHT);
             }
         });
-        waitForStart();
-
-        while (opModeIsActive()) {
-            telemetry.addData("Mean", pipeline.getMean());
-            telemetry.addData("AspectRatio", pipeline.getAspectRatio());
-            telemetry.addData("StackSize", pipeline.stackSize);
-            telemetry.addData("Height", rows);
-            telemetry.addData("Width", cols);
-            telemetry.update();
-            sleep(100);
-        }
+    }
+    public double getMean(){
+        return pipeline.getMean();
+    }
+    public double getAspectRatio(){
+        return pipeline.getAspectRatio();
+    }
+    public StageSwitchingPipeline.StackSize getStackSize(){
+        return pipeline.stackSize;
+    }
+    public void stopcam(){
+        webcam.stopStreaming();
     }
 
     static class StageSwitchingPipeline extends OpenCvPipeline {
