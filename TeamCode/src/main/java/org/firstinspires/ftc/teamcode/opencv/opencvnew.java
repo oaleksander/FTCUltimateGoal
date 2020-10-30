@@ -9,6 +9,7 @@ import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
+import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
@@ -55,7 +56,7 @@ import java.util.List;
                 telemetry.addData("Values", valdown+ " "+valup);
                 telemetry.addData("Height", rows);
                 telemetry.addData("Width", cols);
-                telemetry.addData("", StageSwitchingPipeline.contoursList);
+               // telemetry.addData("", StageSwitchingPipeline.contoursList);
                 telemetry.update();
                 sleep(100);
             }
@@ -64,7 +65,7 @@ import java.util.List;
             Mat all = new Mat();
             Mat yCbCrChan2Mat = new Mat();
             Mat thresholdMat = new Mat();
-            public static List<MatOfPoint> contoursList = new ArrayList<>();
+            List<MatOfPoint> contoursList = new ArrayList<>();
             enum Stage
             {
                 detection,//includes outlines
@@ -96,11 +97,18 @@ import java.util.List;
             @Override
             public Mat processFrame(Mat input)
             {
-                Imgproc.cvtColor(input, yCbCrChan2Mat, Imgproc.COLOR_RGB2YCrCb);
-                Core.extractChannel(yCbCrChan2Mat, yCbCrChan2Mat, 2);//takes cb difference and stores
+                Imgproc.cvtColor(input, yCbCrChan2Mat, Imgproc.COLOR_RGB2HSV);
+                Core.inRange(yCbCrChan2Mat,new Scalar(10,150,100),new Scalar(20,255,255),thresholdMat);
+                Imgproc.erode(thresholdMat,thresholdMat,Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(15,15)));
+                Imgproc.dilate(thresholdMat,thresholdMat,Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(30,30)));
+                Imgproc.findContours(thresholdMat, contoursList, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
+                Imgproc.drawContours(thresholdMat, contoursList, -1, new Scalar(0,255,0),30);
+
+
+               /* Core.extractChannel(yCbCrChan2Mat, yCbCrChan2Mat, 2);//takes cb difference and stores
                 Imgproc.threshold(yCbCrChan2Mat, thresholdMat, 102, 255, Imgproc.THRESH_BINARY_INV);
                 Imgproc.findContours(thresholdMat, contoursList, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
-                yCbCrChan2Mat.copyTo(all);
+               */ yCbCrChan2Mat.copyTo(all);
 
                 /* double[] pixMid = thresholdMat.get((int)(input.rows()* downPos[1]), (int)(input.cols()* downPos[0]));//gets value at circle
                 valdown = (int)pixMid[0];
