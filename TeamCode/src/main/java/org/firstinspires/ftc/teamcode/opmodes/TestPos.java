@@ -14,24 +14,24 @@ public class TestPos extends LinearOpMode {
     @Override
     public void runOpMode() {
 
-        WoENrobot.getInstance().forceInitRobot(this);
-        WoENrobot.getInstance().tFdetector.initialize();
+        WoENrobot.forceInitRobot(this);
+      //  WoENrobot.tFdetector.initialize();
         AutoTransitioner.transitionOnStop(this, "Teleop COMPETITION");
-        WoENrobot.getInstance().tFdetectorThread.start();
-        WoENrobot.getInstance().startRobot();
-        WoENrobot.getInstance().tFdetector.retrieveResult();
+     //   WoENrobot.tFdetectorThread.start();
+        WoENrobot.startRobot();
+       // WoENrobot.tFdetector.retrieveResult();
         WoENrobot.odometry.setRobotCoordinates(new Pose2D (0,0,0));
 /*------------------------------------------------------------------------------------------------*/
 // AUTO CODE GOES HERE
 /*------------------------------------------------------------------------------------------------*/
-        WoENrobot.getInstance().drivetrain.Pos(new Pose2D(0,0, toRadians(0)));
-        WoENrobot.getInstance().drivetrain.Pos(new Pose2D(0,0, toRadians(180)));
-        WoENrobot.getInstance().drivetrain.Pos(new Pose2D(15,30, toRadians(180)));
-        WoENrobot.getInstance().drivetrain.Pos(new Pose2D(15,30, toRadians(90)));
+        WoENrobot.drivetrain.Pos(new Pose2D(0,0, toRadians(0)));
+        WoENrobot.drivetrain.Pos(new Pose2D(0,0, toRadians(180)));
+        WoENrobot.drivetrain.Pos(new Pose2D(15,30, toRadians(180)));
+        WoENrobot.drivetrain.Pos(new Pose2D(15,30, toRadians(90)));
         while(opModeIsActive())
         {
 
-            WoENrobot.getInstance().drivetrain.holonomicMove(0,0,0);
+            WoENrobot.drivetrain.holonomicMove(0,0,0);
 /*------------------------------------------------------------------------------------------------*/
 // FINISH LOOP CODE GOES HERE
 /*------------------------------------------------------------------------------------------------*/

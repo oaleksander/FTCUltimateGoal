@@ -10,8 +10,8 @@ public class Tele_competition extends LinearOpMode {
     @Override
     public void runOpMode() {
 
-        WoENrobot.getInstance().initRobot(this);
-        WoENrobot.getInstance().startRobot();
+        WoENrobot.initRobot(this);
+        WoENrobot.startRobot();
         boolean buttonAwasPressed = false;
         while(opModeIsActive())
         {
