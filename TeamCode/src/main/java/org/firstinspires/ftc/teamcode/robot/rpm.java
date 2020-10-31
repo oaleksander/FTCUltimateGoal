@@ -19,15 +19,22 @@ public class rpm implements RobotModule {
     public void initialize() {
         shooterMotor = opMode.hardwareMap.get(DcMotor.class, "rpm");
     }
-
-    public void startrpm(double time_ms) {
+    static double time_ms;
+    double x = 1;
+    public void update() {
+        //rpmtime.reset();
+        //double x = 1;
+        if (time_ms < rpmtime.milliseconds()) {
+            shooterMotor.setPower(rpmtime.milliseconds() * x);
+        }
+        if (time_ms > rpmtime.milliseconds()){
+            shooterMotor.setPower(1);
+        }
+    }
+    public void setspeedlevel(double time){
+        rpm.time_ms = time;
         rpmtime.reset();
-        double x = 1;
         if (time_ms > 0)
             x = 1 / time_ms;
-        do {
-            shooterMotor.setPower(rpmtime.milliseconds() * x);
-        } while (rpmtime.milliseconds() < time_ms && opMode.opModeIsActive());
-        shooterMotor.setPower(1);
     }
 }
