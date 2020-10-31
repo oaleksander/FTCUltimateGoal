@@ -24,27 +24,6 @@ public class callopencv extends LinearOpMode {
             telemetry.addData("getAspectRatio", WoENrobot.openCVNode.getAspectRatio());
             telemetry.addData("getStackSize", WoENrobot.openCVNode.getStackSize());
             telemetry.update();
-
-
-
-            switch (WoENrobot.openCVNode.getStackSize()) {
-                case FOUR:
-                    tw.setText("FOUR");
-                case ONE:
-                    tw.setText("ONE");
-                default:
-                    tw.setText("ZERO");
-
-            }
         }
-            switch (WoENrobot.openCVNode.getStackSize()) {
-                case FOUR:
-                    tw.setText("FOUR!");
-                case ONE:
-                    tw.setText("ONE!");
-                default:
-                    tw.setText("ZERO!");
-
-            }
     }
 }
