@@ -22,6 +22,7 @@ public class conveyor extends LinearOpMode {
     public DcMotorEx conveyor = null;
     public Servo feeder = null;
     public ElapsedTime conveyortime = new ElapsedTime();
+    public ElapsedTime backcontime = new ElapsedTime();
     float[] hsvValues = new float[3];
     ColorSensor colorSensor;
     DistanceSensor sensorDistance;
@@ -76,8 +77,9 @@ public class conveyor extends LinearOpMode {
             full = false;
         }
         if (on && !full) {
-            if (conveyor.getCurrent(CurrentUnit.AMPS)<= 4){
+            if (conveyor.getCurrent(CurrentUnit.AMPS)<= 4 && backcontime.milliseconds() < 1000){
                 setpowerconveyor(1);
+                backcontime.reset();
             }
             else {
                 setpowerconveyor(-1);
