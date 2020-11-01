@@ -77,11 +77,13 @@ public class conveyor extends LinearOpMode {
             full = false;
         }
         if (on && !full) {
-            if (conveyor.getCurrent(CurrentUnit.AMPS)<= 4 && backcontime.milliseconds() < 1000){
+            if (conveyor.getCurrent(CurrentUnit.AMPS)<= 4 && backcontime.milliseconds() > 1000){
                 setpowerconveyor(1);
-                backcontime.reset();
             }
             else {
+                backcontime.reset();
+            }
+            if (backcontime.milliseconds() <= 1000) {
                 setpowerconveyor(-1);
             }
         }
