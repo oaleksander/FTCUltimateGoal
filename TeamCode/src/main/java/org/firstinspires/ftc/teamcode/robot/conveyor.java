@@ -60,15 +60,22 @@ public class conveyor extends LinearOpMode {
         return hsvValues;
     }
     public float maxcolor = 255, mincolor = 0;
+    boolean full = false;
     public double getdistance(){
         return sensorDistance.getDistance(DistanceUnit.CM);
     }
     boolean on = false;
     public void update(){
-        if ((mincolor <= getcolor()[0]) && (getcolor()[0]<= maxcolor) && (conveyortime.milliseconds()>=1000)){
-            conveyortime.reset();
+        if ((mincolor <= getcolor()[0]) && (getcolor()[0]<= maxcolor)) {
+            if (conveyortime.milliseconds() >= 1000) {
+                full = true;
+            }
         }
-        if (on && conveyortime.milliseconds()<=1000) {
+        else {
+            conveyortime.reset();
+            full = false;
+        }
+        if (on && !full) {
             if (conveyor.getCurrent(CurrentUnit.AMPS)<= 4){
                 setpowerconveyor(1);
             }
