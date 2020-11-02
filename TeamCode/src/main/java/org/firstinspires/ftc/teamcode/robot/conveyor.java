@@ -65,7 +65,7 @@ public class conveyor extends LinearOpMode {
     public double getdistance(){
         return sensorDistance.getDistance(DistanceUnit.CM);
     }
-    boolean on = false;
+    boolean on = false,canbackon = true;
     public void update(){
         if ((mincolor <= getcolor()[0]) && (getcolor()[0]<= maxcolor)) {
             if (conveyortime.milliseconds() >= 1000) {
@@ -77,14 +77,16 @@ public class conveyor extends LinearOpMode {
             full = false;
         }
         if (on && !full) {
-            if (conveyor.getCurrent(CurrentUnit.AMPS)<= 4 && backcontime.milliseconds() > 1000){
+            if (conveyor.getCurrent(CurrentUnit.AMPS)<= 4 && backcontime.milliseconds()>=1000){
                 setpowerconveyor(1);
+                canbackon = true;
             }
             else {
-                backcontime.reset();
-            }
-            if (backcontime.milliseconds() <= 1000) {
-                setpowerconveyor(-1);
+                if (canbackon) {
+                    backcontime.reset();
+                    setpowerconveyor(-1);
+                    canbackon = false;
+                }
             }
         }
         else {
