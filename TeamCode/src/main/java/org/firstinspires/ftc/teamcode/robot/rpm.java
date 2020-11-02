@@ -27,8 +27,9 @@ public class rpm implements RobotModule {
     static double time_ms;
     static double x = 1;
     private static boolean isActivated;
-
+    static double rpm = 6000;
     static boolean on = false;
+
     public void update() {
         //rpmtime.reset();
         //double x = 1;
@@ -42,7 +43,6 @@ public class rpm implements RobotModule {
         }
         else {
            shooterpower(0);
-           rpmtime.reset();
         }
     }
     public void shooterpower(double power){
@@ -50,10 +50,13 @@ public class rpm implements RobotModule {
     }
     public void onshooter(boolean on){
         this.on = on;
+        rpmtime.reset();
+    }
+    public void setrpm(double rpm){
+        this.rpm = rpm;
     }
     public void setspeedlevel(double time){
-        rpm.time_ms = time;
-        rpmtime.reset();
+        this.time_ms = time;
         if (time_ms > 0)
             x = 1 / time_ms;
     }
