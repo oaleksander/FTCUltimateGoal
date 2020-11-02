@@ -88,7 +88,7 @@ public class conveyor implements RobotModule {
                 backon = true;
             }
             else {
-                if (backon) {
+                if (backon && backcontime.milliseconds() >= 1500) {
                     backcontime.reset();
                     setpowerconveyor(-1);
                     backon = false;
