@@ -3,52 +3,56 @@ package org.firstinspires.ftc.teamcode.robot;
 import android.graphics.Color;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.ColorRangeSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 
-import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
 
 
-public class conveyor extends LinearOpMode {
-    public DcMotorEx conveyor = null;
+public class conveyor implements RobotModule {
+    public DcMotorEx conveyorm = null;
     public Servo feeder = null;
     public ElapsedTime conveyortime = new ElapsedTime();
     public ElapsedTime backcontime = new ElapsedTime();
     float[] hsvValues = new float[3];
     ColorSensor colorSensor;
     DistanceSensor sensorDistance;
+    private LinearOpMode opMode = null;
+    public void setOpMode(LinearOpMode opMode) {
+        this.opMode = opMode;
+    }
     /** main int */
     public void initialize(){
         initializecolor();
         initializedrive();
         initializedservo();
     }
+
     /** int color and distanse */
     public void initializecolor(){
-        colorSensor = hardwareMap.get(ColorSensor.class, "color");
-        sensorDistance = hardwareMap.get(DistanceSensor.class, "color");
+        colorSensor = opMode.hardwareMap.get(ColorSensor.class, "color");
+        sensorDistance = opMode.hardwareMap.get(DistanceSensor.class, "color");
     }
     /** int motors */
     public void initializedrive(){
-        conveyor = hardwareMap.get(DcMotorEx.class, "conveyor");
+        conveyorm = opMode.hardwareMap.get(DcMotorEx.class, "conveyor");
 
-        conveyor.setDirection(DcMotorSimple.Direction.FORWARD);
+        conveyorm.setDirection(DcMotorSimple.Direction.FORWARD);
 
-        conveyor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        conveyor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        conveyorm.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        conveyorm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
     /** int servo */
     public void initializedservo(){
-        feeder = hardwareMap.get(Servo.class, "feeder");
+        feeder = opMode.hardwareMap.get(Servo.class, "feeder");
     }
     // правильная ли конвертация?
     public float[] getcolor(){
@@ -60,12 +64,14 @@ public class conveyor extends LinearOpMode {
      */   Color.colorToHSV(colors, hsvValues);
         return hsvValues;
     }
-    public float maxcolor = 255, mincolor = 0;
-    boolean full = false;
     public double getdistance(){
         return sensorDistance.getDistance(DistanceUnit.CM);
     }
-    boolean on = false,canbackon = true;
+    public float maxcolor = 255, mincolor = 0;
+    boolean full = false;
+
+    static boolean on = false;
+    boolean backon = true;
     public void update(){
         if ((mincolor <= getcolor()[0]) && (getcolor()[0]<= maxcolor)) {
             if (conveyortime.milliseconds() >= 1000) {
@@ -77,15 +83,15 @@ public class conveyor extends LinearOpMode {
             full = false;
         }
         if (on && !full) {
-            if (conveyor.getCurrent(CurrentUnit.AMPS)<= 4 && backcontime.milliseconds()>=1000){
+            if (conveyorm.getCurrent(CurrentUnit.AMPS)<= 4 && backcontime.milliseconds()>=1000){
                 setpowerconveyor(1);
-                canbackon = true;
+                backon = true;
             }
             else {
-                if (canbackon) {
+                if (backon) {
                     backcontime.reset();
                     setpowerconveyor(-1);
-                    canbackon = false;
+                    backon = false;
                 }
             }
         }
@@ -93,8 +99,17 @@ public class conveyor extends LinearOpMode {
             setpowerconveyor(0);
         }
     }
+    public void  setOnConveyor(boolean takeon){
+        conveyor.on = takeon;
+    }
+    boolean ispush = false;
+    public void setposclose(boolean push) {
+        ispush = push;
+        if (push) feeder.setPosition(0.5);
+        else feeder.setPosition(1);
+    }
     public void setpowerconveyor(double power){
-        conveyor.setPower(power);
+        conveyorm.setPower(power);
     }
     public void runOpMode(){}
 }
