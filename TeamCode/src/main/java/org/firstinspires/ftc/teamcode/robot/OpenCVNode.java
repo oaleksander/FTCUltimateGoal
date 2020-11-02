@@ -19,8 +19,8 @@ import org.openftc.easyopencv.OpenCvPipeline;
 
 public class OpenCVNode implements RobotModule {
     static OpenCvCamera webcam;
-    private final int rows = 640;
-    private final int cols = 480;
+    private final int rows = 480;
+    private final int cols = 640;
     StageSwitchingPipeline pipeline = new StageSwitchingPipeline();
 
     private LinearOpMode opMode = null;
@@ -31,7 +31,7 @@ public class OpenCVNode implements RobotModule {
 
     public void initialize() {
         int cameraMonitorViewId = opMode.hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", opMode.hardwareMap.appContext.getPackageName());
-        webcam = OpenCvCameraFactory.getInstance().createInternalCamera2(OpenCvInternalCamera2.CameraDirection.BACK, cameraMonitorViewId);
+        webcam = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
         webcam.setPipeline(pipeline);
         webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
@@ -106,6 +106,7 @@ public class OpenCVNode implements RobotModule {
             Imgproc.cvtColor(all, HSVMat, Imgproc.COLOR_RGB2HSV);
 
             Core.inRange(HSVMat, new Scalar(7, (150 + Core.mean(HSVMat).val[1]) / 2, (100 + Core.mean(HSVMat).val[2]) / 2), new Scalar(17, 255, 255), thresholdMat);
+
             Imgproc.erode(thresholdMat, thresholdMat, Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(35, 5)));
             Imgproc.dilate(thresholdMat, thresholdMat, Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(35, 15)));
 
