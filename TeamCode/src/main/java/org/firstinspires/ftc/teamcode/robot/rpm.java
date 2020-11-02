@@ -1,16 +1,18 @@
 package org.firstinspires.ftc.teamcode.robot;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
 
 public class rpm implements RobotModule {
 
-    public DcMotorEx shooterMotor = null;
-    public ElapsedTime rpmtime = new ElapsedTime();
-    private LinearOpMode opMode;
+    public static DcMotorEx shooterMotor = null;
+    public static ElapsedTime rpmtime = new ElapsedTime();
+    private static LinearOpMode opMode;
 
     public void setOpMode(LinearOpMode opMode) {
         this.opMode = opMode;
@@ -19,6 +21,8 @@ public class rpm implements RobotModule {
     public void initialize()
     {
         shooterMotor = opMode.hardwareMap.get(DcMotorEx.class, "odometerX");
+        shooterMotor.setDirection(DcMotorEx.Direction.FORWARD);
+        shooterMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
     static double time_ms;
     static double x = 1;
@@ -38,6 +42,7 @@ public class rpm implements RobotModule {
         }
         else {
            shooterpower(0);
+           rpmtime.reset();
         }
     }
     public void shooterpower(double power){

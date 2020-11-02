@@ -76,15 +76,14 @@ public class Conveyor implements RobotModule {
     static double timelock = 0;
     public void update(){
         setposclose(feederTime.milliseconds()<500);
-        if (getdistance()<6) {
+      // if (getdistance()<6)
             if (conveyortime.milliseconds() >= 1000) {
                 full = true;
             }
-        }
-        else {
+     //   else {
             conveyortime.reset();
             full = false;
-        }
+   //     }
         if (on && !full) {
             if (conveyorm.getCurrent(CurrentUnit.AMPS)<= 4 && backcontime.milliseconds()>=1000){
                 setpowerconveyor(1);

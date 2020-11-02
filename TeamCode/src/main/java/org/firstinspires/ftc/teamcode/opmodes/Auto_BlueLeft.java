@@ -18,12 +18,14 @@ public class Auto_BlueLeft extends BlueLeftAutonomous {
     @Override
     public void main() {
       // conveyor.setOnConveyor(true);
+        shooter.setspeedlevel(15000);
         while(opModeIsActive())
         {
         if(gamepad1.a)
         conveyor.feedRing();
-        if(gamepad1.b)
-            shooter.setspeedlevel(5000);
+        if(gamepad1.y)
+            shooter.shooterpower(1);
+        shooter.onshooter(gamepad1.b);
         conveyor.setOnConveyor(gamepad1.x);
         telemetry.addData("Current",conveyor.conveyorm.getCurrent(CurrentUnit.MILLIAMPS));}
       // MovementMacros.MoveWobble(getXSign());
