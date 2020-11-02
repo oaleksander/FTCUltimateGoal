@@ -32,13 +32,13 @@ public class TwoWheelOdometry implements Odometry {
     private static int YL_old = 0;
     private static int YR_old = 0;
     private static int X_old = 0;
-    public RevBulkData bulkData;
-    public Pose2D worldPosition = new Pose2D();
-    BNO055IMU imu;
-    ExpansionHubMotor odometerYL, odometerYR, odometerX;
-    ExpansionHubEx expansionHub;
+    public static RevBulkData bulkData;
+    public static Pose2D worldPosition = new Pose2D();
+    private static BNO055IMU imu;
+    private static ExpansionHubMotor odometerYL, odometerX;
+    private static ExpansionHubEx expansionHub;
     ElapsedTime looptime = new ElapsedTime();
-    private LinearOpMode opMode = null;
+    private static LinearOpMode opMode = null;
     /**
      * Class initializer
      */
@@ -94,7 +94,7 @@ public class TwoWheelOdometry implements Odometry {
         worldPosition = worldPosition.add(new Pose2D(deltaPosition.rotatedCW(worldPosition.heading + deltaWorldHeading / 2), deltaWorldHeading));
 
         YL_old = bulkData.getMotorCurrentPosition(odometerYL);
-        YR_old = -bulkData.getMotorCurrentPosition(odometerYR);
+        //YR_old = -bulkData.getMotorCurrentPosition(odometerYR);
         X_old = bulkData.getMotorCurrentPosition(odometerX);
 
     }

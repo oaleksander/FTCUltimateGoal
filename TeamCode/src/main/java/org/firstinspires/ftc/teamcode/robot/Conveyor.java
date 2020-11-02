@@ -17,20 +17,21 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
 
 
-public class conveyor implements RobotModule {
-    public DcMotorEx conveyorm = null;
-    public Servo feeder = null;
-    public ElapsedTime conveyortime = new ElapsedTime();
-    public ElapsedTime backcontime = new ElapsedTime();
+public class Conveyor implements RobotModule {
+    public static DcMotorEx conveyorm = null;
+    public static Servo feeder = null;
+    public static ElapsedTime conveyortime = new ElapsedTime();
+    public static ElapsedTime backcontime = new ElapsedTime();
     float[] hsvValues = new float[3];
-    ColorSensor colorSensor;
-    DistanceSensor sensorDistance;
-    private LinearOpMode opMode = null;
+    static ColorSensor colorSensor;
+    static DistanceSensor sensorDistance;
+    private static LinearOpMode opMode = null;
     public void setOpMode(LinearOpMode opMode) {
         this.opMode = opMode;
     }
     /** main int */
     public void initialize(){
+        feederTime.reset();
         initializecolor();
         initializedrive();
         initializedservo();
@@ -38,8 +39,8 @@ public class conveyor implements RobotModule {
 
     /** int color and distanse */
     public void initializecolor(){
-        colorSensor = opMode.hardwareMap.get(ColorSensor.class, "color");
-        sensorDistance = opMode.hardwareMap.get(DistanceSensor.class, "color");
+        colorSensor = opMode.hardwareMap.get(ColorSensor.class, "ringDetector");
+        sensorDistance = opMode.hardwareMap.get(DistanceSensor.class, "ringDetector");
     }
     /** int motors */
     public void initializedrive(){
@@ -67,13 +68,14 @@ public class conveyor implements RobotModule {
     public double getdistance(){
         return sensorDistance.getDistance(DistanceUnit.CM);
     }
-    public float maxcolor = 255, mincolor = 0;
-    boolean full = false;
+    public static final float maxcolor = 255, mincolor = 0;
+    static boolean full = false;
 
     static boolean on = false;
-    boolean backon = true;
+    static boolean backon = true;
     public void update(){
-        if ((mincolor <= getcolor()[0]) && (getcolor()[0]<= maxcolor)) {
+        setposclose(feederTime.milliseconds()<500);
+        if (getdistance()<6) {
             if (conveyortime.milliseconds() >= 1000) {
                 full = true;
             }
@@ -100,9 +102,9 @@ public class conveyor implements RobotModule {
         }
     }
     public void  setOnConveyor(boolean takeon){
-        conveyor.on = takeon;
+        on = takeon;
     }
-    boolean ispush = false;
+    static boolean ispush = false;
     public void setposclose(boolean push) {
         ispush = push;
         if (push) feeder.setPosition(0.5);
@@ -111,5 +113,10 @@ public class conveyor implements RobotModule {
     public void setpowerconveyor(double power){
         conveyorm.setPower(power);
     }
-    public void runOpMode(){}
+
+    private static ElapsedTime feederTime = new ElapsedTime();
+    public void feedRing()
+    {
+        feederTime.reset();
+    }
 }

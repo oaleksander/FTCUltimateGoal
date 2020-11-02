@@ -6,7 +6,7 @@ import static java.lang.Math.toRadians;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.drivetrain;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.openCVNode;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.wobbleManipulator;
-import static org.firstinspires.ftc.teamcode.superclasses.SimpleRobot.delay;
+import static org.firstinspires.ftc.teamcode.robot.WoENrobot.delay;
 
 public class MovementMacros {
     public static void MoveWobble(byte Xsign)

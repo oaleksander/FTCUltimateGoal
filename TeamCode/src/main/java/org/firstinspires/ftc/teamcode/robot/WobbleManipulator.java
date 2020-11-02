@@ -16,15 +16,16 @@ public class WobbleManipulator implements RobotModule {
     public static Servo close = null;
     public static boolean isGrabbed = false;
     static double pos = 0;
-    public ElapsedTime levertime = new ElapsedTime();
-    double power = 0, P = 0, D = 0, errorOld = 0, error = 0;
-    private LinearOpMode opMode = null;
+    public static ElapsedTime levertime = new ElapsedTime();
+    static double power = 0, P = 0, D = 0, errorOld = 0, error = 0;
+    private static LinearOpMode opMode = null;
 
     public void setOpMode(LinearOpMode opMode) {
         this.opMode = opMode;
     }
 
     public void initialize() {
+
         lever = opMode.hardwareMap.get(DcMotorEx.class, "lever");
         close = opMode.hardwareMap.get(Servo.class, "wobbleGrabber");
 
@@ -42,27 +43,27 @@ public class WobbleManipulator implements RobotModule {
     }
 
     public void update() {
-        error = pos - lever.getCurrentPosition();
-        if (Math.abs(error) > minerror) {
-            P = error * kofP;
-            D = (error - errorOld) * kofd;
-            power = P + D;
-            if (power > maxspeed) power = maxspeed;
-            if (power < -maxspeed) power = -maxspeed;
-            lever.setPower(power);
+            error = pos - lever.getCurrentPosition();
+            if (Math.abs(error) > minerror) {
+                P = error * kofP;
+                D = (error - errorOld) * kofd;
+                power = P + D;
+                if (power > maxspeed) power = maxspeed;
+                if (power < -maxspeed) power = -maxspeed;
+                lever.setPower(power);
             /*WoENrobot.getInstance().opMode.telemetry.addData("err",error);
             WoENrobot.getInstance().opMode.telemetry.addData("pow",power);
             WoENrobot.getInstance().opMode.telemetry.addData("pos",pos);
             WoENrobot.getInstance().opMode.telemetry.addData("enc",lever.getCurrentPosition());
             WoENrobot.getInstance().opMode.telemetry.update(); */
-            errorOld = error;
-        } else {
-            lever.setPower(0);
-        }
+                errorOld = error;
+            } else {
+                lever.setPower(0);
+            }
     }
 
     public void setposlever(double pos) {
-        WobbleManipulator.pos = pos;
+        this.pos = pos;
 
     }
 

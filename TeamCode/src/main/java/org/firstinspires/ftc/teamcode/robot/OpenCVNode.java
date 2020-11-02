@@ -19,11 +19,11 @@ import org.openftc.easyopencv.OpenCvPipeline;
 
 public class OpenCVNode implements RobotModule {
     static OpenCvCamera webcam;
-    private final int rows = 480;
-    private final int cols = 640;
+    private static final int rows = 640;
+    private static final int cols = 480;
     StageSwitchingPipeline pipeline = new StageSwitchingPipeline();
 
-    private LinearOpMode opMode = null;
+    private static LinearOpMode opMode = null;
 
     public void setOpMode(LinearOpMode opMode) {
         this.opMode = opMode;
@@ -46,13 +46,13 @@ public class OpenCVNode implements RobotModule {
         return pipeline.stackSize;
     }
 
-    public void stopcam() {
+    public void stopCam() {
         webcam.stopStreaming();
     }
 
     public StackSize retrieveResult() {
         StackSize stackSize = getStackSize();
-        webcam.stopStreaming();
+        stopCam();
         return stackSize;
     }
 
@@ -75,6 +75,7 @@ public class OpenCVNode implements RobotModule {
         Mat all = new Mat();
         Mat HSVMat = new Mat();
         Mat thresholdMat = new Mat();
+        Rect crop = new Rect(0,200,rows,cols-220);
         private volatile StackSize stackSize = StackSize.ZERO;
         private double mean = 0.0;
         private double aspectRatio = 0.0;
@@ -101,23 +102,23 @@ public class OpenCVNode implements RobotModule {
 
         @Override
         public Mat processFrame(Mat input) {
-            input.copyTo(all);
+            all = input.submat(crop);
             Imgproc.GaussianBlur(all, all, new Size(11, 11), 0);
             Imgproc.cvtColor(all, HSVMat, Imgproc.COLOR_RGB2HSV);
 
             Core.inRange(HSVMat, new Scalar(7, (150 + Core.mean(HSVMat).val[1]) / 2, (100 + Core.mean(HSVMat).val[2]) / 2), new Scalar(17, 255, 255), thresholdMat);
-
             Imgproc.erode(thresholdMat, thresholdMat, Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(35, 5)));
             Imgproc.dilate(thresholdMat, thresholdMat, Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(35, 15)));
 
             Rect rect = Imgproc.boundingRect(thresholdMat);
 
+            Imgproc.rectangle(input, crop, new Scalar(0, 255, 0), 2);
             Imgproc.rectangle(all, rect, new Scalar(0, 0, 255), 2);
 
             mean = Core.mean(thresholdMat).val[0];
 
             if (mean > 0.1) {
-                aspectRatio = (double) rect.width / (double) rect.height;
+                aspectRatio = (double)rect.width / (double)rect.height;
                 if (aspectRatio > 1.75)
                     stackSize = StackSize.ONE;
                 else stackSize = StackSize.FOUR;
