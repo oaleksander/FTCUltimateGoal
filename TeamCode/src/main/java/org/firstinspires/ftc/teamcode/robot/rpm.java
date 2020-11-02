@@ -24,19 +24,27 @@ public class rpm implements RobotModule {
     static double x = 1;
     private static boolean isActivated;
 
-    public void activate()
-    {
-
-    }
+    static boolean on = false;
     public void update() {
         //rpmtime.reset();
         //double x = 1;
-        if (time_ms < rpmtime.milliseconds()) {
-            shooterMotor.setPower(rpmtime.milliseconds() * x);
+        if (on) {
+            if (time_ms < rpmtime.milliseconds()) {
+                shooterpower(rpmtime.milliseconds() * x);
+            }
+            if (time_ms > rpmtime.milliseconds()) {
+                shooterpower(1);
+            }
         }
-        if (time_ms > rpmtime.milliseconds()){
-            shooterMotor.setPower(1);
+        else {
+           shooterpower(0);
         }
+    }
+    public void shooterpower(double power){
+        shooterMotor.setPower(power);
+    }
+    public void onshooter(boolean on){
+        this.on = on;
     }
     public void setspeedlevel(double time){
         rpm.time_ms = time;

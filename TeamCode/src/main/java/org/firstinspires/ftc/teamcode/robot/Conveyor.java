@@ -92,7 +92,7 @@ public class Conveyor implements RobotModule {
                 timelock = backcontime.milliseconds();
             }
             else {
-                if (backon && (backcontime.milliseconds() >= (timelock+1000))) {
+                if (backon && (backcontime.milliseconds() >= (timelock+500))) {
                     backcontime.reset();
                     setpowerconveyor(-1);
                     backon = false;
