@@ -29,10 +29,10 @@ public class rpm implements RobotModule {
         //rpmtime.reset();
         //double x = 1;
         if (on) {
-            if (time_ms < rpmtime.milliseconds()) {
+            if (time_ms > rpmtime.milliseconds()) {
                 shooterpower(rpmtime.milliseconds() * x);
             }
-            if (time_ms > rpmtime.milliseconds()) {
+            if (time_ms < rpmtime.milliseconds()) {
                 shooterpower(1);
             }
         }
