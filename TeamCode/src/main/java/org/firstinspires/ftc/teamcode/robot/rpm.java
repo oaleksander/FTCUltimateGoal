@@ -16,11 +16,18 @@ public class rpm implements RobotModule {
         this.opMode = opMode;
     }
 
-    public void initialize() {
-        shooterMotor = opMode.hardwareMap.get(DcMotorEx.class, "rpm");
+    public void initialize()
+    {
+        shooterMotor = opMode.hardwareMap.get(DcMotorEx.class, "odometerX");
     }
     static double time_ms;
-    double x = 1;
+    static double x = 1;
+    private static boolean isActivated;
+
+    public void activate()
+    {
+
+    }
     public void update() {
         //rpmtime.reset();
         //double x = 1;
