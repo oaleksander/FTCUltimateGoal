@@ -1,9 +1,12 @@
 package org.firstinspires.ftc.teamcode.robot;
 
+import android.app.ExpandableListActivity;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
+import org.openftc.revextensions2.ExpansionHubEx;
 
 public class WoENrobot {
     public static TwoWheelOdometry odometry = new TwoWheelOdometry();
@@ -23,6 +26,9 @@ public class WoENrobot {
     private static final boolean defaultNames = true;
     public static LinearOpMode opMode = null;
     public static boolean robotIsInitialized = false;
+
+    private static ExpansionHubEx expansionHub1 = null;
+    private static ExpansionHubEx expansionHub2 = null;
 
     public static ElapsedTime Runtime = new ElapsedTime();
     static Runnable updateRegulators = () -> {
@@ -73,6 +79,10 @@ public class WoENrobot {
         opMode.telemetry.addData("Status", "Initializing...");
         opMode.telemetry.update();
 
+
+        expansionHub2 = opMode.hardwareMap.get(ExpansionHubEx.class, "Expansion Hub 2");
+        expansionHub1 = opMode.hardwareMap.get(ExpansionHubEx.class, "Expansion Hub 1");
+
         for (RobotModule robotModule : activeAobotModules) {
             robotModule.initialize(opMode);
         }
@@ -83,13 +93,21 @@ public class WoENrobot {
         //stopAllMotors();
 
         robotIsInitialized = true;
+
         opMode.telemetry.addData("Status", "Force initialized");
         opMode.telemetry.update();
+
     }
 
     public static void SimpleInit(LinearOpMode OpMode) {
         initRobot(opMode);
         startRobot();
+    }
+
+    void setLedColors(int r, int g, int b)
+    {
+        expansionHub1.setLedColor(r, g, b);
+        expansionHub2.setLedColor(r, g, b);
     }
 
     public static void FullInit(LinearOpMode OpMode) {
