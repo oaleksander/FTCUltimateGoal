@@ -16,7 +16,7 @@ public class Auto_BlueLeft_Park extends LinearOpMode {
 
         WoENrobot.forceInitRobot(this);
         AutoTransitioner.transitionOnStop(this, "Teleop COMPETITION");
-        WoENrobot.odometry.setRobotCoordinates(new Pose2D(-125, -156.5, toRadians(180)));
+        WoENrobot.odometry.setRobotCoordinates(new Pose2D(-125, -156.5, toRadians(0)));
         WoENrobot.startRobot();
         WoENrobot.drivetrain.Pos(new Pose2D(-125, 25, toRadians(180)));
         while (opModeIsActive()) {

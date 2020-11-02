@@ -4,17 +4,17 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.math.Pose2D;
 import org.firstinspires.ftc.teamcode.robot.WoENrobot;
-
+import static org.firstinspires.ftc.teamcode.robot.WoENrobot.*;
 public class AutonomousOpMode extends LinearOpMode {
 
-    public void mainProgram() {
+    public void main() {
     }
 
-    int getXSign() {
+    protected byte getXSign() {
         return 1;
     }
 
-    int getSideSign() {
+    protected byte getSideSign() {
         return 1;
     }
 
@@ -26,9 +26,9 @@ public class AutonomousOpMode extends LinearOpMode {
     @Override
     public void runOpMode() {
         new WoENrobot();
-        WoENrobot.FullInitWithCV(this);
-        WoENrobot.odometry.setRobotCoordinates(getStartPosition());
-        mainProgram();
+        FullInitWithCV(this);
+        odometry.setRobotCoordinates(getStartPosition());
+        main();
         telemetry.addData("Status", "Program finished (" + getRuntime() + ")");
         telemetry.update();
     }
