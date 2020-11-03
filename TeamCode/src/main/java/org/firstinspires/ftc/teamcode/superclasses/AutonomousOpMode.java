@@ -29,6 +29,7 @@ public class AutonomousOpMode extends LinearOpMode {
         FullInitWithCV(this);
         odometry.setRobotCoordinates(getStartPosition());
         main();
+        setLedColors(0,128,128);
         telemetry.addData("Status", "Program finished (" + getRuntime() + ")");
         telemetry.update();
     }

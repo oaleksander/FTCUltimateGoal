@@ -249,7 +249,7 @@ public class Drivetrain implements RobotModule {
             opMode.telemetry.addData("a", control.heading);
             opMode.telemetry.addData("ae", toDegrees(error.heading));
             opMode.telemetry.addData("dist", distanceError);
-            opMode.telemetry.update();
+            WoENrobot.spinOnce();
 
             errold = error;
             distanceError = error.radius();

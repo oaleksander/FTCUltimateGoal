@@ -22,7 +22,7 @@ public class rpm implements RobotModule {
     {
         shooterMotor = opMode.hardwareMap.get(DcMotorEx.class, "odometerX");
         shooterMotor.setDirection(DcMotorEx.Direction.FORWARD);
-        shooterMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        shooterMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
     static double time_ms;
     static double x = 1;
@@ -52,10 +52,14 @@ public class rpm implements RobotModule {
     }
     public void shooterpower(double power){
         shooterMotor.setPower(power);
+     //   shooterMotor.setVelocity(power*1000);
     }
     public void onshooter(boolean on){
-        this.on = on;
-        rpmtime.reset();
+        if(on == !this.on) {
+            this.on = on;      //Времено: что бы можно было вкл/выкл в цикле с геймпада
+            rpmtime.reset();
+        }
+       // rpmtime.reset();
     }
     double pos = 0, posold = 0,time = 0, oldtime = 0, error = 0, P = 0, D = 0, errorold = 0,power = 0;
     static final double minerror = 15, maxspeed = 1, kofP = 0.0015, kofd = 0.00001;
