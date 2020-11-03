@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
 import org.openftc.revextensions2.ExpansionHubEx;
+import org.openftc.revextensions2.RevBulkData;
 
 public class WoENrobot {
     public static TwoWheelOdometry odometry = new TwoWheelOdometry();
@@ -15,7 +16,7 @@ public class WoENrobot {
     public static OpenCVNode openCVNode = new OpenCVNode();
     public static Conveyor conveyor = new Conveyor();
     public static rpm shooter = new rpm();
-    protected static RobotModule[] activeAobotModules = {conveyor, odometry, shooter};
+    protected static RobotModule[] activeAobotModules = {conveyor, odometry, shooter, wobbleManipulator, drivetrain};
 
     public static void FullInitWithCV(LinearOpMode opMode) {
         forceInitRobot(opMode);
@@ -31,16 +32,26 @@ public class WoENrobot {
     private static ExpansionHubEx expansionHub2 = null;
 
     public static ElapsedTime Runtime = new ElapsedTime();
+    public static ElapsedTime looptime = new ElapsedTime();
     static Runnable updateRegulators = () -> {
         while (opMode.opModeIsActive()) {
             for (RobotModule robotModule : activeAobotModules) {
                 robotModule.update();
             }
+            opMode.telemetry.addData("Loop frequency", 1.0/looptime.seconds());
+            looptime.reset();
+            spinCompleted = true;
             opMode.telemetry.update();
         }
     };
     private static Thread regulatorUpdater = new Thread(updateRegulators);
 
+    static boolean spinCompleted = false;
+    public static void spinOnce()
+    {
+    spinCompleted = false;
+    while(!spinCompleted && opMode.opModeIsActive()) {}
+    }
     public static void delay(double delay_ms) {
         ElapsedTime timer = new ElapsedTime();
         timer.reset();
@@ -48,9 +59,11 @@ public class WoENrobot {
     }
 
     public static void startRobot() {
+        setLedColors(255,166,0);
         opMode.waitForStart();
         regulatorUpdater.start();
         Runtime.reset();
+        setLedColors(0,237,255);
         opMode.telemetry.addData("Status", "Running");
         opMode.telemetry.update();
     }
@@ -80,8 +93,8 @@ public class WoENrobot {
         opMode.telemetry.update();
 
 
-        expansionHub2 = opMode.hardwareMap.get(ExpansionHubEx.class, "Expansion Hub 2");
         expansionHub1 = opMode.hardwareMap.get(ExpansionHubEx.class, "Expansion Hub 1");
+        expansionHub2 = opMode.hardwareMap.get(ExpansionHubEx.class, "Expansion Hub 2");
 
         for (RobotModule robotModule : activeAobotModules) {
             robotModule.initialize(opMode);
@@ -104,7 +117,7 @@ public class WoENrobot {
         startRobot();
     }
 
-    void setLedColors(int r, int g, int b)
+    public static void setLedColors(int r, int g, int b)
     {
         expansionHub1.setLedColor(r, g, b);
         expansionHub2.setLedColor(r, g, b);

@@ -61,10 +61,10 @@ public class TwoWheelOdometry implements Odometry {
     }
 
     public void update() {
-        update(worldPosition);
+        calculatePosition(worldPosition);
     }
 
-    public synchronized void update(Pose2D initialPose) {
+    public synchronized void calculatePosition(Pose2D initialPose) {
 
         worldPosition = initialPose;
 
@@ -125,7 +125,7 @@ public class TwoWheelOdometry implements Odometry {
 
     public Pose2D getRobotCoordinates() {
         Vector2D poseTranslation = new Vector2D(worldPosition.x * odometryCMPerCounts, worldPosition.y * odometryCMPerCounts
-        ).add(new Vector2D(0, 1).rotatedCW(worldPosition.heading));
+        );//.add(new Vector2D(0, 1).rotatedCW(worldPosition.heading));
         return new Pose2D(poseTranslation, worldPosition.heading);
     }
 
@@ -136,7 +136,7 @@ public class TwoWheelOdometry implements Odometry {
      */
     public void setRobotCoordinates(Pose2D coordinates) {
         IMUoffset = (float) angleWrap(getIMUheading() + IMUoffset - coordinates.heading);
-        this.update(new Pose2D(coordinates.x * odometryCountsPerCM, coordinates.y * odometryCountsPerCM, coordinates.heading));
+        this.calculatePosition(new Pose2D(coordinates.x * odometryCountsPerCM, coordinates.y * odometryCountsPerCM, coordinates.heading));
     }
 
 }
