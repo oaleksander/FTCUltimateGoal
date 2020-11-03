@@ -36,8 +36,8 @@ public class rpm implements RobotModule {
         pos = shooterMotor.getCurrentPosition();
         oldtime = time;
         time = rpmtime.milliseconds();
-        posold -= pos;
-        oldtime -= time;
+        posold = pos - posold;
+        oldtime = oldtime - time;
         rpm2 = posold / oldtime * 2500; // что выводит?
         if (on) {
             if (time_ms > rpmtime.milliseconds()) {
