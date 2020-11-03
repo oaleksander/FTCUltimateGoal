@@ -32,6 +32,7 @@ public class rpm implements RobotModule {
     static boolean on = false;
     static double rpm2 = 0;
     double speedold = 0,speed = 0;
+    double power2 = 0; //delete
     public void update() {
         posold = pos;
         pos = shooterMotor.getCurrentPosition();
@@ -39,7 +40,8 @@ public class rpm implements RobotModule {
         time = rpmtime.milliseconds();
         posold = pos - posold;
         oldtime = oldtime - time;
-        rpm2 = posold / oldtime * 2500; // что выводит?
+        rpm2 = posold / oldtime * 2500;// что выводит?
+        power2 = regulator();// что выводит?
         if (on) {
             if (time_ms > rpmtime.milliseconds()) {
                 shooterpower(rpmtime.milliseconds() * x);
@@ -71,14 +73,18 @@ public class rpm implements RobotModule {
         }
        // rpmtime.reset();
     }
-    double pos = 0, posold = 0,time = 0, oldtime = 0, error = 0, P = 0, D = 0, errorold = 0,power = 0;
-    static final double minerror = 15, maxspeed = 1, kofP = 0.0015, kofd = 0.00001;
-    public double regulator(){ // что выводит?
+    double pos = 0, posold = 0,time = 0, oldtime = 0, error = 0, P = 0, D = 0, errorold = 0,power = 0, maxpower = 0;
+    static final double kofP = 0.0015, kofd = 0.00001;
+    public double regulator(){
         error = rpm - rpm2;
         P = error * kofP;
         D = (error - errorold)* kofd;
         errorold = error;
-        return power = D + P;
+        power = D + P;
+        if (power > maxpower) power = maxpower;
+        if (power < -maxpower) power = -maxpower;
+        return  power;
+
     }
     public void resetshooter(){
         shooterMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -86,6 +92,7 @@ public class rpm implements RobotModule {
     }
     public void setrpm(double rpm){
         this.rpm = rpm;
+        maxpower = rpm/6000;
     }
     public void setspeedlevel(double time){
         this.time_ms = time;
