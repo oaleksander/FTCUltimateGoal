@@ -74,9 +74,15 @@ public class Conveyor implements RobotModule {
     static boolean on = false;
     static boolean backon = false, stop = false;
     static double timelock = 0;
+    double distance = 0;
+    private static ElapsedTime timepause = new ElapsedTime();
     public void update(){
         setposclose(feederTime.milliseconds()<500);
-       if (getdistance()<6)
+        if (timepause.milliseconds() >= 100){
+            timepause.reset();
+            distance = getdistance();
+        }
+       if (distance<6)
             if (conveyortime.milliseconds() >= 1000) {
                 full = true;
             }
