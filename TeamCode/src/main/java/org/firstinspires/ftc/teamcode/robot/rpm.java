@@ -22,7 +22,7 @@ public class rpm implements RobotModule {
     {
         shooterMotor = opMode.hardwareMap.get(DcMotorEx.class, "odometerX");
         shooterMotor.setDirection(DcMotorEx.Direction.FORWARD);
-        shooterMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        shooterMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
     static double time_ms;
     static double x = 1;
@@ -47,6 +47,7 @@ public class rpm implements RobotModule {
     }
     public void shooterpower(double power){
         shooterMotor.setPower(power);
+     //   shooterMotor.setVelocity(power*1000);
     }
     public void onshooter(boolean on){
         this.on = on;
