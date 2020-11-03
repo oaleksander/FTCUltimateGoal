@@ -68,6 +68,7 @@ public class rpm implements RobotModule {
         error = rpm - rpm2;
         P = error * kofP;
         D = (error - errorold)* kofd;
+        errorold = error;
         return power = D + P;
     }
     public void resetshooter(){
