@@ -117,23 +117,12 @@ public class Conveyor implements RobotModule {
     public void  setOnConveyor(boolean takeon){
         on = takeon;
     }
-    double pos = 1;
     static boolean ispush = false;
     public void setposclose(boolean push) {
         if(push!=ispush) {
             ispush = push;
-            if (push) {
-                if (pos == 1) {
-                    pos = 0.5;
-                    feeder.setPosition(0.5);
-                }
-            }
-            else {
-                if (pos == 0.5) {
-                    pos = 1;
-                    feeder.setPosition(1);
-                }
-            }
+            if (push) feeder.setPosition(0.5);
+            else feeder.setPosition(1);
         }
     }
     public void setpowerconveyor(double power){
