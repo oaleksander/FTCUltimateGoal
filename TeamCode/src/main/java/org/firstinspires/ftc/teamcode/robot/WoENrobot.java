@@ -38,7 +38,7 @@ public class WoENrobot {
             for (RobotModule robotModule : activeAobotModules) {
                 robotModule.update();
             }
-            opMode.telemetry.addData("Loop frequency", 1.0/looptime.seconds());
+            opMode.telemetry.addData("Loop frequency", 1.0/looptime.seconds() + " hz");
             looptime.reset();
             spinCompleted = true;
             opMode.telemetry.update();

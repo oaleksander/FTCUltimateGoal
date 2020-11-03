@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.opencv;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -32,7 +33,7 @@ import java.util.List;
  * YES
  */
 @Autonomous(name = "opencvSkystoneDetector", group = "Sky autonomous")
-//@Disabled//comment out this line before using
+@Disabled
 public class openCVsample extends LinearOpMode {
     //0 means skystone, 1 means yellow stone
     //-1 for debug, but we can keep it like this because if it works, it should change to either 0 or 255
