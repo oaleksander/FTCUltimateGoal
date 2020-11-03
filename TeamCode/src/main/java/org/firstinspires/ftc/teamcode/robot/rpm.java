@@ -31,6 +31,7 @@ public class rpm implements RobotModule {
     static double rpm = 6000;
     static boolean on = false;
     static double rpm2 = 0;
+    double speedold = 0,speed = 0;
     public void update() {
         posold = pos;
         pos = shooterMotor.getCurrentPosition();
@@ -44,11 +45,19 @@ public class rpm implements RobotModule {
                 shooterpower(rpmtime.milliseconds() * x);
             }
             if (time_ms < rpmtime.milliseconds()) {
-                shooterpower(rpm / 6000);
+                speed = rpm / 6000;
+                if (speedold!=speed) {
+                    shooterpower(speed);
+                    speedold = speed;
+                }
             }
         }
         else {
-           shooterpower(0);
+            speed = 0;
+            if (speedold != speed){
+                shooterpower(speed);
+                speedold = speed;
+            }
         }
     }
     public void shooterpower(double power){
