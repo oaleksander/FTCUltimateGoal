@@ -72,7 +72,7 @@ public class Conveyor implements RobotModule {
     static boolean full = false;
 
     static boolean on = false;
-    static boolean backon = true;
+    static boolean backon = false, stop = false;
     static double timelock = 0;
     public void update(){
         setposclose(feederTime.milliseconds()<500);
@@ -85,8 +85,11 @@ public class Conveyor implements RobotModule {
             full = false;
         }
         if (on && !full) {
+            stop = true;
             if (conveyorm.getCurrent(CurrentUnit.AMPS)<= 4 && backcontime.milliseconds()>=1000){
-                setpowerconveyor(1);
+                if (backon == false) {
+                    setpowerconveyor(1);
+                }
                 backon = true;
                 timelock = backcontime.milliseconds();
             }
@@ -99,7 +102,10 @@ public class Conveyor implements RobotModule {
             }
         }
         else {
-            setpowerconveyor(0);
+            if (stop) {
+                setpowerconveyor(0);
+                stop = false;
+            }
         }
     }
     public void  setOnConveyor(boolean takeon){
