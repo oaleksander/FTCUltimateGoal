@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.opencv;
 
 import android.widget.TextView;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -10,6 +11,7 @@ import org.firstinspires.ftc.teamcode.robot.OpenCVNode;
 import org.firstinspires.ftc.teamcode.robot.WoENrobot;
 
 @TeleOp
+@Disabled
 public class callopencv extends LinearOpMode {
 
     @Override

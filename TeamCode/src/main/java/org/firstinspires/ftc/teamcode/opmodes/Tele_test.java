@@ -4,9 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.math.Pose2D;
-import org.firstinspires.ftc.teamcode.robot.Drivetrain;
-import org.firstinspires.ftc.teamcode.robot.WoENrobot;
-import org.firstinspires.ftc.teamcode.robot.WobbleManipulator;
+import static org.firstinspires.ftc.teamcode.robot.WoENrobot.*;
 
 import static java.lang.Math.toRadians;
 
@@ -17,10 +15,9 @@ public class Tele_test extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-
-        WoENrobot.forceInitRobot(this);
-        WoENrobot.startRobot();
-        WoENrobot.odometry.setRobotCoordinates(new Pose2D(62.5, -156.5, toRadians(180)));
+        forceInitRobot(this);
+        startRobot();
+        odometry.setRobotCoordinates(new Pose2D(62.5, -156.5, toRadians(180)));
         while (opModeIsActive()) {
             double turn = 0;
             double y = 0;
@@ -40,36 +37,36 @@ public class Tele_test extends LinearOpMode {
             if (gamepad1.dpad_right)
                 x += 1;
             if (gamepad1.x)
-                WoENrobot.wobbleManipulator.setposlever(0);
+                wobbleManipulator.setposlever(0);
             else if (gamepad1.y)
-                WoENrobot.wobbleManipulator.setposlever(490);
+                wobbleManipulator.setposlever(490);
             else if (gamepad1.b)
-                WoENrobot.wobbleManipulator.setposlever(700);
+                wobbleManipulator.setposlever(700);
             if (gamepad1.a) {
                 if (!buttonAwasPressed)
-                    WoENrobot.wobbleManipulator.setposclose(!WobbleManipulator.isGrabbed);
+                    wobbleManipulator.setposclose(!wobbleManipulator.isGrabbed);
                 buttonAwasPressed = true;
             } else
                 buttonAwasPressed = false;
-            WoENrobot.drivetrain.holonomicMove(-y, -x, turn);
+            drivetrain.holonomicMove(-y, -x, turn);
             telemetry.addData("Status", "Running");
             telemetry.addLine("encoder")
-                    .addData("FL", Drivetrain.driveFrontLeft.getCurrentPosition())
-                    .addData("FR", Drivetrain.driveFrontRight.getCurrentPosition())
-                    .addData("RL", Drivetrain.driveRearLeft.getCurrentPosition())
-                    .addData("RR", Drivetrain.driveRearRight.getCurrentPosition())
-                    .addData("odYL", WoENrobot.odometry.bulkData.getMotorCurrentPosition(0))
-                    .addData("odYR", -WoENrobot.odometry.bulkData.getMotorCurrentPosition(1))
-                    .addData("odX", WoENrobot.odometry.bulkData.getMotorCurrentPosition(2));
+                    .addData("FL", drivetrain.driveFrontLeft.getCurrentPosition())
+                    .addData("FR", drivetrain.driveFrontRight.getCurrentPosition())
+                    .addData("RL", drivetrain.driveRearLeft.getCurrentPosition())
+                    .addData("RR", drivetrain.driveRearRight.getCurrentPosition())
+                    .addData("odYL", odometry.bulkData.getMotorCurrentPosition(0))
+                    .addData("odYR", -odometry.bulkData.getMotorCurrentPosition(1))
+                    .addData("odX", odometry.bulkData.getMotorCurrentPosition(2));
             telemetry.addLine("Control")
                     .addData("y", y)
                     .addData("x", x)
                     .addData("turn", turn);
             try {
                 telemetry.addLine("odometry")
-                        .addData("y", WoENrobot.odometry.getRobotCoordinates().y)
-                        .addData("x", WoENrobot.odometry.getRobotCoordinates().x)
-                        .addData("head", Math.toDegrees(WoENrobot.odometry.getRobotCoordinates().heading));
+                        .addData("y", odometry.getRobotCoordinates().y)
+                        .addData("x", odometry.getRobotCoordinates().x)
+                        .addData("head", Math.toDegrees(odometry.getRobotCoordinates().heading));
             } catch (NullPointerException ignored) {
             }
             //telemetry.addData("Y",  WoENrobot.odometry.getRobotCoordinates().y);
