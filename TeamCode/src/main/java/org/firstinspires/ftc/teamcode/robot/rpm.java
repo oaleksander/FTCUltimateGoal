@@ -55,8 +55,11 @@ public class rpm implements RobotModule {
      //   shooterMotor.setVelocity(power*1000);
     }
     public void onshooter(boolean on){
-        this.on = on;
-        rpmtime.reset();
+        if(on == !this.on) {
+            this.on = on;      //Времено: что бы можно было вкл/выкл в цикле с геймпада
+            rpmtime.reset();
+        }
+       // rpmtime.reset();
     }
     double pos = 0, posold = 0,time = 0, oldtime = 0, error = 0, P = 0, D = 0, errorold = 0,power = 0;
     static final double minerror = 15, maxspeed = 1, kofP = 0.0015, kofd = 0.00001;
