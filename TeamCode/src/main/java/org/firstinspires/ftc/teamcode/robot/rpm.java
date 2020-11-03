@@ -23,6 +23,7 @@ public class rpm implements RobotModule {
         shooterMotor = opMode.hardwareMap.get(DcMotorEx.class, "odometerX");
         shooterMotor.setDirection(DcMotorEx.Direction.FORWARD);
         shooterMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        resetshooter();
     }
     static double time_ms;
     static double x = 1;
