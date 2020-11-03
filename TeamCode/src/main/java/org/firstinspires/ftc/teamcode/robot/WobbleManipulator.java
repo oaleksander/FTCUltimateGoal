@@ -37,11 +37,13 @@ public class WobbleManipulator implements RobotModule {
     }
 
     public void setposclose(boolean dograb) {
-        isGrabbed = dograb;
-        if (dograb) close.setPosition(0.5);
-        else close.setPosition(1);
+        if (dograb != isGrabbed) {
+            isGrabbed = dograb;
+            if (dograb) close.setPosition(0.5);
+            else close.setPosition(1);
+        }
     }
-
+    double oldpower = 0;
     public void update() {
             error = pos - lever.getCurrentPosition();
             if (Math.abs(error) > minerror) {
@@ -50,7 +52,10 @@ public class WobbleManipulator implements RobotModule {
                 power = P + D;
                 if (power > maxspeed) power = maxspeed;
                 if (power < -maxspeed) power = -maxspeed;
-                lever.setPower(power);
+                if (oldpower != power) {
+                    lever.setPower(power);
+                    oldpower = power;
+                }
             /*WoENrobot.getInstance().opMode.telemetry.addData("err",error);
             WoENrobot.getInstance().opMode.telemetry.addData("pow",power);
             WoENrobot.getInstance().opMode.telemetry.addData("pos",pos);
@@ -58,7 +63,11 @@ public class WobbleManipulator implements RobotModule {
             WoENrobot.getInstance().opMode.telemetry.update(); */
                 errorOld = error;
             } else {
-                lever.setPower(0);
+                power = 0;
+                if (oldpower != power) {
+                    lever.setPower(0);
+                    oldpower = power;
+                }
             }
     }
 
