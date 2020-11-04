@@ -94,7 +94,7 @@ public class Conveyor implements RobotModule {
             stop = true;
             if (conveyorm.getCurrent(CurrentUnit.AMPS)<= 4 && backcontime.milliseconds()>=1000){
                 if (backon == false) {
-                    setpowerconveyor(1);
+                    setpowerconveyor(power);
                 }
                 backon = true;
                 timelock = backcontime.milliseconds();
@@ -102,7 +102,7 @@ public class Conveyor implements RobotModule {
             else {
                 if (backon && (backcontime.milliseconds() >= (timelock+500))) {
                     backcontime.reset();
-                    setpowerconveyor(-1);
+                    setpowerconveyor(-power);
                     backon = false;
                 }
             }
@@ -124,6 +124,10 @@ public class Conveyor implements RobotModule {
             if (push) feeder.setPosition(0.5);
             else feeder.setPosition(1);
         }
+    }
+    static double power = 1;
+    public void setpower(double power){
+        this.power = power;
     }
     public void setpowerconveyor(double power){
         conveyorm.setPower(power);
