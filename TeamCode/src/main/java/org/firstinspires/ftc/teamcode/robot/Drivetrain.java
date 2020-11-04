@@ -49,14 +49,6 @@ public class Drivetrain implements RobotModule {
     public static double minDriveSpeed = 0.05;
     public float imuLeftAngleOffset = 0;
     public float imuRightAngleOffset = 0;
-    double powerFrontLeft = 0;
-    double powerFrontRight = 0;
-    double powerRearLeft = 0;
-    double powerRearRight = 0;
-    double powerFrontLeft_old = powerFrontLeft;
-    double powerFrontRight_old = powerFrontRight;
-    double powerRearLeft_old = powerRearLeft;
-    double powerRearRight_old = powerRearRight;
     ElapsedTime looptime = new ElapsedTime();
     private final Odometry odometry;
     private LinearOpMode opMode = null;
@@ -117,33 +109,77 @@ public class Drivetrain implements RobotModule {
         minDriveSpeed = clip(abs(value), 0, 1);
     }
 
-    public void update() {
-        if (powerFrontLeft == 0)
-            powerFrontLeft_old = 0;
-        else
-            powerFrontLeft_old += min(abs(powerFrontLeft - powerFrontLeft_old), abs(looptime.seconds() * maxRampPerSec)) * signum(powerFrontLeft - powerFrontLeft_old);
-        if (powerFrontRight == 0)
-            powerFrontRight_old = 0;
-        else
-            powerFrontRight_old += min(abs(powerFrontRight - powerFrontRight_old), abs(looptime.seconds() * maxRampPerSec)) * signum(powerFrontRight - powerFrontRight_old);
-        if (powerRearLeft == 0)
-            powerRearLeft_old = 0;
-        else
-            powerRearLeft_old += min(abs(powerRearLeft - powerRearLeft_old), abs(looptime.seconds() * maxRampPerSec)) * signum(powerRearLeft - powerRearLeft_old);
-        if (powerRearRight == 0)
-            powerRearRight_old = 0;
-        else
-            powerRearRight_old += min(abs(powerRearRight - powerRearRight_old), abs(looptime.seconds() * maxRampPerSec)) * signum(powerRearRight - powerRearRight_old);
+    double powerFrontLeft_requested = 0;
+    double powerFrontRight_requested = 0;
+    double powerRearLeft_requested = 0;
+    double powerRearRight_requested = 0;
+    double powerFrontLeft_current = powerFrontLeft_requested;
+    double powerFrontRight_current = powerFrontRight_requested;
+    double powerRearLeft_current = powerRearLeft_requested;
+    double powerRearRight_current = powerRearRight_requested;
+    double powerFrontLeft_old = powerFrontLeft_requested;
+    double powerFrontRight_old = powerFrontRight_requested;
+    double powerRearLeft_old = powerRearRight_requested;
+    double powerRearRight_old = powerRearRight_requested;
 
-        driveFrontLeft.setPower(powerFrontLeft_old);
-        driveFrontRight.setPower(powerFrontRight_old);
-        driveRearLeft.setPower(powerRearLeft_old);
-        driveRearRight.setPower(powerRearRight_old);
+    public void update() {
+        if (powerFrontLeft_requested == 0) {
+            powerFrontLeft_current = powerFrontLeft_old = 0;
+            driveFrontLeft.setPower(powerFrontLeft_current);
+        }
+        else {
+            powerFrontLeft_current += min(abs(powerFrontLeft_requested - powerFrontLeft_current), abs(looptime.seconds() * maxRampPerSec)) * signum(powerFrontLeft_requested - powerFrontLeft_current);
+            if(powerFrontLeft_current != powerFrontLeft_old ) {
+                driveFrontLeft.setPower(powerFrontLeft_current);
+                powerFrontLeft_old = powerFrontLeft_current;
+            }
+        }
+        if (powerFrontRight_requested == 0) {
+            powerFrontRight_current = powerFrontRight_old = 0;
+            driveFrontRight.setPower(powerFrontRight_current);
+        }
+        else {
+            powerFrontRight_current += min(abs(powerFrontRight_requested - powerFrontRight_current), abs(looptime.seconds() * maxRampPerSec)) * signum(powerFrontRight_requested - powerFrontRight_current);
+            if(powerFrontRight_current != powerFrontRight_old ) {
+                driveFrontRight.setPower(powerFrontRight_current);
+                powerFrontRight_old = powerFrontRight_current;
+            }
+        }
+        if (powerRearLeft_requested == 0) {
+            powerRearLeft_current = powerRearLeft_old = 0;
+            driveRearLeft.setPower(powerRearLeft_current);
+        }
+        else {
+            powerRearLeft_current += min(abs(powerRearLeft_requested - powerRearLeft_current), abs(looptime.seconds() * maxRampPerSec)) * signum(powerRearLeft_requested - powerRearLeft_current);
+            if(powerRearLeft_current != powerRearLeft_old ) {
+                driveRearLeft.setPower(powerRearLeft_current);
+                powerRearLeft_old = powerRearLeft_current;
+            }
+        }
+        if (powerRearRight_requested == 0) {
+            powerRearRight_current = powerRearRight_old = 0;
+            driveRearRight.setPower(powerRearRight_current);
+        }
+        else {
+            powerRearRight_current += min(abs(powerRearRight_requested - powerRearRight_current), abs(looptime.seconds() * maxRampPerSec)) * signum(powerRearRight_requested - powerRearRight_current);
+            if(powerRearRight_current != powerRearRight_old ) {
+                driveRearRight.setPower(powerRearRight_current);
+                powerRearRight_old = powerRearRight_current;
+            }
+        }
 
         looptime.reset();
     }
 
-    public void driveMotorPowers(double frontLeft, double frontRight, double rearLeft, double rearRight) {
+    public void driveMotorPowers_direct(double frontLeft, double frontRight, double rearLeft, double rearRight)
+    {
+        driveFrontLeft.setPower(frontLeft);
+        driveFrontRight.setPower(frontRight);
+        driveRearLeft.setPower(rearLeft);
+        driveRearRight.setPower(rearRight);
+    }
+
+    public void driveMotorPowers_smart(double frontLeft, double frontRight, double rearLeft, double rearRight) {
 
         double maxabs = max(max(abs(frontLeft), abs(frontRight)), max(abs(rearLeft), abs(rearRight)));
         if (maxabs > maxDriveSpeed) {
@@ -153,21 +189,28 @@ public class Drivetrain implements RobotModule {
             rearRight /= maxabs;
         }
 
-        powerFrontLeft = (clip(abs(frontLeft), minDriveSpeed, 1) * signum(frontLeft));
-        powerFrontRight = (clip(abs(frontRight), minDriveSpeed, 1) * signum(frontRight));
-        powerRearLeft = (clip(abs(rearLeft), minDriveSpeed, 1) * signum(rearLeft));
-        powerRearRight = (clip(abs(rearRight), minDriveSpeed, 1) * signum(rearRight));
+        frontLeft = limitSpeed(frontLeft);
+        frontLeft = limitSpeed(frontLeft);
+        frontLeft = limitSpeed(frontLeft);
+        frontLeft = limitSpeed(frontLeft);
+
+        powerFrontLeft_requested = (clip(abs(frontLeft), minDriveSpeed, 1) * signum(frontLeft));
+        powerFrontRight_requested = (clip(abs(frontRight), minDriveSpeed, 1) * signum(frontRight));
+        powerRearLeft_requested = (clip(abs(rearLeft), minDriveSpeed, 1) * signum(rearLeft));
+        powerRearRight_requested = (clip(abs(rearRight), minDriveSpeed, 1) * signum(rearRight));
     }
 
+    private double limitSpeed(double speed) {return clip(abs(speed), minDriveSpeed, 1) * signum(speed);}
+
     public void stopMotors() {
-        driveMotorPowers(0, 0, 0, 0);
+        driveMotorPowers_smart(0, 0, 0, 0);
     }
 
     private void tankMove(double speedL, double speedR) {
         speedL = Range.clip(speedL, -1.0, 1.0);
         speedR = Range.clip(speedR, -1.0, 1.0);
 
-        driveMotorPowers(speedL, speedR, speedL, speedR);
+        driveMotorPowers_smart(speedL, speedR, speedL, speedR);
     }
 
     public void tankMove(double speed) {
@@ -188,7 +231,7 @@ public class Drivetrain implements RobotModule {
             RFLR /= max(abs(LFRR), abs(RFLR));
         }
 
-        driveMotorPowers(LFRR, RFLR, RFLR, LFRR);
+        driveMotorPowers_smart(LFRR, RFLR, RFLR, LFRR);
     }
 
     public void holonomicMove(double frontways, double sideways, double turn) {
@@ -197,7 +240,7 @@ public class Drivetrain implements RobotModule {
         double RearLeft = frontways - sideways + turn;
         double RearRight = frontways + sideways - turn;
 
-        driveMotorPowers(FrontLeft, FrontRight, RearLeft, RearRight);
+        driveMotorPowers_smart(FrontLeft, FrontRight, RearLeft, RearRight);
     }
 
     public void holonomicMovePolar(double heading, double speed, double turn) {
