@@ -17,6 +17,7 @@ import org.openftc.revextensions2.RevBulkData;
 
 import static java.lang.Math.PI;
 import static java.lang.Math.cos;
+import static java.lang.Math.sin;
 import static java.lang.Math.toRadians;
 import static org.firstinspires.ftc.teamcode.math.MathUtil.angleWrap;
 
@@ -84,15 +85,16 @@ public class TwoWheelOdometry implements Odometry {
 
         Vector2D deltaPosition = new Vector2D(deltaXcomponent, deltaYcomponent);
 
-            /* if (deltaWorldHeading != 0 && false) {   //if deltaAngle = 0 radius of the arc is = Inf which causes model degeneracy
-                double arcAngle = deltaPosition.acot();
-                double arcRadius = deltaPosition.radius()/deltaWorldHeading;
+            if (deltaWorldHeading != 0) {   //if deltaAngle = 0 radius of the arc is = Inf which causes model degeneracy
+                //double arcAngle = deltaPosition.acot();
+                double arcAngle = deltaWorldHeading*2;
+                double arcRadius = deltaPosition.radius()/arcAngle;
 
-                deltaPosition = new Vector2D(arcRadius*(1-cos(arcAngle)),arcRadius*sin(arcAngle)).rotatedCW(arcAngle);
+                deltaPosition = new Vector2D(arcRadius*(1-cos(arcAngle)),arcRadius*sin(arcAngle)).rotatedCW(deltaPosition.acot());
 
-            } */
-        worldPosition = worldPosition.add(new Pose2D(deltaPosition.rotatedCW(worldPosition.heading + deltaWorldHeading / 2), deltaWorldHeading));
-
+            }
+       // worldPosition = worldPosition.add(new Pose2D(deltaPosition.rotatedCW(worldPosition.heading + deltaWorldHeading / 2), deltaWorldHeading));
+        worldPosition = worldPosition.add(new Pose2D(deltaPosition.rotatedCW(worldPosition.heading + deltaWorldHeading), deltaWorldHeading));
         YL_old = bulkData.getMotorCurrentPosition(odometerYL);
         //YR_old = -bulkData.getMotorCurrentPosition(odometerYR);
         X_old = bulkData.getMotorCurrentPosition(odometerX);
