@@ -125,7 +125,7 @@ public class Conveyor implements RobotModule {
         conveyorPower = power;
     }
     private double last_power = 0;
-    public void setConveyorMotorPower(double power){
+    private void setConveyorMotorPower(double power){
         if(last_power!=power) {
             conveyorm.setPower(power);
             last_power = power;
