@@ -50,12 +50,12 @@ public class WoENrobot {
     public static void spinOnce()
     {
     spinCompleted = false;
-    while(!spinCompleted && opMode.opModeIsActive()) {}
+    while(!spinCompleted && opMode.opModeIsActive()) {Thread.yield();}
     }
     public static void delay(double delay_ms) {
         ElapsedTime timer = new ElapsedTime();
         timer.reset();
-        while (timer.milliseconds() < delay_ms && opMode.opModeIsActive()) ;
+        while (timer.milliseconds() < delay_ms && opMode.opModeIsActive()){Thread.yield();}
     }
 
     public static void startRobot() {
