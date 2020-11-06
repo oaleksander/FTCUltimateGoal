@@ -30,9 +30,9 @@ public class rpm implements RobotModule {
     private static boolean isActivated;
     static double rpm = 6000;
     static boolean on = false;
-    static double rpm2 = 0;
+    public static double rpm2 = 0;
     double speedold = 0,speed = 0;
-    double power2 = 0; //delete
+    public static double power2 = 0; //delete
     public void update() {
         posold = pos;
         pos = shooterMotor.getCurrentPosition();
@@ -40,7 +40,7 @@ public class rpm implements RobotModule {
         time = rpmtime.milliseconds();
         posold = pos - posold;
         oldtime = oldtime - time;
-        rpm2 = posold / oldtime * 2500;// что выводит?
+         rpm2 = posold / oldtime * 2500;// что выводит?
         power2 = regulator();// что выводит?
         if (on) {
             if (time_ms > rpmtime.milliseconds()) {
