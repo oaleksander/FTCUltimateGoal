@@ -26,33 +26,27 @@ import static java.lang.Math.toDegrees;
 
 public class Drivetrain implements RobotModule {
 
-    public static final double kP_distance = 0.021, kD_distance = 0.00034;
-    public static final double minImpact = 0.1;
-    public static final double minError_distance = 13;
-    public static final double kP_angle = 0.34, kD_angle = 0;
-    public static final double minError_angle = Math.toRadians(5.5);
+    private static final double kP_distance = 0.021, kD_distance = 0.00034;
+    private static final double kF_distance = 0.1;
+    private static final double minError_distance = 13;
+    private static final double kP_angle = 0.34, kD_angle = 0;
+    private static final double kF_angle = 0.1;
+    private static final double minError_angle = Math.toRadians(5.5);
     /* Drivetrain hardware members. */
-    public static ExpansionHubEx expansionHub1 = null;
-    public static DcMotorEx driveFrontLeft = null;
-    public static DcMotorEx driveFrontRight = null;
-    public static DcMotorEx driveRearLeft = null;
-    public static DcMotorEx driveRearRight = null;
-    public static ExpansionHubEx expansionHub2 = null;
+   // public static ExpansionHubEx expansionHub1 = null;
+    private static DcMotorEx driveFrontLeft = null;
+    private static DcMotorEx driveFrontRight = null;
+    private static DcMotorEx driveRearLeft = null;
+    private static DcMotorEx driveRearRight = null;
 
     /* Drivetrain constatnts. */
-    public static ExpansionHubMotor odometerYL = null;
-    public static ExpansionHubMotor odometerYR = null;
-    public static ExpansionHubMotor odometerX = null;
-    public static BNO055IMU imuLeft;
-    public static BNO055IMU imuRight;
     public static double maxDriveSpeed = 1;
     public static double minDriveSpeed = 0.05;
-    public float imuLeftAngleOffset = 0;
-    public float imuRightAngleOffset = 0;
-    ElapsedTime looptime = new ElapsedTime();
-    private final Odometry odometry;
+    private ElapsedTime looptime = new ElapsedTime();
+    private static Odometry odometry;
     private LinearOpMode opMode = null;
-    private final double maxRampPerSec = 1 / 0.25;
+
+    private static final double maxRampPerSec = 1 / 0.25;
     public Drivetrain(Odometry odometry) {
         this.odometry = odometry;
     }
