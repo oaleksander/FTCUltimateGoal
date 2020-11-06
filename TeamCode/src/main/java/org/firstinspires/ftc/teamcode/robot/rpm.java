@@ -74,7 +74,7 @@ public class rpm implements RobotModule {
        // rpmtime.reset();
     }
     double pos = 0, posold = 0,time = 0, oldtime = 0, error = 0, P = 0, D = 0, errorold = 0,power = 0, maxpower = 0;
-    static final double kofP = 0.0015, kofd = 0.00001;
+    static final double kofP = 0.000075, kofd = 0.000001;
     public double regulator(){
         error = rpm - rpm2;
         P = error * kofP;
@@ -92,7 +92,7 @@ public class rpm implements RobotModule {
     }
     public void setrpm(double rpm){
         this.rpm = rpm;
-        maxpower = rpm/6000;
+        maxpower = 1;
     }
     public void setspeedlevel(double time){
         this.time_ms = time;
