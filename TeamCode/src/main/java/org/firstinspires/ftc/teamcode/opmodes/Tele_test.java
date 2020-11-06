@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -9,6 +10,7 @@ import static org.firstinspires.ftc.teamcode.robot.WoENrobot.*;
 import static java.lang.Math.toRadians;
 
 @TeleOp(name = "Teleop TEST/PRACTICE", group = "Debugging")
+
 public class Tele_test extends LinearOpMode {
 
     boolean buttonAwasPressed = false;
@@ -51,12 +53,12 @@ public class Tele_test extends LinearOpMode {
             drivetrain.holonomicMove(-y, -x, turn);
             telemetry.addData("Status", "Running");
             telemetry.addLine("encoder")
-                    .addData("FL", drivetrain.driveFrontLeft.getCurrentPosition())
+       /*             .addData("FL", drivetrain.driveFrontLeft.getCurrentPosition())
                     .addData("FR", drivetrain.driveFrontRight.getCurrentPosition())
                     .addData("RL", drivetrain.driveRearLeft.getCurrentPosition())
                     .addData("RR", drivetrain.driveRearRight.getCurrentPosition())
                     .addData("odYL", odometry.bulkData.getMotorCurrentPosition(0))
-                    .addData("odYR", -odometry.bulkData.getMotorCurrentPosition(1))
+         */           .addData("odYR", -odometry.bulkData.getMotorCurrentPosition(1))
                     .addData("odX", odometry.bulkData.getMotorCurrentPosition(2));
             telemetry.addLine("Control")
                     .addData("y", y)
