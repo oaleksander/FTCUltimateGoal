@@ -56,28 +56,26 @@ public class Conveyor implements RobotModule {
         feeder = opMode.hardwareMap.get(Servo.class, "feeder");
     }
     // правильная ли конвертация?
-    public float[] getcolor(){
+  /*  public float[] getcolor(){
         int colors = colorSensor.argb();
-   /*     int a = Color.alpha(colors);
+        int a = Color.alpha(colors);
         int r = Color.red(colors);
         int g = Color.green(colors);
         int b = Color.blue(colors);
-     */   Color.colorToHSV(colors, hsvValues);
+        Color.colorToHSV(colors, hsvValues);
         return hsvValues;
-    }
+    }*/
     public double getdistance(){
         return sensorDistance.getDistance(DistanceUnit.CM);
     }
     public static final float maxcolor = 255, mincolor = 0;
     static boolean full = false;
-
-    static boolean on = false;
     static boolean backon = false, stop = false;
     static double timelock = 0;
     double distance = 0;
     private static ElapsedTime timepause = new ElapsedTime();
     public void update(){
-        setposclose(feederTime.milliseconds()<500);
+        setFeederPosition(feederTime.milliseconds()<500);
         if (timepause.milliseconds() >= 100){
             timepause.reset();
             distance = getdistance();
@@ -90,11 +88,11 @@ public class Conveyor implements RobotModule {
             conveyortime.reset();
             full = false;
         }
-        if (on && !full) {
+        if (conveyorPower !=0 && !full) {
             stop = true;
             if (conveyorm.getCurrent(CurrentUnit.AMPS)<= 4 && backcontime.milliseconds()>=1000){
                 if (backon == false) {
-                    setpowerconveyor(power);
+                    setConveyorMotorPower(conveyorPower);
                 }
                 backon = true;
                 timelock = backcontime.milliseconds();
@@ -102,35 +100,36 @@ public class Conveyor implements RobotModule {
             else {
                 if (backon && (backcontime.milliseconds() >= (timelock+500))) {
                     backcontime.reset();
-                    setpowerconveyor(-power);
+                    setConveyorMotorPower(-conveyorPower);
                     backon = false;
                 }
             }
         }
         else {
             if (stop) {
-                setpowerconveyor(0);
+                setConveyorMotorPower(0);
                 stop = false;
             }
         }
     }
-    public void  setOnConveyor(boolean takeon){
-        on = takeon;
-    }
     static boolean ispush = false;
-    public void setposclose(boolean push) {
+    public void setFeederPosition(boolean push) {
         if(push!=ispush) {
             ispush = push;
             if (push) feeder.setPosition(0.5);
             else feeder.setPosition(1);
         }
     }
-    static double power = 1;
-    public void setpower(double power){
-        this.power = power;
+    static double conveyorPower = 0;
+    public void setConveyorPower(double power){
+        conveyorPower = power;
     }
-    public void setpowerconveyor(double power){
-        conveyorm.setPower(power);
+    private double last_power = 0;
+    public void setConveyorMotorPower(double power){
+        if(last_power!=power) {
+            conveyorm.setPower(power);
+            last_power = power;
+        }
     }
 
     private static ElapsedTime feederTime = new ElapsedTime();
