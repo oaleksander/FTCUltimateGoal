@@ -61,7 +61,10 @@ public class TwoWheelOdometry implements Odometry {
     }
 
     public void update() {
-        calculatePosition(worldPosition);
+        if (looptime.milliseconds() > 50) {
+            calculatePosition(worldPosition);
+            looptime.reset();
+        }
     }
 
     public synchronized void calculatePosition(Pose2D initialPose) {
