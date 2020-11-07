@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.robot;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -12,7 +11,6 @@ import org.firstinspires.ftc.teamcode.math.Pose2D;
 import org.firstinspires.ftc.teamcode.math.Vector2D;
 import org.firstinspires.ftc.teamcode.superclasses.Odometry;
 import org.openftc.revextensions2.ExpansionHubEx;
-import org.openftc.revextensions2.ExpansionHubMotor;
 import org.openftc.revextensions2.RevBulkData;
 
 import static java.lang.Math.PI;
@@ -29,17 +27,18 @@ public class TwoWheelOdometry implements Odometry {
     private static final double odometerXcenterOffset = 36.8862986805 * odometryCountsPerCM * cos(toRadians(67.021303041)) / 2;
     private static final double yWheelPairRadiusCm = 18.1275;
     private static final double radiansPerEncoderDifference = (odometryCMPerCounts) / (yWheelPairRadiusCm * 2);
-    private static float IMUoffset = 0;
-    private static int YL_old = 0;
-    private static int YR_old = 0;
-    private static int X_old = 0;
-    public static RevBulkData bulkData;
+    private static final int odometerYL = 0, odometerX = 2;
     public static Pose2D worldPosition = new Pose2D();
+    private static float IMUoffset = 0;
     private static BNO055IMU imu;
-    private static ExpansionHubMotor odometerYL, odometerX;
     private static ExpansionHubEx expansionHub;
-    ElapsedTime looptime = new ElapsedTime();
     private static LinearOpMode opMode = null;
+    public RevBulkData bulkData;
+    ElapsedTime looptime = new ElapsedTime();
+    private int YL_old = 0;
+    private final int YR_old = 0;
+    private int X_old = 0;
+
     /**
      * Class initializer
      */
@@ -72,28 +71,24 @@ public class TwoWheelOdometry implements Odometry {
         bulkData = expansionHub.getBulkInputData();
 
         //Get Current Positions
-        int deltaYL = bulkData.getMotorCurrentPosition(odometerYL) - YL_old;
+        // int deltaYL = bulkData.getMotorCurrentPosition(odometerYL) - YL_old;
         //int deltaYR = -bulkData.getMotorCurrentPosition(odometerYR) - YR_old;
-        int deltaX = bulkData.getMotorCurrentPosition(odometerX) - X_old;
-        double calculatedHeading = getIMUheading();
+        // int deltaX = bulkData.getMotorCurrentPosition(odometerX) - X_old;
         //double calculatedHeading = calculateHeading(bulkData.getMotorCurrentPosition(odometerYL),-bulkData.getMotorCurrentPosition(odometerYR));
-        double deltaWorldHeading = angleWrap(calculatedHeading - worldPosition.heading);
+        double deltaWorldHeading = angleWrap(getIMUheading() - worldPosition.heading);
 
-        //double deltaYcomponent = (double)(deltaYL+deltaYR)/2.0;
-        double deltaYcomponent = deltaYL - deltaWorldHeading * odometerYcenterOffset;
-        double deltaXcomponent = deltaX - deltaWorldHeading * odometerXcenterOffset;
+        Vector2D deltaPosition = new Vector2D((double) (bulkData.getMotorCurrentPosition(odometerX) - X_old) - deltaWorldHeading * odometerXcenterOffset,
+                (double) (bulkData.getMotorCurrentPosition(odometerYL) - YL_old) - deltaWorldHeading * odometerYcenterOffset);
 
-        Vector2D deltaPosition = new Vector2D(deltaXcomponent, deltaYcomponent);
+        if (deltaWorldHeading != 0) {   //if deltaAngle = 0 radius of the arc is = Inf which causes model degeneracy
+            //double arcAngle = deltaPosition.acot();
+            double arcAngle = deltaWorldHeading * 2;
+            double arcRadius = deltaPosition.radius() / arcAngle;
 
-            if (deltaWorldHeading != 0) {   //if deltaAngle = 0 radius of the arc is = Inf which causes model degeneracy
-                //double arcAngle = deltaPosition.acot();
-                double arcAngle = deltaWorldHeading*2;
-                double arcRadius = deltaPosition.radius()/arcAngle;
+            deltaPosition = new Vector2D(arcRadius * (1 - cos(arcAngle)), arcRadius * sin(arcAngle)).rotatedCW(deltaPosition.acot());
 
-                deltaPosition = new Vector2D(arcRadius*(1-cos(arcAngle)),arcRadius*sin(arcAngle)).rotatedCW(deltaPosition.acot());
-
-            }
-       // worldPosition = worldPosition.add(new Pose2D(deltaPosition.rotatedCW(worldPosition.heading + deltaWorldHeading / 2), deltaWorldHeading));
+        }
+        // worldPosition = worldPosition.add(new Pose2D(deltaPosition.rotatedCW(worldPosition.heading + deltaWorldHeading / 2), deltaWorldHeading));
         worldPosition = worldPosition.add(new Pose2D(deltaPosition.rotatedCW(worldPosition.heading + deltaWorldHeading), deltaWorldHeading));
         YL_old = bulkData.getMotorCurrentPosition(odometerYL);
         //YR_old = -bulkData.getMotorCurrentPosition(odometerYR);
@@ -102,27 +97,23 @@ public class TwoWheelOdometry implements Odometry {
     }
 
     public void setOpMode(LinearOpMode opMode) {
-        this.opMode = opMode;
+        TwoWheelOdometry.opMode = opMode;
     }
 
     public void initialize() {
         assignNames();
         initIMU();
         WoENrobot.delay(500);
-        odometerYL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        //odometerYR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        odometerX.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         bulkData = expansionHub.getBulkInputData();
         YL_old = bulkData.getMotorCurrentPosition(odometerYL);
-        //YR_old = -bulkData.getMotorCurrentPosition(odometerYR);
         X_old = bulkData.getMotorCurrentPosition(odometerX);
     }
 
     private void assignNames() {
         expansionHub = opMode.hardwareMap.get(ExpansionHubEx.class, "Expansion Hub 2");
-        odometerYL = (ExpansionHubMotor) opMode.hardwareMap.dcMotor.get("odometerYL");
+        //  odometerYL = (ExpansionHubMotor) opMode.hardwareMap.dcMotor.get("odometerYL");
         //odometerYR = (ExpansionHubMotor) opMode.hardwareMap.dcMotor.get("odometerYL");
-        odometerX = (ExpansionHubMotor) opMode.hardwareMap.dcMotor.get("odometerX");
+        // odometerX = (ExpansionHubMotor) opMode.hardwareMap.dcMotor.get("odometerX");
     }
 
     public Pose2D getRobotCoordinates() {

@@ -13,14 +13,18 @@ public class Vector2D implements Comparable {
     }
 
     public Vector2D rotated(double angle) {
-        double newX = x * Math.cos(angle) - y * Math.sin(angle);
-        double newY = x * Math.sin(angle) + y * Math.cos(angle);
+        double sina = Math.sin(angle);
+        double cosa = MathUtil.cosFromSin(sina, angle);
+        double newX = x * cosa - y * sina;
+        double newY = x * sina + y * cosa;
         return new Vector2D(newX, newY);
     }
 
     public Vector2D rotatedCW(double angle) {
-        double newX = x * Math.cos(angle) + y * Math.sin(angle);
-        double newY = -x * Math.sin(angle) + y * Math.cos(angle);
+        double sina = Math.sin(angle);
+        double cosa = MathUtil.cosFromSin(sina, angle);
+        double newX = x * cosa + y * sina;
+        double newY = -x * sina + y * cosa;
         return new Vector2D(newX, newY);
     }
 
