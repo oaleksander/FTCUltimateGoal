@@ -35,11 +35,6 @@ import java.util.List;
 @Autonomous(name = "opencvSkystoneDetector", group = "Sky autonomous")
 @Disabled
 public class openCVsample extends LinearOpMode {
-    //0 means skystone, 1 means yellow stone
-    //-1 for debug, but we can keep it like this because if it works, it should change to either 0 or 255
-    private static int valMid = -1;
-    private static int valLeft = -1;
-    private static int valRight = -1;
     private static final float rectHeight = .6f / 8f;
     private static final float rectWidth = 1.5f / 8f;
     private static final float offsetX = 0f / 8f;//changing this moves the three rects and the three circles left or right, range : (-2, 2) not inclusive
@@ -47,11 +42,16 @@ public class openCVsample extends LinearOpMode {
     private static final float[] midPos = {4f / 8f + offsetX, 4f / 8f + offsetY};//0 = col, 1 = row
     private static final float[] leftPos = {2f / 8f + offsetX, 4f / 8f + offsetY};
     private static final float[] rightPos = {6f / 8f + offsetX, 4f / 8f + offsetY};
+    //0 means skystone, 1 means yellow stone
+    //-1 for debug, but we can keep it like this because if it works, it should change to either 0 or 255
+    private static int valMid = -1;
+    private static int valLeft = -1;
+    private static int valRight = -1;
     private final int rows = 640;
     //moves all rectangles right or left by amount. units are in ratio to monitor
     private final int cols = 480;
-    OpenCvCamera phoneCam;
     private final ElapsedTime runtime = new ElapsedTime();
+    OpenCvCamera phoneCam;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -73,12 +73,12 @@ public class openCVsample extends LinearOpMode {
     }
 
     static class StageSwitchingPipeline extends OpenCvPipeline {
+        private final Stage[] stages = Stage.values();
         Mat yCbCrChan2Mat = new Mat();
         Mat thresholdMat = new Mat();
         Mat all = new Mat();
         List<MatOfPoint> contoursList = new ArrayList<>();
         private Stage stageToRenderToViewport = Stage.detection;
-        private final Stage[] stages = Stage.values();
 
         @Override
         public void onViewportTapped() {
