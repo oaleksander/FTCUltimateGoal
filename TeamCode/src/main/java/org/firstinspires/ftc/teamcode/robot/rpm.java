@@ -26,14 +26,14 @@ public class rpm implements RobotModule {
     }
 
     public void initialize() {
-        shooterMotor = opMode.hardwareMap.get(DcMotorEx.class, "odometerX");
+        shooterMotor = opMode.hardwareMap.get(DcMotorEx.class, "lever");
         shooterMotor.setDirection(DcMotorEx.Direction.FORWARD);
         shooterMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         resetshooter();
     }
 
     public void update() {
-        posold = pos;
+       /* posold = pos;
         pos = shooterMotor.getCurrentPosition();
         oldtime = time;
         time = rpmtime.milliseconds();
@@ -57,12 +57,12 @@ public class rpm implements RobotModule {
                 shooterpower(speed);
                 speedold = speed;
             }
-        }
+        }*/
     }
 
     public void shooterpower(double power) {
-        shooterMotor.setPower(power);
-        //   shooterMotor.setVelocity(power*1000);
+        //shooterMotor.setPower(power);
+        shooterMotor.setVelocity(power*0.4);
     }
 
     public void onshooter(boolean on) {
