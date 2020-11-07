@@ -14,6 +14,7 @@ import org.openftc.revextensions2.ExpansionHubEx;
 import org.openftc.revextensions2.RevBulkData;
 
 import static java.lang.Math.PI;
+import static java.lang.Math.abs;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
 import static java.lang.Math.toRadians;
@@ -27,7 +28,7 @@ public class TwoWheelOdometry implements Odometry {
     private static final double odometerXcenterOffset = 36.8862986805 * odometryCountsPerCM * cos(toRadians(67.021303041)) / 2;
     private static final double yWheelPairRadiusCm = 18.1275;
     private static final double radiansPerEncoderDifference = (odometryCMPerCounts) / (yWheelPairRadiusCm * 2);
-    private static final int odometerYL = 0, odometerX = 2;
+    private static final int odometerYL = 0, odometerYR = 1, odometerX = 2;
     public static Pose2D worldPosition = new Pose2D();
     private static float IMUoffset = 0;
     private static BNO055IMU imu;
@@ -36,7 +37,7 @@ public class TwoWheelOdometry implements Odometry {
     public RevBulkData bulkData;
     ElapsedTime looptime = new ElapsedTime();
     private int YL_old = 0;
-    private final int YR_old = 0;
+    private int YR_old = 0;
     private int X_old = 0;
 
     /**
@@ -47,7 +48,7 @@ public class TwoWheelOdometry implements Odometry {
     }
 
     private double calculateHeading(int L, int R) {
-        return (double) (L - R) * radiansPerEncoderDifference;
+        return angleWrap((double) (L - R) * radiansPerEncoderDifference-IMUoffset);
     }
 
     private void initIMU() {
@@ -78,10 +79,11 @@ public class TwoWheelOdometry implements Odometry {
         //int deltaYR = -bulkData.getMotorCurrentPosition(odometerYR) - YR_old;
         // int deltaX = bulkData.getMotorCurrentPosition(odometerX) - X_old;
         //double calculatedHeading = calculateHeading(bulkData.getMotorCurrentPosition(odometerYL),-bulkData.getMotorCurrentPosition(odometerYR));
-        double deltaWorldHeading = angleWrap(getIMUheading() - worldPosition.heading);
+        //double deltaWorldHeading = angleWrap(getIMUheading() - worldPosition.heading);
+        double deltaWorldHeading = angleWrap(calculateHeading(bulkData.getMotorCurrentPosition(odometerYL),-bulkData.getMotorCurrentPosition(odometerYR)) - worldPosition.heading);
 
         Vector2D deltaPosition = new Vector2D((double) (bulkData.getMotorCurrentPosition(odometerX) - X_old) - deltaWorldHeading * odometerXcenterOffset,
-                (double) (bulkData.getMotorCurrentPosition(odometerYL) - YL_old) - deltaWorldHeading * odometerYcenterOffset);
+                ((double) (bulkData.getMotorCurrentPosition(odometerYL) - YL_old)+(double) (-bulkData.getMotorCurrentPosition(odometerYR) - YR_old))/2);
 
         if (deltaWorldHeading != 0) {   //if deltaAngle = 0 radius of the arc is = Inf which causes model degeneracy
             //double arcAngle = deltaPosition.acot();
@@ -92,9 +94,9 @@ public class TwoWheelOdometry implements Odometry {
 
         }
         // worldPosition = worldPosition.add(new Pose2D(deltaPosition.rotatedCW(worldPosition.heading + deltaWorldHeading / 2), deltaWorldHeading));
-        worldPosition = worldPosition.add(new Pose2D(deltaPosition.rotatedCW(worldPosition.heading + deltaWorldHeading), deltaWorldHeading));
+        worldPosition = worldPosition.add(new Pose2D(deltaPosition.rotatedCW(worldPosition.heading), deltaWorldHeading));
         YL_old = bulkData.getMotorCurrentPosition(odometerYL);
-        //YR_old = -bulkData.getMotorCurrentPosition(odometerYR);
+        YR_old = -bulkData.getMotorCurrentPosition(odometerYR);
         X_old = bulkData.getMotorCurrentPosition(odometerX);
 
     }
@@ -109,6 +111,7 @@ public class TwoWheelOdometry implements Odometry {
         WoENrobot.delay(500);
         bulkData = expansionHub.getBulkInputData();
         YL_old = bulkData.getMotorCurrentPosition(odometerYL);
+        YR_old = bulkData.getMotorCurrentPosition(odometerYR);
         X_old = bulkData.getMotorCurrentPosition(odometerX);
     }
 
@@ -131,7 +134,7 @@ public class TwoWheelOdometry implements Odometry {
      * @return robot position in (x,y,heading) form
      */
     public void setRobotCoordinates(Pose2D coordinates) {
-        IMUoffset = (float) angleWrap(getIMUheading() + IMUoffset - coordinates.heading);
+        IMUoffset = (float) angleWrap(calculateHeading(bulkData.getMotorCurrentPosition(odometerYL),-bulkData.getMotorCurrentPosition(odometerYR)) + IMUoffset - coordinates.heading);
         this.calculatePosition(new Pose2D(coordinates.x * odometryCountsPerCM, coordinates.y * odometryCountsPerCM, coordinates.heading));
     }
 

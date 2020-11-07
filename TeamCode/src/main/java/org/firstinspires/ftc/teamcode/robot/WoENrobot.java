@@ -25,21 +25,20 @@ public class WoENrobot {
     static Runnable updateRegulators = () -> {
         measurementTime.reset();
         while (opMode.opModeIsActive()) {
-           /* if(measurementTime.seconds() > 0.25)
+            if(measurementTime.seconds() > 0.25)
             {
                 opMode.telemetry.addData("Loop frequency", 1/(measurementTime.seconds()/i) + " Hz");
                 measurementTime.reset();
                 i = 0;
             }
             i++;
-            looptime.reset();
-            */
+            //looptime.reset();
+
             for (RobotModule robotModule : activeAobotModules) {
                 robotModule.update();
             }
-            opMode.telemetry.update();
             spinCompleted = true;
-
+            opMode.telemetry.update();
         }
     };
     private static ExpansionHubEx expansionHub1 = null;
