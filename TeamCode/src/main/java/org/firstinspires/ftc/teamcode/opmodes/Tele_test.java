@@ -1,13 +1,17 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.math.Pose2D;
-import static org.firstinspires.ftc.teamcode.robot.WoENrobot.*;
+import org.firstinspires.ftc.teamcode.robot.WobbleManipulator;
 
 import static java.lang.Math.toRadians;
+import static org.firstinspires.ftc.teamcode.robot.WoENrobot.drivetrain;
+import static org.firstinspires.ftc.teamcode.robot.WoENrobot.forceInitRobot;
+import static org.firstinspires.ftc.teamcode.robot.WoENrobot.odometry;
+import static org.firstinspires.ftc.teamcode.robot.WoENrobot.startRobot;
+import static org.firstinspires.ftc.teamcode.robot.WoENrobot.wobbleManipulator;
 
 @TeleOp(name = "Teleop TEST/PRACTICE", group = "Debugging")
 
@@ -46,19 +50,19 @@ public class Tele_test extends LinearOpMode {
                 wobbleManipulator.setposlever(700);
             if (gamepad1.a) {
                 if (!buttonAwasPressed)
-                    wobbleManipulator.setposclose(!wobbleManipulator.isGrabbed);
+                    wobbleManipulator.setposclose(!WobbleManipulator.isGrabbed);
                 buttonAwasPressed = true;
             } else
                 buttonAwasPressed = false;
             drivetrain.holonomicMove(-y, -x, turn);
             telemetry.addData("Status", "Running");
             telemetry.addLine("encoder")
-       /*             .addData("FL", drivetrain.driveFrontLeft.getCurrentPosition())
-                    .addData("FR", drivetrain.driveFrontRight.getCurrentPosition())
-                    .addData("RL", drivetrain.driveRearLeft.getCurrentPosition())
-                    .addData("RR", drivetrain.driveRearRight.getCurrentPosition())
-                    .addData("odYL", odometry.bulkData.getMotorCurrentPosition(0))
-         */           .addData("odYR", -odometry.bulkData.getMotorCurrentPosition(1))
+                    /*            .addData("FL", drivetrain.driveFrontLeft.getCurrentPosition())
+                                 .addData("FR", drivetrain.driveFrontRight.getCurrentPosition())
+                                 .addData("RL", drivetrain.driveRearLeft.getCurrentPosition())
+                                 .addData("RR", drivetrain.driveRearRight.getCurrentPosition())
+                                 .addData("odYL", odometry.bulkData.getMotorCurrentPosition(0))
+                      */.addData("odYR", -odometry.bulkData.getMotorCurrentPosition(1))
                     .addData("odX", odometry.bulkData.getMotorCurrentPosition(2));
             telemetry.addLine("Control")
                     .addData("y", y)
