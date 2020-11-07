@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.robot;
 
-import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -12,8 +11,6 @@ import org.firstinspires.ftc.teamcode.math.Vector2D;
 import org.firstinspires.ftc.teamcode.superclasses.Odometry;
 import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
 import org.jetbrains.annotations.NotNull;
-import org.openftc.revextensions2.ExpansionHubEx;
-import org.openftc.revextensions2.ExpansionHubMotor;
 
 import static com.qualcomm.robotcore.util.Range.clip;
 import static java.lang.Math.abs;
@@ -32,23 +29,33 @@ public class Drivetrain implements RobotModule {
     private static final double kP_angle = 0.34, kD_angle = 0;
     private static final double kF_angle = 0.1;
     private static final double minError_angle = Math.toRadians(5.5);
+    private static final double maxRampPerSec = 1 / 0.25;
+    /* Drivetrain constatnts. */
+    public static double maxDriveSpeed = 1;
+    public static double minDriveSpeed = 0.05;
     /* Drivetrain hardware members. */
-   // public static ExpansionHubEx expansionHub1 = null;
+    // public static ExpansionHubEx expansionHub1 = null;
     private static DcMotorEx driveFrontLeft = null;
     private static DcMotorEx driveFrontRight = null;
     private static DcMotorEx driveRearLeft = null;
     private static DcMotorEx driveRearRight = null;
-
-    /* Drivetrain constatnts. */
-    public static double maxDriveSpeed = 1;
-    public static double minDriveSpeed = 0.05;
-    private ElapsedTime looptime = new ElapsedTime();
     private static Odometry odometry;
+    double powerFrontLeft_requested = 0;
+    double powerFrontRight_requested = 0;
+    double powerRearLeft_requested = 0;
+    double powerRearRight_requested = 0;
+    double powerFrontLeft_current = powerFrontLeft_requested;
+    double powerFrontRight_current = powerFrontRight_requested;
+    double powerRearLeft_current = powerRearLeft_requested;
+    double powerRearRight_current = powerRearRight_requested;
+    double powerFrontLeft_old = powerFrontLeft_requested;
+    double powerFrontRight_old = powerFrontRight_requested;
+    double powerRearLeft_old = powerRearRight_requested;
+    double powerRearRight_old = powerRearRight_requested;
+    private final ElapsedTime looptime = new ElapsedTime();
     private LinearOpMode opMode = null;
-
-    private static final double maxRampPerSec = 1 / 0.25;
     public Drivetrain(Odometry odometry) {
-        this.odometry = odometry;
+        Drivetrain.odometry = odometry;
     }
 
     public void setOpMode(LinearOpMode opMode) {
@@ -103,27 +110,13 @@ public class Drivetrain implements RobotModule {
         minDriveSpeed = clip(abs(value), 0, 1);
     }
 
-    double powerFrontLeft_requested = 0;
-    double powerFrontRight_requested = 0;
-    double powerRearLeft_requested = 0;
-    double powerRearRight_requested = 0;
-    double powerFrontLeft_current = powerFrontLeft_requested;
-    double powerFrontRight_current = powerFrontRight_requested;
-    double powerRearLeft_current = powerRearLeft_requested;
-    double powerRearRight_current = powerRearRight_requested;
-    double powerFrontLeft_old = powerFrontLeft_requested;
-    double powerFrontRight_old = powerFrontRight_requested;
-    double powerRearLeft_old = powerRearRight_requested;
-    double powerRearRight_old = powerRearRight_requested;
-
     public void update() {
         if (powerFrontLeft_requested == 0) {
             powerFrontLeft_current = powerFrontLeft_old = 0;
             driveFrontLeft.setPower(powerFrontLeft_current);
-        }
-        else {
+        } else {
             powerFrontLeft_current += min(abs(powerFrontLeft_requested - powerFrontLeft_current), abs(looptime.seconds() * maxRampPerSec)) * signum(powerFrontLeft_requested - powerFrontLeft_current);
-            if(powerFrontLeft_current != powerFrontLeft_old ) {
+            if (powerFrontLeft_current != powerFrontLeft_old) {
                 driveFrontLeft.setPower(powerFrontLeft_current);
                 powerFrontLeft_old = powerFrontLeft_current;
             }
@@ -131,10 +124,9 @@ public class Drivetrain implements RobotModule {
         if (powerFrontRight_requested == 0) {
             powerFrontRight_current = powerFrontRight_old = 0;
             driveFrontRight.setPower(powerFrontRight_current);
-        }
-        else {
+        } else {
             powerFrontRight_current += min(abs(powerFrontRight_requested - powerFrontRight_current), abs(looptime.seconds() * maxRampPerSec)) * signum(powerFrontRight_requested - powerFrontRight_current);
-            if(powerFrontRight_current != powerFrontRight_old ) {
+            if (powerFrontRight_current != powerFrontRight_old) {
                 driveFrontRight.setPower(powerFrontRight_current);
                 powerFrontRight_old = powerFrontRight_current;
             }
@@ -142,10 +134,9 @@ public class Drivetrain implements RobotModule {
         if (powerRearLeft_requested == 0) {
             powerRearLeft_current = powerRearLeft_old = 0;
             driveRearLeft.setPower(powerRearLeft_current);
-        }
-        else {
+        } else {
             powerRearLeft_current += min(abs(powerRearLeft_requested - powerRearLeft_current), abs(looptime.seconds() * maxRampPerSec)) * signum(powerRearLeft_requested - powerRearLeft_current);
-            if(powerRearLeft_current != powerRearLeft_old ) {
+            if (powerRearLeft_current != powerRearLeft_old) {
                 driveRearLeft.setPower(powerRearLeft_current);
                 powerRearLeft_old = powerRearLeft_current;
             }
@@ -153,10 +144,9 @@ public class Drivetrain implements RobotModule {
         if (powerRearRight_requested == 0) {
             powerRearRight_current = powerRearRight_old = 0;
             driveRearRight.setPower(powerRearRight_current);
-        }
-        else {
+        } else {
             powerRearRight_current += min(abs(powerRearRight_requested - powerRearRight_current), abs(looptime.seconds() * maxRampPerSec)) * signum(powerRearRight_requested - powerRearRight_current);
-            if(powerRearRight_current != powerRearRight_old ) {
+            if (powerRearRight_current != powerRearRight_old) {
                 driveRearRight.setPower(powerRearRight_current);
                 powerRearRight_old = powerRearRight_current;
             }
@@ -165,8 +155,7 @@ public class Drivetrain implements RobotModule {
         looptime.reset();
     }
 
-    public void driveMotorPowers_direct(double frontLeft, double frontRight, double rearLeft, double rearRight)
-    {
+    public void driveMotorPowers_direct(double frontLeft, double frontRight, double rearLeft, double rearRight) {
         driveFrontLeft.setPower(frontLeft);
         driveFrontRight.setPower(frontRight);
         driveRearLeft.setPower(rearLeft);
@@ -194,7 +183,9 @@ public class Drivetrain implements RobotModule {
         powerRearRight_requested = (clip(abs(rearRight), minDriveSpeed, 1) * signum(rearRight));
     }
 
-    private double limitSpeed(double speed) {return clip(abs(speed), minDriveSpeed, 1) * signum(speed);}
+    private double limitSpeed(double speed) {
+        return clip(abs(speed), minDriveSpeed, 1) * signum(speed);
+    }
 
     public void stopMotors() {
         driveMotorPowers_smart(0, 0, 0, 0);

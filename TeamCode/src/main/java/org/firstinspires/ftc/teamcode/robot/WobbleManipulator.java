@@ -15,13 +15,14 @@ public class WobbleManipulator implements RobotModule {
     public static DcMotorEx lever = null;
     public static Servo close = null;
     public static boolean isGrabbed = false;
-    static double pos = 0;
     public static ElapsedTime levertime = new ElapsedTime();
+    static double pos = 0;
     static double power = 0, P = 0, D = 0, errorOld = 0, error = 0;
     private static LinearOpMode opMode = null;
+    double oldpower = 0;
 
     public void setOpMode(LinearOpMode opMode) {
-        this.opMode = opMode;
+        WobbleManipulator.opMode = opMode;
     }
 
     public void initialize() {
@@ -43,36 +44,36 @@ public class WobbleManipulator implements RobotModule {
             else close.setPosition(1);
         }
     }
-    double oldpower = 0;
+
     public void update() {
-            error = pos - lever.getCurrentPosition();
-            if (Math.abs(error) > minerror) {
-                P = error * kofP;
-                D = (error - errorOld) * kofd;
-                power = P + D;
-                if (power > maxspeed) power = maxspeed;
-                if (power < -maxspeed) power = -maxspeed;
-                if (oldpower != power) {
-                    lever.setPower(power);
-                    oldpower = power;
-                }
+        error = pos - lever.getCurrentPosition();
+        if (Math.abs(error) > minerror) {
+            P = error * kofP;
+            D = (error - errorOld) * kofd;
+            power = P + D;
+            if (power > maxspeed) power = maxspeed;
+            if (power < -maxspeed) power = -maxspeed;
+            if (oldpower != power) {
+                lever.setPower(power);
+                oldpower = power;
+            }
             /*WoENrobot.getInstance().opMode.telemetry.addData("err",error);
             WoENrobot.getInstance().opMode.telemetry.addData("pow",power);
             WoENrobot.getInstance().opMode.telemetry.addData("pos",pos);
             WoENrobot.getInstance().opMode.telemetry.addData("enc",lever.getCurrentPosition());
             WoENrobot.getInstance().opMode.telemetry.update(); */
-                errorOld = error;
-            } else {
-                power = 0;
-                if (oldpower != power) {
-                    lever.setPower(0);
-                    oldpower = power;
-                }
+            errorOld = error;
+        } else {
+            power = 0;
+            if (oldpower != power) {
+                lever.setPower(0);
+                oldpower = power;
             }
+        }
     }
 
     public void setposlever(double pos) {
-        this.pos = pos;
+        WobbleManipulator.pos = pos;
 
     }
 

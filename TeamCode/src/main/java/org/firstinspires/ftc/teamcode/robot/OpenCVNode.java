@@ -14,31 +14,24 @@ import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvInternalCamera;
-import org.openftc.easyopencv.OpenCvInternalCamera2;
 import org.openftc.easyopencv.OpenCvPipeline;
 
 public class OpenCVNode implements RobotModule {
-    static OpenCvCamera webcam;
     private static final int rows = 640;
     private static final int cols = 480;
+    static OpenCvCamera webcam;
+    private static LinearOpMode opMode = null;
     StageSwitchingPipeline pipeline = new StageSwitchingPipeline();
 
-    private static LinearOpMode opMode = null;
-
     public void setOpMode(LinearOpMode opMode) {
-        this.opMode = opMode;
+        OpenCVNode.opMode = opMode;
     }
 
     public void initialize() {
         int cameraMonitorViewId = opMode.hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", opMode.hardwareMap.appContext.getPackageName());
         webcam = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
         webcam.setPipeline(pipeline);
-        webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
-            @Override
-            public void onOpened() {
-                webcam.startStreaming(rows, cols, OpenCvCameraRotation.SIDEWAYS_LEFT);
-            }
-        });
+        webcam.openCameraDeviceAsync(() -> webcam.startStreaming(rows, cols, OpenCvCameraRotation.SIDEWAYS_LEFT));
     }
 
 
@@ -47,7 +40,8 @@ public class OpenCVNode implements RobotModule {
     }
 
     public void stopCam() {
-        webcam.stopStreaming();
+        webcam.closeCameraDeviceAsync(() -> {
+        });
     }
 
     public StackSize retrieveResult() {
@@ -72,15 +66,15 @@ public class OpenCVNode implements RobotModule {
 
     static class StageSwitchingPipeline extends OpenCvPipeline {
 
+        private final Stage[] stages = Stage.values();
         Mat all = new Mat();
         Mat HSVMat = new Mat();
         Mat thresholdMat = new Mat();
-        Rect crop = new Rect(0,200,rows,cols-220);
+        Rect crop = new Rect(0, 200, rows, cols - 220);
         private volatile StackSize stackSize = StackSize.ZERO;
         private double mean = 0.0;
         private double aspectRatio = 0.0;
         private Stage stageToRenderToViewport = Stage.detection;
-        private final Stage[] stages = Stage.values();
 
         @Override
         public void onViewportTapped() {
@@ -118,7 +112,7 @@ public class OpenCVNode implements RobotModule {
             mean = Core.mean(thresholdMat).val[0];
 
             if (mean > 0.1) {
-                aspectRatio = (double)rect.width / (double)rect.height;
+                aspectRatio = (double) rect.width / (double) rect.height;
                 if (aspectRatio > 1.75)
                     stackSize = StackSize.ONE;
                 else stackSize = StackSize.FOUR;
