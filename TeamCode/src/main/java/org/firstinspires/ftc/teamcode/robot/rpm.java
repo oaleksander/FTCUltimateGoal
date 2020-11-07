@@ -9,19 +9,17 @@ import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
 
 public class rpm implements RobotModule {
 
-    static final double kofP = 0.000075, kofd = 0.000001;
     public static DcMotorEx shooterMotor = null;
     public static ElapsedTime rpmtime = new ElapsedTime();
     public static LinearOpMode opMode;
     public static double rpm2 = 0;
-    public static double power2 = 0; //delete
     static double time_ms;
     static double x = 1;
     static double rpm = 6000;
     static boolean on = false;
     private static boolean isActivated;
     double speedold = 0, speed = 0;
-    double pos = 0, posold = 0, time = 0, oldtime = 0, error = 0, P = 0, D = 0, errorold = 0, power = 0, maxpower = 0;
+    double pos = 0, posold = 0, time = 0, oldtime = 0;
 
     public void setOpMode(LinearOpMode opMode) {
         org.firstinspires.ftc.teamcode.robot.rpm.opMode = opMode;
@@ -42,7 +40,6 @@ public class rpm implements RobotModule {
         posold = pos - posold;
         oldtime = oldtime - time;
         rpm2 = posold / oldtime * 2500;// что выводит?
-        power2 = regulator();// что выводит?
         if (on) {
             if (time_ms > rpmtime.milliseconds()) {
                 shooterpower(rpmtime.milliseconds() * x);
@@ -76,18 +73,6 @@ public class rpm implements RobotModule {
         // rpmtime.reset();
     }
 
-    public double regulator() {
-        error = rpm - rpm2;
-        P = error * kofP;
-        D = (error - errorold) * kofd;
-        errorold = error;
-        power = D + P;
-        if (power > maxpower) power = maxpower;
-        if (power < -maxpower) power = -maxpower;
-        return power;
-
-    }
-
     public void resetshooter() {
         shooterMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         shooterMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -95,7 +80,6 @@ public class rpm implements RobotModule {
 
     public void setrpm(double rpm) {
         org.firstinspires.ftc.teamcode.robot.rpm.rpm = rpm;
-        maxpower = 1;
     }
 
     public void setspeedlevel(double time) {

@@ -24,7 +24,6 @@ public class Auto_sandbox extends AutonomousOpMode {
         do {
             telemetry.addData("getStackSize", WoENrobot.openCVNode.getStackSize());
             telemetry.addData("rpm", rpm.rpm2);
-            telemetry.addData("powercorect", rpm.power2);
             telemetry.addData("amp", Conveyor.conveyorm.getCurrent(CurrentUnit.AMPS));
             spinOnce();
         } while (opModeIsActive());
