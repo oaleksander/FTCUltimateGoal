@@ -1,80 +1,88 @@
 package org.firstinspires.ftc.teamcode.robot;
 
-import android.app.ExpandableListActivity;
-
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
 import org.openftc.revextensions2.ExpansionHubEx;
-import org.openftc.revextensions2.RevBulkData;
 
 public class WoENrobot {
+    private static final boolean defaultNames = true;
     public static TwoWheelOdometry odometry = new TwoWheelOdometry();
     public static Drivetrain drivetrain = new Drivetrain(odometry);
     public static WobbleManipulator wobbleManipulator = new WobbleManipulator();
     public static OpenCVNode openCVNode = new OpenCVNode();
     public static Conveyor conveyor = new Conveyor();
     public static rpm shooter = new rpm();
-    protected static RobotModule[] activeAobotModules = {conveyor, odometry, shooter, wobbleManipulator, drivetrain};
+    public static LinearOpMode opMode = null;
+    public static boolean robotIsInitialized = false;
+    public static ElapsedTime Runtime = new ElapsedTime();
+    public static ElapsedTime measurementTime = new ElapsedTime();
+    public static ElapsedTime looptime = new ElapsedTime();
+    protected static RobotModule[] activeAobotModules = {conveyor, odometry, shooter, wobbleManipulator, drivetrain}; //conveyor, odometry, shooter, wobbleManipulator, drivetrain
+    static long i = 0;
+    static boolean spinCompleted = false;
+    static Runnable updateRegulators = () -> {
+        measurementTime.reset();
+        while (opMode.opModeIsActive()) {
+           /* if(measurementTime.seconds() > 0.25)
+            {
+                opMode.telemetry.addData("Loop frequency", 1/(measurementTime.seconds()/i) + " Hz");
+                measurementTime.reset();
+                i = 0;
+            }
+            i++;
+            looptime.reset();
+            */
+            for (RobotModule robotModule : activeAobotModules) {
+                robotModule.update();
+            }
+            opMode.telemetry.update();
+            spinCompleted = true;
+
+        }
+    };
+    private static ExpansionHubEx expansionHub1 = null;
+    private static ExpansionHubEx expansionHub2 = null;
+    private static Thread regulatorUpdater = new Thread(updateRegulators);
 
     public static void FullInitWithCV(LinearOpMode opMode) {
         forceInitRobot(opMode);
         openCVNode.initialize(opMode);
-        startRobot();
     }
 
-    private static final boolean defaultNames = true;
-    public static LinearOpMode opMode = null;
-    public static boolean robotIsInitialized = false;
-
-    private static ExpansionHubEx expansionHub1 = null;
-    private static ExpansionHubEx expansionHub2 = null;
-
-    public static ElapsedTime Runtime = new ElapsedTime();
-    public static ElapsedTime looptime = new ElapsedTime();
-    static Runnable updateRegulators = () -> {
-        while (opMode.opModeIsActive()) {
-            for (RobotModule robotModule : activeAobotModules) {
-                robotModule.update();
-            }
-            opMode.telemetry.addData("Loop frequency", 1.0/looptime.seconds() + " hz");
-            looptime.reset();
-            spinCompleted = true;
-            opMode.telemetry.update();
+    public static void spinOnce() {
+        spinCompleted = false;
+        while (!spinCompleted && opMode.opModeIsActive()) {
+            Thread.yield();
         }
-    };
-    private static Thread regulatorUpdater = new Thread(updateRegulators);
-
-    static boolean spinCompleted = false;
-    public static void spinOnce()
-    {
-    spinCompleted = false;
-    while(!spinCompleted && opMode.opModeIsActive()) {Thread.yield();}
     }
+
     public static void delay(double delay_ms) {
         ElapsedTime timer = new ElapsedTime();
         timer.reset();
-        while (timer.milliseconds() < delay_ms && opMode.opModeIsActive()){Thread.yield();}
+        while (timer.milliseconds() < delay_ms && opMode.opModeIsActive()) {
+            Thread.yield();
+        }
     }
 
     public static void startRobot() {
-        setLedColors(255,166,0);
+        setLedColors(255, 166, 0);
         opMode.waitForStart();
         regulatorUpdater.start();
         Runtime.reset();
-        setLedColors(0,237,255);
+        setLedColors(0, 237, 255);
         opMode.telemetry.addData("Status", "Running");
         opMode.telemetry.update();
     }
 
-    public static void initRobot(LinearOpMode opMode) {
+    public static void initRobot(LinearOpMode OpMode) {
         if (!robotIsInitialized) {
             forceInitRobot(opMode);
             opMode.telemetry.addData("Status", "Initialization successful");
             opMode.telemetry.update();
         } else {
-            org.firstinspires.ftc.teamcode.robot.WoENrobot.opMode = opMode;
+            opMode = OpMode;
             for (RobotModule robotModule : activeAobotModules) {
                 robotModule.setOpMode(opMode);
             }
@@ -117,15 +125,13 @@ public class WoENrobot {
         startRobot();
     }
 
-    public static void setLedColors(int r, int g, int b)
-    {
+    public static void setLedColors(int r, int g, int b) {
         expansionHub1.setLedColor(r, g, b);
         expansionHub2.setLedColor(r, g, b);
     }
 
     public static void FullInit(LinearOpMode OpMode) {
         forceInitRobot(opMode);
-        startRobot();
     }
 }
 
