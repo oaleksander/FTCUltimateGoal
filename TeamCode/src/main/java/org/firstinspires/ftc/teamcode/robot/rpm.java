@@ -19,7 +19,6 @@ public class rpm implements RobotModule {
     static boolean on = false;
     private static boolean isActivated;
     double speedold = 0, speed = 0;
-    double pos = 0, posold = 0, time = 0, oldtime = 0;
 
     public void setOpMode(LinearOpMode opMode) {
         org.firstinspires.ftc.teamcode.robot.rpm.opMode = opMode;
@@ -33,13 +32,6 @@ public class rpm implements RobotModule {
     }
 
     public void update() {
-       /* posold = pos;
-        pos = shooterMotor.getCurrentPosition();
-        oldtime = time;
-        time = rpmtime.milliseconds();
-        posold = pos - posold;
-        oldtime = oldtime - time;
-        rpm2 = posold / oldtime * 2500;// что выводит?
         if (on) {
             if (time_ms > rpmtime.milliseconds()) {
                 shooterpower(rpmtime.milliseconds() * x);
@@ -57,12 +49,15 @@ public class rpm implements RobotModule {
                 shooterpower(speed);
                 speedold = speed;
             }
-        }*/
+        }
     }
 
     public void shooterpower(double power) {
-        //shooterMotor.setPower(power);
-        shooterMotor.setVelocity(power*0.4);
+        shooterMotor.setPower(power);
+        //shooterMotor.setVelocity(power*0.4);
+    }
+    public void shooterVelocity(double velocity){
+        shooterMotor.setVelocity(velocity);
     }
 
     public void onshooter(boolean on) {
