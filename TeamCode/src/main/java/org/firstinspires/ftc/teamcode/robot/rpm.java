@@ -37,9 +37,9 @@ public class rpm implements RobotModule {
                 shooterpower(rpmtime.milliseconds() * x);
             }
             if (time_ms < rpmtime.milliseconds()) {
-                speed = rpm / 6000;
+                speed = rpm * 0.4;
                 if (speedold != speed) {
-                    shooterpower(speed);
+                    shooterVelocity(speed);
                     speedold = speed;
                 }
             }
