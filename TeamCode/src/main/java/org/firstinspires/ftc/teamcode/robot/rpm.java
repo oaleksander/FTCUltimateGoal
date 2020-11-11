@@ -27,7 +27,8 @@ public class rpm implements RobotModule {
     public void initialize() {
         shooterMotor = opMode.hardwareMap.get(DcMotorEx.class, "shooterMotor");
         shooterMotor.setDirection(DcMotorEx.Direction.FORWARD);
-        resetshooter();
+        shooterMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        shooterMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     public void update() {
@@ -53,7 +54,6 @@ public class rpm implements RobotModule {
 
     public void shooterpower(double power) {
         shooterMotor.setPower(power);
-        //shooterMotor.setVelocity(power*0.4);
     }
     public void shooterVelocity(double velocity){
         shooterMotor.setVelocity(velocity);
@@ -61,24 +61,17 @@ public class rpm implements RobotModule {
 
     public void onshooter(boolean on) {
         if (on == !org.firstinspires.ftc.teamcode.robot.rpm.on) {
-            org.firstinspires.ftc.teamcode.robot.rpm.on = on;      //Времено: что бы можно было вкл/выкл в цикле с геймпада
+            org.firstinspires.ftc.teamcode.robot.rpm.on = on;
             rpmtime.reset();
         }
-        // rpmtime.reset();
     }
 
-    public void resetshooter() {
-        shooterMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        shooterMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-    }
 
-    public void setrpm(double Rpm) {
+    public void setShootersetings(double Rpm, double time) {
         rpm = Rpm;
-    }
-
-    public void setspeedlevel(double time) {
         time_ms = time;
         if (time_ms > 0)
             x = rpm / time_ms / 6000;
     }
+
 }
