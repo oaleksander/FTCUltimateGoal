@@ -28,6 +28,14 @@ public class Vector2D implements Comparable {
         return new Vector2D(newX, newY);
     }
 
+    public void normalize(){
+        double r = radius();
+        if(radius()!=0) {
+            x /= radius();
+            y /= radius();
+        }
+    }
+
     public Vector2D add(@NotNull Vector2D p) {
         return new Vector2D(this.x + p.x, this.y + p.y);
     }
