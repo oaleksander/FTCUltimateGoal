@@ -4,31 +4,21 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.teamcode.math.Pose2D;
-import org.firstinspires.ftc.teamcode.math.Vector2D;
-import org.firstinspires.ftc.teamcode.superclasses.Odometry;
+import org.firstinspires.ftc.teamcode.math.Vector3D;
+import org.firstinspires.ftc.teamcode.superclasses.Drivetrain;
 import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
-import org.jetbrains.annotations.NotNull;
 
 import static com.qualcomm.robotcore.util.Range.clip;
 import static java.lang.Math.abs;
-import static java.lang.Math.cos;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.signum;
-import static java.lang.Math.sin;
-import static java.lang.Math.toDegrees;
 
-public class Drivetrain implements RobotModule {
+public class MecanumDrivetrain implements RobotModule, Drivetrain {
 
-    private static final double kP_distance = 0.021, kD_distance = 0.00034;
-    private static final double kF_distance = 0.1;
-    private static final double minError_distance = 13;
-    private static final double kP_angle = 0.34, kD_angle = 0;
-    private static final double kF_angle = 0.1;
-    private static final double minError_angle = Math.toRadians(5.5);
+
+    private boolean smartMode = true;
     private static final double maxRampPerSec = 1 / 0.25;
     /* Drivetrain constatnts. */
     public static double maxDriveSpeed = 1;
@@ -39,7 +29,6 @@ public class Drivetrain implements RobotModule {
     private static DcMotorEx driveFrontRight = null;
     private static DcMotorEx driveRearLeft = null;
     private static DcMotorEx driveRearRight = null;
-    private static Odometry odometry;
     double powerFrontLeft_requested = 0;
     double powerFrontRight_requested = 0;
     double powerRearLeft_requested = 0;
@@ -53,10 +42,11 @@ public class Drivetrain implements RobotModule {
     double powerRearLeft_old = powerRearRight_requested;
     double powerRearRight_old = powerRearRight_requested;
     private final ElapsedTime looptime = new ElapsedTime();
-    private LinearOpMode opMode = null;
-    public Drivetrain(Odometry odometry) {
-        Drivetrain.odometry = odometry;
+
+    public MecanumDrivetrain(){
     }
+
+    private LinearOpMode opMode = null;
 
     public void setOpMode(LinearOpMode opMode) {
         this.opMode = opMode;
@@ -66,8 +56,21 @@ public class Drivetrain implements RobotModule {
         assignNames();
         setMotorDirections();
         setMotor0PowerBehaviors(DcMotorEx.ZeroPowerBehavior.FLOAT);
-        setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        stopMotors();
+        setSmartMode(true);
+        setRobotVelocity(0,0,0);
+    }
+
+    public void setSmartMode(boolean SmartMode)
+    {
+        smartMode = SmartMode;
+        if(smartMode)
+        {
+            setMotorMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        }
+        else
+        {
+            setMotorMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        }
     }
 
     private void assignNames() {
@@ -91,7 +94,7 @@ public class Drivetrain implements RobotModule {
         driveRearRight.setZeroPowerBehavior(zeroPowerBehavior);
     }
 
-    private void setMode(DcMotorEx.RunMode runMode) {
+    private void setMotorMode(DcMotorEx.RunMode runMode) {
         driveFrontLeft.setMode(runMode);
         driveFrontRight.setMode(runMode);
         driveRearLeft.setMode(runMode);
@@ -99,7 +102,7 @@ public class Drivetrain implements RobotModule {
     }
 
     private void resetEncoders() {
-        setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        setMotorMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
     }
 
     public void setMaxDriveSpeed(double value) {
@@ -113,21 +116,17 @@ public class Drivetrain implements RobotModule {
     public void update() {
         if (powerFrontLeft_requested == 0) {
             powerFrontLeft_current = powerFrontLeft_old = 0;
-            driveFrontLeft.setPower(powerFrontLeft_current);
         } else {
             powerFrontLeft_current += min(abs(powerFrontLeft_requested - powerFrontLeft_current), abs(looptime.seconds() * maxRampPerSec)) * signum(powerFrontLeft_requested - powerFrontLeft_current);
             if (powerFrontLeft_current != powerFrontLeft_old) {
-                driveFrontLeft.setPower(powerFrontLeft_current);
                 powerFrontLeft_old = powerFrontLeft_current;
             }
         }
         if (powerFrontRight_requested == 0) {
             powerFrontRight_current = powerFrontRight_old = 0;
-            driveFrontRight.setPower(powerFrontRight_current);
         } else {
             powerFrontRight_current += min(abs(powerFrontRight_requested - powerFrontRight_current), abs(looptime.seconds() * maxRampPerSec)) * signum(powerFrontRight_requested - powerFrontRight_current);
             if (powerFrontRight_current != powerFrontRight_old) {
-                driveFrontRight.setPower(powerFrontRight_current);
                 powerFrontRight_old = powerFrontRight_current;
             }
         }
@@ -137,7 +136,6 @@ public class Drivetrain implements RobotModule {
         } else {
             powerRearLeft_current += min(abs(powerRearLeft_requested - powerRearLeft_current), abs(looptime.seconds() * maxRampPerSec)) * signum(powerRearLeft_requested - powerRearLeft_current);
             if (powerRearLeft_current != powerRearLeft_old) {
-                driveRearLeft.setPower(powerRearLeft_current);
                 powerRearLeft_old = powerRearLeft_current;
             }
         }
@@ -147,9 +145,24 @@ public class Drivetrain implements RobotModule {
         } else {
             powerRearRight_current += min(abs(powerRearRight_requested - powerRearRight_current), abs(looptime.seconds() * maxRampPerSec)) * signum(powerRearRight_requested - powerRearRight_current);
             if (powerRearRight_current != powerRearRight_old) {
-                driveRearRight.setPower(powerRearRight_current);
                 powerRearRight_old = powerRearRight_current;
             }
+        }
+
+
+        if(smartMode)
+        {
+            driveFrontLeft.setVelocity(powerFrontLeft_current*2300);
+            driveFrontRight.setVelocity(powerFrontRight_current*2300);
+            driveRearLeft.setVelocity(powerRearLeft_current*2300);
+            driveRearRight.setVelocity(powerRearRight_current*2300);
+        }
+        else
+        {
+            driveFrontLeft.setPower(powerFrontLeft_current);
+            driveFrontRight.setPower(powerFrontRight_current);
+            driveRearLeft.setPower(powerRearLeft_current);
+            driveRearRight.setPower(powerRearRight_current);
         }
 
         looptime.reset();
@@ -162,20 +175,20 @@ public class Drivetrain implements RobotModule {
         driveRearRight.setPower(rearRight);
     }
 
-    public void driveMotorPowers_smart(double frontLeft, double frontRight, double rearLeft, double rearRight) {
+    public void driveMotorPowers(double frontLeft, double frontRight, double rearLeft, double rearRight) {
 
         double maxabs = max(max(abs(frontLeft), abs(frontRight)), max(abs(rearLeft), abs(rearRight)));
         if (maxabs > maxDriveSpeed) {
-            frontLeft /= maxabs;
-            frontRight /= maxabs;
-            rearLeft /= maxabs;
-            rearRight /= maxabs;
+            frontLeft = (frontLeft / maxabs) * maxDriveSpeed;
+            frontRight = (frontRight / maxabs) * maxDriveSpeed;
+            rearLeft = (rearLeft / maxabs) * maxDriveSpeed;
+            rearRight = (rearRight / maxabs) * maxDriveSpeed;
         }
 
         frontLeft = limitSpeed(frontLeft);
-        frontLeft = limitSpeed(frontLeft);
-        frontLeft = limitSpeed(frontLeft);
-        frontLeft = limitSpeed(frontLeft);
+        frontRight = limitSpeed(frontRight);
+        rearLeft = limitSpeed(rearLeft);
+        rearRight = limitSpeed(rearRight);
 
         powerFrontLeft_requested = (clip(abs(frontLeft), minDriveSpeed, 1) * signum(frontLeft));
         powerFrontRight_requested = (clip(abs(frontRight), minDriveSpeed, 1) * signum(frontRight));
@@ -187,102 +200,14 @@ public class Drivetrain implements RobotModule {
         return clip(abs(speed), minDriveSpeed, 1) * signum(speed);
     }
 
-    public void stopMotors() {
-        driveMotorPowers_smart(0, 0, 0, 0);
-    }
 
-    private void tankMove(double speedL, double speedR) {
-        speedL = Range.clip(speedL, -1.0, 1.0);
-        speedR = Range.clip(speedR, -1.0, 1.0);
-
-        driveMotorPowers_smart(speedL, speedR, speedL, speedR);
-    }
-
-    public void tankMove(double speed) {
-        tankMove(speed, speed);
-    }
-
-    public void tankTurn(double speed) {
-        tankMove(speed, -speed);
-    }
-
-    void holonomicMove(double frontways, double sideways) {
-
-        double LFRR = frontways + sideways;
-        double RFLR = frontways - sideways;
-
-        if (abs(LFRR) > 1.0 || abs(RFLR) > 1.0) {
-            LFRR /= max(abs(LFRR), abs(RFLR));
-            RFLR /= max(abs(LFRR), abs(RFLR));
-        }
-
-        driveMotorPowers_smart(LFRR, RFLR, RFLR, LFRR);
-    }
-
-    public void holonomicMove(double frontways, double sideways, double turn) {
+    public void setRobotVelocity(double frontways, double sideways, double turn) {
         double FrontLeft = frontways + sideways + turn;
         double FrontRight = frontways - sideways - turn;
         double RearLeft = frontways - sideways + turn;
         double RearRight = frontways + sideways - turn;
 
-        driveMotorPowers_smart(FrontLeft, FrontRight, RearLeft, RearRight);
-    }
-
-    public void holonomicMovePolar(double heading, double speed, double turn) {
-        turn = Range.clip(turn, -1.0, 1.0);
-        speed = Range.clip(speed, -1.0, 1.0);
-        double frontways = speed * cos(heading);
-        double sideways = speed * sin(heading);
-
-        holonomicMove(frontways, sideways, turn);
-    }
-
-    void holonomicMovePolar(double heading, double speed) {
-        speed = Range.clip(speed, -1.0, 1.0);
-        holonomicMove(speed * cos(heading), speed * sin(heading));
-    }
-
-    public void holonomicMove(@NotNull Pose2D move) {
-        holonomicMove(move.y, move.x, move.heading);
-    }
-
-    public void holonomicMoveFC(@NotNull Pose2D move) {
-        Vector2D coordinates = new Vector2D(move.x, move.y).rotatedCW(-WoENrobot.odometry.getRobotCoordinates().heading);
-        holonomicMove(coordinates.y, coordinates.x, move.heading);
-    }
-
-    public void Pos(@NotNull Pose2D target) {
-
-
-        Pose2D error = target.substract(odometry.getRobotCoordinates());
-        Pose2D errold = error;
-        double distanceError = error.radius();
-
-        ElapsedTime looptime = new ElapsedTime();
-        while (opMode.opModeIsActive() && (distanceError > minError_distance || abs(error.heading) > minError_angle) && looptime.seconds() < 4) {
-
-            error = target.substract(WoENrobot.odometry.getRobotCoordinates());
-
-            Pose2D differr = (error.substract(errold)).divideByDouble(looptime.seconds());
-            looptime.reset();
-
-            Pose2D control = new Pose2D(
-                    error.x * kP_distance + differr.x * kD_distance,
-                    error.y * kP_distance + differr.y * kD_distance,
-                    error.heading * kP_angle + differr.heading * kP_angle);
-
-            holonomicMoveFC(control);
-            opMode.telemetry.addData("y", control.y);
-            opMode.telemetry.addData("x", control.x);
-            opMode.telemetry.addData("a", control.heading);
-            opMode.telemetry.addData("ae", toDegrees(error.heading));
-            opMode.telemetry.addData("dist", distanceError);
-            WoENrobot.spinOnce();
-
-            errold = error;
-            distanceError = error.radius();
-        }
-        holonomicMove(0, 0, 0);
+        driveMotorPowers(FrontLeft, FrontRight, RearLeft, RearRight);
     }
 
 

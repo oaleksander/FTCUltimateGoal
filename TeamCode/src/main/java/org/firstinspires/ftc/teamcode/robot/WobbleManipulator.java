@@ -14,7 +14,7 @@ public class WobbleManipulator implements RobotModule {
     static final double minerror = 15, maxspeed = 1, kofP = 0.0015, kofd = 0.00001;
     public static DcMotorEx lever = null;
     public static Servo close = null;
-    public static boolean isGrabbed = false;
+    public boolean isGrabbed = false;
     public static ElapsedTime levertime = new ElapsedTime();
     static double pos = 0;
     static double power = 0, P = 0, D = 0, errorOld = 0, error = 0;
