@@ -20,14 +20,13 @@ public class rpm implements RobotModule {
     private static boolean isActivated;
     double speedold = 0, speed = 0;
 
-    public void setOpMode(LinearOpMode opMode) {
-        org.firstinspires.ftc.teamcode.robot.rpm.opMode = opMode;
+    public void setOpMode(LinearOpMode OpMode) {
+        opMode = OpMode;
     }
 
     public void initialize() {
-        shooterMotor = opMode.hardwareMap.get(DcMotorEx.class, "lever");
+        shooterMotor = opMode.hardwareMap.get(DcMotorEx.class, "shooterMotor");
         shooterMotor.setDirection(DcMotorEx.Direction.FORWARD);
-        shooterMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         resetshooter();
     }
 
@@ -73,8 +72,8 @@ public class rpm implements RobotModule {
         shooterMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
-    public void setrpm(double rpm) {
-        org.firstinspires.ftc.teamcode.robot.rpm.rpm = rpm;
+    public void setrpm(double Rpm) {
+        rpm = Rpm;
     }
 
     public void setspeedlevel(double time) {
