@@ -14,12 +14,13 @@ public class WobbleManipulator implements RobotModule {
     static final double minerror = 15, maxspeed = 1, kofP = 0.0015, kofd = 0.00001;
     public static DcMotorEx lever = null;
     public static Servo close = null;
+    public static Servo angle = null;
     public boolean isGrabbed = false;
     public static ElapsedTime levertime = new ElapsedTime();
     static double pos = 0;
     static double power = 0, P = 0, D = 0, errorOld = 0, error = 0;
     private static LinearOpMode opMode = null;
-    double oldpower = 0;
+    double oldpower = 0, oldpos = 0;
 
     public void setOpMode(LinearOpMode opMode) {
         WobbleManipulator.opMode = opMode;
@@ -29,6 +30,7 @@ public class WobbleManipulator implements RobotModule {
 
         lever = opMode.hardwareMap.get(DcMotorEx.class, "lever");
         close = opMode.hardwareMap.get(Servo.class, "wobbleGrabber");
+        angle = opMode.hardwareMap.get(Servo.class, "angle");
 
         lever.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         lever.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -71,10 +73,15 @@ public class WobbleManipulator implements RobotModule {
             }
         }
     }
+    public void setAngle(double posa){
+        if (posa != oldpos){
+            angle.setPosition(posa);
+            oldpos = posa;
+        }
+    }
 
     public void setposlever(double pos) {
         WobbleManipulator.pos = pos;
-
     }
 
 }
