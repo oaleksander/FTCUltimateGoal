@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.superclasses;
+package org.firstinspires.ftc.teamcode.opmodes;
 
 public class BlueAutonomous extends AutonomousOpMode {
     @Override

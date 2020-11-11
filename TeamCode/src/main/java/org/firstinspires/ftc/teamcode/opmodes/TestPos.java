@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.opmodes;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.robot.rpm;
-import org.firstinspires.ftc.teamcode.superclasses.AutonomousOpMode;
 
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.openCVNode;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.shooter;
