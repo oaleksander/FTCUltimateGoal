@@ -3,16 +3,17 @@ package org.firstinspires.ftc.teamcode.opmodes;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.robot.WoENrobot;
 import org.firstinspires.ftc.teamcode.robot.WobbleManipulator;
+
+import static org.firstinspires.ftc.teamcode.robot.WoENrobot.*;
 
 @TeleOp(name = "TeleOp COMPETITION", group = "Competition")
 public class Tele_competition extends LinearOpMode {
     @Override
     public void runOpMode() {
 
-        WoENrobot.initRobot(this);
-        WoENrobot.startRobot();
+        initRobot(this);
+        startRobot();
         boolean buttonAwasPressed = false;
         while (opModeIsActive()) {
             double turn = 0;
@@ -33,18 +34,18 @@ public class Tele_competition extends LinearOpMode {
             if (gamepad1.dpad_right)
                 x += 1;
             if (gamepad1.x)
-                WoENrobot.wobbleManipulator.setposlever(0);
+                wobbleManipulator.setposlever(0);
             else if (gamepad1.y)
-                WoENrobot.wobbleManipulator.setposlever(490);
+                wobbleManipulator.setposlever(490);
             else if (gamepad1.b)
-                WoENrobot.wobbleManipulator.setposlever(700);
+                wobbleManipulator.setposlever(700);
             if (gamepad1.a) {
                 if (!buttonAwasPressed)
-                    WoENrobot.wobbleManipulator.setposclose(!WobbleManipulator.isGrabbed);
+                    wobbleManipulator.setposclose(!wobbleManipulator.isGrabbed);
                 buttonAwasPressed = true;
             } else
                 buttonAwasPressed = false;
-            WoENrobot.drivetrain.holonomicMove(-y, -x, turn);
+            drivetrain.setRobotVelocity(-y, -x, turn);
         }
     }
 }

@@ -4,7 +4,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.*;
-import org.firstinspires.ftc.teamcode.superclasses.AutonomousOpMode;
 
 
 @Autonomous
