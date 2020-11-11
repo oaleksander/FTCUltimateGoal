@@ -7,31 +7,25 @@ import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
 import org.openftc.revextensions2.ExpansionHubEx;
 
 public class WoENrobot {
-    private static final boolean defaultNames = true;
-    public static TwoWheelOdometry odometry = new TwoWheelOdometry();
-    public static Drivetrain drivetrain = new Drivetrain(odometry);
+
     public static WobbleManipulator wobbleManipulator = new WobbleManipulator();
     public static OpenCVNode openCVNode = new OpenCVNode();
     public static Conveyor conveyor = new Conveyor();
     public static rpm shooter = new rpm();
+
+    public static ThreeWheelOdometry odometry = new ThreeWheelOdometry();
+    public static MecanumDrivetrain drivetrain = new MecanumDrivetrain();
+    public static Movement movement = new Movement(odometry,drivetrain);
+
+
+    protected static RobotModule[] activeAobotModules = {conveyor, odometry, shooter, wobbleManipulator, drivetrain}; //conveyor, odometry, shooter, wobbleManipulator, drivetrain
+
     public static LinearOpMode opMode = null;
     public static boolean robotIsInitialized = false;
-    public static ElapsedTime Runtime = new ElapsedTime();
-    public static ElapsedTime measurementTime = new ElapsedTime();
-    public static ElapsedTime looptime = new ElapsedTime();
-    protected static RobotModule[] activeAobotModules = {conveyor, odometry, shooter, wobbleManipulator, drivetrain}; //conveyor, odometry, shooter, wobbleManipulator, drivetrain
-    static long i = 0;
+    public static ElapsedTime runTime = new ElapsedTime();
     static boolean spinCompleted = false;
     static Runnable updateRegulators = () -> {
-        measurementTime.reset();
         while (opMode.opModeIsActive()) {
-            if(measurementTime.seconds() > 0.25)
-            {
-                opMode.telemetry.addData("Loop frequency", 1/(measurementTime.seconds()/i) + " Hz");
-                measurementTime.reset();
-                i = 0;
-            }
-            i++;
             //looptime.reset();
 
             for (RobotModule robotModule : activeAobotModules) {
@@ -46,8 +40,8 @@ public class WoENrobot {
     private static Thread regulatorUpdater = new Thread(updateRegulators);
 
     public static void FullInitWithCV(LinearOpMode opMode) {
-        forceInitRobot(opMode);
         openCVNode.initialize(opMode);
+        forceInitRobot(opMode);
     }
 
     public static void spinOnce() {
@@ -69,7 +63,7 @@ public class WoENrobot {
         setLedColors(255, 166, 0);
         opMode.waitForStart();
         regulatorUpdater.start();
-        Runtime.reset();
+        runTime.reset();
         setLedColors(0, 237, 255);
         opMode.telemetry.addData("Status", "Running");
         opMode.telemetry.update();
