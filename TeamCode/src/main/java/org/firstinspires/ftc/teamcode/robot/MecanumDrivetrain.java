@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.robot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.math.Vector3D;
@@ -81,10 +82,10 @@ public class MecanumDrivetrain implements RobotModule, Drivetrain {
     }
 
     private void setMotorDirections() {
-        driveFrontLeft.setDirection(DcMotorEx.Direction.FORWARD);
-        driveFrontRight.setDirection(DcMotorEx.Direction.REVERSE);
-        driveRearLeft.setDirection(DcMotorEx.Direction.FORWARD);
-        driveRearRight.setDirection(DcMotorEx.Direction.REVERSE);
+        driveFrontLeft.setDirection(DcMotorEx.Direction.REVERSE);
+        driveFrontRight.setDirection(DcMotorEx.Direction.FORWARD);
+        driveRearLeft.setDirection(DcMotorEx.Direction.REVERSE);
+        driveRearRight.setDirection(DcMotorEx.Direction.FORWARD);
     }
 
     private void setMotor0PowerBehaviors(DcMotorEx.ZeroPowerBehavior zeroPowerBehavior) {
