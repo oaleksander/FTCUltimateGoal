@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.opmodes;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.misc.ButtonSwitch;
 import org.firstinspires.ftc.teamcode.robot.WobbleManipulator;
 
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.*;
@@ -11,9 +12,9 @@ import static org.firstinspires.ftc.teamcode.robot.WoENrobot.*;
 public class Tele_competition extends LinearOpMode {
     @Override
     public void runOpMode() {
-
         initRobot(this);
         startRobot();
+        ButtonSwitch buttonAswitch = new ButtonSwitch();
         boolean buttonAwasPressed = false;
         while (opModeIsActive()) {
             double turn = 0;
@@ -39,13 +40,8 @@ public class Tele_competition extends LinearOpMode {
                 wobbleManipulator.setposlever(490);
             else if (gamepad1.b)
                 wobbleManipulator.setposlever(700);
-            if (gamepad1.a) {
-                if (!buttonAwasPressed)
-                    wobbleManipulator.setposclose(!wobbleManipulator.isGrabbed);
-                buttonAwasPressed = true;
-            } else
-                buttonAwasPressed = false;
-            drivetrain.setRobotVelocity(-y, -x, turn);
+            wobbleManipulator.setposclose(buttonAswitch.isTriggered(gamepad1.a));
+            drivetrain.setRobotVelocity(y, x, turn);
         }
     }
 }
