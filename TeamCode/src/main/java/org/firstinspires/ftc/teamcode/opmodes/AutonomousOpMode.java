@@ -44,7 +44,7 @@ public class AutonomousOpMode extends LinearOpMode {
 
     void start_loop() {
         telemetry.addLine("Use gamedad 1 X/B to select alliance color, dpad L/R to select alliance side");
-        xSign = gamepad1.b ? 1 : gamepad1.x ? -1 : sideSign;
+        xSign = gamepad1.b ? 1 : gamepad1.x ? -1 : xSign;
         sideSign = gamepad1.dpad_right ? 1 : gamepad1.dpad_left ? -1 : sideSign;
         telemetry.addData("Alliance", getXSign() == 1 ? "RED" : "BLUE");
         telemetry.addData("SIDE", getSideSign() == 1 ? "RIGHT" : "LEFT");
@@ -52,7 +52,6 @@ public class AutonomousOpMode extends LinearOpMode {
     }
 
     public void runOpMode() {
-        new WoENrobot();
         FullInitWithCV(this);
         startRobot();
         openCVNode.stopCam();
