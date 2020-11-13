@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.math;
 
-import org.jetbrains.annotations.NotNull;
-
 import static org.firstinspires.ftc.teamcode.math.MathUtil.angleWrap;
 
 public class Pose2D extends Vector2D implements Cloneable {
@@ -40,7 +38,7 @@ public class Pose2D extends Vector2D implements Cloneable {
         return new Pose2D(x / d, y / d, heading / d);
     }
 
-    public Pose2D minus(@org.jetbrains.annotations.NotNull Pose2D p2) {
+    public Pose2D minus(Pose2D p2) {
         return new Pose2D(x - p2.x, y - p2.y, heading - p2.heading);
     }
 

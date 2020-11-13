@@ -8,6 +8,11 @@ public class Vector3D extends Vector2D implements Cloneable {
         this.z = z;
     }
 
+    public Vector3D(Pose2D p)
+    {
+        this(p.x,p.y,p.heading);
+    }
+
     public Vector3D() {
         this(0, 0, 0);
     }
@@ -32,7 +37,7 @@ public class Vector3D extends Vector2D implements Cloneable {
         return new Vector3D(x / d, y / d, z / d);
     }
 
-    public Vector3D minus(@org.jetbrains.annotations.NotNull Vector3D p2) {
+    public Vector3D minus(Vector3D p2) {
         return new Vector3D(x - p2.x, y - p2.y, z - p2.z);
     }
 
