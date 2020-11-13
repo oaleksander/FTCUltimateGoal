@@ -95,16 +95,11 @@ public class ThreeWheelOdometry implements Odometry, RobotModule {
     }
 
     public void initialize() {
-        assignNames();
-        WoENrobot.delay(500);
+        expansionHub = opMode.hardwareMap.get(ExpansionHubEx.class, "Expansion Hub 2");
         bulkData = expansionHub.getBulkInputData();
         YL_old = bulkData.getMotorCurrentPosition(odometerYL);
         YR_old = -bulkData.getMotorCurrentPosition(odometerYR);
         X_old = bulkData.getMotorCurrentPosition(odometerX);
-    }
-
-    private void assignNames() {
-        expansionHub = opMode.hardwareMap.get(ExpansionHubEx.class, "Expansion Hub 2");
     }
 
     public Pose2D getRobotCoordinates() {
