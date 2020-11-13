@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.math;
 
-import org.jetbrains.annotations.NotNull;
-
 public class Vector2D implements Comparable {
 
     public double x = 0;
@@ -36,11 +34,11 @@ public class Vector2D implements Comparable {
         }
     }
 
-    public Vector2D add(@NotNull Vector2D p) {
+    public Vector2D add(Vector2D p) {
         return new Vector2D(this.x + p.x, this.y + p.y);
     }
 
-    public Vector2D minus(@NotNull Vector2D p) {
+    public Vector2D minus(Vector2D p) {
         return new Vector2D(this.x - p.x, this.y - p.y);
     }
 
