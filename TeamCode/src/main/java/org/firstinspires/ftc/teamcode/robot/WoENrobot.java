@@ -18,7 +18,7 @@ public class WoENrobot {
     public static Movement movement = new Movement(odometry,drivetrain);
 
 
-    protected static RobotModule[] activeAobotModules = {conveyor, odometry, shooter, wobbleManipulator, drivetrain}; //conveyor, odometry, shooter, wobbleManipulator, drivetrain
+    protected static RobotModule[] activeAobotModules = {odometry, drivetrain, movement, shooter, wobbleManipulator, conveyor}; //conveyor, odometry, shooter, wobbleManipulator, drivetrain
 
     public static LinearOpMode opMode = null;
     public static boolean robotIsInitialized = false;

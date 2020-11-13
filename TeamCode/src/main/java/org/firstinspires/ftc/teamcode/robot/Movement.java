@@ -8,12 +8,13 @@ import org.firstinspires.ftc.teamcode.math.Pose2D;
 import org.firstinspires.ftc.teamcode.math.Vector2D;
 import org.firstinspires.ftc.teamcode.superclasses.Drivetrain;
 import org.firstinspires.ftc.teamcode.superclasses.Odometry;
+import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
 
 import static java.lang.Math.abs;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
 
-public class Movement {
+public class Movement implements RobotModule {
     private static Odometry odometry;
     private static Drivetrain drivetrain;
     private LinearOpMode opMode = null;
