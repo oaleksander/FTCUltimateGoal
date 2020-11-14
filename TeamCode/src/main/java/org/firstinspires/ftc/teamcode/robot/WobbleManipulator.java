@@ -73,17 +73,31 @@ public class WobbleManipulator implements RobotModule {
             }
         }
     }
+    //double medium = 0.5, down = 0, up = 1, oldposangle = up;
+    boolean ismed = false, isdown = false;
+    public void upmediumdown(boolean upmedium, boolean updown){
+        if(upmedium != ismed){
+            ismed = upmedium;
+            if (upmedium) changepos(positions.up);
+            else changepos(positions.medium);
+        }
+        if (updown != isdown){
+            isdown = updown;
+            if(updown) changepos(positions.up);
+            else changepos(positions.down);
+        }
+    }
     enum positions {up, down, medium}
     public void changepos(positions Positions){
         switch (Positions){
             case up:
-                setAngle(1);
+                setposlever(0);
                 break;
             case down:
-                setAngle(0);
+                setposlever(720);
                 break;
             case medium:
-                setAngle(0.5);
+                setposlever(360);
                 break;
         }
 
