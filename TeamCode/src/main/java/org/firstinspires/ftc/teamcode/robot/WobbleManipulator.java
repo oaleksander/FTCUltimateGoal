@@ -77,6 +77,35 @@ public class WobbleManipulator implements RobotModule {
     short posangle = 0;
     boolean ismed = false, isdown = false;
     public void upmediumdown(boolean upmedium, boolean updown){
+        if (upmedium && !updown){
+            if(!ismed){
+                ismed = true;
+                if (posangle == 1){
+                    posangle = 0;
+                    changepos(positions.up);
+                }
+                else {
+                    posangle = 1;
+                    changepos(positions.medium);
+                }
+            }
+        }
+        else ismed = false;
+        if (updown && !upmedium){
+            if (!isdown){
+                isdown = true;
+                if(posangle == 2){
+                    posangle = 0;
+                    changepos(positions.up);
+                }
+                else{
+                    posangle = 2;
+                    changepos(positions.down);
+                }
+            }
+        }
+        else isdown = false;
+        /*
         if(upmedium != ismed){
             ismed = upmedium;
             isdown = false; // test
@@ -88,8 +117,24 @@ public class WobbleManipulator implements RobotModule {
             ismed = false; //test
             if(updown) changepos(positions.up);
             else changepos(positions.down);
-        }
+        }*/
     }
+    /*
+    if(gamepad2.b)
+        {
+            if(pushback== false)
+            {
+                pushback = true;
+                if (speed == 1) {
+                    speed = 0.5;
+                } else {
+                    speed = 1;
+                }
+            }
+        }
+        else
+            pushback = false;
+     */
     enum positions {up, down, medium}
     public void changepos(positions Positions){
         switch (Positions){
@@ -105,6 +150,7 @@ public class WobbleManipulator implements RobotModule {
         }
 
     }
+
     public void setAngle(double posa){
         if (posa != oldpos){
             angle.setPosition(posa);

@@ -47,7 +47,7 @@ public class Tele_test extends LinearOpMode {
             if (gamepad1.dpad_right)
                 x += 1;
             wobbleManipulator.setposclose(buttonAswitch.isTriggered(gamepad1.a));
-            wobbleManipulator.upmediumdown(medium.isTriggered(gamepad1.y),down.isTriggered(gamepad1.x));
+            wobbleManipulator.upmediumdown(gamepad1.y,gamepad1.x); // correct
             drivetrain.setRobotVelocity(y, x, turn);
             spinOnce();
 
