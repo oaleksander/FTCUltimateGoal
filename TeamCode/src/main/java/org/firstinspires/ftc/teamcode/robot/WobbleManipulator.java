@@ -76,7 +76,7 @@ public class WobbleManipulator implements RobotModule {
     enum posithions {up, down, medium}
     private posithions Posithions;
     public void changepos(String pos){
-        switch (pos){
+        switch (Posithions){
             case up:
                 setAngle(1);
                 break;
