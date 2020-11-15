@@ -24,8 +24,7 @@ public class Tele_test extends LinearOpMode {
         forceInitRobot(this);
         startRobot();
         ButtonSwitch buttonAswitch = new ButtonSwitch();
-        ButtonSwitch medium = new ButtonSwitch();
-        ButtonSwitch down = new ButtonSwitch();
+
         //odometry.setRobotCoordinates(new Pose2D(0, 0, 0));
         odometry.setRobotCoordinates(new Pose2D(93.75 * 1 + 31.25 * (-1), -156.5, 0));
         while (opModeIsActive()) {
