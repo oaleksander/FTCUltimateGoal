@@ -33,7 +33,7 @@ public class MovementMacros {
             default:
                 movement.Pos(new Pose2D(xSign * 150, 6, toRadians(0)));
         }
-        WoENrobot.wobbleManipulator.setposclose(false);
+        wobbleManipulator.setposclose(false);
         WoENrobot.wobbleManipulator.setposlever(120);
         WoENrobot.delay(100);
         WoENrobot.wobbleManipulator.setposlever(0);

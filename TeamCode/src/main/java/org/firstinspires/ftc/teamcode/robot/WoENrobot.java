@@ -12,6 +12,7 @@ public class WoENrobot {
     public static OpenCVNode openCVNode = new OpenCVNode();
     public static Conveyor conveyor = new Conveyor();
     public static rpm shooter = new rpm();
+    public static TelemetryDebugging telemetryDebugging = new TelemetryDebugging();
 
     public static ThreeWheelOdometry odometry = new ThreeWheelOdometry();
     public static MecanumDrivetrain drivetrain = new MecanumDrivetrain();

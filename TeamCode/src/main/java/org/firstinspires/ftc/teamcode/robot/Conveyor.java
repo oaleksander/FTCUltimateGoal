@@ -131,8 +131,8 @@ public class Conveyor implements RobotModule {
     public void setFeederPosition(boolean push) {
         if (push != ispush) {
             ispush = push;
-            if (push) feeder.setPosition(0.5);
-            else feeder.setPosition(1);
+            if (push) feeder.setPosition(0.33);
+            else feeder.setPosition(0);
         }
     }
 

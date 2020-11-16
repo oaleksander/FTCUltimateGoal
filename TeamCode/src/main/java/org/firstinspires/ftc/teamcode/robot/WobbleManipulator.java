@@ -1,3 +1,4 @@
+
 package org.firstinspires.ftc.teamcode.robot;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -11,11 +12,11 @@ import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
 
 public class WobbleManipulator implements RobotModule {
 
-    static final double minerror = 15, maxspeed = 1, kofP = 0.0015, kofd = 0.00001;
+    static final double minerror = 15, maxspeed = 0.7, kofP = 0.0015, kofd = 0.00001;
     public static DcMotorEx lever = null;
     public static Servo close = null;
    // public static Servo angle = null;
-    public boolean isGrabbed = false;
+    public boolean isGrabbed = true;
     public static ElapsedTime levertime = new ElapsedTime();
     static double pos = 0;
     static double power = 0, P = 0, D = 0, errorOld = 0, error = 0;
@@ -36,14 +37,14 @@ public class WobbleManipulator implements RobotModule {
         lever.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         lever.setDirection(DcMotorSimple.Direction.REVERSE);
         lever.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
+        setposclose(true);
     }
 
     public void setposclose(boolean dograb) {
         if (dograb != isGrabbed) {
             isGrabbed = dograb;
-            if (dograb) close.setPosition(0.5);
-            else close.setPosition(1);
+            if (dograb) close.setPosition(0.85);
+            else close.setPosition(0.42);
         }
     }
 
@@ -142,10 +143,10 @@ public class WobbleManipulator implements RobotModule {
                 setposlever(0);
                 break;
             case down:
-                setposlever(720);
+                setposlever(920);
                 break;
             case medium:
-                setposlever(360);
+                setposlever(550);
                 break;
         }
 

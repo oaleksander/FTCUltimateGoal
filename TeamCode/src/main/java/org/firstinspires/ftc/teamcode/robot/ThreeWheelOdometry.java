@@ -64,11 +64,11 @@ public class ThreeWheelOdometry implements Odometry, RobotModule {
 
         bulkData = expansionHub.getBulkInputData();
 
-        double deltaWorldHeading = angleWrap(calculateHeading(bulkData.getMotorCurrentPosition(odometerYL),-bulkData.getMotorCurrentPosition(odometerYR)) - worldPosition.heading);
+        double deltaWorldHeading = angleWrap(calculateHeading(-bulkData.getMotorCurrentPosition(odometerYL),+bulkData.getMotorCurrentPosition(odometerYR)) - worldPosition.heading);
 
         Vector2D deltaPosition = new Vector2D(
-                (double) (bulkData.getMotorCurrentPosition(odometerX) - X_old) - deltaWorldHeading * odometerXcenterOffset,
-                (double)( (bulkData.getMotorCurrentPosition(odometerYL) - YL_old)+(-bulkData.getMotorCurrentPosition(odometerYR) - YR_old))/2);
+                (double) (-bulkData.getMotorCurrentPosition(odometerX) - X_old) - deltaWorldHeading * odometerXcenterOffset,
+                (double)( (-bulkData.getMotorCurrentPosition(odometerYL) - YL_old)+(+bulkData.getMotorCurrentPosition(odometerYR) - YR_old))/2);
 
         if (deltaWorldHeading != 0) {   //if deltaAngle = 0 radius of the arc is = Inf which causes model degeneracy
             double arcAngle = deltaWorldHeading * 2;
@@ -85,9 +85,9 @@ public class ThreeWheelOdometry implements Odometry, RobotModule {
                 new Pose2D(deltaPosition.rotatedCW(worldPosition.heading),
                         deltaWorldHeading));
 
-        YL_old = bulkData.getMotorCurrentPosition(odometerYL);
-        YR_old = -bulkData.getMotorCurrentPosition(odometerYR);
-        X_old = bulkData.getMotorCurrentPosition(odometerX);
+        YL_old = -bulkData.getMotorCurrentPosition(odometerYL);
+        YR_old = +bulkData.getMotorCurrentPosition(odometerYR);
+        X_old = -bulkData.getMotorCurrentPosition(odometerX);
     }
 
     public void setOpMode(LinearOpMode opMode) {
@@ -95,11 +95,11 @@ public class ThreeWheelOdometry implements Odometry, RobotModule {
     }
 
     public void initialize() {
-        expansionHub = opMode.hardwareMap.get(ExpansionHubEx.class, "Expansion Hub 2");
+        expansionHub = opMode.hardwareMap.get(ExpansionHubEx.class, "Expansion Hub 1");
         bulkData = expansionHub.getBulkInputData();
-        YL_old = bulkData.getMotorCurrentPosition(odometerYL);
-        YR_old = -bulkData.getMotorCurrentPosition(odometerYR);
-        X_old = bulkData.getMotorCurrentPosition(odometerX);
+        YL_old = -bulkData.getMotorCurrentPosition(odometerYL);
+        YR_old = +bulkData.getMotorCurrentPosition(odometerYR);
+        X_old = -bulkData.getMotorCurrentPosition(odometerX);
     }
 
     public Pose2D getRobotCoordinates() {
@@ -109,10 +109,10 @@ public class ThreeWheelOdometry implements Odometry, RobotModule {
     }
     public Vector3D getRobotVelocity()
     {
-        double angularVelocity = calculateIncrementalHeading(bulkData.getMotorCurrentPosition(odometerYL),-bulkData.getMotorCurrentPosition(odometerYR));
+        double angularVelocity = calculateIncrementalHeading(bulkData.getMotorVelocity(odometerYL),-bulkData.getMotorVelocity(odometerYR));
         return new Vector3D(
-                ((double)bulkData.getMotorCurrentPosition(odometerX)-angularVelocity*odometerXcenterOffset)* odometryCMPerCounts,
-                (double)(bulkData.getMotorVelocity(odometerYL)-bulkData.getMotorVelocity(odometerYR)) * odometryCMPerCounts/2,
+                ((double)bulkData.getMotorVelocity(odometerX)-angularVelocity*odometerXcenterOffset)* odometryCMPerCounts,
+                (double)(-bulkData.getMotorVelocity(odometerYL)+bulkData.getMotorVelocity(odometerYR)) * odometryCMPerCounts/2,
                 angularVelocity);
     }
 

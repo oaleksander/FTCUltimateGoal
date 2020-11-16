@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.math.Pose2D;
 import org.firstinspires.ftc.teamcode.math.Vector2D;
+import org.firstinspires.ftc.teamcode.math.Vector3D;
 import org.firstinspires.ftc.teamcode.superclasses.Drivetrain;
 import org.firstinspires.ftc.teamcode.superclasses.Odometry;
 import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
@@ -51,14 +52,15 @@ public class Movement implements RobotModule {
 
             error = target.substract(odometry.getRobotCoordinates());
 
-            Pose2D differr = (error.substract(errold)).divideByDouble(looptime.seconds());
+            Pose2D differr = new Pose2D(0,0,0);//error.substract(errold)).divideByDouble(looptime.seconds());
             looptime.reset();
 
-            Pose2D control = new Pose2D(
+            Vector3D control = new Vector3D(
                     error.x * kP_distance + differr.x * kD_distance,
                     error.y * kP_distance + differr.y * kD_distance,
                     error.heading * kP_angle + differr.heading * kP_angle);
 
+            holonomicMoveFC(control);
 
 
             errold = error;
