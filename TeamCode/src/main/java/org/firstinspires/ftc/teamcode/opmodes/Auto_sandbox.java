@@ -22,8 +22,8 @@ public class Auto_sandbox extends AutonomousOpMode {
         do {
             onShooter = gamepad1.dpad_down?false : (gamepad1.dpad_up ? true : onShooter);
 
-            telemetry.addData("getStackSize", openCVNode.getStackSize());
-            telemetry.addData("rpm", shooter.shooterMotor.getVelocity()/0.4);
+            //telemetry.addData("getStackSize", openCVNode.getStackSize());
+            //telemetry.addData("rpm", shooter.shooterMotor.getVelocity()/0.4);
             spinOnce();
         } while (opModeIsActive());
     }

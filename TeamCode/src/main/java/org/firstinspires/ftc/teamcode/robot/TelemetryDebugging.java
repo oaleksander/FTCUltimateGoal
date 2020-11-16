@@ -5,6 +5,7 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
 
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.*;
@@ -53,6 +54,10 @@ public class TelemetryDebugging implements RobotModule{
             opMode.telemetry.addLine("Robot position").addData("y", odometry.getRobotCoordinates().y).addData("x", odometry.getRobotCoordinates().x).addData("head", Math.toDegrees(odometry.getRobotCoordinates().heading));
             opMode.telemetry.addLine("Robot velocity").addData("y", odometry.getRobotVelocity().y).addData("x", odometry.getRobotVelocity().x).addData("head", Math.toDegrees(odometry.getRobotVelocity().z));
             opMode.telemetry.addData("Shooter velo", shooter.shooterMotor.getVelocity());
+            opMode.telemetry.addData("Shooter position", shooter.shooterMotor.getCurrentPosition());
+            opMode.telemetry.addData("Shooter current", shooter.shooterMotor.getCurrent(CurrentUnit.MILLIAMPS));
+
+
             opMode.telemetry.addData("OpenCV stack size", openCVNode.getStackSize());
 
             double by = -odometry.getRobotCoordinates().x / 2.54;

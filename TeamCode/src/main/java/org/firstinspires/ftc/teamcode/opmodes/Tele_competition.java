@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.opmodes;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.math.Pose2D;
 import org.firstinspires.ftc.teamcode.misc.ButtonSwitch;
 import org.firstinspires.ftc.teamcode.robot.WobbleManipulator;
 
@@ -15,7 +16,14 @@ public class Tele_competition extends LinearOpMode {
         initRobot(this);
         startRobot();
         ButtonSwitch buttonAswitch = new ButtonSwitch();
-        boolean buttonAwasPressed = false;
+
+        ButtonSwitch buttonStartswitch = new ButtonSwitch();
+
+        //odometry.setRobotCoordinates(new Pose2D(0, 0, 0));
+        odometry.setRobotCoordinates(new Pose2D(93.75 * 1 + 31.25 * (-1), -156.5, 0));
+        shooter.setShootersetings(3333,1000);
+        buttonAswitch.isTriggered(true);
+        buttonAswitch.isTriggered(false);
         while (opModeIsActive()) {
             double turn = 0;
             double y = 0;
@@ -34,14 +42,14 @@ public class Tele_competition extends LinearOpMode {
                 x = -1;
             if (gamepad1.dpad_right)
                 x += 1;
-            if (gamepad1.x)
-                wobbleManipulator.setposlever(0);
-            else if (gamepad1.y)
-                wobbleManipulator.setposlever(490);
-            else if (gamepad1.b)
-                wobbleManipulator.setposlever(700);
             wobbleManipulator.setposclose(buttonAswitch.isTriggered(gamepad1.a));
+            wobbleManipulator.upmediumdown(gamepad1.y,gamepad1.x); // correct
+            shooter.onshooter(buttonStartswitch.isTriggered(gamepad1.start));
+            if(gamepad1.b)
+                conveyor.feedRing();
+
             drivetrain.setRobotVelocity(y, x, turn);
+      //      spinOnce();
         }
     }
 }

@@ -26,10 +26,10 @@ public class MecanumDrivetrain implements RobotModule, Drivetrain {
     public static double minDriveSpeed = 0.05;
     /* Drivetrain hardware members. */
     // public static ExpansionHubEx expansionHub1 = null;
-    private static DcMotorEx driveFrontLeft = null;
-    private static DcMotorEx driveFrontRight = null;
-    private static DcMotorEx driveRearLeft = null;
-    private static DcMotorEx driveRearRight = null;
+    public static DcMotorEx driveFrontLeft = null;
+    public static DcMotorEx driveFrontRight = null;
+    public static DcMotorEx driveRearLeft = null;
+    public static DcMotorEx driveRearRight = null;
     double powerFrontLeft_requested = 0;
     double powerFrontRight_requested = 0;
     double powerRearLeft_requested = 0;
@@ -57,7 +57,7 @@ public class MecanumDrivetrain implements RobotModule, Drivetrain {
         assignNames();
         setMotorDirections();
         setMotor0PowerBehaviors(DcMotorEx.ZeroPowerBehavior.FLOAT);
-        setSmartMode(true);
+        setSmartMode(false);
         setRobotVelocity(0,0,0);
     }
 
@@ -82,10 +82,10 @@ public class MecanumDrivetrain implements RobotModule, Drivetrain {
     }
 
     private void setMotorDirections() {
-        driveFrontLeft.setDirection(DcMotorEx.Direction.REVERSE);
-        driveFrontRight.setDirection(DcMotorEx.Direction.FORWARD);
-        driveRearLeft.setDirection(DcMotorEx.Direction.REVERSE);
-        driveRearRight.setDirection(DcMotorEx.Direction.FORWARD);
+        driveFrontLeft.setDirection(DcMotorEx.Direction.FORWARD);
+        driveFrontRight.setDirection(DcMotorEx.Direction.REVERSE);
+        driveRearLeft.setDirection(DcMotorEx.Direction.FORWARD);
+        driveRearRight.setDirection(DcMotorEx.Direction.REVERSE);
     }
 
     private void setMotor0PowerBehaviors(DcMotorEx.ZeroPowerBehavior zeroPowerBehavior) {
@@ -117,6 +117,8 @@ public class MecanumDrivetrain implements RobotModule, Drivetrain {
     public void update() {
         if (powerFrontLeft_requested == 0) {
             powerFrontLeft_current = powerFrontLeft_old = 0;
+            //driveFrontLeft.setPower(powerFrontLeft_current);
+
         } else {
             powerFrontLeft_current += min(abs(powerFrontLeft_requested - powerFrontLeft_current), abs(looptime.seconds() * maxRampPerSec)) * signum(powerFrontLeft_requested - powerFrontLeft_current);
             if (powerFrontLeft_current != powerFrontLeft_old) {
@@ -133,7 +135,7 @@ public class MecanumDrivetrain implements RobotModule, Drivetrain {
         }
         if (powerRearLeft_requested == 0) {
             powerRearLeft_current = powerRearLeft_old = 0;
-            driveRearLeft.setPower(powerRearLeft_current);
+        //    driveRearLeft.setPower(powerRearLeft_current);
         } else {
             powerRearLeft_current += min(abs(powerRearLeft_requested - powerRearLeft_current), abs(looptime.seconds() * maxRampPerSec)) * signum(powerRearLeft_requested - powerRearLeft_current);
             if (powerRearLeft_current != powerRearLeft_old) {
@@ -142,7 +144,7 @@ public class MecanumDrivetrain implements RobotModule, Drivetrain {
         }
         if (powerRearRight_requested == 0) {
             powerRearRight_current = powerRearRight_old = 0;
-            driveRearRight.setPower(powerRearRight_current);
+       //     driveRearRight.setPower(powerRearRight_current);
         } else {
             powerRearRight_current += min(abs(powerRearRight_requested - powerRearRight_current), abs(looptime.seconds() * maxRampPerSec)) * signum(powerRearRight_requested - powerRearRight_current);
             if (powerRearRight_current != powerRearRight_old) {
