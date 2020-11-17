@@ -68,10 +68,54 @@ public class Movement implements RobotModule {
         }
         drivetrain.setRobotVelocity(0, 0, 0);
     }
+    /*
+        public boolean Pos(Pose2D target) {
 
-    public void holonomicMoveFC(Pose2D move) {
+
+        Pose2D error = target.substract(odometry.getRobotCoordinates());
+        Pose2D errold = error;
+        double distanceError = error.radius();
+
+        ElapsedTime looptime = new ElapsedTime();
+        if ((distanceError > minError_distance || abs(error.heading) > minError_angle) && looptime.seconds() < 4) {
+
+
+            distanceError = error.radius();
+
+
+            error = target.substract(odometry.getRobotCoordinates());
+            if(distanceError>60)
+            {
+                error.heading=angleWrapHalf(error.acot());
+            }
+
+            Vector3D differr = new Vector3D(0,0,0);
+            looptime.reset();
+
+            Vector3D control = new Vector3D(
+                    error.x * kP_distance + differr.x * kD_distance,
+                    error.y * kP_distance + differr.y * kD_distance,
+                    error.heading * kP_angle + differr.z * kP_angle);
+
+            holonomicMoveFC(control);
+
+
+
+
+
+            errold = error;
+            return false;
+        }
+        else {
+             return true;
+        }
+    }
+
+     */
+
+    public void holonomicMoveFC(Vector3D move) {
         Vector2D coordinates = new Vector2D(move.x, move.y).rotatedCW(-odometry.getRobotCoordinates().heading);
-        drivetrain.setRobotVelocity(coordinates.y, coordinates.x, move.heading);
+        drivetrain.setRobotVelocity(coordinates.y, coordinates.x, move.z);
     }
 
     public void holonomicMovePolar(double heading, double speed, double turn) {
