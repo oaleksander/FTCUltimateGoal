@@ -1,3 +1,4 @@
+
 package org.firstinspires.ftc.teamcode.robot;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -19,7 +20,7 @@ public class WoENrobot {
     public static Movement movement = new Movement(odometry,drivetrain);
 
 
-    protected static RobotModule[] activeAobotModules = {odometry, drivetrain, movement, shooter, wobbleManipulator, conveyor}; //conveyor, odometry, shooter, wobbleManipulator, drivetrain
+    protected static RobotModule[] activeAobotModules = {odometry, drivetrain, movement, shooter, wobbleManipulator, conveyor, telemetryDebugging}; //conveyor, odometry, shooter, wobbleManipulator, drivetrain
 
     public static LinearOpMode opMode = null;
     public static boolean robotIsInitialized = false;
