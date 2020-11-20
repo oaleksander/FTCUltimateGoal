@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
-
+@Deprecated
 public class WobbleManipulator implements RobotModule {
 
     static final double minerror = 15, maxspeed = 0.7, kofP = 0.0015, kofd = 0.00001;

@@ -13,7 +13,7 @@ import static org.firstinspires.ftc.teamcode.robot.WoENrobot.odometry;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.shooter;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.spinOnce;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.startRobot;
-import static org.firstinspires.ftc.teamcode.robot.WoENrobot.wobbleManipulator;
+import static org.firstinspires.ftc.teamcode.robot.WoENrobot.wobbleManipulator2;
 
 @TeleOp(name = "Teleop TEST/PRACTICE", group = "Debugging")
 
@@ -52,8 +52,8 @@ public class Tele_test extends LinearOpMode {
                 x = -1;
             if (gamepad1.dpad_right)
                 x += 1;
-            wobbleManipulator.setposclose(buttonAswitch.isTriggered(gamepad1.a));
-            wobbleManipulator.upmediumdown(gamepad1.y,gamepad1.x); // correct
+            wobbleManipulator2.setposclose(buttonAswitch.isTriggered(gamepad1.a));
+            wobbleManipulator2.upmediumdown(gamepad1.y,gamepad1.x); // correct
             shooter.onshooter(buttonStartswitch.isTriggered(gamepad1.start));
             if(gamepad1.b)
             conveyor.feedRing();
