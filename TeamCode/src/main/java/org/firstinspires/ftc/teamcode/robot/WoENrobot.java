@@ -9,7 +9,7 @@ import org.openftc.revextensions2.ExpansionHubEx;
 
 public class WoENrobot {
 
-    public static WobbleManipulator wobbleManipulator = new WobbleManipulator();
+    public static WobbleManipulator2 wobbleManipulator2 = new WobbleManipulator2();
     public static OpenCVNode openCVNode = new OpenCVNode();
     public static Conveyor conveyor = new Conveyor();
     public static rpm shooter = new rpm();
@@ -20,7 +20,7 @@ public class WoENrobot {
     public static Movement movement = new Movement(odometry,drivetrain);
 
 
-    protected static RobotModule[] activeAobotModules = {odometry, drivetrain, movement, shooter, wobbleManipulator, conveyor, telemetryDebugging}; //conveyor, odometry, shooter, wobbleManipulator, drivetrain
+    protected static RobotModule[] activeAobotModules = {odometry, drivetrain, movement, shooter, wobbleManipulator2, conveyor, telemetryDebugging}; //conveyor, odometry, shooter, wobbleManipulator, drivetrain
 
     public static LinearOpMode opMode = null;
     public static boolean robotIsInitialized = false;

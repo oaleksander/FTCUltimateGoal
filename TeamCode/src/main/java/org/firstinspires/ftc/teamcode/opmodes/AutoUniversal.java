@@ -18,6 +18,6 @@ public class AutoUniversal extends AutonomousOpMode {
         MoveWobble();
        //PutRingsToLowGoal();
         movement.Pos(new Pose2D(getStartPosition().x, 25, 0));
-        wobbleManipulator.setposlever(360);
+        wobbleManipulator2.setAngle(0.2);
     }
 }

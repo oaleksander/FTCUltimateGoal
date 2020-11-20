@@ -6,7 +6,7 @@ import org.firstinspires.ftc.teamcode.math.Pose2D;
 import org.firstinspires.ftc.teamcode.misc.AutoTransitioner;
 
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.movement;
-import static org.firstinspires.ftc.teamcode.robot.WoENrobot.wobbleManipulator;
+import static org.firstinspires.ftc.teamcode.robot.WoENrobot.wobbleManipulator2;
 
 @Autonomous
 public class AutoNothing extends AutonomousOpMode {
