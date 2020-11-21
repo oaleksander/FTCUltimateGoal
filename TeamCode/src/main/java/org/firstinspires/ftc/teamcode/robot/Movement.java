@@ -20,12 +20,12 @@ public class Movement implements RobotModule {
     private static Drivetrain drivetrain;
     private LinearOpMode opMode = null;
 
-    private static final double kP_distance = 0.021, kD_distance = 0.00034;
+    private static final double kP_distance = 0.008, kD_distance = 0.00034;
     private static final double kF_distance = 0.1;
-    private static final double minError_distance = 13;
+    private static final double minError_distance = 3;
     private static final double kP_angle = 0.34, kD_angle = 0;
     private static final double kF_angle = 0.1;
-    private static final double minError_angle = Math.toRadians(5.5);
+    private static final double minError_angle = Math.toRadians(3);
 
 
     public Movement(Odometry Odometry, Drivetrain Drivetrain) {
