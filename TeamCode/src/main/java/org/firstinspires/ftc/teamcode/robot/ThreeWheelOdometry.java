@@ -70,7 +70,7 @@ public class ThreeWheelOdometry implements Odometry, RobotModule {
                 (double) (-bulkData.getMotorCurrentPosition(odometerX) - X_old) - deltaWorldHeading * odometerXcenterOffset,
                 (double)( (bulkData.getMotorCurrentPosition(odometerYL) - YL_old)+(-bulkData.getMotorCurrentPosition(odometerYR) - YR_old))/2);
 
-        if (deltaWorldHeading != 0) {   //if deltaAngle = 0 radius of the arc is = Inf which causes model degeneracy
+       if (deltaWorldHeading != 0) {   //if deltaAngle = 0 radius of the arc is = Inf which causes model degeneracy
             double arcAngle = deltaWorldHeading * 2;
             double arcRadius = deltaPosition.radius() / arcAngle;
 
@@ -82,7 +82,7 @@ public class ThreeWheelOdometry implements Odometry, RobotModule {
         }
 
         worldPosition = worldPosition.add(
-                new Pose2D(deltaPosition.rotatedCW(-worldPosition.heading),
+                new Pose2D(deltaPosition.rotatedCW(worldPosition.heading),
                         deltaWorldHeading));
 
         YL_old = bulkData.getMotorCurrentPosition(odometerYL);

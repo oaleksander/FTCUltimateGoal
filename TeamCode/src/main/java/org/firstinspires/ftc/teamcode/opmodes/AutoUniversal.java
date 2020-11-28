@@ -16,7 +16,7 @@ public class AutoUniversal extends AutonomousOpMode {
     public void main() {
         AutoTransitioner.transitionOnStop(this, "TeleOp COMPETITION");
         MoveWobble();
-       //PutRingsToLowGoal();
+       PutRingsToLowGoal();
         movement.Pos(new Pose2D(getStartPosition().x, 25, 0));
         wobbleManipulator2.setAngle(0.2);
     }
