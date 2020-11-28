@@ -26,7 +26,7 @@ public class TwoWheelOdometry implements Odometry, RobotModule {
     private static final double odometryCMPerCounts = (odometryWheelDiameterCm * PI) / 1440;
     private static final double odometerYcenterOffset = 38.3633669516 * odometryCountsPerCM * cos(toRadians(19.490773014)) / 2;
     private static final double odometerXcenterOffset = 36.8862986805 * odometryCountsPerCM * cos(toRadians(67.021303041)) / 2;
-    private static final double yWheelPairRadiusCm = 18.1275;
+    private static final double yWheelPairRadiusCm = 18.425;//18.1275;
     private static final double radiansPerEncoderDifference = (odometryCMPerCounts) / (yWheelPairRadiusCm * 2);
     private static final int odometerY = 1, odometerX = 2;
     public static Pose2D worldPosition = new Pose2D();
