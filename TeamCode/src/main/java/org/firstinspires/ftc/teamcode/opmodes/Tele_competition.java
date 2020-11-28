@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.math.Pose2D;
 import org.firstinspires.ftc.teamcode.misc.ButtonSwitch;
-import org.firstinspires.ftc.teamcode.robot.WobbleManipulator;
+import org.firstinspires.ftc.teamcode.robot.WobbleManipulator2;
 
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.*;
 
@@ -42,8 +42,8 @@ public class Tele_competition extends LinearOpMode {
                 x = -1;
             if (gamepad1.dpad_right)
                 x += 1;
-            wobbleManipulator.setposclose(buttonAswitch.isTriggered(gamepad1.a));
-            wobbleManipulator.upmediumdown(gamepad1.y,gamepad1.x); // correct
+            wobbleManipulator2.setposclose(buttonAswitch.isTriggered(gamepad1.a));
+            wobbleManipulator2.upmediumdown(gamepad1.y,gamepad1.x); // correct
             shooter.onshooter(buttonStartswitch.isTriggered(gamepad1.start));
             if(gamepad1.b)
                 conveyor.feedRing();

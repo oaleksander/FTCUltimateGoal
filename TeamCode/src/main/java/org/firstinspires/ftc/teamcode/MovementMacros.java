@@ -7,7 +7,7 @@ import static java.lang.Math.toRadians;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.delay;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.movement;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.openCVNode;
-import static org.firstinspires.ftc.teamcode.robot.WoENrobot.wobbleManipulator;
+import static org.firstinspires.ftc.teamcode.robot.WoENrobot.wobbleManipulator2;
 
 public class MovementMacros {
 
@@ -20,8 +20,8 @@ public class MovementMacros {
     }
 
     public static void MoveWobble() {
-        wobbleManipulator.setposclose(true);
-        wobbleManipulator.setposlever(0);
+        wobbleManipulator2.setposclose(true);
+        wobbleManipulator2.setAngle(0);
         switch (openCVNode.getStackSize()) {
             case FOUR:
                 movement.Pos(new Pose2D(xSign * 150, 126, toRadians(0)));
@@ -33,18 +33,18 @@ public class MovementMacros {
             default:
                 movement.Pos(new Pose2D(xSign * 150, 6, toRadians(0)));
         }
-        wobbleManipulator.setposclose(false);
-        WoENrobot.wobbleManipulator.setposlever(120);
+        wobbleManipulator2.setposclose(false);
+        WoENrobot.wobbleManipulator2.setAngle(0.25);
         WoENrobot.delay(100);
-        WoENrobot.wobbleManipulator.setposlever(0);
+        WoENrobot.wobbleManipulator2.setAngle(0);
         WoENrobot.delay(100);
-        WoENrobot.wobbleManipulator.setposlever(120);
+        WoENrobot.wobbleManipulator2.setAngle(0.25);
     }
 
     public static void PutRingsToLowGoal() {
         movement.Pos(new Pose2D((93.75 + 11.25 * xSign) * xSign, 150, toRadians(0)));
-        wobbleManipulator.setposlever(505);
+        wobbleManipulator2.setAngle(0.55);
         delay(1000);
-        wobbleManipulator.setposlever(470);
+        wobbleManipulator2.setAngle(0.5);
     }
 }
