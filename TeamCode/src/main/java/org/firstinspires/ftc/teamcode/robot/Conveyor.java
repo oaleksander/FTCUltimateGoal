@@ -88,8 +88,13 @@ public class Conveyor implements RobotModule {
     public double getdistance() {
         return sensorDistance.getDistance(DistanceUnit.CM);
     }
-
+    double time = 500;
+    short i = 3;
     public void update() {
+        if (i < 3 && feederTime.milliseconds() > time*2){
+            i++;
+            feedRing();
+        }
         setFeederPosition(feederTime.milliseconds() < 500);
         if (timepause.milliseconds() >= 100) {
             timepause.reset();
@@ -149,5 +154,9 @@ public class Conveyor implements RobotModule {
 
     public void feedRing() {
         feederTime.reset();
+    }
+
+    public void feedrings() {
+        i = 0;
     }
 }
