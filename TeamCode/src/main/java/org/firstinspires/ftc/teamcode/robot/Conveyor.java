@@ -95,7 +95,7 @@ public class Conveyor implements RobotModule {
             i++;
             feedRing();
         }
-        setFeederPosition(feederTime.milliseconds() < 500);
+        setFeederPosition(feederTime.milliseconds() < time);
         if (timepause.milliseconds() >= 100) {
             timepause.reset();
             distance = getdistance();
