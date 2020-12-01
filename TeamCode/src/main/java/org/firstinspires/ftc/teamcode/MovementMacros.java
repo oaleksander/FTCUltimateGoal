@@ -19,19 +19,26 @@ public class MovementMacros {
         MovementMacros.sideSign = sideSign;
     }
 
+    public static void ShootTargets()
+    {
+        movement.Pos(new Pose2D(xSign*30, -60,toRadians(-10*xSign)));
+        movement.Pos(new Pose2D(xSign*30, -60,toRadians(-15*xSign)));
+        movement.Pos(new Pose2D(xSign*30, -60,toRadians(-5*xSign)));
+    }
+
     public static void MoveWobble() {
         wobbleManipulator2.setposclose(true);
         wobbleManipulator2.setAngle(0);
         switch (openCVNode.getStackSize()) {
             case FOUR:
-                movement.Pos(new Pose2D(xSign * 150, 126, toRadians(0)));
+                movement.Pos(new Pose2D(xSign * 140, 126, toRadians(45*xSign)));
                 break;
             case ONE:
-                movement.Pos(new Pose2D(xSign * 91, 66, toRadians(0)));
+                movement.Pos(new Pose2D(xSign * 81, 66, toRadians(45*xSign)));
                 break;
             case ZERO:
             default:
-                movement.Pos(new Pose2D(xSign * 150, 6, toRadians(0)));
+                movement.Pos(new Pose2D(xSign * 140, 6, toRadians(45*xSign)));
         }
         wobbleManipulator2.setposclose(false);
         WoENrobot.wobbleManipulator2.setAngle(0.25);

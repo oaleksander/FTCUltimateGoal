@@ -57,7 +57,7 @@ public class MecanumDrivetrain implements RobotModule, Drivetrain {
         assignNames();
         setMotorDirections();
         setMotor0PowerBehaviors(DcMotorEx.ZeroPowerBehavior.FLOAT);
-        setSmartMode(false);
+        setSmartMode(true);
         setRobotVelocity(0,0,0);
     }
 

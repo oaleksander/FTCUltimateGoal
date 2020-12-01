@@ -117,9 +117,10 @@ public class TwoWheelOdometry implements Odometry, RobotModule {
 
     public Vector3D getRobotVelocity() {
         double angularVelocity = -imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZXY, AngleUnit.RADIANS).firstAngle;
-        return new Vector3D(
+        return new Vector3D(new Vector2D(
                 ((double) bulkData.getMotorCurrentPosition(odometerX) - angularVelocity * odometerXcenterOffset) * odometryCMPerCounts,
-                ((double) -bulkData.getMotorVelocity(odometerY) - angularVelocity * odometerXcenterOffset) * odometryCMPerCounts,
+                ((double) -bulkData.getMotorVelocity(odometerY) - angularVelocity * odometerXcenterOffset) * odometryCMPerCounts)
+                .rotatedCW(worldPosition.heading),
                 angularVelocity);
     }
 
