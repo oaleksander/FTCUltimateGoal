@@ -100,9 +100,9 @@ public class OpenCVNode implements RobotModule {
             Imgproc.GaussianBlur(all, all, new Size(11, 11), 0);
             Imgproc.cvtColor(all, HSVMat, Imgproc.COLOR_RGB2HSV);
 
-            Core.inRange(HSVMat, new Scalar(7, (160 + Core.mean(HSVMat).val[1]) / 2, (90 + Core.mean(HSVMat).val[2]) / 2), new Scalar(15, 255, 255), thresholdMat);
-            Imgproc.erode(thresholdMat, thresholdMat, Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(35, 5)));
-            Imgproc.dilate(thresholdMat, thresholdMat, Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(35, 15)));
+            Core.inRange(HSVMat, new Scalar(7, (160 + Core.mean(HSVMat).val[1]) / 2, (80 + Core.mean(HSVMat).val[2]) / 2), new Scalar(15, 255, 255), thresholdMat);
+            Imgproc.erode(thresholdMat, thresholdMat, Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(35, 5)));
+            Imgproc.dilate(thresholdMat, thresholdMat, Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(35, 15)));
 
             Rect rect = Imgproc.boundingRect(thresholdMat);
 
@@ -113,7 +113,7 @@ public class OpenCVNode implements RobotModule {
 
             if (mean > 0.1) {
                 aspectRatio = (double) rect.width / (double) rect.height;
-                if (aspectRatio > 1.75)
+                if (aspectRatio > 2.2)
                     stackSize = StackSize.ONE;
                 else stackSize = StackSize.FOUR;
             } else {
