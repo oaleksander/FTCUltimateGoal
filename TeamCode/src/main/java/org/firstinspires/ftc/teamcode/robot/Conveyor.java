@@ -20,7 +20,7 @@ public class Conveyor implements RobotModule {
     public static ElapsedTime conveyortime = new ElapsedTime();
     public static ElapsedTime backcontime = new ElapsedTime();
     static DistanceSensor sensorDistance;
-    static boolean full = false;
+    public static boolean full = false;
     static boolean backon = false, stop = false;
     static double timelock = 0;
     static boolean ispush = false;
@@ -88,22 +88,26 @@ public class Conveyor implements RobotModule {
     public double getdistance() {
         return sensorDistance.getDistance(DistanceUnit.CM);
     }
-    double time = 500;
+    double time = 150;
     short i = 3;
     public void update() {
-        if (i < 3 && feederTime.milliseconds() > time*2){
-            i++;
+        if (i < 3 && feederTime.milliseconds() > time*2.5){
             feedRing();
+            i++;
+
         }
         setFeederPosition(feederTime.milliseconds() < time);
         if (timepause.milliseconds() >= 100) {
             timepause.reset();
             distance = getdistance();
         }
-        if (distance < 6)
+        if (distance < 6){
             if (conveyortime.milliseconds() >= 1000) {
                 full = true;
-            } else {
+            }
+        }
+
+        else {
                 conveyortime.reset();
                 full = false;
             }
@@ -136,8 +140,8 @@ public class Conveyor implements RobotModule {
     public void setFeederPosition(boolean push) {
         if (push != ispush) {
             ispush = push;
-            if (push) feeder.setPosition(0.33);
-            else feeder.setPosition(0);
+            if (push) feeder.setPosition(0.25);
+            else feeder.setPosition(0.06);
         }
     }
 
@@ -158,5 +162,6 @@ public class Conveyor implements RobotModule {
 
     public void feedrings() {
         i = 0;
+        feedRing();
     }
 }
