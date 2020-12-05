@@ -56,7 +56,9 @@ public class rpm implements RobotModule {
     public void shooterpower(double power) {
         shooterMotor.setPower(power);
     }
-    public void shooterVelocity(double velocity){
+    public void shooterVelocity(double velocity)
+    {
+       // shooterMotor.setPower(velocity/2400);
         shooterMotor.setVelocity(velocity);
     }
 
