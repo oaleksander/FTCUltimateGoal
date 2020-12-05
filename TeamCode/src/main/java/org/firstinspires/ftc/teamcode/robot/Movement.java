@@ -13,19 +13,21 @@ import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
 
 import static java.lang.Math.abs;
 import static java.lang.Math.cos;
+import static java.lang.Math.signum;
 import static java.lang.Math.sin;
+import static org.firstinspires.ftc.teamcode.math.MathUtil.angleWrapHalf;
 
 public class Movement implements RobotModule {
     private static Odometry odometry;
     private static Drivetrain drivetrain;
     private LinearOpMode opMode = null;
 
-    private static final double kP_distance = 0.008, kD_distance = 0.00034;
+    private static final double kP_distance = 0.010, kD_distance = 0.00034;
     private static final double kF_distance = 0.1;
     private static final double minError_distance = 5;
-    private static final double kP_angle = 0.34, kD_angle = 0;
+    private static final double kP_angle = 0.40, kD_angle = 0;
     private static final double kF_angle = 0.1;
-    private static final double minError_angle = Math.toRadians(5);
+    private static final double minError_angle = Math.toRadians(1);
 
 
     public Movement(Odometry Odometry, Drivetrain Drivetrain) {
@@ -47,24 +49,37 @@ public class Movement implements RobotModule {
         Pose2D errold = error;
         double distanceError = error.radius();
 
-        ElapsedTime looptime = new ElapsedTime();
-        while (opMode.opModeIsActive() && (distanceError > minError_distance || abs(error.heading) > minError_angle) && looptime.seconds() < 4) {
+        ElapsedTime movementTime = new ElapsedTime();
+        while (opMode.opModeIsActive() && (distanceError >= minError_distance || abs(error.heading) >= minError_angle) && movementTime.seconds() < 4) {
 
+            errold = error;
             error = target.substract(odometry.getRobotCoordinates());
 
-            Pose2D differr = new Pose2D(0,0,0);//error.substract(errold)).divideByDouble(looptime.seconds());
-            looptime.reset();
+            distanceError = error.radius();
+            if(distanceError>100)
+            {
+                error.heading=angleWrapHalf(error.acot());
+            }
 
-            Vector3D control = new Vector3D(
-                    error.x * kP_distance + differr.x * kD_distance,
-                    error.y * kP_distance + differr.y * kD_distance,
-                    error.heading * kP_angle + differr.heading * kP_angle);
+            Pose2D deltaError = error.substract(errold);
+
+            Vector3D currentVelocity = odometry.getRobotVelocity();
+            Vector3D diffError = new Vector3D(currentVelocity.x*signum(deltaError.x),
+                    currentVelocity.y*signum(deltaError.y),
+                    currentVelocity.z*signum(deltaError.heading));
+
+            Vector2D movementControl = new Vector2D(
+                    error.x * kP_distance + diffError.x * kD_distance,
+                    error.y * kP_distance + diffError.y * kD_distance);
+            if(movementControl.radius()>1)
+                movementControl.normalize();
+
+            Vector3D control = new Vector3D(movementControl,
+                    error.heading * kP_angle + diffError.z * kD_angle);
 
             holonomicMoveFC(control);
 
 
-            errold = error;
-            distanceError = error.radius();
         }
         drivetrain.setRobotVelocity(0, 0, 0);
     }
