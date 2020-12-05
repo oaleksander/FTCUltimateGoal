@@ -56,6 +56,9 @@ public class TelemetryDebugging implements RobotModule{
             opMode.telemetry.addData("Shooter velo", shooter.shooterMotor.getVelocity());
             opMode.telemetry.addData("Shooter position", shooter.shooterMotor.getCurrentPosition());
             opMode.telemetry.addData("Shooter current", shooter.shooterMotor.getCurrent(CurrentUnit.MILLIAMPS));
+            opMode.telemetry.addData("dist", conveyor.distance);
+            opMode.telemetry.addData("full",conveyor.full);
+            opMode.telemetry.addData("conveyortime",conveyor.conveyortime);
 
 
             opMode.telemetry.addData("OpenCV stack size", openCVNode.getStackSize());

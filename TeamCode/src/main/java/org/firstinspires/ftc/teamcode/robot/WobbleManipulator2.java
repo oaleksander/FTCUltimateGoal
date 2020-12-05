@@ -61,14 +61,14 @@ public class WobbleManipulator2 implements RobotModule {
         }
         else isdown = false;
     }
-    enum positions {up, down, medium}
+    public enum positions {up, down, medium}
     public void changepos(WobbleManipulator2.positions Positions){
         switch (Positions){
             case up:
-                setAngle(0);
+                setAngle(1);
                 break;
             case down:
-                setAngle(1);
+                setAngle(0.18);
                 break;
             case medium:
                 setAngle(0.5);
