@@ -91,9 +91,9 @@ public class Conveyor implements RobotModule {
     double time = 150;
     short i = 3;
     public void update() {
-        if (i < 3 && feederTime.milliseconds() > time*2.5){
+        if (i != 0 && feederTime.milliseconds() > time*2.5){
             feedRing();
-            i++;
+            i--;
 
         }
         setFeederPosition(feederTime.milliseconds() < time);
@@ -140,7 +140,7 @@ public class Conveyor implements RobotModule {
     public void setFeederPosition(boolean push) {
         if (push != ispush) {
             ispush = push;
-            if (push) feeder.setPosition(0.25);
+            if (push) feeder.setPosition(0.3);
             else feeder.setPosition(0.06);
         }
     }
@@ -161,7 +161,7 @@ public class Conveyor implements RobotModule {
     }
 
     public void feedrings() {
-        i = 0;
-        feedRing();
+        i = 3;
+        //feedRing();
     }
 }
