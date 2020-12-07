@@ -29,7 +29,7 @@ public class WobbleManipulator2 implements RobotModule {
         if (dograb != isGrabbed) {
             isGrabbed = dograb;
             if (dograb) close.setPosition(0.85);
-            else close.setPosition(0.42);
+            else close.setPosition(0.19);
         }
     }
 
