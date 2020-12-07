@@ -62,10 +62,10 @@ public class rpm implements RobotModule {
         shooterMotor.setVelocity(velocity);
     }
 
-    public void onshooter(boolean on) {
-        if (on == !org.firstinspires.ftc.teamcode.robot.rpm.on) {
-            org.firstinspires.ftc.teamcode.robot.rpm.on = on;
+    public void onshooter(boolean On) {
+        if(On!=on) {
             rpmtime.reset();
+            on = On;
         }
     }
 
