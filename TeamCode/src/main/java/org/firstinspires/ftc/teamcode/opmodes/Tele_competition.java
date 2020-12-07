@@ -16,14 +16,11 @@ public class Tele_competition extends LinearOpMode {
         initRobot(this);
         startRobot();
         ButtonSwitch buttonAswitch = new ButtonSwitch();
+        ButtonSwitch buttonBackswitch = new ButtonSwitch();
 
         ButtonSwitch buttonStartswitch = new ButtonSwitch();
 
-        //odometry.setRobotCoordinates(new Pose2D(0, 0, 0));
-        odometry.setRobotCoordinates(new Pose2D(93.75 * 1 + 31.25 * (-1), -156.5, 0));
-        shooter.setShootersetings(3333,1000);
-        buttonAswitch.isTriggered(true);
-        buttonAswitch.isTriggered(false);
+        shooter.setShootersetings(4321,500);
         while (opModeIsActive()) {
             double turn = 0;
             double y = 0;
@@ -45,8 +42,11 @@ public class Tele_competition extends LinearOpMode {
             wobbleManipulator2.setposclose(buttonAswitch.isTriggered(gamepad1.a));
             wobbleManipulator2.upmediumdown(gamepad1.y,gamepad1.x); // correct
             shooter.onshooter(buttonStartswitch.isTriggered(gamepad1.start));
+            conveyor.setConveyorPower(buttonBackswitch.isTriggered(gamepad1.back)?1:0);
             if(gamepad1.b)
                 conveyor.feedRing();
+            if(gamepad1.right_stick_button)
+                conveyor.feedrings();
 
             drivetrain.setRobotVelocity(y, x, turn);
       //      spinOnce();
