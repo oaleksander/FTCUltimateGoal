@@ -73,7 +73,7 @@ public class WoENrobot {
 
     public static void initRobot(LinearOpMode OpMode) {
         if (!robotIsInitialized) {
-            forceInitRobot(opMode);
+            forceInitRobot(OpMode);
             opMode.telemetry.addData("Status", "Initialization successful");
             opMode.telemetry.update();
         } else {
@@ -115,7 +115,7 @@ public class WoENrobot {
 
     }
 
-    public static void SimpleInit(LinearOpMode OpMode) {
+    public static void simpleInit(LinearOpMode OpMode) {
         initRobot(opMode);
         startRobot();
     }
