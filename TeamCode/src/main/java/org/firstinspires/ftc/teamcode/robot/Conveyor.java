@@ -62,7 +62,7 @@ public class Conveyor implements RobotModule {
     public void initializedrive() {
         conveyorm = opMode.hardwareMap.get(DcMotorEx.class, "conveyor");
 
-        conveyorm.setDirection(DcMotorSimple.Direction.REVERSE);
+        conveyorm.setDirection(DcMotorSimple.Direction.FORWARD);
 
         conveyorm.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         conveyorm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -89,14 +89,15 @@ public class Conveyor implements RobotModule {
         return sensorDistance.getDistance(DistanceUnit.CM);
     }
     double time = 125;
-    short i = 0;
+    byte i = 0;
     public void update() {
-        if (i != 0 && feederTime.milliseconds() > time*2.5){
+
+        setFeederPosition(feederTime.milliseconds() < time);
+        if (i > 0 && feederTime.milliseconds() > time*2.5){
             feedRing();
             i--;
 
         }
-        setFeederPosition(feederTime.milliseconds() < time);
         if (timepause.milliseconds() >= 100) {
             timepause.reset();
             distance = getdistance();
@@ -133,6 +134,7 @@ public class Conveyor implements RobotModule {
             if (stop) {
                 setConveyorMotorPower(0);
                 stop = false;
+                backon = false;
             }
         }
     }

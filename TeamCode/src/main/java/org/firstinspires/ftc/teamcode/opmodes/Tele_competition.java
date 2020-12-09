@@ -20,7 +20,7 @@ public class Tele_competition extends LinearOpMode {
 
         ButtonSwitch buttonStartswitch = new ButtonSwitch();
 
-        shooter.setShootersetings(4321,500);
+        shooter.setShootersetings(4444,500);
         while (opModeIsActive()) {
             double turn = 0;
             double y = 0;

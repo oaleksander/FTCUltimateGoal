@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.math.Pose2D;
 import org.firstinspires.ftc.teamcode.misc.ButtonSwitch;
+import org.firstinspires.ftc.teamcode.misc.SinglePressButton;
 import org.firstinspires.ftc.teamcode.robot.WobbleManipulator2;
 
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.conveyor;
@@ -30,15 +31,16 @@ public class Tele_test extends LinearOpMode {
         ButtonSwitch buttonAswitch = new ButtonSwitch();
 
         ButtonSwitch buttonStartswitch = new ButtonSwitch();
+        SinglePressButton threeRingPresser = new SinglePressButton();
 
         //odometry.setRobotCoordinates(new Pose2D(0, 0, 0));
         odometry.setRobotCoordinates(new Pose2D(93.75 * 1 + 31.25 * (-1), -156.5, 0));
         shooter.setShootersetings(4444,2000);
         buttonAswitch.isTriggered(true);
         buttonAswitch.isTriggered(false);
-        shooter.onshooter(true);
-        delay(5000);
-        conveyor.feedrings();
+       // shooter.onshooter(true);
+       // delay(5000);
+        //conveyor.feedrings();
         //wobbleManipulator2.changepos(WobbleManipulator2.positions.down);
        // wobbleManipulator2.setAngle(1);
         while (opModeIsActive()) {
@@ -61,9 +63,9 @@ public class Tele_test extends LinearOpMode {
                 x += 1;
             wobbleManipulator2.setposclose(buttonAswitch.isTriggered(gamepad1.a));
             wobbleManipulator2.upmediumdown(gamepad1.y,gamepad1.x); // correct
-            //shooter.onshooter(buttonStartswitch.isTriggered(gamepad1.start));
-            if(gamepad1.b)
-            conveyor.feedRing();
+            shooter.onshooter(buttonStartswitch.isTriggered(gamepad1.start));
+            if(threeRingPresser.isTriggered(gamepad1.b))
+            conveyor.feedrings();
 
             if(gamepad2.x)
                 drivetrain.driveFrontLeft.setPower(1);
