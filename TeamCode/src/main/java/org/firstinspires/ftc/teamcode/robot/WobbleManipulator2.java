@@ -10,7 +10,7 @@ import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
 public class WobbleManipulator2 implements RobotModule {
     public static Servo close = null;
     public static Servo angle = null;
-    public boolean isGrabbed = true;
+    public boolean isGrabbed = false;
     public static ElapsedTime levertime = new ElapsedTime();
     private static LinearOpMode opMode = null;
     double oldpos = 0;

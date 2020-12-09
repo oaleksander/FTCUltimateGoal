@@ -23,7 +23,7 @@ public class Conveyor implements RobotModule {
     public static boolean full = false;
     static boolean backon = false, stop = false;
     static double timelock = 0;
-    static boolean ispush = false;
+    static boolean ispush = true;
     static double conveyorPower = 0;
     private static LinearOpMode opMode = null;
     private static final ElapsedTime timepause = new ElapsedTime();
