@@ -46,6 +46,7 @@ public class Conveyor implements RobotModule {
         initializecolor();
         initializedrive();
         initializedservo();
+
     }
 
     /**
@@ -73,6 +74,7 @@ public class Conveyor implements RobotModule {
      */
     public void initializedservo() {
         feeder = opMode.hardwareMap.get(Servo.class, "feeder");
+        setFeederPosition(false);
     }
 
     // правильная ли конвертация?
@@ -92,12 +94,11 @@ public class Conveyor implements RobotModule {
     byte i = 0;
     public void update() {
 
-        setFeederPosition(feederTime.milliseconds() < time);
         if (i > 0 && feederTime.milliseconds() > time*2.5){
             feedRing();
             i--;
-
         }
+        setFeederPosition(feederTime.milliseconds() < time);
         if (timepause.milliseconds() >= 100) {
             timepause.reset();
             distance = getdistance();
