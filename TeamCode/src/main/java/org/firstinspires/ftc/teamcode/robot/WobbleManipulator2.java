@@ -22,7 +22,10 @@ public class WobbleManipulator2 implements RobotModule {
     public void initialize() {
         close = opMode.hardwareMap.get(Servo.class, "wobbleGrabber");
         angle = opMode.hardwareMap.get(Servo.class, "angle");
-        setposclose(true);
+        close.setPosition(0.85);
+        isGrabbed = true;
+        angle.setPosition(1);
+        oldpos = 1;
     }
 
     public void setposclose(boolean dograb) {

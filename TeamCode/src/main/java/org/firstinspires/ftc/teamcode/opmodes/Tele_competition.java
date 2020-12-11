@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.math.Pose2D;
 import org.firstinspires.ftc.teamcode.misc.ButtonSwitch;
+import org.firstinspires.ftc.teamcode.misc.SinglePressButton;
 import org.firstinspires.ftc.teamcode.robot.WobbleManipulator2;
 
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.*;
@@ -20,7 +21,9 @@ public class Tele_competition extends LinearOpMode {
 
         ButtonSwitch buttonStartswitch = new ButtonSwitch();
 
-        shooter.setShootersetings(4444,500);
+        SinglePressButton threeRingPresser = new SinglePressButton();
+
+        shooter.setShootersetings(5044,500);
         while (opModeIsActive()) {
             double turn = 0;
             double y = 0;
@@ -45,7 +48,7 @@ public class Tele_competition extends LinearOpMode {
             conveyor.setConveyorPower(buttonBackswitch.isTriggered(gamepad1.back)?1:0);
             if(gamepad1.b)
                 conveyor.feedRing();
-            if(gamepad1.right_stick_button)
+            if(threeRingPresser.isTriggered(gamepad1.right_stick_button))
                 conveyor.feedrings();
 
             drivetrain.setRobotVelocity(y, x, turn);

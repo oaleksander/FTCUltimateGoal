@@ -23,7 +23,7 @@ public class Conveyor implements RobotModule {
     public static boolean full = false;
     static boolean backon = false, stop = false;
     static double timelock = 0;
-    static boolean ispush = true;
+    static boolean ispush = false;
     static double conveyorPower = 0;
     private static LinearOpMode opMode = null;
     private static final ElapsedTime timepause = new ElapsedTime();
@@ -74,7 +74,9 @@ public class Conveyor implements RobotModule {
      */
     public void initializedservo() {
         feeder = opMode.hardwareMap.get(Servo.class, "feeder");
-        setFeederPosition(false);
+        feeder.setPosition(0.06);
+        ispush = false;
+
     }
 
     // правильная ли конвертация?
