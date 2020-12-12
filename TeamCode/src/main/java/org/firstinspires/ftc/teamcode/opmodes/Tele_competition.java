@@ -18,13 +18,15 @@ public class Tele_competition extends LinearOpMode {
         startRobot();
         ButtonSwitch buttonAswitch = new ButtonSwitch();
         ButtonSwitch buttonBackswitch = new ButtonSwitch();
-        ButtonSwitch speedSHhooter = new ButtonSwitch();
+        ButtonSwitch buttonspeedShooter = new ButtonSwitch();
+        ButtonSwitch buttonspeedConveyor = new ButtonSwitch();
 
         ButtonSwitch buttonStartswitch = new ButtonSwitch();
-
         SinglePressButton threeRingPresser = new SinglePressButton();
 
-        shooter.setShootersetings(5044,500);
+        double powerconveyor = 1;
+
+        shooter.setShootersetings(5000,500);
         while (opModeIsActive()) {
             double turn = 0;
             double y = 0;
@@ -44,9 +46,11 @@ public class Tele_competition extends LinearOpMode {
             if (gamepad1.dpad_right)
                 x += 1;
             wobbleManipulator2.setposclose(buttonAswitch.isTriggered(gamepad1.a));
-            wobbleManipulator2.upmediumdown(gamepad2.y,gamepad2.x); // correct
+            wobbleManipulator2.upmediumdown(gamepad2.b,gamepad2.x); // correct
             shooter.onshooter(buttonStartswitch.isTriggered(gamepad2.a));
-            conveyor.setConveyorPower(buttonBackswitch.isTriggered(gamepad2.left_bumper)?1:0);
+            conveyor.setConveyorPower(buttonBackswitch.isTriggered(gamepad2.left_bumper)?powerconveyor:0);
+            shooter.setShootersetings((buttonspeedShooter.isTriggered(gamepad2.y)?4000:5000),500);
+            powerconveyor = (buttonspeedConveyor.isTriggered(gamepad2.right_bumper)?-1:1);
 
             if(gamepad1.b)
                 conveyor.feedRing();
