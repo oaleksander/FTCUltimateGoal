@@ -71,8 +71,10 @@ public class rpm implements RobotModule {
 
 
     public void setShootersetings(double Rpm, double time) {
-        rpm = Rpm;
-        time_ms = time;
+        if(rpm != Rpm || time_ms != time) {
+            rpm = Rpm;
+            time_ms = time;
+        }
         if (time_ms > 0)
             x = rpm / time_ms / 6000;
     }
