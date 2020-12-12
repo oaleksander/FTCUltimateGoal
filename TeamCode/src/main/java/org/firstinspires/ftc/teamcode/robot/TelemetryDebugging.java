@@ -56,8 +56,8 @@ public class TelemetryDebugging implements RobotModule{
             opMode.telemetry.addData("Shooter velo", shooter.shooterMotor.getVelocity());
             opMode.telemetry.addData("Shooter position", shooter.shooterMotor.getCurrentPosition());
             opMode.telemetry.addData("Shooter current", shooter.shooterMotor.getCurrent(CurrentUnit.MILLIAMPS));
-            opMode.telemetry.addData("I", conveyor.i);
-            opMode.telemetry.addData("full",conveyor.full);
+            opMode.telemetry.addData("conpower", conveyor.conveyorPower);
+            //opMode.telemetry.addData("backmust",conveyor.backmust);
             //opMode.telemetry.addData("conveyortime",conveyor.conveyortime);
 
 

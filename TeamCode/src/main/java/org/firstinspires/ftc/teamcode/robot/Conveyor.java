@@ -22,6 +22,7 @@ public class Conveyor implements RobotModule {
     static DistanceSensor sensorDistance;
     public static boolean full = false;
     static boolean backon = false, stop = false;
+    static boolean backmust = false;
     static double timelock = 0;
     static boolean ispush = false;
     static double conveyorPower = 0;
@@ -96,7 +97,7 @@ public class Conveyor implements RobotModule {
     byte i = 0;
     public void update() {
 
-        if (i > 0 && feederTime.milliseconds() > time*2.5){
+        if (i > 0 && feederTime.milliseconds() > time * 2.5) {
             feedRing();
             i--;
         }
@@ -105,16 +106,15 @@ public class Conveyor implements RobotModule {
             timepause.reset();
             distance = getdistance();
         }
-        if (distance < 6){
+        if (distance < 6) {
             if (conveyortime.milliseconds() >= 1000) {
                 full = true;
             }
+        } else {
+            conveyortime.reset();
+            full = false;
         }
-
-        else {
-                conveyortime.reset();
-                full = false;
-            }
+        if (!backmust) {
         if (conveyorPower != 0 && !full) {
             if (!stop) {
                 stop = true;
@@ -125,8 +125,7 @@ public class Conveyor implements RobotModule {
                     backon = true;
                 }
                 timelock = backcontime.milliseconds();
-            }
-            else {
+            } else {
                 if (backon && (backcontime.milliseconds() >= (timelock + 500))) {
                     backcontime.reset();
                     setConveyorMotorPower(-conveyorPower);
@@ -140,14 +139,16 @@ public class Conveyor implements RobotModule {
                 backon = false;
             }
         }
+    } else {
+            setConveyorMotorPower(-conveyorPower);
+            backon = false;
+    }
     }
 
     public void setFeederPosition(boolean push) {
-        if (push != ispush) {
-            ispush = push;
             if (push) feeder.setPosition(0.3);
             else feeder.setPosition(0.06);
-        }
+
     }
 
     public void setConveyorPower(double power) {
@@ -160,7 +161,9 @@ public class Conveyor implements RobotModule {
             //last_power = power;
       //  }
     }
-
+    public void setBackmust(boolean Backmust){
+        backmust = Backmust;
+    }
     public void feedRing() {
         feederTime.reset();
     }

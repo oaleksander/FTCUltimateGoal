@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
@@ -16,7 +17,7 @@ public class rpm implements RobotModule {
     public static double rpm2 = 0;
     static double time_ms;
     static double x = 1;
-    static double rpm = 6000;
+    public static double rpm = 6000;
     static boolean on = false;
     private static boolean isActivated;
     double speedold = 0, speed = 0;
@@ -26,7 +27,14 @@ public class rpm implements RobotModule {
     }
 
     public void initialize() {
+
         shooterMotor = opMode.hardwareMap.get(DcMotorEx.class, "shooterMotor");
+        MotorConfigurationType motorConfigurationType = shooterMotor.getMotorType().clone();
+        motorConfigurationType.setAchieveableMaxRPMFraction(0.95);
+        motorConfigurationType.setTicksPerRev(24);
+        motorConfigurationType.setGearing(1);
+        motorConfigurationType.setMaxRPM(6000);
+        shooterMotor.setMotorType(motorConfigurationType);
         shooterMotor.setDirection(DcMotorEx.Direction.FORWARD);
         shooterMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         shooterMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -71,12 +79,9 @@ public class rpm implements RobotModule {
 
 
     public void setShootersetings(double Rpm, double time) {
-        if(rpm != Rpm || time_ms != time) {
-            rpm = Rpm;
+        rpm = Rpm;
             time_ms = time;
-        }
-        if (time_ms > 0)
-            x = rpm / time_ms / 6000;
+            x = rpm / Math.abs(time_ms) / 6000;
     }
 
 }

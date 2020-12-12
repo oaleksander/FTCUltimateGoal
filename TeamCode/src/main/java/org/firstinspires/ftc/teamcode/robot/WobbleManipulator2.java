@@ -74,7 +74,7 @@ public class WobbleManipulator2 implements RobotModule {
                 setAngle(0.18);
                 break;
             case medium:
-                setAngle(0.5);
+                setAngle(0.6);
                 break;
         }
 
