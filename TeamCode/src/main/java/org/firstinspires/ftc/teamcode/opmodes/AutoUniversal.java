@@ -15,7 +15,6 @@ public class AutoUniversal extends AutonomousOpMode {
 
     @Override
     public void main() {
-        AutoTransitioner.transitionOnStop(this, "TeleOp COMPETITION");
         MoveWobble();
         PutRingsToLowGoal();
         ShootTargets();
