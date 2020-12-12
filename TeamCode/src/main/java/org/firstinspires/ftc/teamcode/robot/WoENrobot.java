@@ -27,8 +27,7 @@ public class WoENrobot {
     public static ElapsedTime runTime = new ElapsedTime();
     static boolean spinCompleted = false;
     static Runnable updateRegulators = () -> {
-        while (opMode.opModeIsActive()) {
-            //looptime.reset();
+        while (opMode.opModeIsActive()&&!Thread.interrupted()) {
 
             for (RobotModule robotModule : activeAobotModules) {
                 robotModule.update();
@@ -82,6 +81,7 @@ public class WoENrobot {
                 robotModule.setOpMode(opMode);
             }
             if (regulatorUpdater.getState() != Thread.State.NEW) {
+                regulatorUpdater.interrupt();
                 regulatorUpdater = new Thread(updateRegulators);
             }
             opMode.telemetry.addData("Status", "Already initialized, ready");
@@ -104,6 +104,7 @@ public class WoENrobot {
         }
 
         if (regulatorUpdater.getState() != Thread.State.NEW) {
+            regulatorUpdater.interrupt();
             regulatorUpdater = new Thread(updateRegulators);
         }
         //stopAllMotors();
