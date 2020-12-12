@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.MovementMacros;
 import org.firstinspires.ftc.teamcode.math.Pose2D;
+import org.firstinspires.ftc.teamcode.misc.AutoTransitioner;
 import org.firstinspires.ftc.teamcode.robot.WoENrobot;
 
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.FullInitWithCV;
@@ -17,6 +18,7 @@ public class AutonomousOpMode extends LinearOpMode {
     MovementMacros M;
     byte xSign = 1;
     byte sideSign = 1;
+    boolean thereAreTwoGamepads;
 
     public void main() {
     }
@@ -43,11 +45,14 @@ public class AutonomousOpMode extends LinearOpMode {
     }
 
     void start_loop() {
+
         telemetry.addLine("Use gamedad 1 X/B to select alliance color, dpad L/R to select alliance side");
         xSign = gamepad1.b ? 1 : gamepad1.x ? -1 : xSign;
         sideSign = gamepad1.dpad_right ? 1 : gamepad1.dpad_left ? -1 : sideSign;
         telemetry.addData("Alliance", getXSign() == 1 ? "RED" : "BLUE");
         telemetry.addData("SIDE", getSideSign() == 1 ? "RIGHT" : "LEFT");
+        thereAreTwoGamepads = gamepad2.start||gamepad2.b||thereAreTwoGamepads;
+        if(thereAreTwoGamepads) telemetry.addLine("Second gamepad detected");
         telemetry.update();
     }
 
@@ -57,6 +62,10 @@ public class AutonomousOpMode extends LinearOpMode {
         openCVNode.stopCam();
         new MovementMacros(getXSign(), getSideSign());
         odometry.setRobotCoordinates(getStartPosition());
+        if(thereAreTwoGamepads)
+        AutoTransitioner.transitionOnStop(this, "TeleOp COMPETITION");
+        else
+        AutoTransitioner.transitionOnStop(this, "TeleOp COMPETITION single");
         main();
         setLedColors(0, 128, 128);
         telemetry.addData("Status", "Program finished (" + getRuntime() + ")");
