@@ -14,9 +14,9 @@ public class PIDchanger extends LinearOpMode {
     // our DC motor.
     DcMotorEx shooter;
 
-    public static final double NEW_P = 2.5;
-    public static final double NEW_I = 0.1;
-    public static final double NEW_D = 0.2;
+    public static final double NEW_P = 9;
+    public static final double NEW_I = 2.5;
+    public static final double NEW_D = 0;
     public static final double NEW_F = 0;
 
     public void runOpMode() {
@@ -31,7 +31,7 @@ public class PIDchanger extends LinearOpMode {
         PIDFCoefficients pidOrig = shooter.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // change coefficients using methods included with DcMotorEx class.
-        PIDFCoefficients pidNew = new PIDFCoefficients(NEW_P, NEW_I, NEW_D, NEW_F);
+        PIDFCoefficients pidNew = new PIDFCoefficients(9, 2.5, 0, 0);
         shooter.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidNew);
 
         // re-read coefficients and verify change.
@@ -42,8 +42,8 @@ public class PIDchanger extends LinearOpMode {
             telemetry.addData("Runtime", "%.03f", getRuntime());
             telemetry.addData("P,I,D,F (orig)", "%.04f, %.04f, %.0f, %.0f",
                     pidOrig.p, pidOrig.i, pidOrig.d, pidOrig.f);
-          //  telemetry.addData("P,I,D (modified)", "%.04f, %.04f, %.04f",
-          //          pidModified.p, pidModified.i, pidModified.d);
+            telemetry.addData("P,I,D (modified)", "%.04f, %.04f, %.04f",
+                    pidModified.p, pidModified.i, pidModified.d);
             telemetry.update();
         }
     }
