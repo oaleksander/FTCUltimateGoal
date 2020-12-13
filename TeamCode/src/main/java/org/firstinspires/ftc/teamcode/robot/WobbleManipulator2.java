@@ -39,7 +39,7 @@ public class WobbleManipulator2 implements RobotModule {
     public void reset()
     {
         isGrabbed = false;
-        close.setPosition(0.19);
+        close.setPosition(0.85);
         angle.setPosition(1);
     }
 
