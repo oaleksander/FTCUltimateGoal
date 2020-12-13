@@ -5,6 +5,7 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
 
@@ -19,6 +20,8 @@ public class TelemetryDebugging implements RobotModule{
     public static double ROBOT_SIDE_LENGTH = 20;
 
     FtcDashboard dashboard = null;
+
+    Telemetry telemetry;
 
     TelemetryPacket packet = null;
 
@@ -35,6 +38,7 @@ public class TelemetryDebugging implements RobotModule{
 
     public void setOpMode(LinearOpMode opMode) {
         this.opMode = opMode;
+
     }
 
     @Override
@@ -42,26 +46,27 @@ public class TelemetryDebugging implements RobotModule{
         dashboard = FtcDashboard.getInstance();
         measurementTime.reset();
         loopCount=0;
+        telemetry = opMode.telemetry;
     }
+
+
 
     public void update() {
         if(measurementTime.seconds() > 0.25)
         {
-            opMode.telemetry.addData("Status", "Running");
+            telemetry.addData("Status", "Running");
             opMode.telemetry.addData("Loop frequency", 1 / (measurementTime.seconds() / loopCount) + " Hz");
 
-            opMode.telemetry.addLine("Odometry encoders").addData("odYL", odometry.bulkData.getMotorCurrentPosition(0)).addData("odYR", odometry.bulkData.getMotorCurrentPosition(1)).addData("odX", odometry.bulkData.getMotorCurrentPosition(2));
-            opMode.telemetry.addLine("Robot position").addData("y", odometry.getRobotCoordinates().y).addData("x", odometry.getRobotCoordinates().x).addData("head", Math.toDegrees(odometry.getRobotCoordinates().heading));
-            opMode.telemetry.addLine("Robot velocity").addData("y", odometry.getRobotVelocity().y).addData("x", odometry.getRobotVelocity().x).addData("head", Math.toDegrees(odometry.getRobotVelocity().z));
-            opMode.telemetry.addData("Shooter velo", shooter.shooterMotor.getVelocity());
-            opMode.telemetry.addData("Shooter position", shooter.shooterMotor.getCurrentPosition());
-            opMode.telemetry.addData("Shooter current", shooter.shooterMotor.getCurrent(CurrentUnit.MILLIAMPS));
-            opMode.telemetry.addData("conpower", conveyor.conveyorPower);
-            //opMode.telemetry.addData("backmust",conveyor.backmust);
-            //opMode.telemetry.addData("conveyortime",conveyor.conveyortime);
+            telemetry.addLine("Odometry encoders").addData("odYL", odometry.bulkData.getMotorCurrentPosition(0)).addData("odYR", odometry.bulkData.getMotorCurrentPosition(1)).addData("odX", odometry.bulkData.getMotorCurrentPosition(2));
+            telemetry.addLine("Robot position").addData("y", odometry.getRobotCoordinates().y).addData("x", odometry.getRobotCoordinates().x).addData("head", Math.toDegrees(odometry.getRobotCoordinates().heading));
+            telemetry.addLine("Robot velocity").addData("y", odometry.getRobotVelocity().y).addData("x", odometry.getRobotVelocity().x).addData("head", Math.toDegrees(odometry.getRobotVelocity().z));
+            telemetry.addData("Shooter velo", shooter.shooterMotor.getVelocity());
+            telemetry.addData("Shooter position", shooter.shooterMotor.getCurrentPosition());
+            telemetry.addData("Shooter current", shooter.shooterMotor.getCurrent(CurrentUnit.MILLIAMPS));
+            telemetry.addData("conpower", conveyor.conveyorPower);
 
 
-            opMode.telemetry.addData("OpenCV stack size", openCVNode.getStackSize());
+            telemetry.addData("OpenCV stack size", openCVNode.getStackSize());
 
             double by = -odometry.getRobotCoordinates().x / 2.54;
             double bx = odometry.getRobotCoordinates().y / 2.54;
@@ -84,7 +89,7 @@ public class TelemetryDebugging implements RobotModule{
 
             measurementTime.reset();
             loopCount = 0;
-            opMode.telemetry.update();
+            telemetry.update();
         }
         loopCount++;
     }

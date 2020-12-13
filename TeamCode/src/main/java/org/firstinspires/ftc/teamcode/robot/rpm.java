@@ -20,7 +20,8 @@ public class rpm implements RobotModule {
     public static double rpm = 6000;
     static boolean on = false;
     private static boolean isActivated;
-    double speedold = 0, speed = 0;
+    double speedold = 0;
+    double speed = 0;
 
     public void setOpMode(LinearOpMode OpMode) {
         opMode = OpMode;
@@ -83,5 +84,14 @@ public class rpm implements RobotModule {
             time_ms = time;
             x = rpm / Math.abs(time_ms) / 6000;
     }
-
+    public boolean isCorrectRpm()
+    {
+        return isCorrectRpm(25);
+    }
+    public boolean isCorrectRpm(double error){
+        if(Math.abs(speed - shooterMotor.getVelocity()) < error)
+            return  true;
+        else
+            return false;
+    }
 }

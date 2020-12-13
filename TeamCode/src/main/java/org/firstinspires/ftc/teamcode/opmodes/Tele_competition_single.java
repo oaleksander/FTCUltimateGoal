@@ -25,7 +25,7 @@ public class Tele_competition_single  extends LinearOpMode {
 
         SinglePressButton threeRingPresser = new SinglePressButton();
 
-        shooter.setShootersetings(5044,500);
+        shooter.setShootersetings(3800,500);
         while (opModeIsActive()) {
             double turn = 0;
             double y = 0;
