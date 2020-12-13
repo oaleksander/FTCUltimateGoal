@@ -50,6 +50,16 @@ public class Conveyor implements RobotModule {
 
     }
 
+    public void reset() {
+        feeder.setPosition(0.06);
+        conveyorm.setPower(0);
+        ispush = false;
+        backon = false;
+        stop = false;
+        conveyorPower = 0;
+        i=0;
+    }
+
     /**
      * int color and distanse
      */

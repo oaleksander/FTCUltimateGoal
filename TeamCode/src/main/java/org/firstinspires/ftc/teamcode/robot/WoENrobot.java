@@ -33,7 +33,6 @@ public class WoENrobot {
                 robotModule.update();
             }
             spinCompleted = true;
-            opMode.telemetry.update();
         }
     };
     private static ExpansionHubEx expansionHub1 = null;

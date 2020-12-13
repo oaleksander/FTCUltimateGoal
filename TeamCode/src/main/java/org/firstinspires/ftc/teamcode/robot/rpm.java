@@ -41,6 +41,11 @@ public class rpm implements RobotModule {
         shooterMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
+    public void reset() {
+        shooterMotor.setVelocity(0);
+        on=false;
+    }
+
     public void update() {
         if (on) {
             if (time_ms > rpmtime.milliseconds()) {
