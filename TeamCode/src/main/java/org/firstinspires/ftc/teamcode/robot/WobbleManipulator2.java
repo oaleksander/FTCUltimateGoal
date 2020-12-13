@@ -40,7 +40,7 @@ public class WobbleManipulator2 implements RobotModule {
     {
         isGrabbed = false;
         close.setPosition(0.19);
-        setAngle(1);
+        angle.setPosition(1);
     }
 
     short posangle = 0;
