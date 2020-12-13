@@ -15,9 +15,8 @@ public class AutoUniversal extends AutonomousOpMode {
 
     @Override
     public void main() {
-        MoveWobble();
-        PutRingsToLowGoal();
         ShootTargets();
+        MoveWobble();
         movement.Pos(new Pose2D(getStartPosition().x, 25, 0));
         wobbleManipulator2.setAngle(0.2);
     }
