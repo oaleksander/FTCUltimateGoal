@@ -29,7 +29,7 @@ public class MovementMacros {
         if (sideSign * xSign == 1)
             movement.Pos(new Pose2D(xSign * 128, -44, toRadians(-11 * xSign)));
         else
-            movement.Pos(new Pose2D(xSign * 45, -48, toRadians(7 * xSign)));
+            movement.Pos(new Pose2D(xSign * 49, -30, toRadians(1 * xSign)));
         while (opMode.opModeIsActive() && !shooter.isCorrectRpm()) {
         }
         conveyor.feedrings();
