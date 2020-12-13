@@ -140,7 +140,7 @@ public class Conveyor implements RobotModule {
             }
         }
     } else {
-            setConveyorMotorPower(-conveyorPower);
+            setConveyorMotorPower(-1);
             backon = false;
     }
     }
