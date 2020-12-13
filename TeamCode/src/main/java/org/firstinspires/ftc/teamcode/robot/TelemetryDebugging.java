@@ -54,11 +54,11 @@ public class TelemetryDebugging implements RobotModule{
     public void update() {
         if(measurementTime.seconds() > 0.25)
         {
-            telemetry.addData("Status", "Running");
+           // telemetry.addData("Status", "Running");
             //telemetry.addData("Loop frequency", 1 / (measurementTime.seconds() / loopCount) + " Hz");
 
-            telemetry.addLine("Odometry encoders").addData("odYL", odometry.bulkData.getMotorCurrentPosition(0)).addData("odYR", odometry.bulkData.getMotorCurrentPosition(1)).addData("odX", odometry.bulkData.getMotorCurrentPosition(2));
-            telemetry.addLine("Robot position").addData("y", odometry.getRobotCoordinates().y).addData("x", odometry.getRobotCoordinates().x).addData("head", Math.toDegrees(odometry.getRobotCoordinates().heading));
+            //telemetry.addLine("Odometry encoders").addData("odYL", odometry.bulkData.getMotorCurrentPosition(0)).addData("odYR", odometry.bulkData.getMotorCurrentPosition(1)).addData("odX", odometry.bulkData.getMotorCurrentPosition(2));
+          //  telemetry.addLine("Robot position").addData("y", odometry.getRobotCoordinates().y).addData("x", odometry.getRobotCoordinates().x).addData("head", Math.toDegrees(odometry.getRobotCoordinates().heading));
             //telemetry.addLine("Robot velocity").addData("y", odometry.getRobotVelocity().y).addData("x", odometry.getRobotVelocity().x).addData("head", Math.toDegrees(odometry.getRobotVelocity().z));
             telemetry.addData("Shooter velo", shooter.shooterMotor.getVelocity()*2.5);
             //telemetry.addData("Shooter position", shooter.shooterMotor.getCurrentPosition());
@@ -68,7 +68,7 @@ public class TelemetryDebugging implements RobotModule{
 
             //telemetry.addData("OpenCV stack size", openCVNode.getStackSize());
 
-            double by = -odometry.getRobotCoordinates().x / 2.54;
+         /*   double by = -odometry.getRobotCoordinates().x / 2.54;
             double bx = odometry.getRobotCoordinates().y / 2.54;
             double l = ROBOT_SIDE_LENGTH / 2;
 
@@ -88,7 +88,7 @@ public class TelemetryDebugging implements RobotModule{
 
 
             measurementTime.reset();
-            loopCount = 0;
+         */  loopCount = 0;
             telemetry.update();
         }
         loopCount++;
