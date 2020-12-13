@@ -27,9 +27,9 @@ public class MovementMacros {
         shooter.setShootersetings(3850, 500);
         shooter.onshooter(true);
         if (sideSign * xSign == 1)
-            movement.Pos(new Pose2D(xSign * 128, -44, toRadians(-11 * xSign)));
+            movement.Pos(new Pose2D(xSign * 128, -48.5, toRadians(-12 * xSign)));
         else
-            movement.Pos(new Pose2D(xSign * 49, -30, toRadians(1 * xSign)));
+            movement.Pos(new Pose2D(xSign * 49, -30, toRadians(2 * xSign)));
         while (opMode.opModeIsActive() && !shooter.isCorrectRpm()) {
         }
         conveyor.feedrings();
@@ -46,11 +46,11 @@ public class MovementMacros {
                     movement.Pos(new Pose2D(xSign * 154, 103, toRadians(-8 * xSign)));
                     break;
                 case ONE:
-                    movement.Pos(new Pose2D(xSign * 144, 60, toRadians(-60 * xSign)));
+                    movement.Pos(new Pose2D(xSign * 144, 50, toRadians(-60 * xSign)));
                     break;
                 case ZERO:
                 default:
-                    movement.Pos(new Pose2D(xSign * 135, 35, toRadians(30 * xSign)));
+                    movement.Pos(new Pose2D(xSign * 135, 5, toRadians(0 * xSign)));
             }
             else
 
