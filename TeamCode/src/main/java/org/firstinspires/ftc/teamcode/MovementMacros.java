@@ -26,14 +26,19 @@ public class MovementMacros {
     public static void ShootTargets() {
         shooter.setShootersetings(3850, 500);
         shooter.onshooter(true);
-        if (sideSign * xSign == 1)
-            movement.Pos(new Pose2D(xSign * 128, -48.5, toRadians(-12 * xSign)));
+        if (sideSign == 1 &&  xSign == 1)
+            movement.Pos(new Pose2D(xSign * 121, -48.5, toRadians(-10.5)));
         else
-            movement.Pos(new Pose2D(xSign * 49, -30, toRadians(2 * xSign)));
-        while (opMode.opModeIsActive() && !shooter.isCorrectRpm()) {
-        }
+        if (sideSign == -1 &&  xSign == 1)
+            movement.Pos(new Pose2D(xSign * 53, -30, toRadians(3)));
+        else
+        if (sideSign == -1 &&  xSign == -1)
+            movement.Pos(new Pose2D(xSign * 147.5, -9.5, toRadians(10.5)));
+        else // if (sideSign == 1 &&  xSign == -1)
+            movement.Pos(new Pose2D(xSign * 61.5, -28, toRadians(-11.5)));
+        while (opMode.opModeIsActive() && !shooter.isCorrectRpm()) { }
         conveyor.feedrings();
-        delay(1000);
+        delay(900);
         shooter.onshooter(false);
     }
 
@@ -43,14 +48,14 @@ public class MovementMacros {
         if (sideSign * xSign == 1)
             switch (openCVNode.getStackSize()) {
                 case FOUR:
-                    movement.Pos(new Pose2D(xSign * 154, 103, toRadians(-8 * xSign)));
+                    movement.Pos(new Pose2D(xSign * 154, 113, toRadians(-8 * xSign)));
                     break;
                 case ONE:
-                    movement.Pos(new Pose2D(xSign * 144, 50, toRadians(-60 * xSign)));
+                    movement.Pos(new Pose2D(xSign * 144, 63, toRadians(-45 * xSign)));
                     break;
                 case ZERO:
                 default:
-                    movement.Pos(new Pose2D(xSign * 135, 5, toRadians(0 * xSign)));
+                    movement.Pos(new Pose2D(xSign * 145, -15, toRadians(0 * xSign)));
             }
             else
 
@@ -59,7 +64,7 @@ public class MovementMacros {
                 movement.Pos(new Pose2D(xSign * 110, 116, toRadians(50 * xSign)));
                 break;
             case ONE:
-                movement.Pos(new Pose2D(xSign * 66, 61, toRadians(50 * xSign)));
+                movement.Pos(new Pose2D(xSign * 54.5+8.5, 63+3*xSign, toRadians(50 * xSign)));
                 break;
             case ZERO:
             default:
@@ -68,7 +73,7 @@ public class MovementMacros {
         wobbleManipulator2.changepos(WobbleManipulator2.positions.down);
         WoENrobot.delay(1800);
         wobbleManipulator2.setposclose(false);
-        WoENrobot.delay(300);
+        WoENrobot.delay(1000);
     }
 
     public static void PutRingsToLowGoal() {

@@ -31,7 +31,7 @@ public class WobbleManipulator2 implements RobotModule {
     public void setposclose(boolean dograb) {
         if (dograb != isGrabbed) {
             isGrabbed = dograb;
-            if (dograb) close.setPosition(0.85);
+            if (dograb) close.setPosition(0.73);
             else close.setPosition(0.19);
         }
     }
@@ -39,7 +39,7 @@ public class WobbleManipulator2 implements RobotModule {
     public void reset()
     {
         isGrabbed = false;
-        close.setPosition(0.85);
+        close.setPosition(0.73);
         angle.setPosition(1);
     }
 
