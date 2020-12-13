@@ -13,6 +13,9 @@ public interface RobotModule {
         initialize();
     }
 
+    default void reset() {
+    }
+
     default void update() {
     }
 }
