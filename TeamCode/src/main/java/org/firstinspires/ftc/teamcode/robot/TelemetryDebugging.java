@@ -43,7 +43,7 @@ public class TelemetryDebugging implements RobotModule{
 
     @Override
     public void initialize() {
-        dashboard = FtcDashboard.getInstance();
+        //dashboard = FtcDashboard.getInstance();
         measurementTime.reset();
         loopCount=0;
         telemetry = opMode.telemetry;
@@ -55,18 +55,18 @@ public class TelemetryDebugging implements RobotModule{
         if(measurementTime.seconds() > 0.25)
         {
             telemetry.addData("Status", "Running");
-            opMode.telemetry.addData("Loop frequency", 1 / (measurementTime.seconds() / loopCount) + " Hz");
+            //telemetry.addData("Loop frequency", 1 / (measurementTime.seconds() / loopCount) + " Hz");
 
             telemetry.addLine("Odometry encoders").addData("odYL", odometry.bulkData.getMotorCurrentPosition(0)).addData("odYR", odometry.bulkData.getMotorCurrentPosition(1)).addData("odX", odometry.bulkData.getMotorCurrentPosition(2));
             telemetry.addLine("Robot position").addData("y", odometry.getRobotCoordinates().y).addData("x", odometry.getRobotCoordinates().x).addData("head", Math.toDegrees(odometry.getRobotCoordinates().heading));
-            telemetry.addLine("Robot velocity").addData("y", odometry.getRobotVelocity().y).addData("x", odometry.getRobotVelocity().x).addData("head", Math.toDegrees(odometry.getRobotVelocity().z));
+            //telemetry.addLine("Robot velocity").addData("y", odometry.getRobotVelocity().y).addData("x", odometry.getRobotVelocity().x).addData("head", Math.toDegrees(odometry.getRobotVelocity().z));
             telemetry.addData("Shooter velo", shooter.shooterMotor.getVelocity());
-            telemetry.addData("Shooter position", shooter.shooterMotor.getCurrentPosition());
-            telemetry.addData("Shooter current", shooter.shooterMotor.getCurrent(CurrentUnit.MILLIAMPS));
-            telemetry.addData("conpower", conveyor.conveyorPower);
+            //telemetry.addData("Shooter position", shooter.shooterMotor.getCurrentPosition());
+            //telemetry.addData("Shooter current", shooter.shooterMotor.getCurrent(CurrentUnit.MILLIAMPS));
+            //telemetry.addData("conpower", conveyor.conveyorPower);
 
 
-            telemetry.addData("OpenCV stack size", openCVNode.getStackSize());
+            //telemetry.addData("OpenCV stack size", openCVNode.getStackSize());
 
             double by = -odometry.getRobotCoordinates().x / 2.54;
             double bx = odometry.getRobotCoordinates().y / 2.54;
@@ -84,7 +84,7 @@ public class TelemetryDebugging implements RobotModule{
             packet.fieldOverlay()
                     .setFill("black")
                     .fillPolygon(bxPoints, byPoints);
-            dashboard.sendTelemetryPacket(packet);
+            //fdashboard.sendTelemetryPacket(packet);
 
 
             measurementTime.reset();
