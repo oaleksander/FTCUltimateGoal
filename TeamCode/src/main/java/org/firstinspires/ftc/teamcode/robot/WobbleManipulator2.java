@@ -36,6 +36,13 @@ public class WobbleManipulator2 implements RobotModule {
         }
     }
 
+    public void reset()
+    {
+        isGrabbed = false;
+        close.setPosition(0.19);
+        setAngle(1);
+    }
+
     short posangle = 0;
     boolean ismed = false, isdown = false;
     public void upmediumdown(boolean upmedium, boolean updown){

@@ -78,6 +78,7 @@ public class WoENrobot {
             opMode = OpMode;
             for (RobotModule robotModule : activeAobotModules) {
                 robotModule.setOpMode(opMode);
+                robotModule.reset();
             }
             if (regulatorUpdater.getState() != Thread.State.NEW) {
                 regulatorUpdater.interrupt();
@@ -100,6 +101,7 @@ public class WoENrobot {
 
         for (RobotModule robotModule : activeAobotModules) {
             robotModule.initialize(opMode);
+            robotModule.reset();
         }
 
         if (regulatorUpdater.getState() != Thread.State.NEW) {
