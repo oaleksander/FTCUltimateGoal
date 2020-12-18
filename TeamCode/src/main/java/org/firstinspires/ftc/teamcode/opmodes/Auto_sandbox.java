@@ -14,10 +14,11 @@ import static org.firstinspires.ftc.teamcode.robot.WoENrobot.*;
 public class Auto_sandbox extends AutonomousOpMode {
     @Override
     public void main() {
+        shooter.setShootersetings(3800,1);
+        shooter.onshooter(true);
         do {
-            movement.Pos(new Pose2D(getStartPosition().x, 25, 0));
-            MotionTask mt = new MotionTask(0,0,0,()->{});
-            Pose2D p2d = (Pose2D)mt;
+            delay(1);
         } while (opModeIsActive());
+        shooter.onshooter(false);
     }
 }

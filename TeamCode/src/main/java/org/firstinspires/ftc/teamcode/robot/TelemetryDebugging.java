@@ -43,10 +43,11 @@ public class TelemetryDebugging implements RobotModule{
 
     @Override
     public void initialize() {
-        //dashboard = FtcDashboard.getInstance();
+        dashboard = FtcDashboard.getInstance();
         measurementTime.reset();
         loopCount=0;
-        telemetry = opMode.telemetry;
+        //telemetry = opMode.telemetry;
+        telemetry = dashboard.getTelemetry();
     }
 
 
