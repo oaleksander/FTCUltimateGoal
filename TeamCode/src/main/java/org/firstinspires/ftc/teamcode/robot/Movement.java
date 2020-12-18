@@ -50,7 +50,7 @@ public class Movement implements RobotModule {
         double distanceError = error.radius();
 
         ElapsedTime movementTime = new ElapsedTime();
-        while (opMode.opModeIsActive() && (distanceError >= minError_distance || abs(error.heading) >= minError_angle) && movementTime.seconds() < 5) {
+        while (opMode.opModeIsActive() && (distanceError >= minError_distance || abs(error.heading) >= minError_angle) && movementTime.seconds() < 4) {
 
             errold = error;
             error = target.substract(odometry.getRobotCoordinates());
