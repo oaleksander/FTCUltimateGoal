@@ -26,6 +26,19 @@ dependencies {
    implementation 'org.openftc:easyopencv:1.4.1'
 }
 
+repositories {
+    jcenter()
+
+    maven {
+        url "https://maven.0x778.tk"
+    }
+}
+
+dependencies {
+    // This will get the latest compatible version
+    implementation 'com.spartronics4915.lib:ftc265:2.1.2'
+}
+
 dependencies {
 
     implementation 'org.jetbrains:annotations:16.0.2'

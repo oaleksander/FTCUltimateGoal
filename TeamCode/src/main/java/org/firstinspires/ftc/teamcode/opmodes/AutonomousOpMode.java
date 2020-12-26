@@ -55,8 +55,9 @@ public class AutonomousOpMode extends LinearOpMode {
         if(thereAreTwoGamepads) telemetry.addLine("Second gamepad detected");
         telemetry.update();
     }
-
-    public void runOpMode() {
+    
+    @Override
+    public void runOpMode() throws InterruptedException {
         FullInitWithCV(this);
         startRobot();
         openCVNode.stopCam();
