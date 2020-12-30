@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.robot;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -15,33 +14,38 @@ import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
 
 
 public class Conveyor implements RobotModule {
-    public static DcMotorEx conveyorm = null;
-    public static Servo feeder = null;
-    public static ElapsedTime conveyortime = new ElapsedTime();
-    public static ElapsedTime backcontime = new ElapsedTime();
-    static DistanceSensor sensorDistance;
-    public static boolean full = false;
-    static boolean backon = false, stop = false;
-    static boolean backmust = false;
-    static double timelock = 0;
-    static boolean ispush = false;
-    static double conveyorPower = 0;
     private static LinearOpMode opMode = null;
-    private static final ElapsedTime timepause = new ElapsedTime();
-    private static final ElapsedTime feederTime = new ElapsedTime();
-/*    public static final float maxcolor = 255, mincolor = 0;
-    static ColorSensor colorSensor;
-    float[] hsvValues = new float[3];*/
-    double distance = 0;
-    private double last_power = 0;
-    
+
+    public DcMotorEx conveyorm = null;
+
+    public Servo feeder = null;
+
+    public DistanceSensor sensorDistance;
+
+    private final ElapsedTime conveyorTime = new ElapsedTime();
+    private final ElapsedTime backconTime = new ElapsedTime();
+    private final ElapsedTime pauseTime = new ElapsedTime();
+    private final ElapsedTime feederTime = new ElapsedTime();
+
+
+    private boolean full = false;
+    private boolean backon = false, stop = false;
+    private boolean backmust = false;
+
+    private byte i = 0;
+
+    private double timelock = 0;
+    private double conveyorPower = 0;
+
+    private double distance = 0;
+
+    private final double time = 125;
+
     public void setOpMode(LinearOpMode opMode) {
         Conveyor.opMode = opMode;
     }
 
-    /**
-     * main int
-     */
+
     public void initialize() {
         feederTime.reset();
         initializecolor();
@@ -53,24 +57,16 @@ public class Conveyor implements RobotModule {
     public void reset() {
         feeder.setPosition(0.06);
         conveyorm.setPower(0);
-        ispush = false;
         backon = false;
         stop = false;
         conveyorPower = 0;
         i=0;
     }
 
-    /**
-     * int color and distanse
-     */
     public void initializecolor() {
-        //colorSensor = opMode.hardwareMap.get(ColorSensor.class, "ringDetector");
         sensorDistance = opMode.hardwareMap.get(DistanceSensor.class, "ringDetector");
     }
 
-    /**
-     * int motors
-     */
     public void initializedrive() {
         conveyorm = opMode.hardwareMap.get(DcMotorEx.class, "conveyor");
 
@@ -80,31 +76,15 @@ public class Conveyor implements RobotModule {
         conveyorm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
-    /**
-     * int servo
-     */
     public void initializedservo() {
         feeder = opMode.hardwareMap.get(Servo.class, "feeder");
         feeder.setPosition(0.06);
-        ispush = false;
-
     }
 
-    // правильная ли конвертация?
-  /*  public float[] getcolor(){
-        int colors = colorSensor.argb();
-        int a = Color.alpha(colors);
-        int r = Color.red(colors);
-        int g = Color.green(colors);
-        int b = Color.blue(colors);
-        Color.colorToHSV(colors, hsvValues);
-        return hsvValues;
-    }*/
     public double getdistance() {
         return sensorDistance.getDistance(DistanceUnit.CM);
     }
-    double time = 125;
-    byte i = 0;
+
     public void update() {
 
         if (i > 0 && feederTime.milliseconds() > time * 2.5) {
@@ -112,16 +92,16 @@ public class Conveyor implements RobotModule {
             i--;
         }
         setFeederPosition(feederTime.milliseconds() < time);
-        if (timepause.milliseconds() >= 100) {
-            timepause.reset();
+        if (pauseTime.milliseconds() >= 100) {
+            pauseTime.reset();
             distance = getdistance();
         }
         if (distance < 6) {
-            if (conveyortime.milliseconds() >= 1000) {
+            if (conveyorTime.milliseconds() >= 1000) {
                 full = true;
             }
         } else {
-            conveyortime.reset();
+            conveyorTime.reset();
             full = false;
         }
         if (!backmust) {
@@ -129,15 +109,15 @@ public class Conveyor implements RobotModule {
             if (!stop) {
                 stop = true;
             }
-            if (conveyorm.getCurrent(CurrentUnit.AMPS) <= 4 && backcontime.milliseconds() >= 1000) {
-                if (backon == false) {
+            if (conveyorm.getCurrent(CurrentUnit.AMPS) <= 4 && backconTime.milliseconds() >= 1000) {
+                if (!backon) {
                     setConveyorMotorPower(conveyorPower);
                     backon = true;
                 }
-                timelock = backcontime.milliseconds();
+                timelock = backconTime.milliseconds();
             } else {
-                if (backon && (backcontime.milliseconds() >= (timelock + 500))) {
-                    backcontime.reset();
+                if (backon && (backconTime.milliseconds() >= (timelock + 500))) {
+                    backconTime.reset();
                     setConveyorMotorPower(-conveyorPower);
                     backon = false;
                 }
@@ -150,20 +130,15 @@ public class Conveyor implements RobotModule {
             }
         }
     } else {
-            //if (backmust) {
-                setConveyorMotorPower(-1);
-                backon = false;
-                stop = true;
-            //}
-           // else
-               // setConveyorMotorPower(0);
-    }
+            setConveyorMotorPower(-1);
+            backon = false;
+            stop = true;
+        }
     }
 
     public void setFeederPosition(boolean push) {
             if (push) feeder.setPosition(0.3);
             else feeder.setPosition(0.06);
-
     }
 
     public void setConveyorPower(double power) {
@@ -171,10 +146,7 @@ public class Conveyor implements RobotModule {
     }
 
     private void setConveyorMotorPower(double power) {
-        //if (last_power != power) {
-            conveyorm.setPower(power);
-            //last_power = power;
-      //  }
+        conveyorm.setPower(power);
     }
     public void setBackmust(boolean Backmust){
         backmust = Backmust;
@@ -185,6 +157,5 @@ public class Conveyor implements RobotModule {
 
     public void feedrings() {
         i = 3;
-        //feedRing();
     }
 }
