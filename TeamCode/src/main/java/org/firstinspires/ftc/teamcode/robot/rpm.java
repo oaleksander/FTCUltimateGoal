@@ -31,7 +31,7 @@ public class rpm implements RobotModule {
 
         shooterMotor = opMode.hardwareMap.get(DcMotorEx.class, "shooterMotor");
         MotorConfigurationType motorConfigurationType = shooterMotor.getMotorType().clone();
-        motorConfigurationType.setAchieveableMaxRPMFraction(0.95);
+        motorConfigurationType.setAchieveableMaxRPMFraction(0.896476253);
         motorConfigurationType.setTicksPerRev(24);
         motorConfigurationType.setGearing(1);
         motorConfigurationType.setMaxRPM(6000);
