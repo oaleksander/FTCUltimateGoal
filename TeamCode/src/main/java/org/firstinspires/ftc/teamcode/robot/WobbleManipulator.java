@@ -19,7 +19,10 @@ public class WobbleManipulator implements RobotModule {
 
     private ElapsedTime leverTime = new ElapsedTime();
 
+    private boolean ismed = false, isdown = false;
     private boolean isGrabbed = true;
+
+    private byte posangle = 0;
 
     private double pos = 0;
     private double power = 0, P = 0, D = 0, errorOld = 0, error = 0;
@@ -75,8 +78,7 @@ public class WobbleManipulator implements RobotModule {
             }
         }
     }
-    short posangle = 0;
-    boolean ismed = false, isdown = false;
+
     public void upmediumdown(boolean upmedium, boolean updown){
         if (upmedium && !updown){
             if(!ismed){
