@@ -37,8 +37,9 @@ public class rpm implements RobotModule {
         motorConfigurationType.setGearing(1);
         motorConfigurationType.setMaxRPM(6000);
         shooterMotor.setMotorType(motorConfigurationType);
-        PIDFCoefficients pidNew = new PIDFCoefficients(1, 1, 9, 0);
+       // PIDFCoefficients pidNew = new PIDFCoefficients(1, 1, 9, 0);
 //       PIDFCoefficients pidNew = new PIDFCoefficients(3.628, 1.3, 5, 14.28);
+         PIDFCoefficients pidNew = new PIDFCoefficients(25.5, 0.075, 16, 15.23);
         shooterMotor.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidNew);
         shooterMotor.setDirection(DcMotorEx.Direction.FORWARD);
         shooterMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);

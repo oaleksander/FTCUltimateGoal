@@ -58,10 +58,12 @@ public class TelemetryDebugging implements RobotModule{
            // telemetry.addData("Status", "Running");
             //telemetry.addData("Loop frequency", 1 / (measurementTime.seconds() / loopCount) + " Hz");
 
+            telemetry.setMsTransmissionInterval(40);
             //telemetry.addLine("Odometry encoders").addData("odYL", odometry.bulkData.getMotorCurrentPosition(0)).addData("odYR", odometry.bulkData.getMotorCurrentPosition(1)).addData("odX", odometry.bulkData.getMotorCurrentPosition(2));
           //  telemetry.addLine("Robot position").addData("y", odometry.getRobotCoordinates().y).addData("x", odometry.getRobotCoordinates().x).addData("head", Math.toDegrees(odometry.getRobotCoordinates().heading));
             //telemetry.addLine("Robot velocity").addData("y", odometry.getRobotVelocity().y).addData("x", odometry.getRobotVelocity().x).addData("head", Math.toDegrees(odometry.getRobotVelocity().z));
             telemetry.addData("Shooter velo", shooter.shooterMotor.getVelocity()*2.5);
+            telemetry.addData("Shooter tgt", 3800);
             //telemetry.addData("Shooter position", shooter.shooterMotor.getCurrentPosition());
             //telemetry.addData("Shooter current", shooter.shooterMotor.getCurrent(CurrentUnit.MILLIAMPS));
             //telemetry.addData("conpower", conveyor.conveyorPower);
