@@ -11,20 +11,26 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
 @Deprecated
 public class WobbleManipulator implements RobotModule {
+    private LinearOpMode opMode;
 
-    static final double minerror = 15, maxspeed = 0.7, kofP = 0.0015, kofd = 0.00001;
-    public static DcMotorEx lever = null;
-    public static Servo close = null;
+    private DcMotorEx lever = null;
 
-    public boolean isGrabbed = true;
-    public static ElapsedTime levertime = new ElapsedTime();
-    static double pos = 0;
-    static double power = 0, P = 0, D = 0, errorOld = 0, error = 0;
-    private static LinearOpMode opMode = null;
-    double oldpower = 0;
+    private Servo close = null;
 
-    public void setOpMode(LinearOpMode opMode) {
-        WobbleManipulator.opMode = opMode;
+    private ElapsedTime leverTime = new ElapsedTime();
+
+    private boolean isGrabbed = true;
+
+    private double pos = 0;
+    private double power = 0, P = 0, D = 0, errorOld = 0, error = 0;
+    private double oldpower = 0;
+
+    private final double closeClose = 0.73;
+    private final double closeOpen = 0.19;
+    private final double minerror = 15, maxspeed = 0.7, kofP = 0.0015, kofd = 0.00001;
+
+    public void setOpMode(LinearOpMode OpMode) {
+        opMode = OpMode;
     }
 
     public void initialize() {
@@ -43,8 +49,8 @@ public class WobbleManipulator implements RobotModule {
     public void setposclose(boolean dograb) {
         if (dograb != isGrabbed) {
             isGrabbed = dograb;
-            if (dograb) close.setPosition(0.85);
-            else close.setPosition(0.42);
+            if (dograb) close.setPosition(closeClose);
+            else close.setPosition(closeOpen);
         }
     }
 
@@ -60,11 +66,6 @@ public class WobbleManipulator implements RobotModule {
                 lever.setPower(power);
                 oldpower = power;
             }
-            /*WoENrobot.getInstance().opMode.telemetry.addData("err",error);
-            WoENrobot.getInstance().opMode.telemetry.addData("pow",power);
-            WoENrobot.getInstance().opMode.telemetry.addData("pos",pos);
-            WoENrobot.getInstance().opMode.telemetry.addData("enc",lever.getCurrentPosition());
-            WoENrobot.getInstance().opMode.telemetry.update(); */
             errorOld = error;
         } else {
             power = 0;
@@ -123,8 +124,8 @@ public class WobbleManipulator implements RobotModule {
 
     }
 
-    public void setposlever(double pos) {
-        WobbleManipulator.pos = pos;
+    public void setposlever(double Pos) {
+        pos = Pos;
     }
 
 }

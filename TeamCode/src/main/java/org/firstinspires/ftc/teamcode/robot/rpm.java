@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
 public class rpm implements RobotModule {
     private LinearOpMode opMode;
 
-    public DcMotorEx shooterMotor = null;
+    private DcMotorEx shooterMotor = null;
 
     private final ElapsedTime rpmTime = new ElapsedTime();
 
@@ -96,6 +96,10 @@ public class rpm implements RobotModule {
     public boolean isCorrectRpm()
     {
         return isCorrectRpm(25);
+    }
+
+    public double getRpm(){
+        return shooterMotor.getVelocity()*2.5;
     }
 
     public boolean isCorrectRpm(double error){

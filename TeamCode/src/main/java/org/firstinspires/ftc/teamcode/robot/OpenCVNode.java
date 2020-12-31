@@ -17,14 +17,14 @@ import org.openftc.easyopencv.OpenCvInternalCamera;
 import org.openftc.easyopencv.OpenCvPipeline;
 
 public class OpenCVNode implements RobotModule {
-    private static final int rows = 640;
-    private static final int cols = 480;
-    static OpenCvCamera webcam;
-    private static LinearOpMode opMode = null;
+    static final int rows = 640;
+    static final int cols = 480;
+    OpenCvCamera webcam;
+    LinearOpMode opMode;
     StageSwitchingPipeline pipeline = new StageSwitchingPipeline();
 
-    public void setOpMode(LinearOpMode opMode) {
-        OpenCVNode.opMode = opMode;
+    public void setOpMode(LinearOpMode OpMode) {
+        opMode = OpMode;
     }
 
     public void initialize() {
@@ -78,11 +78,6 @@ public class OpenCVNode implements RobotModule {
 
         @Override
         public void onViewportTapped() {
-            /*
-             * Note that this method is invoked from the UI thread
-             * so whatever we do here, we must do quickly.
-             */
-
             int currentStageNum = stageToRenderToViewport.ordinal();
 
             int nextStageNum = currentStageNum + 1;
