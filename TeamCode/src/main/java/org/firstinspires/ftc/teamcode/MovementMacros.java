@@ -5,13 +5,7 @@ import org.firstinspires.ftc.teamcode.robot.WoENrobot;
 import org.firstinspires.ftc.teamcode.robot.WobbleManipulator2;
 
 import static java.lang.Math.toRadians;
-import static org.firstinspires.ftc.teamcode.robot.WoENrobot.conveyor;
-import static org.firstinspires.ftc.teamcode.robot.WoENrobot.delay;
-import static org.firstinspires.ftc.teamcode.robot.WoENrobot.movement;
-import static org.firstinspires.ftc.teamcode.robot.WoENrobot.opMode;
-import static org.firstinspires.ftc.teamcode.robot.WoENrobot.openCVNode;
-import static org.firstinspires.ftc.teamcode.robot.WoENrobot.shooter;
-import static org.firstinspires.ftc.teamcode.robot.WoENrobot.wobbleManipulator2;
+import static org.firstinspires.ftc.teamcode.robot.WoENrobot.*;
 
 public class MovementMacros {
 

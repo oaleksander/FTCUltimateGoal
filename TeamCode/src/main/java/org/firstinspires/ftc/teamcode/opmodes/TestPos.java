@@ -2,11 +2,7 @@ package org.firstinspires.ftc.teamcode.opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-import org.firstinspires.ftc.teamcode.robot.rpm;
-
-import static org.firstinspires.ftc.teamcode.robot.WoENrobot.openCVNode;
-import static org.firstinspires.ftc.teamcode.robot.WoENrobot.shooter;
-import static org.firstinspires.ftc.teamcode.robot.WoENrobot.spinOnce;
+import static org.firstinspires.ftc.teamcode.robot.WoENrobot.*;
 
 @Autonomous(name = "Pos test")
 public class TestPos extends AutonomousOpMode {

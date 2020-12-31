@@ -5,13 +5,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.MovementMacros;
 import org.firstinspires.ftc.teamcode.math.Pose2D;
 import org.firstinspires.ftc.teamcode.misc.AutoTransitioner;
-import org.firstinspires.ftc.teamcode.robot.WoENrobot;
 
-import static org.firstinspires.ftc.teamcode.robot.WoENrobot.FullInitWithCV;
-import static org.firstinspires.ftc.teamcode.robot.WoENrobot.odometry;
-import static org.firstinspires.ftc.teamcode.robot.WoENrobot.openCVNode;
-import static org.firstinspires.ftc.teamcode.robot.WoENrobot.setLedColors;
-import static org.firstinspires.ftc.teamcode.robot.WoENrobot.startRobot;
+import static org.firstinspires.ftc.teamcode.robot.WoENrobot.*;
 
 public class AutonomousOpMode extends LinearOpMode {
 
