@@ -6,12 +6,14 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.misc.CommandSender;
 import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
 
 public class rpm implements RobotModule {
     private LinearOpMode opMode;
 
     private DcMotorEx shooterMotor = null;
+    private CommandSender shooterVelocitySender = new CommandSender(p -> shooterMotor.setVelocity(p));
 
     private final ElapsedTime rpmTime = new ElapsedTime();
 
@@ -22,6 +24,7 @@ public class rpm implements RobotModule {
     private double rpm = 6000;
     private double speedOld = 0;
     private double speed = 0;
+    private double velocityTarget = 2400;
 
     public void setOpMode(LinearOpMode OpMode) {
         opMode = OpMode;
@@ -53,31 +56,21 @@ public class rpm implements RobotModule {
     public void update() {
         if (on) {
             if (time_ms > rpmTime.milliseconds()) {
-                shooterpower(rpmTime.milliseconds() * x);
+                speed = rpmTime.milliseconds() * x * velocityTarget;
             }
             if (time_ms < rpmTime.milliseconds()) {
-                speed = rpm * 0.4;
-                if (speedOld != speed) {
-                    shooterVelocity(speed);
-                    speedOld = speed;
-                }
+                speed = velocityTarget;
             }
         } else {
             speed = 0;
-            if (speedOld != speed) {
-                shooterpower(speed);
-                speedOld = speed;
-            }
         }
+        shooterVelocity(speed);
     }
 
-    private void shooterpower(double power) {
-        shooterMotor.setPower(power);
-    }
 
     private void shooterVelocity(double velocity)
     {
-        shooterMotor.setVelocity(velocity);
+        shooterVelocitySender.send(velocity);
     }
 
     public void onshooter(boolean On) {
@@ -91,6 +84,7 @@ public class rpm implements RobotModule {
         rpm = Rpm;
         time_ms = time;
         x = rpm / Math.abs(time_ms) / 6000;
+        velocityTarget = rpm * 0.4;
     }
 
     public boolean isCorrectRpm()
