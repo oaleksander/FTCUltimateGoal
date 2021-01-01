@@ -4,8 +4,22 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 @Deprecated
 public class AI {
-    private static ElapsedTime AItime = new ElapsedTime();
+    private final ElapsedTime AItime = new ElapsedTime();
+
+    private final double interval = 1000;
+    private final double maxError = 3;
+
     public void initialize (){
-    AItime.reset();
+        AItime.reset();
+    }
+
+    public void update(){
+        if (AItime.milliseconds() > interval){
+            AItime.reset();
+            if(Math.abs(5) > 3)
+            {
+                
+            }
+        }
     }
 }
