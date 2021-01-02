@@ -6,7 +6,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
 
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.*;
@@ -48,6 +47,7 @@ public class TelemetryDebugging implements RobotModule{
         loopCount=0;
         //telemetry = opMode.telemetry;
         telemetry = dashboard.getTelemetry();
+       // dashboard.startCameraStream(openCVNode.getWebcam(),0);
     }
 
 
@@ -62,8 +62,8 @@ public class TelemetryDebugging implements RobotModule{
             //telemetry.addLine("Odometry encoders").addData("odYL", odometry.bulkData.getMotorCurrentPosition(0)).addData("odYR", odometry.bulkData.getMotorCurrentPosition(1)).addData("odX", odometry.bulkData.getMotorCurrentPosition(2));
           //  telemetry.addLine("Robot position").addData("y", odometry.getRobotCoordinates().y).addData("x", odometry.getRobotCoordinates().x).addData("head", Math.toDegrees(odometry.getRobotCoordinates().heading));
             //telemetry.addLine("Robot velocity").addData("y", odometry.getRobotVelocity().y).addData("x", odometry.getRobotVelocity().x).addData("head", Math.toDegrees(odometry.getRobotVelocity().z));
-            telemetry.addData("Shooter velo", shooter.getRpm());
-            telemetry.addData("Shooter tgt", 3800);
+            telemetry.addData("Shooter velo", shooter.getCurrentRpm());
+            telemetry.addData("Shooter tgt", shooter.getRpmTarget());
             //telemetry.addData("Shooter position", shooter.shooterMotor.getCurrentPosition());
             //telemetry.addData("Shooter current", shooter.shooterMotor.getCurrent(CurrentUnit.MILLIAMPS));
             //telemetry.addData("conpower", conveyor.conveyorPower);
