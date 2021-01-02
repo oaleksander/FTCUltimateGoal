@@ -42,7 +42,11 @@ public class rpm implements RobotModule {
        // PIDFCoefficients pidNew = new PIDFCoefficients(1, 1, 9, 0);
 //       PIDFCoefficients pidNew = new PIDFCoefficients(3.628, 1.3, 5, 14.28);
          PIDFCoefficients pidNew = new PIDFCoefficients(25.5, 0.075, 16, 15.23);
-        shooterMotor.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidNew);
+        try {
+            shooterMotor.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidNew);
+        } catch (UnsupportedOperationException e) {
+            opMode.telemetry.addData("Drivetrain PIDF error ", e.getMessage());
+        }
         shooterMotor.setDirection(DcMotorEx.Direction.FORWARD);
         shooterMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         shooterMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
