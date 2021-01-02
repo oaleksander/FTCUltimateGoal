@@ -66,18 +66,6 @@ public class Tele_test extends LinearOpMode {
             shooter.onshooter(buttonStartswitch.isTriggered(gamepad1.start));
             if(threeRingPresser.isTriggered(gamepad1.b))
             conveyor.feedrings();
-
-            if(gamepad2.x)
-                drivetrain.driveFrontLeft.setPower(1);
-            else
-                drivetrain.driveFrontLeft.setPower(0);
-
-
-            if(gamepad2.y)
-                drivetrain.driveFrontRight.setPower(1);
-            else
-                drivetrain.driveFrontRight.setPower(0);
-
             drivetrain.setRobotVelocity(y, x, turn);
             spinOnce();
 
