@@ -5,18 +5,14 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.math.Vector2D;
-import org.firstinspires.ftc.teamcode.math.Vector3D;
 import org.firstinspires.ftc.teamcode.misc.CommandSender;
-import org.firstinspires.ftc.teamcode.opencv.EasyOpenCVExample;
+import org.firstinspires.ftc.teamcode.misc.motorAccelerationLimiter;
 import org.firstinspires.ftc.teamcode.superclasses.Drivetrain;
 import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.function.DoubleConsumer;
 
 import static com.qualcomm.robotcore.util.Range.clip;
 import static java.lang.Math.abs;
@@ -53,8 +49,7 @@ public class MecanumDrivetrain implements RobotModule, Drivetrain {
     private static final double theoreticalMaxSpeed = (maxRPM/60)*achieveableMaxRPMFraction*Math.PI*2;
     private static double maxDriveSpeed = achieveableMaxRPMFraction*theoreticalMaxSpeed;
     private static double minDriveSpeed = 0.05*theoreticalMaxSpeed;
-    private static final double maxRampPerSec = 1 / 0.25;
-    private double maxAcceleration = 1 / 0.25;
+    private double maxAcceleration = theoreticalMaxSpeed / 0.25;
 
     /* Motor controllers */
     private final motorAccelerationLimiter mFLProfiler = new motorAccelerationLimiter(new CommandSender(v -> driveFrontLeft.setVelocity(v, AngleUnit.RADIANS))::send, maxAcceleration);
@@ -165,29 +160,6 @@ public class MecanumDrivetrain implements RobotModule, Drivetrain {
         minDriveSpeed = clip(abs(value), 0, 1);
     }
 
-    private static class motorAccelerationLimiter {
-        private double maxAcceleration = 1;
-        private double currentVelocity = 0;
-        private final DoubleConsumer motorToControl;
-        private final ElapsedTime looptime = new ElapsedTime();
-
-        public motorAccelerationLimiter(DoubleConsumer motorToControl, double maxAcceleration) {
-            this.motorToControl = motorToControl;
-            this.maxAcceleration = maxAcceleration;
-            looptime.reset();
-        }
-
-        public void setVelocity(double requestedVelocity) {
-            if (requestedVelocity == 0) {
-                currentVelocity = 0;
-            } else {
-                currentVelocity += min(abs(requestedVelocity - currentVelocity), abs(looptime.seconds() * maxAcceleration)) * signum(requestedVelocity - currentVelocity);
-            }
-            looptime.reset();
-            motorToControl.accept(currentVelocity);
-        }
-    }
-
     public void update() {
         mFLProfiler.setVelocity(powerFrontLeft);
         mFRProfiler.setVelocity(powerFrontRight);
@@ -205,18 +177,13 @@ public class MecanumDrivetrain implements RobotModule, Drivetrain {
     public void driveMotorPowers(double frontLeft, double frontRight, double rearLeft, double rearRight) {
 
         double maxabs = max(max(abs(frontLeft), abs(frontRight)), max(abs(rearLeft), abs(rearRight)));
-        if (maxabs > 1) {
+        if (maxabs > maxDriveSpeed) {
+            maxabs = maxabs/maxDriveSpeed;
             frontLeft = (frontLeft / maxabs);
             frontRight = (frontRight / maxabs);
             rearLeft = (rearLeft / maxabs);
             rearRight = (rearRight / maxabs);
         }
-
-        frontLeft *= theoreticalMaxSpeed;
-        frontLeft *= theoreticalMaxSpeed;
-        frontLeft *= theoreticalMaxSpeed;
-        frontLeft *= theoreticalMaxSpeed;
-
 
         powerFrontLeft = limitSpeed(frontLeft);
         powerFrontRight = limitSpeed(frontRight);
