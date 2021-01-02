@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 
 import org.firstinspires.ftc.teamcode.math.Pose2D;
@@ -14,11 +15,9 @@ import static org.firstinspires.ftc.teamcode.robot.WoENrobot.*;
 public class Auto_sandbox extends AutonomousOpMode {
     @Override
     public void main() {
-        shooter.setShootersetings(3800,1);
-        shooter.onshooter(true);
-        do {
-            delay(1);
-        } while (opModeIsActive());
-        shooter.onshooter(false);
+        ElapsedTime et = new ElapsedTime();
+        while(opModeIsActive())
+        drivetrain.setRobotVelocity(Math.sin(et.seconds()*4*Math.PI)*120,0,0);
+        spinOnce();
     }
 }
