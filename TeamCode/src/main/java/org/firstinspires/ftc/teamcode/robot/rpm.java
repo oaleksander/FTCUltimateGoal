@@ -96,7 +96,9 @@ public class rpm implements RobotModule {
         return isCorrectRpm(25);
     }
 
-    public double getRpm(){
+    public double getRpmTarget() {return rpm;}
+
+    public double getCurrentRpm(){
         return shooterMotor.getVelocity()*2.5;
     }
 
