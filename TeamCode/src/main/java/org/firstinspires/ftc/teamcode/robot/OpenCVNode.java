@@ -14,6 +14,7 @@ import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvInternalCamera;
+import org.openftc.easyopencv.OpenCvInternalCamera2;
 import org.openftc.easyopencv.OpenCvPipeline;
 
 public class OpenCVNode implements RobotModule {
@@ -34,6 +35,9 @@ public class OpenCVNode implements RobotModule {
         webcam.openCameraDeviceAsync(() -> webcam.startStreaming(rows, cols, OpenCvCameraRotation.SIDEWAYS_LEFT));
     }
 
+    public OpenCvCamera getWebcam() {
+        return webcam;
+    }
 
     public StackSize getStackSize() {
         return pipeline.stackSize;
