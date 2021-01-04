@@ -10,7 +10,7 @@ import org.openftc.revextensions2.ExpansionHubEx;
 public class WoENrobot {
 
     public static WobbleManipulator2 wobbleManipulator2 = new WobbleManipulator2();
-    public static OpenCVNode openCVNode = new OpenCVNode();
+    public static OpenCVNodeWebcam openCVNode = new OpenCVNodeWebcam();
     public static Conveyor conveyor = new Conveyor();
     public static rpm shooter = new rpm();
     public static TelemetryDebugging telemetryDebugging = new TelemetryDebugging();
@@ -20,7 +20,7 @@ public class WoENrobot {
     public static Movement movement = new Movement(odometry,drivetrain);
 
 
-    protected static RobotModule[] activeAobotModules = {odometry, drivetrain, movement, shooter, wobbleManipulator2, conveyor, telemetryDebugging}; //conveyor, odometry, shooter, wobbleManipulator, drivetrain
+    protected static RobotModule[] activeRobotModules = {odometry, drivetrain, movement, shooter, wobbleManipulator2, conveyor, telemetryDebugging}; //conveyor, odometry, shooter, wobbleManipulator, drivetrain
 
     public static LinearOpMode opMode = null;
     public static boolean robotIsInitialized = false;
@@ -28,8 +28,8 @@ public class WoENrobot {
     static boolean spinCompleted = false;
     static Runnable updateRegulators = () -> {
         while (opMode.opModeIsActive()&&!Thread.interrupted()) {
-
-            for (RobotModule robotModule : activeAobotModules) {
+           // Arrays.stream(activeRobotModules).forEach(RobotModule::update);
+            for (RobotModule robotModule : activeRobotModules) {
                 robotModule.update();
             }
             spinCompleted = true;
@@ -76,7 +76,7 @@ public class WoENrobot {
             opMode.telemetry.update();
         } else {
             opMode = OpMode;
-            for (RobotModule robotModule : activeAobotModules) {
+            for (RobotModule robotModule : activeRobotModules) {
                 robotModule.setOpMode(opMode);
                 robotModule.reset();
             }
@@ -99,7 +99,7 @@ public class WoENrobot {
         expansionHub1 = opMode.hardwareMap.get(ExpansionHubEx.class, "Expansion Hub 1");
         expansionHub2 = opMode.hardwareMap.get(ExpansionHubEx.class, "Expansion Hub 2");
 
-        for (RobotModule robotModule : activeAobotModules) {
+        for (RobotModule robotModule : activeRobotModules) {
             robotModule.initialize(opMode);
             robotModule.reset();
         }
