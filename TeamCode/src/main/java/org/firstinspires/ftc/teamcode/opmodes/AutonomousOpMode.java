@@ -6,7 +6,11 @@ import org.firstinspires.ftc.teamcode.MovementMacros;
 import org.firstinspires.ftc.teamcode.math.Pose2D;
 import org.firstinspires.ftc.teamcode.misc.AutoTransitioner;
 
-import static org.firstinspires.ftc.teamcode.robot.WoENrobot.*;
+import static org.firstinspires.ftc.teamcode.robot.WoENrobot.FullInitWithCV;
+import static org.firstinspires.ftc.teamcode.robot.WoENrobot.odometry;
+import static org.firstinspires.ftc.teamcode.robot.WoENrobot.openCVNode;
+import static org.firstinspires.ftc.teamcode.robot.WoENrobot.setLedColors;
+import static org.firstinspires.ftc.teamcode.robot.WoENrobot.startRobot;
 
 public class AutonomousOpMode extends LinearOpMode {
 
@@ -46,22 +50,22 @@ public class AutonomousOpMode extends LinearOpMode {
         sideSign = gamepad1.dpad_right ? 1 : gamepad1.dpad_left ? -1 : sideSign;
         telemetry.addData("Alliance", getXSign() == 1 ? "RED" : "BLUE");
         telemetry.addData("SIDE", getSideSign() == 1 ? "RIGHT" : "LEFT");
-        thereAreTwoGamepads = gamepad2.start||gamepad2.b||thereAreTwoGamepads;
-        if(thereAreTwoGamepads) telemetry.addLine("Second gamepad detected");
+        thereAreTwoGamepads = gamepad2.start || gamepad2.b || thereAreTwoGamepads;
+        if (thereAreTwoGamepads) telemetry.addLine("Second gamepad detected");
         telemetry.update();
     }
-    
+
     @Override
-    public void runOpMode() throws InterruptedException {
+    public void runOpMode(){
         FullInitWithCV(this);
         startRobot();
         openCVNode.stopCam();
         new MovementMacros(getXSign(), getSideSign());
         odometry.setRobotCoordinates(getStartPosition());
-        if(thereAreTwoGamepads)
-        AutoTransitioner.transitionOnStop(this, "TeleOp COMPETITION");
+        if (thereAreTwoGamepads)
+            AutoTransitioner.transitionOnStop(this, "TeleOp COMPETITION");
         else
-        AutoTransitioner.transitionOnStop(this, "TeleOp COMPETITION single");
+            AutoTransitioner.transitionOnStop(this, "TeleOp COMPETITION single");
         main();
         setLedColors(0, 128, 128);
         telemetry.addData("Status", "Program finished (" + getRuntime() + ")");

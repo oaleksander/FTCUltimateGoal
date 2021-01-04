@@ -1,4 +1,3 @@
-
 package org.firstinspires.ftc.teamcode.robot;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -9,28 +8,22 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
+
 @Deprecated
 public class WobbleManipulator implements RobotModule {
-    private LinearOpMode opMode;
-
-    private DcMotorEx lever = null;
-
-    private Servo close = null;
-
-    private ElapsedTime leverTime = new ElapsedTime();
-
-    private boolean ismed = false, isdown = false;
-    private boolean isGrabbed = true;
-
-    private byte posangle = 0;
-
-    private double pos = 0;
-    private double power = 0, P = 0, D = 0, errorOld = 0, error = 0;
-    private double oldpower = 0;
-
     private final double closeClose = 0.73;
     private final double closeOpen = 0.19;
     private final double minerror = 15, maxspeed = 0.7, kofP = 0.0015, kofd = 0.00001;
+    private LinearOpMode opMode;
+    private DcMotorEx lever = null;
+    private Servo close = null;
+    private final ElapsedTime leverTime = new ElapsedTime();
+    private boolean ismed = false, isdown = false;
+    private boolean isGrabbed = true;
+    private byte posangle = 0;
+    private double pos = 0;
+    private double power = 0, P = 0, D = 0, errorOld = 0, error = 0;
+    private double oldpower = 0;
 
     public void setOpMode(LinearOpMode OpMode) {
         opMode = OpMode;
@@ -79,40 +72,35 @@ public class WobbleManipulator implements RobotModule {
         }
     }
 
-    public void upmediumdown(boolean upmedium, boolean updown){
-        if (upmedium && !updown){
-            if(!ismed){
+    public void upmediumdown(boolean upmedium, boolean updown) {
+        if (upmedium && !updown) {
+            if (!ismed) {
                 ismed = true;
-                if (posangle == 1){
+                if (posangle == 1) {
                     posangle = 0;
                     changepos(positions.up);
-                }
-                else {
+                } else {
                     posangle = 1;
                     changepos(positions.medium);
                 }
             }
-        }
-        else ismed = false;
-        if (updown && !upmedium){
-            if (!isdown){
+        } else ismed = false;
+        if (updown && !upmedium) {
+            if (!isdown) {
                 isdown = true;
-                if(posangle == 2){
+                if (posangle == 2) {
                     posangle = 0;
                     changepos(positions.up);
-                }
-                else{
+                } else {
                     posangle = 2;
                     changepos(positions.down);
                 }
             }
-        }
-        else isdown = false;
+        } else isdown = false;
     }
 
-    enum positions {up, down, medium}
-    public void changepos(positions Positions){
-        switch (Positions){
+    public void changepos(positions Positions) {
+        switch (Positions) {
             case up:
                 setposlever(0);
                 break;
@@ -129,5 +117,7 @@ public class WobbleManipulator implements RobotModule {
     public void setposlever(double Pos) {
         pos = Pos;
     }
+
+    enum positions {up, down, medium}
 
 }

@@ -18,47 +18,40 @@ import org.jetbrains.annotations.NotNull;
 import static com.qualcomm.robotcore.util.Range.clip;
 import static java.lang.Math.abs;
 import static java.lang.Math.max;
-import static java.lang.Math.min;
 import static java.lang.Math.signum;
 
 public class MecanumDrivetrain implements RobotModule, Drivetrain {
 
 
-
-    /* Drivetrain hardware members. */
-    DcMotorEx driveFrontLeft = null;
-    DcMotorEx driveFrontRight = null;
-    DcMotorEx driveRearLeft = null;
-    DcMotorEx driveRearRight = null;
-
     /* Physical constants */
-    private static final double wheelRadius = 9.8/2;
-    private static final double strafingMultiplier = 1/0.8;
-    private static final Vector2D wheelCenterOffset = new Vector2D(18.05253,15.20000);
+    private static final double wheelRadius = 9.8 / 2;
+    private static final double strafingMultiplier = 1 / 0.8;
+    private static final Vector2D wheelCenterOffset = new Vector2D(18.05253, 15.20000);
     private static final double rotationDecrepancy = 1.0;
-    private static final double forwardMultiplier = 1/wheelRadius;
-    private static final double sidewaysMultiplier = forwardMultiplier*strafingMultiplier;
-    private static final double turnMultiplier = (wheelCenterOffset.x+wheelCenterOffset.y)*rotationDecrepancy/wheelRadius;
-
-
+    private static final double forwardMultiplier = 1 / wheelRadius;
+    private static final double sidewaysMultiplier = forwardMultiplier * strafingMultiplier;
+    private static final double turnMultiplier = (wheelCenterOffset.x + wheelCenterOffset.y) * rotationDecrepancy / wheelRadius;
     /* Motor parameters constatnts. */
     private static final PIDFCoefficients drivePIDFCoefficients = new PIDFCoefficients(15.00, 0.075, 15, 15.00);
     private static final double achieveableMaxRPMFraction = 0.9;
     private static final double tickPerRev = 480;
     private static final double gearing = 20;
     private static final double maxRPM = 300;
-    public static final double theoreticalMaxSpeed = (maxRPM/60)*Math.PI*2;
-
-    private static double maxMotorSpeed = achieveableMaxRPMFraction*theoreticalMaxSpeed;
-    private static double minMotorSpeed = 0.05*theoreticalMaxSpeed;
-    private double maxAcceleration = theoreticalMaxSpeed / 0.25;
+    public static final double theoreticalMaxSpeed = (maxRPM / 60) * Math.PI * 2;
+    private static double maxMotorSpeed = achieveableMaxRPMFraction * theoreticalMaxSpeed;
+    private static double minMotorSpeed = 0.05 * theoreticalMaxSpeed;
+    private final double maxAcceleration = theoreticalMaxSpeed / 0.25;
+    /* Drivetrain hardware members. */
+    DcMotorEx driveFrontLeft = null;
+    DcMotorEx driveFrontRight = null;
+    DcMotorEx driveRearLeft = null;
+    DcMotorEx driveRearRight = null;
 
     /* Motor controllers */
     private final motorAccelerationLimiter mFLProfiler = new motorAccelerationLimiter(new CommandSender(v -> driveFrontLeft.setVelocity(v, AngleUnit.RADIANS))::send, maxAcceleration);
     private final motorAccelerationLimiter mFRProfiler = new motorAccelerationLimiter(new CommandSender(v -> driveFrontRight.setVelocity(v, AngleUnit.RADIANS))::send, maxAcceleration);
     private final motorAccelerationLimiter mRLProfiler = new motorAccelerationLimiter(new CommandSender(v -> driveRearLeft.setVelocity(v, AngleUnit.RADIANS))::send, maxAcceleration);
     private final motorAccelerationLimiter mRRProfiler = new motorAccelerationLimiter(new CommandSender(v -> driveRearRight.setVelocity(v, AngleUnit.RADIANS))::send, maxAcceleration);
-
 
 
     private boolean smartMode = true;
@@ -76,11 +69,10 @@ public class MecanumDrivetrain implements RobotModule, Drivetrain {
         assignNames();
         setMotorDirections();
         setMotor0PowerBehaviors(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        setMotorConfiguration(achieveableMaxRPMFraction,tickPerRev,gearing,maxRPM);
+        setMotorConfiguration(achieveableMaxRPMFraction, tickPerRev, gearing, maxRPM);
         try {
             setPIDFCoefficients(drivePIDFCoefficients);
-        }catch(UnsupportedOperationException e)
-        {
+        } catch (UnsupportedOperationException e) {
             opMode.telemetry.addData("Drivetrain PIDF error ", e.getMessage());
         }
         setSmartMode(true);
@@ -124,24 +116,21 @@ public class MecanumDrivetrain implements RobotModule, Drivetrain {
         driveRearRight.setMode(runMode);
     }
 
-    private void setPIDFCoefficients(PIDFCoefficients pidfCoefficients)
-    {
+    private void setPIDFCoefficients(PIDFCoefficients pidfCoefficients) {
         driveFrontLeft.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoefficients);
         driveFrontRight.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoefficients);
         driveRearLeft.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoefficients);
         driveRearRight.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoefficients);
     }
 
-    private void setMotorConfiguration(double achieveableMaxRPMFraction, double tickPerRev, double gearing, double maxRPM)
-    {
+    private void setMotorConfiguration(double achieveableMaxRPMFraction, double tickPerRev, double gearing, double maxRPM) {
         setMotorConfiguration(driveFrontLeft, achieveableMaxRPMFraction, tickPerRev, gearing, maxRPM);
         setMotorConfiguration(driveFrontRight, achieveableMaxRPMFraction, tickPerRev, gearing, maxRPM);
         setMotorConfiguration(driveRearLeft, achieveableMaxRPMFraction, tickPerRev, gearing, maxRPM);
         setMotorConfiguration(driveRearRight, achieveableMaxRPMFraction, tickPerRev, gearing, maxRPM);
     }
 
-    private void setMotorConfiguration(@NotNull DcMotorEx dcMotor, double achieveableMaxRPMFraction, double tickPerRev, double gearing, double maxRPM)
-    {
+    private void setMotorConfiguration(@NotNull DcMotorEx dcMotor, double achieveableMaxRPMFraction, double tickPerRev, double gearing, double maxRPM) {
         MotorConfigurationType motorConfigurationType = dcMotor.getMotorType().clone();
         motorConfigurationType.setAchieveableMaxRPMFraction(achieveableMaxRPMFraction);
         motorConfigurationType.setTicksPerRev(tickPerRev);
@@ -180,7 +169,7 @@ public class MecanumDrivetrain implements RobotModule, Drivetrain {
 
         double maxabs = max(max(abs(frontLeft), abs(frontRight)), max(abs(rearLeft), abs(rearRight)));
         if (maxabs > maxMotorSpeed) {
-            maxabs = maxabs/ maxMotorSpeed;
+            maxabs = maxabs / maxMotorSpeed;
             frontLeft = (frontLeft / maxabs);
             frontRight = (frontRight / maxabs);
             rearLeft = (rearLeft / maxabs);
@@ -198,7 +187,7 @@ public class MecanumDrivetrain implements RobotModule, Drivetrain {
     }
 
     public Vector3D getMaxRobotVelocity() {
-        return new Vector3D(maxMotorSpeed/forwardMultiplier,maxMotorSpeed/forwardMultiplier,maxMotorSpeed/turnMultiplier);
+        return new Vector3D(maxMotorSpeed / forwardMultiplier, maxMotorSpeed / forwardMultiplier, maxMotorSpeed / turnMultiplier);
     }
 
     public void setRobotVelocity(double frontways, double sideways, double turn) {

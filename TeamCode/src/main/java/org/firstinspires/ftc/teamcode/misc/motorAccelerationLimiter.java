@@ -9,10 +9,10 @@ import static java.lang.Math.min;
 import static java.lang.Math.signum;
 
 public class motorAccelerationLimiter {
-    private double maxAcceleration = 1;
-    private double currentVelocity = 0;
     private final DoubleConsumer motorToControl;
     private final ElapsedTime looptime = new ElapsedTime();
+    private double maxAcceleration;
+    private double currentVelocity = 0;
 
     public motorAccelerationLimiter(DoubleConsumer motorToControl, double maxAcceleration) {
         this.motorToControl = motorToControl;

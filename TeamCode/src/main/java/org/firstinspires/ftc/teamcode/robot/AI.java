@@ -9,16 +9,15 @@ public class AI {
     private final double interval = 1000;
     private final double maxError = 3;
 
-    public void initialize (){
+    public void initialize() {
         AItime.reset();
     }
 
-    public void update(){
-        if (AItime.milliseconds() > interval){
+    public void update() {
+        if (AItime.milliseconds() > interval) {
             AItime.reset();
-            if(Math.abs(5) > 3)
-            {
-                
+            if (Math.abs(5) > 3) {
+
             }
         }
     }

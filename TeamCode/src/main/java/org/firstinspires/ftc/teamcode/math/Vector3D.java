@@ -1,16 +1,17 @@
 package org.firstinspires.ftc.teamcode.math;
 
+import java.util.Locale;
+
 public class Vector3D extends Vector2D implements Cloneable {
-    public double z = 0;
+    public double z;
 
     public Vector3D(double x, double y, double z) {
         super(x, y);
         this.z = z;
     }
 
-    public Vector3D(Pose2D p)
-    {
-        this(p.x,p.y,p.heading);
+    public Vector3D(Pose2D p) {
+        this(p.x, p.y, p.heading);
     }
 
     public Vector3D() {
@@ -45,20 +46,18 @@ public class Vector3D extends Vector2D implements Cloneable {
         return new Vector3D(x * d, y * d, z * d);
     }
 
-    public void normalize(){
+    public void normalize() {
         double r = radius();
-        if(radius()!=0)
-        {
-            x/=radius();
-            y/=radius();
-            z/=radius();
+        if (radius() != 0) {
+            x /= radius();
+            y /= radius();
+            z /= radius();
         }
     }
 
     public double radius() {
         return Math.sqrt(x * x + y * y + z * z);
     }
-
 
 
     public void clampAbs(Vector3D p2) {
@@ -92,7 +91,7 @@ public class Vector3D extends Vector2D implements Cloneable {
 
     @Override
     public String toString() {
-        return String.format("{x: %.3f, y: %.3f, z: %.3f}", x, y, z);
+        return String.format(Locale.getDefault(),"{x: %.3f, y: %.3f, z: %.3f}", x, y, z);
     }
 
     @Override

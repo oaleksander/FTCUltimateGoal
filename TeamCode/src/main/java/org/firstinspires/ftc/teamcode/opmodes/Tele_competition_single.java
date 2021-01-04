@@ -13,8 +13,9 @@ import static org.firstinspires.ftc.teamcode.robot.WoENrobot.initRobot;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.shooter;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.startRobot;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.wobbleManipulator2;
+
 @TeleOp(name = "TeleOp COMPETITION single", group = "Competition")
-public class Tele_competition_single  extends LinearOpMode {
+public class Tele_competition_single extends LinearOpMode {
     @Override
     public void runOpMode() {
         initRobot(this);
@@ -26,27 +27,27 @@ public class Tele_competition_single  extends LinearOpMode {
 
         SinglePressButton threeRingPresser = new SinglePressButton();
 
-        shooter.setShootersetings(3800,500);
+        shooter.setShootersetings(3800, 500);
         while (opModeIsActive()) {
 
             wobbleManipulator2.setposclose(buttonAswitch.isTriggered(gamepad1.a));
-            wobbleManipulator2.upmediumdown(gamepad1.y,gamepad1.x); // correct
+            wobbleManipulator2.upmediumdown(gamepad1.y, gamepad1.x); // correct
             shooter.onshooter(buttonStartswitch.isTriggered(gamepad1.start));
-            conveyor.setConveyorPower(buttonBackswitch.isTriggered(gamepad1.back)?1:0);
-            if(gamepad1.b)
+            conveyor.setConveyorPower(buttonBackswitch.isTriggered(gamepad1.back) ? 1 : 0);
+            if (gamepad1.b)
                 conveyor.feedRing();
-            if(threeRingPresser.isTriggered(gamepad1.right_stick_button))
+            if (threeRingPresser.isTriggered(gamepad1.right_stick_button))
                 conveyor.feedrings();
 
             drivetrain.setRobotVelocity(calculateDrivingVelocity());
             //      spinOnce();
         }
     }
-    Vector3D calculateDrivingVelocity()
-    {
+
+    Vector3D calculateDrivingVelocity() {
         double turn = 0;
-        double y = 0;
-        double x = 0;
+        double y;
+        double x;
         if (gamepad1.left_bumper) turn -= 0.25;
         else turn -= gamepad1.left_trigger;
         if (gamepad1.right_bumper) turn += 0.25;
@@ -61,6 +62,6 @@ public class Tele_competition_single  extends LinearOpMode {
             x = -1;
         if (gamepad1.dpad_right)
             x += 1;
-        return new Vector3D(x,y,turn).multiply(drivetrain.getMaxRobotVelocity());
+        return new Vector3D(x, y, turn).multiply(drivetrain.getMaxRobotVelocity());
     }
 }

@@ -8,21 +8,17 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
 
-import static org.firstinspires.ftc.teamcode.robot.WoENrobot.*;
+import static org.firstinspires.ftc.teamcode.robot.WoENrobot.shooter;
 
-public class TelemetryDebugging implements RobotModule{
-
-    private LinearOpMode opMode = null;
-
-    private ElapsedTime measurementTime = new ElapsedTime();
+public class TelemetryDebugging implements RobotModule {
 
     public static double ROBOT_SIDE_LENGTH = 20;
-
     FtcDashboard dashboard = null;
-
     Telemetry telemetry;
-
     TelemetryPacket packet = null;
+    long loopCount = 0;
+    private LinearOpMode opMode = null;
+    private final ElapsedTime measurementTime = new ElapsedTime();
 
     private static void rotatePoints(double[] xPoints, double[] yPoints, double angle) {
         for (int i = 0; i < xPoints.length; i++) {
@@ -33,8 +29,6 @@ public class TelemetryDebugging implements RobotModule{
         }
     }
 
-    long loopCount = 0;
-
     public void setOpMode(LinearOpMode opMode) {
         this.opMode = opMode;
 
@@ -44,23 +38,21 @@ public class TelemetryDebugging implements RobotModule{
     public void initialize() {
         dashboard = FtcDashboard.getInstance();
         measurementTime.reset();
-        loopCount=0;
+        loopCount = 0;
         //telemetry = opMode.telemetry;
         telemetry = dashboard.getTelemetry();
-       // dashboard.startCameraStream(openCVNode.getWebcam(),0);
+        // dashboard.startCameraStream(openCVNode.getWebcam(),0);
     }
 
 
-
     public void update() {
-        if(measurementTime.seconds() > 0.25)
-        {
-           // telemetry.addData("Status", "Running");
+        if (measurementTime.seconds() > 0.25) {
+            // telemetry.addData("Status", "Running");
             //telemetry.addData("Loop frequency", 1 / (measurementTime.seconds() / loopCount) + " Hz");
 
             telemetry.setMsTransmissionInterval(40);
             //telemetry.addLine("Odometry encoders").addData("odYL", odometry.bulkData.getMotorCurrentPosition(0)).addData("odYR", odometry.bulkData.getMotorCurrentPosition(1)).addData("odX", odometry.bulkData.getMotorCurrentPosition(2));
-          //  telemetry.addLine("Robot position").addData("y", odometry.getRobotCoordinates().y).addData("x", odometry.getRobotCoordinates().x).addData("head", Math.toDegrees(odometry.getRobotCoordinates().heading));
+            //  telemetry.addLine("Robot position").addData("y", odometry.getRobotCoordinates().y).addData("x", odometry.getRobotCoordinates().x).addData("head", Math.toDegrees(odometry.getRobotCoordinates().heading));
             //telemetry.addLine("Robot velocity").addData("y", odometry.getRobotVelocity().y).addData("x", odometry.getRobotVelocity().x).addData("head", Math.toDegrees(odometry.getRobotVelocity().z));
             telemetry.addData("Shooter velo", shooter.getCurrentRpm());
             telemetry.addData("Shooter tgt", shooter.getRpmTarget());
@@ -91,7 +83,8 @@ public class TelemetryDebugging implements RobotModule{
 
 
             measurementTime.reset();
-         */  loopCount = 0;
+         */
+            loopCount = 0;
             telemetry.update();
         }
         loopCount++;

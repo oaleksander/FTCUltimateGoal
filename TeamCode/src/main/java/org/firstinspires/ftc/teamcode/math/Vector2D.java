@@ -1,9 +1,11 @@
 package org.firstinspires.ftc.teamcode.math;
 
+import java.util.Locale;
+
 public class Vector2D implements Comparable {
 
-    public double x = 0;
-    public double y = 0;
+    public double x;
+    public double y;
 
     public Vector2D(double x, double y) {
         this.x = x;
@@ -26,9 +28,9 @@ public class Vector2D implements Comparable {
         return new Vector2D(newX, newY);
     }
 
-    public void normalize(){
+    public void normalize() {
         double r = radius();
-        if(radius()!=0) {
+        if (radius() != 0) {
             x /= radius();
             y /= radius();
         }
@@ -74,7 +76,7 @@ public class Vector2D implements Comparable {
 
     @Override
     public String toString() {
-        return String.format("(%.1f, %.1f)", x, y);
+        return String.format(Locale.getDefault(),  "(%.1f, %.1f)", x, y);
     }
 
     @Override

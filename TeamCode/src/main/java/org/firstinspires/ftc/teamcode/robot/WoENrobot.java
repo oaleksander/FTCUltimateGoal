@@ -1,4 +1,3 @@
-
 package org.firstinspires.ftc.teamcode.robot;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -17,18 +16,15 @@ public class WoENrobot {
 
     public static ThreeWheelOdometry odometry = new ThreeWheelOdometry();
     public static MecanumDrivetrain drivetrain = new MecanumDrivetrain();
-    public static Movement movement = new Movement(odometry,drivetrain);
-
-
-    protected static RobotModule[] activeRobotModules = {odometry, drivetrain, movement, shooter, wobbleManipulator2, conveyor, telemetryDebugging}; //conveyor, odometry, shooter, wobbleManipulator, drivetrain
-
+    public static Movement movement = new Movement(odometry, drivetrain);
     public static LinearOpMode opMode = null;
     public static boolean robotIsInitialized = false;
     public static ElapsedTime runTime = new ElapsedTime();
+    protected static RobotModule[] activeRobotModules = {odometry, drivetrain, movement, shooter, wobbleManipulator2, conveyor, telemetryDebugging}; //conveyor, odometry, shooter, wobbleManipulator, drivetrain
     static boolean spinCompleted = false;
     static Runnable updateRegulators = () -> {
-        while (opMode.opModeIsActive()&&!Thread.interrupted()) {
-           // Arrays.stream(activeRobotModules).forEach(RobotModule::update);
+        while (opMode.opModeIsActive() && !Thread.interrupted()) {
+            // Arrays.stream(activeRobotModules).forEach(RobotModule::update);
             for (RobotModule robotModule : activeRobotModules) {
                 robotModule.update();
             }

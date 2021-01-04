@@ -21,15 +21,15 @@ public class MathUtil {
     }
 
     public static double angleWrapHalf(double angle) {
-        while (angle > PI/2) angle -= PI;
-        while (angle < -PI/2) angle += PI;
+        while (angle > PI / 2) angle -= PI;
+        while (angle < -PI / 2) angle += PI;
         return angle;
     }
 
     public static double cosFromSin(double sin, double angle) {
         double cos = Math.sqrt(1 - sin * sin);
         angle = angleWrap(angle);
-        if ((angle > PI/2) || (angle < -PI / 2))
+        if ((angle > PI / 2) || (angle < -PI / 2))
             cos *= -1;
         return cos;
     }

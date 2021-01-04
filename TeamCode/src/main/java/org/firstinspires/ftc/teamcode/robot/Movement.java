@@ -18,17 +18,16 @@ import static java.lang.Math.sin;
 import static org.firstinspires.ftc.teamcode.math.MathUtil.angleWrapHalf;
 
 public class Movement implements RobotModule {
-    private static Odometry odometry;
-    private static Drivetrain drivetrain;
-    private LinearOpMode opMode = null;
-
-   // private static final double kP_distance = 0.010, kD_distance = 0.00034;
+    // private static final double kP_distance = 0.010, kD_distance = 0.00034;
     private static final double kP_distance = 1.38544236023, kD_distance = 0.04710504024;
     private static final double kF_distance = 0.1;
     private static final double minError_distance = 3;
-   // private static final double kP_angle = 0.40, kD_angle = 0;
+    // private static final double kP_angle = 0.40, kD_angle = 0;
     private static final double kP_angle = 1.66657076647, kD_angle = 0;
     private static final double minError_angle = Math.toRadians(0.5);
+    private static Odometry odometry;
+    private static Drivetrain drivetrain;
+    private LinearOpMode opMode = null;
 
 
     public Movement(Odometry Odometry, Drivetrain Drivetrain) {
@@ -40,14 +39,15 @@ public class Movement implements RobotModule {
         this.opMode = opMode;
     }
 
-    public void initialize() {}
+    public void initialize() {
+    }
 
 
     public void Pos(Pose2D target) {
 
 
         Pose2D error = target.substract(odometry.getRobotCoordinates());
-        Pose2D errold = error;
+        Pose2D errold;
         double distanceError = error.radius();
 
         ElapsedTime movementTime = new ElapsedTime();
@@ -57,22 +57,21 @@ public class Movement implements RobotModule {
             error = target.substract(odometry.getRobotCoordinates());
 
             distanceError = error.radius();
-            if(distanceError>100)
-            {
-                error.heading=angleWrapHalf(error.acot());
+            if (distanceError > 100) {
+                error.heading = angleWrapHalf(error.acot());
             }
 
             Pose2D deltaError = error.substract(errold);
 
             Vector3D currentVelocity = odometry.getRobotVelocity();
-            Vector3D diffError = new Vector3D(currentVelocity.x*signum(deltaError.x),
-                    currentVelocity.y*signum(deltaError.y),
-                    currentVelocity.z*signum(deltaError.heading));
+            Vector3D diffError = new Vector3D(currentVelocity.x * signum(deltaError.x),
+                    currentVelocity.y * signum(deltaError.y),
+                    currentVelocity.z * signum(deltaError.heading));
 
             Vector2D movementControl = new Vector2D(
                     error.x * kP_distance + diffError.x * kD_distance,
                     error.y * kP_distance + diffError.y * kD_distance);
-            if(movementControl.radius()>1)
+            if (movementControl.radius() > 1)
                 movementControl.normalize();
 
             Vector3D control = new Vector3D(movementControl,

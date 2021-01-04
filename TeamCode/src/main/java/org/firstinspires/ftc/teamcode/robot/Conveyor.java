@@ -13,35 +13,24 @@ import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
 
 
 public class Conveyor implements RobotModule {
-    private LinearOpMode opMode;
-
-    private DcMotorEx conveyorm = null;
-
-    private Servo feeder = null;
-
-    private DistanceSensor sensorDistance;
-
     private final ElapsedTime conveyorTime = new ElapsedTime();
     private final ElapsedTime backOnTime = new ElapsedTime();
     private final ElapsedTime pauseTime = new ElapsedTime();
     private final ElapsedTime feederTime = new ElapsedTime();
-
-
-    private boolean full = false;
-    private boolean backOn = false, stop = false;
-    private boolean backMust = false;
-
-    private byte i = 0;
-
-    private double timelock = 0;
-    private double conveyorPower = 0;
-
-    private double distance = 0;
-
     private final double time = 125;
     private final double feederClose = 0.06;
     private final double feederOpen = 0.3;
-
+    private LinearOpMode opMode;
+    private DcMotorEx conveyorm = null;
+    private Servo feeder = null;
+    private DistanceSensor sensorDistance;
+    private boolean full = false;
+    private boolean backOn = false, stop = false;
+    private boolean backMust = false;
+    private byte i = 0;
+    private double timelock = 0;
+    private double conveyorPower = 0;
+    private double distance = 0;
 
     public void setOpMode(LinearOpMode OpMode) {
         opMode = OpMode;
@@ -61,7 +50,7 @@ public class Conveyor implements RobotModule {
         backOn = false;
         stop = false;
         conveyorPower = 0;
-        i=0;
+        i = 0;
     }
 
     private void initializecolor() {
@@ -105,8 +94,7 @@ public class Conveyor implements RobotModule {
             conveyorTime.reset();
             full = false;
         }
-        if (!backMust)
-        {
+        if (!backMust) {
             if (conveyorPower != 0 && !full) {
                 if (!stop) {
                     stop = true;
@@ -139,8 +127,8 @@ public class Conveyor implements RobotModule {
     }
 
     private void setFeederPosition(boolean push) {
-            if (push) feeder.setPosition(feederOpen);
-            else feeder.setPosition(feederClose);
+        if (push) feeder.setPosition(feederOpen);
+        else feeder.setPosition(feederClose);
     }
 
     public void setConveyorPower(double power) {
@@ -150,9 +138,11 @@ public class Conveyor implements RobotModule {
     private void setConveyorMotorPower(double power) {
         conveyorm.setPower(power);
     }
-    public void setBackmust(boolean Backmust){
+
+    public void setBackmust(boolean Backmust) {
         backMust = Backmust;
     }
+
     public void feedRing() {
         feederTime.reset();
     }

@@ -36,6 +36,7 @@ public class TwoWheelOdometry implements Odometry, RobotModule {
     private static LinearOpMode opMode = null;
     public RevBulkData bulkData;
     ElapsedTime looptime = new ElapsedTime();
+    double angle_last = 0;
     private int Y_old = 0;
     private int X_old = 0;
 
@@ -55,8 +56,6 @@ public class TwoWheelOdometry implements Odometry, RobotModule {
         imu.initialize(new BNO055IMU.Parameters());
         IMUoffset = (float) getIMUheading();
     }
-
-    double angle_last = 0;
 
     private double getIMUheading() {
         if (looptime.milliseconds() > 50) {
@@ -115,6 +114,11 @@ public class TwoWheelOdometry implements Odometry, RobotModule {
         return new Pose2D(poseTranslation, worldPosition.heading);
     }
 
+    public void setRobotCoordinates(Pose2D coordinates) {
+        IMUoffset = (float) angleWrap(calculateHeading(bulkData.getMotorCurrentPosition(odometerY), -bulkData.getMotorCurrentPosition(odometerY)) + IMUoffset - coordinates.heading);
+        this.calculatePosition(new Pose2D(coordinates.x * odometryCountsPerCM, coordinates.y * odometryCountsPerCM, coordinates.heading));
+    }
+
     public Vector3D getRobotVelocity() {
         double angularVelocity = -imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZXY, AngleUnit.RADIANS).firstAngle;
         return new Vector3D(new Vector2D(
@@ -122,11 +126,6 @@ public class TwoWheelOdometry implements Odometry, RobotModule {
                 ((double) -bulkData.getMotorVelocity(odometerY) - angularVelocity * odometerXcenterOffset) * odometryCMPerCounts)
                 .rotatedCW(worldPosition.heading),
                 angularVelocity);
-    }
-
-    public void setRobotCoordinates(Pose2D coordinates) {
-        IMUoffset = (float) angleWrap(calculateHeading(bulkData.getMotorCurrentPosition(odometerY), -bulkData.getMotorCurrentPosition(odometerY)) + IMUoffset - coordinates.heading);
-        this.calculatePosition(new Pose2D(coordinates.x * odometryCountsPerCM, coordinates.y * odometryCountsPerCM, coordinates.heading));
     }
 
 }

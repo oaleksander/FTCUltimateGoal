@@ -10,19 +10,15 @@ import org.firstinspires.ftc.teamcode.misc.CommandSender;
 import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
 
 public class rpm implements RobotModule {
-    private LinearOpMode opMode;
-
-    private DcMotorEx shooterMotor = null;
-    private CommandSender shooterVelocitySender = new CommandSender(p -> shooterMotor.setVelocity(p));
-
     private final ElapsedTime rpmTime = new ElapsedTime();
-
+    private LinearOpMode opMode;
+    private DcMotorEx shooterMotor = null;
+    private final CommandSender shooterVelocitySender = new CommandSender(p -> shooterMotor.setVelocity(p));
     private boolean on = false;
 
     private double time_ms = 1;
     private double x = 1;
     private double rpm = 6000;
-    private double speedOld = 0;
     private double speed = 0;
     private double velocityTarget = 2400;
 
@@ -39,9 +35,9 @@ public class rpm implements RobotModule {
         motorConfigurationType.setGearing(1);
         motorConfigurationType.setMaxRPM(6000);
         shooterMotor.setMotorType(motorConfigurationType);
-       // PIDFCoefficients pidNew = new PIDFCoefficients(1, 1, 9, 0);
+        // PIDFCoefficients pidNew = new PIDFCoefficients(1, 1, 9, 0);
 //       PIDFCoefficients pidNew = new PIDFCoefficients(3.628, 1.3, 5, 14.28);
-         PIDFCoefficients pidNew = new PIDFCoefficients(25.5, 0.075, 16, 15.23);
+        PIDFCoefficients pidNew = new PIDFCoefficients(25.5, 0.075, 16, 15.23);
         try {
             shooterMotor.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidNew);
         } catch (UnsupportedOperationException e) {
@@ -54,7 +50,7 @@ public class rpm implements RobotModule {
 
     public void reset() {
         shooterMotor.setVelocity(0);
-        on=false;
+        on = false;
     }
 
     public void update() {
@@ -72,13 +68,12 @@ public class rpm implements RobotModule {
     }
 
 
-    private void shooterVelocity(double velocity)
-    {
+    private void shooterVelocity(double velocity) {
         shooterVelocitySender.send(velocity);
     }
 
     public void onshooter(boolean On) {
-        if(On!=on) {
+        if (On != on) {
             rpmTime.reset();
             on = On;
         }
@@ -91,18 +86,19 @@ public class rpm implements RobotModule {
         velocityTarget = rpm * 0.4;
     }
 
-    public boolean isCorrectRpm()
-    {
+    public boolean isCorrectRpm() {
         return isCorrectRpm(25);
     }
 
-    public double getRpmTarget() {return rpm;}
-
-    public double getCurrentRpm(){
-        return shooterMotor.getVelocity()*2.5;
+    public double getRpmTarget() {
+        return rpm;
     }
 
-    public boolean isCorrectRpm(double error){
+    public double getCurrentRpm() {
+        return shooterMotor.getVelocity() * 2.5;
+    }
+
+    public boolean isCorrectRpm(double error) {
         return Math.abs(speed - shooterMotor.getVelocity()) < error;
     }
 }

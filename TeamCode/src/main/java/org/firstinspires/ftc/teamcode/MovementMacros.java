@@ -5,7 +5,13 @@ import org.firstinspires.ftc.teamcode.robot.WoENrobot;
 import org.firstinspires.ftc.teamcode.robot.WobbleManipulator2;
 
 import static java.lang.Math.toRadians;
-import static org.firstinspires.ftc.teamcode.robot.WoENrobot.*;
+import static org.firstinspires.ftc.teamcode.robot.WoENrobot.conveyor;
+import static org.firstinspires.ftc.teamcode.robot.WoENrobot.delay;
+import static org.firstinspires.ftc.teamcode.robot.WoENrobot.movement;
+import static org.firstinspires.ftc.teamcode.robot.WoENrobot.opMode;
+import static org.firstinspires.ftc.teamcode.robot.WoENrobot.openCVNode;
+import static org.firstinspires.ftc.teamcode.robot.WoENrobot.shooter;
+import static org.firstinspires.ftc.teamcode.robot.WoENrobot.wobbleManipulator2;
 
 public class MovementMacros {
 
@@ -20,17 +26,16 @@ public class MovementMacros {
     public static void ShootTargets() {
         shooter.setShootersetings(3850, 500);
         shooter.onshooter(true);
-        if (sideSign == 1 &&  xSign == 1)
+        if (sideSign == 1 && xSign == 1)
             movement.Pos(new Pose2D(xSign * 121, -48.5, toRadians(-10.5)));
-        else
-        if (sideSign == -1 &&  xSign == 1)
+        else if (sideSign == -1 && xSign == 1)
             movement.Pos(new Pose2D(xSign * 53, -30, toRadians(3)));
-        else
-        if (sideSign == -1 &&  xSign == -1)
+        else if (sideSign == -1 && xSign == -1)
             movement.Pos(new Pose2D(xSign * 147.5, -9.5, toRadians(10.5)));
         else // if (sideSign == 1 &&  xSign == -1)
             movement.Pos(new Pose2D(xSign * 61.5, -28, toRadians(-11.5)));
-        while (opMode.opModeIsActive() && !shooter.isCorrectRpm()) { }
+        while (opMode.opModeIsActive() && !shooter.isCorrectRpm()) {Thread.yield();
+        }
         conveyor.feedrings();
         delay(900);
         shooter.onshooter(false);
@@ -51,19 +56,19 @@ public class MovementMacros {
                 default:
                     movement.Pos(new Pose2D(xSign * 145, -15, toRadians(0 * xSign)));
             }
-            else
+        else
 
-        switch (openCVNode.getStackSize()) {
-            case FOUR:
-                movement.Pos(new Pose2D(xSign * 110, 116, toRadians(50 * xSign)));
-                break;
-            case ONE:
-                movement.Pos(new Pose2D(xSign * 54.5+8.5, 63+3*xSign, toRadians(50 * xSign)));
-                break;
-            case ZERO:
-            default:
-                movement.Pos(new Pose2D(xSign * 120, 0, toRadians(50 * xSign)));
-        }
+            switch (openCVNode.getStackSize()) {
+                case FOUR:
+                    movement.Pos(new Pose2D(xSign * 110, 116, toRadians(50 * xSign)));
+                    break;
+                case ONE:
+                    movement.Pos(new Pose2D(xSign * 54.5 + 8.5, 63 + 3 * xSign, toRadians(50 * xSign)));
+                    break;
+                case ZERO:
+                default:
+                    movement.Pos(new Pose2D(xSign * 120, 0, toRadians(50 * xSign)));
+            }
         wobbleManipulator2.changepos(WobbleManipulator2.positions.down);
         WoENrobot.delay(1800);
         wobbleManipulator2.setposclose(false);

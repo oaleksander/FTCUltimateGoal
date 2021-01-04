@@ -7,10 +7,8 @@ import org.firstinspires.ftc.teamcode.math.Pose2D;
 import org.firstinspires.ftc.teamcode.math.Vector3D;
 import org.firstinspires.ftc.teamcode.misc.ButtonSwitch;
 import org.firstinspires.ftc.teamcode.misc.SinglePressButton;
-import org.firstinspires.ftc.teamcode.robot.WobbleManipulator2;
 
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.conveyor;
-import static org.firstinspires.ftc.teamcode.robot.WoENrobot.delay;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.drivetrain;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.forceInitRobot;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.odometry;
@@ -36,29 +34,29 @@ public class Tele_test extends LinearOpMode {
 
         //odometry.setRobotCoordinates(new Pose2D(0, 0, 0));
         odometry.setRobotCoordinates(new Pose2D(93.75 * 1 + 31.25 * (-1), -156.5, 0));
-        shooter.setShootersetings(4444,2000);
+        shooter.setShootersetings(4444, 2000);
         buttonAswitch.isTriggered(true);
         buttonAswitch.isTriggered(false);
-       // shooter.onshooter(true);
-       // delay(5000);
+        // shooter.onshooter(true);
+        // delay(5000);
         //conveyor.feedrings();
         //wobbleManipulator2.changepos(WobbleManipulator2.positions.down);
-       // wobbleManipulator2.setAngle(1);
+        // wobbleManipulator2.setAngle(1);
         while (opModeIsActive()) {
             wobbleManipulator2.setposclose(buttonAswitch.isTriggered(gamepad1.a));
-            wobbleManipulator2.upmediumdown(gamepad1.y,gamepad1.x); // correct
+            wobbleManipulator2.upmediumdown(gamepad1.y, gamepad1.x); // correct
             shooter.onshooter(buttonStartswitch.isTriggered(gamepad1.start));
-            if(threeRingPresser.isTriggered(gamepad1.b))
-            conveyor.feedrings();
+            if (threeRingPresser.isTriggered(gamepad1.b))
+                conveyor.feedrings();
             drivetrain.setRobotVelocity(calculateDrivingVelocity());
             spinOnce();
         }
     }
-    Vector3D calculateDrivingVelocity()
-    {
+
+    Vector3D calculateDrivingVelocity() {
         double turn = 0;
-        double y = 0;
-        double x = 0;
+        double y;
+        double x;
         if (gamepad1.left_bumper) turn -= 0.25;
         else turn -= gamepad1.left_trigger;
         if (gamepad1.right_bumper) turn += 0.25;
@@ -73,6 +71,6 @@ public class Tele_test extends LinearOpMode {
             x = -1;
         if (gamepad1.dpad_right)
             x += 1;
-        return new Vector3D(x,y,turn).multiply(drivetrain.getMaxRobotVelocity());
+        return new Vector3D(x, y, turn).multiply(drivetrain.getMaxRobotVelocity());
     }
 }
