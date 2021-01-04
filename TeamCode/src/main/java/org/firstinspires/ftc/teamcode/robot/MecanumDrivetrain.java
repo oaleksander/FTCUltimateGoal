@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigu
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.math.Vector2D;
+import org.firstinspires.ftc.teamcode.math.Vector3D;
 import org.firstinspires.ftc.teamcode.misc.CommandSender;
 import org.firstinspires.ftc.teamcode.misc.motorAccelerationLimiter;
 import org.firstinspires.ftc.teamcode.superclasses.Drivetrain;
@@ -31,13 +32,13 @@ public class MecanumDrivetrain implements RobotModule, Drivetrain {
     DcMotorEx driveRearRight = null;
 
     /* Physical constants */
-    private static double wheelRadius = 9.8/2;
-    private static double strafingMultiplier = 1/0.8;
-    private static Vector2D wheelCenterOffset = new Vector2D(18.05253,15.20000);
-    private static double rotationDecrepancy = 1.0;
-    private static double forwardMultiplier = 1/wheelRadius;
-    private static double sidewaysMultiplier = strafingMultiplier/wheelRadius;
-    private static double turnMultiplier = (wheelCenterOffset.x+wheelCenterOffset.y)*rotationDecrepancy/wheelRadius;
+    private static final double wheelRadius = 9.8/2;
+    private static final double strafingMultiplier = 1/0.8;
+    private static final Vector2D wheelCenterOffset = new Vector2D(18.05253,15.20000);
+    private static final double rotationDecrepancy = 1.0;
+    private static final double forwardMultiplier = 1/wheelRadius;
+    private static final double sidewaysMultiplier = forwardMultiplier*strafingMultiplier;
+    private static final double turnMultiplier = (wheelCenterOffset.x+wheelCenterOffset.y)*rotationDecrepancy/wheelRadius;
 
 
     /* Motor parameters constatnts. */
@@ -46,9 +47,10 @@ public class MecanumDrivetrain implements RobotModule, Drivetrain {
     private static final double tickPerRev = 480;
     private static final double gearing = 20;
     private static final double maxRPM = 300;
-    private static final double theoreticalMaxSpeed = (maxRPM/60)*achieveableMaxRPMFraction*Math.PI*2;
-    private static double maxDriveSpeed = achieveableMaxRPMFraction*theoreticalMaxSpeed;
-    private static double minDriveSpeed = 0.05*theoreticalMaxSpeed;
+    public static final double theoreticalMaxSpeed = (maxRPM/60)*Math.PI*2;
+
+    private static double maxMotorSpeed = achieveableMaxRPMFraction*theoreticalMaxSpeed;
+    private static double minMotorSpeed = 0.05*theoreticalMaxSpeed;
     private double maxAcceleration = theoreticalMaxSpeed / 0.25;
 
     /* Motor controllers */
@@ -153,11 +155,11 @@ public class MecanumDrivetrain implements RobotModule, Drivetrain {
     }
 
     public void setMaxDriveSpeed(double value) {
-        maxDriveSpeed = clip(abs(value), 0, 1);
+        maxMotorSpeed = clip(abs(value), 0, theoreticalMaxSpeed);
     }
 
     public void setMinDriveSpeed(double value) {
-        minDriveSpeed = clip(abs(value), 0, 1);
+        minMotorSpeed = clip(abs(value), 0, theoreticalMaxSpeed);
     }
 
     public void update() {
@@ -177,8 +179,8 @@ public class MecanumDrivetrain implements RobotModule, Drivetrain {
     public void driveMotorPowers(double frontLeft, double frontRight, double rearLeft, double rearRight) {
 
         double maxabs = max(max(abs(frontLeft), abs(frontRight)), max(abs(rearLeft), abs(rearRight)));
-        if (maxabs > maxDriveSpeed) {
-            maxabs = maxabs/maxDriveSpeed;
+        if (maxabs > maxMotorSpeed) {
+            maxabs = maxabs/ maxMotorSpeed;
             frontLeft = (frontLeft / maxabs);
             frontRight = (frontRight / maxabs);
             rearLeft = (rearLeft / maxabs);
@@ -192,9 +194,12 @@ public class MecanumDrivetrain implements RobotModule, Drivetrain {
     }
 
     private double limitSpeed(double speed) {
-        return clip(abs(speed), minDriveSpeed, maxDriveSpeed) * signum(speed);
+        return clip(abs(speed), minMotorSpeed, maxMotorSpeed) * signum(speed);
     }
 
+    public Vector3D getMaxRobotVelocity() {
+        return new Vector3D(maxMotorSpeed/forwardMultiplier,maxMotorSpeed/forwardMultiplier,maxMotorSpeed/turnMultiplier);
+    }
 
     public void setRobotVelocity(double frontways, double sideways, double turn) {
 
