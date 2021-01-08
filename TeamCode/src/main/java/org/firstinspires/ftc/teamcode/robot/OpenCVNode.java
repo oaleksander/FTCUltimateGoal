@@ -94,7 +94,6 @@ public class OpenCVNode implements RobotModule {
 
         @Override
         public Mat processFrame(Mat input) {
-            all = input;
             all = input.submat(crop);
             Imgproc.GaussianBlur(all, all, new Size(9, 9), 0);
             Imgproc.cvtColor(all, HSVMat, Imgproc.COLOR_RGB2HSV);
