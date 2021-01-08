@@ -26,6 +26,7 @@ public class WoENrobot {
     protected static RobotModule[] activeRobotModules = {odometry, drivetrain, movement, shooter, wobbleManipulator2, conveyor, telemetryDebugging}; //conveyor, odometry, shooter, wobbleManipulator, drivetrain
     static boolean spinCompleted = false;
     static Runnable updateRegulators = () -> {
+        setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
         while (opMode.opModeIsActive() && !Thread.interrupted()) {
             clearBulkCaches();
             // Arrays.stream(activeRobotModules).forEach(RobotModule::update);
@@ -100,7 +101,7 @@ public class WoENrobot {
         allHubs = opMode.hardwareMap.getAll(LynxModule.class);
         expansionHub1 = opMode.hardwareMap.get(ExpansionHubEx.class, "Expansion Hub 1");
         expansionHub2 = opMode.hardwareMap.get(ExpansionHubEx.class, "Expansion Hub 2");
-        setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
 
         for (RobotModule robotModule : activeRobotModules) {
             robotModule.initialize(opMode);
