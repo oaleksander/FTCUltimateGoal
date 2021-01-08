@@ -1,10 +1,13 @@
 package org.firstinspires.ftc.teamcode.robot;
 
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
 import org.openftc.revextensions2.ExpansionHubEx;
+
+import java.util.List;
 
 public class WoENrobot {
 
@@ -24,6 +27,7 @@ public class WoENrobot {
     static boolean spinCompleted = false;
     static Runnable updateRegulators = () -> {
         while (opMode.opModeIsActive() && !Thread.interrupted()) {
+            clearBulkCaches();
             // Arrays.stream(activeRobotModules).forEach(RobotModule::update);
             for (RobotModule robotModule : activeRobotModules) {
                 robotModule.update();
@@ -33,6 +37,7 @@ public class WoENrobot {
     };
     private static ExpansionHubEx expansionHub1 = null;
     private static ExpansionHubEx expansionHub2 = null;
+    private static List<LynxModule> allHubs = null;
     private static Thread regulatorUpdater = new Thread(updateRegulators);
 
     public static void FullInitWithCV(LinearOpMode opMode) {
@@ -92,8 +97,10 @@ public class WoENrobot {
         opMode.telemetry.update();
 
 
+        allHubs = opMode.hardwareMap.getAll(LynxModule.class);
         expansionHub1 = opMode.hardwareMap.get(ExpansionHubEx.class, "Expansion Hub 1");
         expansionHub2 = opMode.hardwareMap.get(ExpansionHubEx.class, "Expansion Hub 2");
+        setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
 
         for (RobotModule robotModule : activeRobotModules) {
             robotModule.initialize(opMode);
@@ -122,7 +129,18 @@ public class WoENrobot {
         expansionHub1.setLedColor(r, g, b);
         expansionHub2.setLedColor(r, g, b);
     }
-
+    public static void setBulkCachingMode(LynxModule.BulkCachingMode mode)
+    {
+        for (LynxModule module : allHubs) {
+            module.setBulkCachingMode(mode);
+        }
+    }
+    public static void clearBulkCaches()
+    {
+        for (LynxModule module : allHubs) {
+            module.clearBulkCache();
+        }
+    }
     public static void FullInit(LinearOpMode OpMode) {
         forceInitRobot(opMode);
     }
