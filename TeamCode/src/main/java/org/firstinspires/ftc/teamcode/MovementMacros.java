@@ -36,7 +36,7 @@ public class MovementMacros {
             movement.Pos(new Pose2D(xSign * 61.5, -28, toRadians(-11.5)));
         while (opMode.opModeIsActive() && !shooter.isCorrectRpm()) {Thread.yield();
         }
-        conveyor.feedrings();
+        shooter.feedrings();
         delay(900);
         shooter.onshooter(false);
     }

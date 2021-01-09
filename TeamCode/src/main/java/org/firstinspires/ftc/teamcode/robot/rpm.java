@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.robot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -11,15 +12,20 @@ import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
 
 public class rpm implements RobotModule {
     private final ElapsedTime rpmTime = new ElapsedTime();
+    private final ElapsedTime feederTime = new ElapsedTime();
+    private final double time = 125;
     private final double lowRpm = 3500;
     private final double highRpm = 3800;
     private final double timeRpm = 500;
+    private final double feederClose = 0.06;
+    private final double feederOpen = 0.3;
     private LinearOpMode opMode;
     private DcMotorEx shooterMotor = null;
+    private Servo feeder = null;
     private final CommandSender shooterVelocitySender = new CommandSender(p -> shooterMotor.setVelocity(p));
     private boolean on = false;
     private boolean powerShotB = false;
-
+    private byte i = 0;
     private double time_ms = 1;
     private double x = 1;
     private double rpm = 6000;
@@ -51,14 +57,27 @@ public class rpm implements RobotModule {
         shooterMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         shooterMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         setShootersetings(highRpm, timeRpm);
+        initializedservo();
+        feederTime.reset();
+    }
+    private void initializedservo() {
+        feeder = opMode.hardwareMap.get(Servo.class, "feeder");
+        feeder.setPosition(feederClose);
     }
 
     public void reset() {
+        feeder.setPosition(feederClose);
         shooterMotor.setVelocity(0);
         on = false;
+        i = 0;
     }
 
     public void update() {
+        if (i > 0 && feederTime.milliseconds() > time * 2.5 && isCorrectRpm()) {
+            feedRing();
+            i--;
+        }
+        setFeederPosition(feederTime.milliseconds() < time);
         if (on) {
             if (time_ms > rpmTime.milliseconds()) {
                 speed = rpmTime.milliseconds() * x * velocityTarget;
@@ -72,6 +91,10 @@ public class rpm implements RobotModule {
         shooterVelocity(speed);
     }
 
+    private void setFeederPosition(boolean push) {
+        if (push && isCorrectRpm()) feeder.setPosition(feederOpen);
+        else feeder.setPosition(feederClose);
+    }
 
     private void shooterVelocity(double velocity) {
         shooterVelocitySender.send(velocity);
@@ -115,5 +138,12 @@ public class rpm implements RobotModule {
 
     public boolean isCorrectRpm(double error) {
         return Math.abs(speed - shooterMotor.getVelocity()) < error;
+    }
+    public void feedRing() {
+        feederTime.reset();
+    }
+
+    public void feedrings() {
+        i = 3;
     }
 }

@@ -16,18 +16,14 @@ public class Conveyor implements RobotModule {
     private final ElapsedTime conveyorTime = new ElapsedTime();
     private final ElapsedTime backOnTime = new ElapsedTime();
     private final ElapsedTime pauseTime = new ElapsedTime();
-    private final ElapsedTime feederTime = new ElapsedTime();
-    private final double time = 125;
-    private final double feederClose = 0.06;
-    private final double feederOpen = 0.3;
+
     private LinearOpMode opMode;
     private DcMotorEx conveyorm = null;
-    private Servo feeder = null;
     private DistanceSensor sensorDistance;
     private boolean full = false;
     private boolean backOn = false, stop = false;
     private boolean backMust = false;
-    private byte i = 0;
+
     private double timelock = 0;
     private double conveyorPower = 0;
     private double distance = 0;
@@ -38,19 +34,18 @@ public class Conveyor implements RobotModule {
 
 
     public void initialize() {
-        feederTime.reset();
+
         initializecolor();
         initializedrive();
-        initializedservo();
     }
 
     public void reset() {
-        feeder.setPosition(feederClose);
+
         conveyorm.setPower(0);
         backOn = false;
         stop = false;
         conveyorPower = 0;
-        i = 0;
+
     }
 
     private void initializecolor() {
@@ -66,10 +61,7 @@ public class Conveyor implements RobotModule {
         conveyorm.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
     }
 
-    private void initializedservo() {
-        feeder = opMode.hardwareMap.get(Servo.class, "feeder");
-        feeder.setPosition(feederClose);
-    }
+
 
     private double getdistance() {
         return sensorDistance.getDistance(DistanceUnit.CM);
@@ -77,11 +69,7 @@ public class Conveyor implements RobotModule {
 
     public void update() {
 
-        if (i > 0 && feederTime.milliseconds() > time * 2.5) {
-            feedRing();
-            i--;
-        }
-        setFeederPosition(feederTime.milliseconds() < time);
+
         if (pauseTime.milliseconds() >= 100) {
             pauseTime.reset();
             distance = getdistance();
@@ -126,10 +114,7 @@ public class Conveyor implements RobotModule {
         }
     }
 
-    private void setFeederPosition(boolean push) {
-        if (push) feeder.setPosition(feederOpen);
-        else feeder.setPosition(feederClose);
-    }
+
 
     public void setConveyorPower(double power) {
         conveyorPower = power;
@@ -143,11 +128,5 @@ public class Conveyor implements RobotModule {
         backMust = Backmust;
     }
 
-    public void feedRing() {
-        feederTime.reset();
-    }
 
-    public void feedrings() {
-        i = 3;
-    }
 }

@@ -48,7 +48,7 @@ public class Tele_test extends LinearOpMode {
             wobbleManipulator2.upmediumdown(gamepad1.y, gamepad1.x); // correct
             shooter.onshooter(buttonStartswitch.isTriggered(gamepad1.start));
             if (threeRingPresser.isTriggered(gamepad1.b))
-                conveyor.feedrings();
+                shooter.feedrings();
             drivetrain.setRobotVelocity(calculateDrivingVelocity());
             spinOnce();
         }

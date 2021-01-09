@@ -43,9 +43,9 @@ public class Tele_competition extends LinearOpMode {
             //   powerconveyor = (buttonspeedConveyor.isTriggered(gamepad2.right_bumper)?-1:1);
 
             if (gamepad1.b)
-                conveyor.feedRing();
+                shooter.feedRing();
             if (threeRingPresser.isTriggered(gamepad1.right_stick_button))
-                conveyor.feedrings();
+                shooter.feedrings();
 
             drivetrain.setRobotVelocity(calculateDrivingVelocity());
             //      spinOnce();
