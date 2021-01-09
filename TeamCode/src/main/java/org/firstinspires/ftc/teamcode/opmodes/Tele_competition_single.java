@@ -27,7 +27,7 @@ public class Tele_competition_single extends LinearOpMode {
 
         SinglePressButton threeRingPresser = new SinglePressButton();
 
-        shooter.setShootersetings(3800, 500);
+       //shooter.setShootersetings(3800, 500);
         while (opModeIsActive()) {
 
             wobbleManipulator2.setposclose(buttonAswitch.isTriggered(gamepad1.a));

@@ -30,13 +30,13 @@ public class Tele_competition extends LinearOpMode {
         //conveyor.feeder.setPosition(0.06);
         //  double powerconveyor = 1;
 
-        shooter.setShootersetings(3800, 500);
+        //shooter.setShootersetings(3800, 500);
         while (opModeIsActive()) {
             wobbleManipulator2.setposclose(buttonAswitch.isTriggered(gamepad1.a));
             wobbleManipulator2.upmediumdown(gamepad2.b, gamepad2.x); // correct
             shooter.onshooter(buttonStartswitch.isTriggered(gamepad2.a));
             conveyor.setConveyorPower(buttonBackswitch.isTriggered(gamepad2.left_trigger > 0.5) ? 1 : 0);
-            shooter.setShootersetings((buttonspeedShooter.isTriggered(gamepad2.y) ? 3500 : 3800), 500);
+            shooter.powerShot(buttonspeedShooter.isTriggered(gamepad2.y));
             conveyor.setBackmust(gamepad2.right_trigger > 0.5);
             //    telemetry.addData("speed",shooter.shooterMotor.getVelocity()*2.5);
             //  telemetry.update();

@@ -11,10 +11,14 @@ import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
 
 public class rpm implements RobotModule {
     private final ElapsedTime rpmTime = new ElapsedTime();
+    private final double lowRpm = 3500;
+    private final double highRpm = 3800;
+    private final double timeRpm = 500;
     private LinearOpMode opMode;
     private DcMotorEx shooterMotor = null;
     private final CommandSender shooterVelocitySender = new CommandSender(p -> shooterMotor.setVelocity(p));
     private boolean on = false;
+    private boolean powerShotB = false;
 
     private double time_ms = 1;
     private double x = 1;
@@ -46,6 +50,7 @@ public class rpm implements RobotModule {
         shooterMotor.setDirection(DcMotorEx.Direction.FORWARD);
         shooterMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         shooterMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        setShootersetings(highRpm, timeRpm);
     }
 
     public void reset() {
@@ -79,11 +84,13 @@ public class rpm implements RobotModule {
         }
     }
 
-    public void setShootersetings(double Rpm, double time) {
-        rpm = Rpm;
-        time_ms = time;
-        x = rpm / Math.abs(time_ms) / 6000;
-        velocityTarget = rpm * 0.4;
+    private void setShootersetings(double Rpm, double time) {
+        if (Rpm != rpm || time != time_ms ) {
+            rpm = Rpm;
+            time_ms = time;
+            x = rpm / Math.abs(time_ms) / 6000;
+            velocityTarget = rpm * 0.4;
+        }
     }
 
     public boolean isCorrectRpm() {
@@ -96,6 +103,14 @@ public class rpm implements RobotModule {
 
     public double getCurrentRpm() {
         return shooterMotor.getVelocity() * 2.5;
+    }
+
+    public void powerShot(boolean PowerShotB) {
+        if (PowerShotB != powerShotB){
+            powerShotB = PowerShotB;
+            if (powerShotB) setShootersetings(lowRpm,timeRpm);
+            else setShootersetings(highRpm, timeRpm);
+        }
     }
 
     public boolean isCorrectRpm(double error) {

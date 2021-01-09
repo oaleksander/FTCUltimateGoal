@@ -24,7 +24,7 @@ public class MovementMacros {
     }
 
     public static void ShootTargets() {
-        shooter.setShootersetings(3850, 500);
+        //shooter.setShootersetings(3850, 500);
         shooter.onshooter(true);
         if (sideSign == 1 && xSign == 1)
             movement.Pos(new Pose2D(xSign * 121, -48.5, toRadians(-10.5)));
