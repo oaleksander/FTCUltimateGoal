@@ -28,7 +28,7 @@ public class Tele_test extends LinearOpMode {
         forceInitRobot(this);
         startRobot();
         ButtonSwitch buttonAswitch = new ButtonSwitch();
-
+        ButtonSwitch smartModeSwitch = new ButtonSwitch();
         ButtonSwitch buttonStartswitch = new ButtonSwitch();
         SinglePressButton threeRingPresser = new SinglePressButton();
 
@@ -43,6 +43,7 @@ public class Tele_test extends LinearOpMode {
         //wobbleManipulator2.changepos(WobbleManipulator2.positions.down);
         // wobbleManipulator2.setAngle(1);
         while (opModeIsActive()) {
+            drivetrain.setSmartMode(smartModeSwitch.isTriggered(gamepad1.left_stick_button));
             wobbleManipulator2.setposclose(buttonAswitch.isTriggered(gamepad1.a));
             wobbleManipulator2.upmediumdown(gamepad1.y, gamepad1.x); // correct
             shooter.onshooter(buttonStartswitch.isTriggered(gamepad1.start));

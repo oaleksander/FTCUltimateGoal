@@ -7,12 +7,13 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
 import org.openftc.revextensions2.ExpansionHubEx;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class WoENrobot {
 
     public static WobbleManipulator2 wobbleManipulator2 = new WobbleManipulator2();
-    public static OpenCVNodeWebcam openCVNode = new OpenCVNodeWebcam();
+    public static OpenCVNode openCVNode = new OpenCVNodeWebcam();
     public static Conveyor conveyor = new Conveyor();
     public static rpm shooter = new rpm();
     public static TelemetryDebugging telemetryDebugging = new TelemetryDebugging();
@@ -26,17 +27,16 @@ public class WoENrobot {
     protected static RobotModule[] activeRobotModules = {odometry, drivetrain, movement, shooter, wobbleManipulator2, conveyor, telemetryDebugging}; //conveyor, odometry, shooter, wobbleManipulator, drivetrain
     static boolean spinCompleted = false;
     static Runnable updateRegulators = () -> {
-        setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+       // setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
         while (opMode.opModeIsActive() && !Thread.interrupted()) {
-            clearBulkCaches();
-            // Arrays.stream(activeRobotModules).forEach(RobotModule::update);
-            for (RobotModule robotModule : activeRobotModules) {
-                robotModule.update();
-            }
+       //     clearBulkCaches();
+             Arrays.stream(activeRobotModules).forEach(RobotModule::update);
+          //  for (RobotModule robotModule : activeRobotModules) {
+        //        robotModule.update();
+      //      }
             spinCompleted = true;
         }
     };
-    private static ExpansionHubEx expansionHub1 = null;
     private static ExpansionHubEx expansionHub2 = null;
     private static List<LynxModule> allHubs = null;
     private static Thread regulatorUpdater = new Thread(updateRegulators);
@@ -99,7 +99,6 @@ public class WoENrobot {
 
 
         allHubs = opMode.hardwareMap.getAll(LynxModule.class);
-        expansionHub1 = opMode.hardwareMap.get(ExpansionHubEx.class, "Expansion Hub 1");
         expansionHub2 = opMode.hardwareMap.get(ExpansionHubEx.class, "Expansion Hub 2");
         setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
 
@@ -127,7 +126,6 @@ public class WoENrobot {
     }
 
     public static void setLedColors(int r, int g, int b) {
-        expansionHub1.setLedColor(r, g, b);
         expansionHub2.setLedColor(r, g, b);
     }
     public static void setBulkCachingMode(LynxModule.BulkCachingMode mode)

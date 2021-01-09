@@ -58,9 +58,9 @@ public class Conveyor implements RobotModule {
     }
 
     private void initializedrive() {
-        conveyorm = opMode.hardwareMap.get(DcMotorEx.class, "conveyor");
+        conveyorm = opMode.hardwareMap.get(DcMotorEx.class, "shooterMotor2");
 
-        conveyorm.setDirection(DcMotorSimple.Direction.FORWARD);
+        conveyorm.setDirection(DcMotorSimple.Direction.REVERSE);
 
         conveyorm.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         conveyorm.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);

@@ -98,9 +98,9 @@ public class OpenCVNode implements RobotModule {
             Imgproc.GaussianBlur(all, all, new Size(9, 9), 0);
             Imgproc.cvtColor(all, HSVMat, Imgproc.COLOR_RGB2HSV);
 
-            Core.inRange(HSVMat, new Scalar(7, (160 + Core.mean(HSVMat).val[1]) / 2, (80 + Core.mean(HSVMat).val[2]) / 2), new Scalar(15, 255, 255), thresholdMat);
-            Imgproc.erode(thresholdMat, thresholdMat, Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(35, 5)));
-            Imgproc.dilate(thresholdMat, thresholdMat, Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(35, 15)));
+            Core.inRange(HSVMat, new Scalar(12, (160 + Core.mean(HSVMat).val[1]) / 2, (80 + Core.mean(HSVMat).val[2]) / 2), new Scalar(18, 255, 255), thresholdMat);
+            Imgproc.erode(thresholdMat, thresholdMat, Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(35, 10)));
+            Imgproc.dilate(thresholdMat, thresholdMat, Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(35, 10)));
 
             Rect rect = Imgproc.boundingRect(thresholdMat);
 

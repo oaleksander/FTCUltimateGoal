@@ -71,8 +71,8 @@ public class Movement implements RobotModule {
             Vector2D movementControl = new Vector2D(
                     error.x * kP_distance + diffError.x * kD_distance,
                     error.y * kP_distance + diffError.y * kD_distance);
-            if (movementControl.radius() > 1)
-                movementControl.normalize();
+          //  if (movementControl.radius() > drivetrain)
+          //      movementControl.normalize();
 
             Vector3D control = new Vector3D(movementControl,
                     error.heading * kP_angle + diffError.z * kD_angle);

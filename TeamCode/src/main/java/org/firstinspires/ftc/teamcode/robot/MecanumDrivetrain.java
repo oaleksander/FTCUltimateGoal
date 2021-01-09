@@ -54,7 +54,7 @@ public class MecanumDrivetrain implements RobotModule, Drivetrain {
     private final motorAccelerationLimiter mRRProfiler = new motorAccelerationLimiter(new CommandSender(v -> driveRearRight.setVelocity(v, AngleUnit.RADIANS))::send, maxAcceleration);
 
 
-    private boolean smartMode = true;
+    private boolean smartMode = false;
     private double powerFrontLeft = 0;
     private double powerFrontRight = 0;
     private double powerRearLeft = 0;
@@ -152,10 +152,18 @@ public class MecanumDrivetrain implements RobotModule, Drivetrain {
     }
 
     public void update() {
-        mFLProfiler.setVelocity(powerFrontLeft);
-        mFRProfiler.setVelocity(powerFrontRight);
-        mRLProfiler.setVelocity(powerRearLeft);
-        mRRProfiler.setVelocity(powerRearRight);
+        if(smartMode)
+        {
+            mFLProfiler.setVelocity(powerFrontLeft);
+            mFRProfiler.setVelocity(powerFrontRight);
+            mRLProfiler.setVelocity(powerRearLeft);
+            mRRProfiler.setVelocity(powerRearRight);
+        }
+        else
+        driveMotorPowers_direct(powerFrontLeft/maxMotorSpeed,
+                powerFrontRight/maxMotorSpeed,
+                powerRearLeft/maxMotorSpeed,
+                powerRearRight/maxMotorSpeed);
     }
 
     public void driveMotorPowers_direct(double frontLeft, double frontRight, double rearLeft, double rearRight) {
