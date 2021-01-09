@@ -27,9 +27,9 @@ public class WoENrobot {
     protected static RobotModule[] activeRobotModules = {odometry, drivetrain, movement, shooter, wobbleManipulator2, conveyor, telemetryDebugging}; //conveyor, odometry, shooter, wobbleManipulator, drivetrain
     static boolean spinCompleted = false;
     static Runnable updateRegulators = () -> {
-       // setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
         while (opMode.opModeIsActive() && !Thread.interrupted()) {
-       //     clearBulkCaches();
+           clearBulkCaches();
              Arrays.stream(activeRobotModules).forEach(RobotModule::update);
           //  for (RobotModule robotModule : activeRobotModules) {
         //        robotModule.update();
@@ -37,6 +37,7 @@ public class WoENrobot {
             spinCompleted = true;
         }
     };
+    private static ExpansionHubEx expansionHub1 = null;
     private static ExpansionHubEx expansionHub2 = null;
     private static List<LynxModule> allHubs = null;
     private static Thread regulatorUpdater = new Thread(updateRegulators);
@@ -99,6 +100,7 @@ public class WoENrobot {
 
 
         allHubs = opMode.hardwareMap.getAll(LynxModule.class);
+        expansionHub1 = opMode.hardwareMap.get(ExpansionHubEx.class, "Control Hub");
         expansionHub2 = opMode.hardwareMap.get(ExpansionHubEx.class, "Expansion Hub 2");
         setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
 
@@ -126,6 +128,7 @@ public class WoENrobot {
     }
 
     public static void setLedColors(int r, int g, int b) {
+        expansionHub1.setLedColor(r, g, b);
         expansionHub2.setLedColor(r, g, b);
     }
     public static void setBulkCachingMode(LynxModule.BulkCachingMode mode)

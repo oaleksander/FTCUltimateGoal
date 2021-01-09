@@ -9,7 +9,6 @@ public class AutoNothing extends AutonomousOpMode {
 
     @Override
     public void main() {
-        AutoTransitioner.transitionOnStop(this, "TeleOp COMPETITION");
         // MoveWobble();
         //PutRingsToLowGoal();
         // movement.Pos(new Pose2D(getStartPosition().x, 25, 0));

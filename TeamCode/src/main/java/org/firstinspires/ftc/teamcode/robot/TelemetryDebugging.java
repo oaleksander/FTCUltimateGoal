@@ -45,20 +45,21 @@ public class TelemetryDebugging implements RobotModule {
         loopCount = 0;
         telemetry = opMode.telemetry;
         //telemetry = dashboard.getTelemetry();
-         dashboard.startCameraStream(openCVNode.getWebcam(),0);
+        telemetry.setMsTransmissionInterval(333);
+      //   dashboard.startCameraStream(openCVNode.getWebcam(),0);
     }
 
 
     public void update() {
-        if (measurementTime.seconds() > 0.25) {
+        if (measurementTime.milliseconds() > 3333) {
             // telemetry.addData("Status", "Running");
-            //telemetry.addData("Loop frequency", 1 / (measurementTime.seconds() / loopCount) + " Hz");
+            telemetry.addData("Loop frequency", 1 / (measurementTime.seconds() / loopCount) + " Hz");
 
-            //telemetry.setMsTransmissionInterval(40);
+            //
             //telemetry.addLine("Odometry encoders").addData("odYL", odometry.bulkData.getMotorCurrentPosition(0)).addData("odYR", odometry.bulkData.getMotorCurrentPosition(1)).addData("odX", odometry.bulkData.getMotorCurrentPosition(2));
             //telemetry.addLine("Robot position").addData("y", odometry.getRobotCoordinates().y).addData("x", odometry.getRobotCoordinates().x).addData("head", Math.toDegrees(odometry.getRobotCoordinates().heading));
-            Vector3D velocity = odometry.getRobotVelocity();
-            telemetry.addLine("Robot velocity").addData("y", velocity.y).addData("x", velocity.x).addData("head", Math.toDegrees(velocity.z));
+           // Vector3D velocity = odometry.getRobotVelocity();
+            //telemetry.addLine("Robot velocity").addData("y", velocity.y).addData("x", velocity.x).addData("head", Math.toDegrees(velocity.z));
            telemetry.addData("head", Math.toDegrees(odometry.getRobotCoordinates().heading));
             // telemetry.addData("Shooter velo", shooter.getCurrentRpm());
            // telemetry.addData("Shooter tgt", shooter.getRpmTarget());

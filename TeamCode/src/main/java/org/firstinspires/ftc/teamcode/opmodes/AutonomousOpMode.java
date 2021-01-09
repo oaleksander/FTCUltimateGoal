@@ -62,10 +62,6 @@ public class AutonomousOpMode extends LinearOpMode {
         openCVNode.stopCam();
         new MovementMacros(getXSign(), getSideSign());
         odometry.setRobotCoordinates(getStartPosition());
-        if (thereAreTwoGamepads)
-            AutoTransitioner.transitionOnStop(this, "TeleOp COMPETITION");
-        else
-            AutoTransitioner.transitionOnStop(this, "TeleOp COMPETITION single");
         main();
         setLedColors(0, 128, 128);
         telemetry.addData("Status", "Program finished (" + getRuntime() + ")");
