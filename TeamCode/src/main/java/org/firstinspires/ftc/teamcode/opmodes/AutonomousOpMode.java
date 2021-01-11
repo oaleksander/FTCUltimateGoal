@@ -1,14 +1,19 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
+import android.graphics.Color;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.MovementMacros;
 import org.firstinspires.ftc.teamcode.math.Pose2D;
+import org.firstinspires.ftc.teamcode.math.Vector3D;
 import org.firstinspires.ftc.teamcode.misc.AutoTransitioner;
+import org.firstinspires.ftc.teamcode.misc.HSVRGB;
 
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.FullInitWithCV;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.odometry;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.openCVNode;
+import static org.firstinspires.ftc.teamcode.robot.WoENrobot.runTime;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.setLedColors;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.startRobot;
 
@@ -44,7 +49,8 @@ public class AutonomousOpMode extends LinearOpMode {
     }
 
     void start_loop() {
-
+        Vector3D color = HSVRGB.convert((float)(runTime.seconds()*50)%360,100,50);
+        setLedColors((int)color.x,(int)color.y,(int)color.z);
         telemetry.addLine("Use gamedad 1 X/B to select alliance color, dpad L/R to select alliance side");
         xSign = gamepad1.b ? 1 : gamepad1.x ? -1 : xSign;
         sideSign = gamepad1.dpad_right ? 1 : gamepad1.dpad_left ? -1 : sideSign;
