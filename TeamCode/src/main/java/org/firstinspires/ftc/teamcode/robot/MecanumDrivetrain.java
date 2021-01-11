@@ -81,11 +81,7 @@ public class MecanumDrivetrain implements RobotModule, Drivetrain {
 
     public void setSmartMode(boolean SmartMode) {
         smartMode = SmartMode;
-        if (smartMode) {
-            setMotorMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        } else {
-            setMotorMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        }
+        setMotorMode(SmartMode?DcMotorEx.RunMode.RUN_USING_ENCODER:DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     private void assignNames() {
