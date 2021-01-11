@@ -21,15 +21,22 @@ public class rpm implements RobotModule {
     private final double feederOpen = 0.3;
     private LinearOpMode opMode;
     private DcMotorEx shooterMotor = null;
-    private Servo feeder = null;
     private final CommandSender shooterVelocitySender = new CommandSender(p -> shooterMotor.setVelocity(p));
-    private boolean on = false;
-    private boolean powerShotB = false;
-    private byte i = 0;
-    private double time_ms = 1;
-    private double x = 1;
-    private double rpm = 6000;
-    private double speed = 0;
+    private Servo feeder = null;
+    private final CommandSender feederPositionSender = new CommandSender(p -> feeder.setPosition(p));
+    //private boolean shooterIsOn = false;
+    public enum ShooterMode
+    {
+        HIGHGOAL,
+        POWERSHOT,
+        OFF
+    }
+    private ShooterMode shooterMode = ShooterMode.OFF;
+    private byte ringsToShoot = 0;
+    private double timeToAccelerate_ms = 1;
+    private double accelerationIncrement = 1;
+    private double rpmTarget = 6000;
+    private double currentVelocity = 0;
     private double velocityTarget = 2400;
 
     public void setOpMode(LinearOpMode OpMode) {
@@ -45,18 +52,16 @@ public class rpm implements RobotModule {
         motorConfigurationType.setGearing(1);
         motorConfigurationType.setMaxRPM(6000);
         shooterMotor.setMotorType(motorConfigurationType);
-        // PIDFCoefficients pidNew = new PIDFCoefficients(1, 1, 9, 0);
-//       PIDFCoefficients pidNew = new PIDFCoefficients(3.628, 1.3, 5, 14.28);
         PIDFCoefficients pidNew = new PIDFCoefficients(25.5, 0.075, 16, 15.23);
         try {
             shooterMotor.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidNew);
         } catch (UnsupportedOperationException e) {
-            opMode.telemetry.addData("Drivetrain PIDF error ", e.getMessage());
+            opMode.telemetry.addData("Shooter PIDF error ", e.getMessage());
         }
         shooterMotor.setDirection(DcMotorEx.Direction.FORWARD);
         shooterMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         shooterMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        setShootersetings(highRpm, timeRpm);
+        setShootingMode(ShooterMode.HIGHGOAL);
         initializedservo();
         feederTime.reset();
     }
@@ -68,51 +73,38 @@ public class rpm implements RobotModule {
     public void reset() {
         feeder.setPosition(feederClose);
         shooterMotor.setVelocity(0);
-        on = false;
-        i = 0;
+        setShootingMode(ShooterMode.OFF);
+        ringsToShoot = 0;
     }
 
     public void update() {
-        if (i > 0 && feederTime.milliseconds() > time * 2.5 && isCorrectRpm()) {
-            feedRing();
-            i--;
+        if (ringsToShoot > 0 && feederTime.milliseconds() > time * 2.5) {
+            if(velocityTarget!=0) feederTime.reset();
+            ringsToShoot--;
         }
         setFeederPosition(feederTime.milliseconds() < time);
-        if (on) {
-            if (time_ms > rpmTime.milliseconds()) {
-                speed = rpmTime.milliseconds() * x * velocityTarget;
-            }
-            if (time_ms < rpmTime.milliseconds()) {
-                speed = velocityTarget;
-            }
-        } else {
-            speed = 0;
-        }
-        shooterVelocity(speed);
+        currentVelocity = rpmTime.milliseconds() >= timeToAccelerate_ms?
+                velocityTarget
+                :rpmTime.milliseconds() * accelerationIncrement * velocityTarget;
+        shooterVelocitySender.send(currentVelocity);
     }
 
     private void setFeederPosition(boolean push) {
-        if (push && isCorrectRpm()) feeder.setPosition(feederOpen);
-        else feeder.setPosition(feederClose);
+        feederPositionSender.send(push?feederOpen:feederClose);
     }
 
-    private void shooterVelocity(double velocity) {
-        shooterVelocitySender.send(velocity);
-    }
-
-    public void onshooter(boolean On) {
-        if (On != on) {
+ /*  public void onshooter(boolean On) {
+        if (On)
             rpmTime.reset();
-            on = On;
-        }
-    }
+        shooterIsOn = On;
+    }*/
 
     private void setShootersetings(double Rpm, double time) {
-        if (Rpm != rpm || time != time_ms ) {
-            rpm = Rpm;
-            time_ms = time;
-            x = rpm / Math.abs(time_ms) / 6000;
-            velocityTarget = rpm * 0.4;
+        if (Rpm != rpmTarget || time != timeToAccelerate_ms) {
+            rpmTarget = Rpm;
+            if(time!=0) timeToAccelerate_ms = Math.abs(time);
+            accelerationIncrement = rpmTarget / timeToAccelerate_ms / 6000;
+            velocityTarget = rpmTarget * 0.4;
         }
     }
 
@@ -121,29 +113,43 @@ public class rpm implements RobotModule {
     }
 
     public double getRpmTarget() {
-        return rpm;
+        return rpmTarget;
     }
 
     public double getCurrentRpm() {
         return shooterMotor.getVelocity() * 2.5;
     }
 
-    public void powerShot(boolean PowerShotB) {
-        if (PowerShotB != powerShotB){
-            powerShotB = PowerShotB;
-            if (powerShotB) setShootersetings(lowRpm,timeRpm);
-            else setShootersetings(highRpm, timeRpm);
+    public ShooterMode getShootingMode() {
+        return shooterMode;
+    }
+    public void setShootingMode(ShooterMode mode)
+    {
+        if(mode!=ShooterMode.OFF && shooterMode==ShooterMode.OFF)
+            rpmTime.reset();
+        shooterMode = mode;
+        switch (mode)
+        {
+            case HIGHGOAL:
+                setShootersetings(highRpm, timeRpm);
+                break;
+            case POWERSHOT:
+                setShootersetings(lowRpm,timeRpm);
+                break;
+            case OFF:
+                setShootersetings(0,timeRpm);
         }
     }
 
     public boolean isCorrectRpm(double error) {
-        return Math.abs(speed - shooterMotor.getVelocity()) < error;
+        return Math.abs(currentVelocity - shooterMotor.getVelocity()) < error;
     }
     public void feedRing() {
+        ringsToShoot = 1;
         feederTime.reset();
     }
 
-    public void feedrings() {
-        i = 3;
+    public void feedRings() {
+        ringsToShoot = 3;
     }
 }
