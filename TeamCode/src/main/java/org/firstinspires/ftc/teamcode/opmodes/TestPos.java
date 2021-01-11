@@ -12,8 +12,6 @@ public class TestPos extends AutonomousOpMode {
     public void main() {
         while (opModeIsActive()) {
             openCVNode.retrieveResult();
-            //telemetry.addData("rpm2", shooter.rpm2);
-            shooter.onshooter(gamepad1.a);
             spinOnce();
         }
     }

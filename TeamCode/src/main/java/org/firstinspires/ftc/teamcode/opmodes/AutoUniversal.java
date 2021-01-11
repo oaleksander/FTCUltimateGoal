@@ -26,8 +26,6 @@ public class AutoUniversal extends AutonomousOpMode {
         else
             movement.Pos(new Pose2D(odometry.getRobotCoordinates().x, 25, 0));
         wobbleManipulator2.changepos(WobbleManipulator2.positions.down);
-        while (opModeIsActive()) {
-            delay(1);
-        }
+        delay(3000);
     }
 }

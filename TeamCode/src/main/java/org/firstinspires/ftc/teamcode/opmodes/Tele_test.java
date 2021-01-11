@@ -7,8 +7,8 @@ import org.firstinspires.ftc.teamcode.math.Pose2D;
 import org.firstinspires.ftc.teamcode.math.Vector3D;
 import org.firstinspires.ftc.teamcode.misc.ButtonSwitch;
 import org.firstinspires.ftc.teamcode.misc.SinglePressButton;
+import org.firstinspires.ftc.teamcode.robot.rpm;
 
-import static org.firstinspires.ftc.teamcode.robot.WoENrobot.conveyor;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.drivetrain;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.forceInitRobot;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.odometry;
@@ -46,9 +46,11 @@ public class Tele_test extends LinearOpMode {
             drivetrain.setSmartMode(smartModeSwitch.isTriggered(gamepad1.left_stick_button));
             wobbleManipulator2.setposclose(buttonAswitch.isTriggered(gamepad1.a));
             wobbleManipulator2.upmediumdown(gamepad1.y, gamepad1.x); // correct
-            shooter.onshooter(buttonStartswitch.isTriggered(gamepad1.start));
+            shooter.setShootingMode(buttonStartswitch.isTriggered(gamepad1.start)?
+                    rpm.ShooterMode.HIGHGOAL
+                    :rpm.ShooterMode.OFF);
             if (threeRingPresser.isTriggered(gamepad1.b))
-                shooter.feedrings();
+                shooter.feedRings();
             drivetrain.setRobotVelocity(calculateDrivingVelocity());
             spinOnce();
         }

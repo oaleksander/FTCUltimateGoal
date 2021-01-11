@@ -1,16 +1,19 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.util.ElapsedTime;
+
 import org.firstinspires.ftc.teamcode.math.Pose2D;
 import org.firstinspires.ftc.teamcode.robot.WoENrobot;
 import org.firstinspires.ftc.teamcode.robot.WobbleManipulator2;
+import org.firstinspires.ftc.teamcode.robot.rpm;
 
 import static java.lang.Math.toRadians;
-import static org.firstinspires.ftc.teamcode.robot.WoENrobot.conveyor;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.delay;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.movement;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.opMode;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.openCVNode;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.shooter;
+import static org.firstinspires.ftc.teamcode.robot.WoENrobot.spinOnce;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.wobbleManipulator2;
 
 public class MovementMacros {
@@ -25,7 +28,7 @@ public class MovementMacros {
 
     public static void ShootTargets() {
         //shooter.setShootersetings(3850, 500);
-        shooter.onshooter(true);
+        shooter.setShootingMode(rpm.ShooterMode.HIGHGOAL);
         if (sideSign == 1 && xSign == 1)
             movement.Pos(new Pose2D(xSign * 121, -48.5, toRadians(-10.5)));
         else if (sideSign == -1 && xSign == 1)
@@ -34,11 +37,12 @@ public class MovementMacros {
             movement.Pos(new Pose2D(xSign * 147.5, -9.5, toRadians(10.5)));
         else // if (sideSign == 1 &&  xSign == -1)
             movement.Pos(new Pose2D(xSign * 61.5, -28, toRadians(-11.5)));
-        while (opMode.opModeIsActive() && !shooter.isCorrectRpm()) {Thread.yield();
-        }
-        shooter.feedrings();
+        ElapsedTime shooterAccelerationTimeout = new ElapsedTime();
+        while (opMode.opModeIsActive() && !shooter.isCorrectRpm() && shooterAccelerationTimeout.seconds()<3)
+            spinOnce();
+        shooter.feedRings();
         delay(900);
-        shooter.onshooter(false);
+        shooter.setShootingMode(rpm.ShooterMode.OFF);
     }
 
     public static void MoveWobble() {
