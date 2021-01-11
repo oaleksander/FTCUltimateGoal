@@ -56,7 +56,7 @@ public class ThreeWheelOdometry implements Odometry, RobotModule {
 
     private ElapsedTime IMUAccessTimer = new ElapsedTime();
     private double calculateHeading(int L, int R) {
-        if(IMUAccessTimer.seconds()>1.5)
+        if(IMUAccessTimer.seconds()>2)
         {
             EncoderHeadingCovariance = angleWrap (angleWrap((double) (L - R) * radiansPerEncoderDifference)-getIMUheading());
             IMUAccessTimer.reset();
