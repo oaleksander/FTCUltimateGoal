@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.misc.CommandSender;
 import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
 
 
@@ -19,6 +20,7 @@ public class Conveyor implements RobotModule {
 
     private LinearOpMode opMode;
     private DcMotorEx conveyorm = null;
+    private final CommandSender conveyorPowerSender = new CommandSender(p -> conveyorm.setPower(p));
     private DistanceSensor sensorDistance;
     private boolean full = false;
     private boolean backOn = false, stop = false;
@@ -27,6 +29,7 @@ public class Conveyor implements RobotModule {
     private double timelock = 0;
     private double conveyorPower = 0;
     private double distance = 0;
+    private double current = 0;
 
     public void setOpMode(LinearOpMode OpMode) {
         opMode = OpMode;
@@ -53,11 +56,10 @@ public class Conveyor implements RobotModule {
     }
 
     private void initializedrive() {
-        conveyorm = opMode.hardwareMap.get(DcMotorEx.class, "shooterMotor2");
+        conveyorm = opMode.hardwareMap.get(DcMotorEx.class, "odometerXConveyor");
 
         conveyorm.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        conveyorm.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         conveyorm.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
     }
 
@@ -69,10 +71,10 @@ public class Conveyor implements RobotModule {
 
     public void update() {
 
-
-        if (pauseTime.milliseconds() >= 100) {
+        if (pauseTime.milliseconds() >= 320) {
             pauseTime.reset();
             distance = getdistance();
+            current = conveyorm.getCurrent(CurrentUnit.AMPS);
         }
         if (distance < 6) {
             if (conveyorTime.milliseconds() >= 1000) {
@@ -87,7 +89,7 @@ public class Conveyor implements RobotModule {
                 if (!stop) {
                     stop = true;
                 }
-                if (conveyorm.getCurrent(CurrentUnit.AMPS) <= 4 && backOnTime.milliseconds() >= 1000) {
+                if (current <= 4 && backOnTime.milliseconds() >= 1000) {
                     if (!backOn) {
                         setConveyorMotorPower(conveyorPower);
                         backOn = true;
@@ -121,7 +123,7 @@ public class Conveyor implements RobotModule {
     }
 
     private void setConveyorMotorPower(double power) {
-        conveyorm.setPower(power);
+        conveyorPowerSender.send(power);
     }
 
     public void setBackmust(boolean Backmust) {
