@@ -24,17 +24,14 @@ public class WoENrobot {
     public static LinearOpMode opMode = null;
     public static boolean robotIsInitialized = false;
     public static ElapsedTime runTime = new ElapsedTime();
-    protected static RobotModule[] activeRobotModules = {odometry, drivetrain, movement, shooter, wobbleManipulator2, conveyor, telemetryDebugging}; //conveyor, odometry, shooter, wobbleManipulator, drivetrain
+    protected static RobotModule[] activeRobotModules = {odometry, drivetrain, movement, shooter, wobbleManipulator2,conveyor, telemetryDebugging}; //conveyor, odometry, shooter, wobbleManipulator, drivetrain
     static boolean spinCompleted = false;
     static Runnable updateRegulators = () -> {
         setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
         while (opMode.opModeIsActive() && !Thread.interrupted()) {
            clearBulkCaches();
-             Arrays.stream(activeRobotModules).forEach(RobotModule::update);
-          //  for (RobotModule robotModule : activeRobotModules) {
-        //        robotModule.update();
-      //      }
-            spinCompleted = true;
+           Arrays.stream(activeRobotModules).forEach(RobotModule::update);
+           spinCompleted = true;
         }
     };
     private static ExpansionHubEx expansionHub1 = null;
