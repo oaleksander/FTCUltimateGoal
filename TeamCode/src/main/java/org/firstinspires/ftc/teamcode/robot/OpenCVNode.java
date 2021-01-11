@@ -47,7 +47,6 @@ public class OpenCVNode implements RobotModule {
             webcam.closeCameraDeviceAsync(() -> {
             });
         }catch (Exception ignored){}
-
     }
 
     public StackSize retrieveResult() {
