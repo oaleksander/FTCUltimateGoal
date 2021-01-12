@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.robot;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -15,15 +14,15 @@ import org.firstinspires.ftc.teamcode.math.Vector3D;
 import org.firstinspires.ftc.teamcode.superclasses.Odometry;
 import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
 import org.openftc.revextensions2.ExpansionHubEx;
-import org.openftc.revextensions2.RevBulkData;
 
 import static java.lang.Math.PI;
+import static java.lang.Math.abs;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
 import static java.lang.Math.toRadians;
 import static org.firstinspires.ftc.teamcode.math.MathUtil.angleWrap;
 
-public class ThreeWheelOdometry implements Odometry, RobotModule {
+public class ThreeWheelOdometry implements Odometry{
     private static final double odometryWheelDiameterCm = 4.8;
     private static final double odometryCountsPerCM = (1440) / (odometryWheelDiameterCm * PI);
     private static final double odometryCMPerCounts = (odometryWheelDiameterCm * PI) / 1440;
@@ -41,7 +40,7 @@ public class ThreeWheelOdometry implements Odometry, RobotModule {
     private static LinearOpMode opMode = null;
   //  public RevBulkData bulkData;
     private float IMUoffset = 0;
-    private double EncoderHeadingCovariance = 0;
+    private double encoderHeadingCovariance = 0;
     private int YL_old = 0;
     private int YR_old = 0;
     private int X_old = 0;
@@ -58,10 +57,11 @@ public class ThreeWheelOdometry implements Odometry, RobotModule {
     private double calculateHeading(int L, int R) {
         if(IMUAccessTimer.seconds()>2)
         {
-            EncoderHeadingCovariance = angleWrap (angleWrap((double) (L - R) * radiansPerEncoderDifference)-getIMUheading());
+            double angleDivergence = angleWrap (angleWrap((double) (L - R) * radiansPerEncoderDifference)-getIMUheading());
+            if(abs(angleDivergence)>0.05) encoderHeadingCovariance = angleDivergence;
             IMUAccessTimer.reset();
         }
-        return angleWrap((double) (L - R) * radiansPerEncoderDifference - angleOffset-EncoderHeadingCovariance);
+        return angleWrap((double) (L - R) * radiansPerEncoderDifference - angleOffset- encoderHeadingCovariance);
     }
 
     private double calculateIncrementalHeading(double L, double R) {
@@ -70,13 +70,17 @@ public class ThreeWheelOdometry implements Odometry, RobotModule {
 
     private void initIMU() {
         imu = opMode.hardwareMap.get(BNO055IMU.class, "imu 1");
-        imu.initialize(new BNO055IMU.Parameters());
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.mode = BNO055IMU.SensorMode.NDOF;
+        imu.initialize(parameters);
         IMUoffset = (float) getIMUheading();
-        EncoderHeadingCovariance = 0;
+        encoderHeadingCovariance = 0;
         IMUAccessTimer.reset();
     }
 
     private double getIMUheading() {
+       // float angle1 = -imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZXY, AngleUnit.RADIANS).firstAngle;
+     //   float angle2 = -imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZXY, AngleUnit.RADIANS).firstAngle;
             return angleWrap(-imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZXY, AngleUnit.RADIANS).firstAngle - IMUoffset);
     }
 
