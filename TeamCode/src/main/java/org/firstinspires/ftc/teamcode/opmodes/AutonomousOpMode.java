@@ -1,13 +1,9 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
-import android.graphics.Color;
-
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.MovementMacros;
 import org.firstinspires.ftc.teamcode.math.Pose2D;
 import org.firstinspires.ftc.teamcode.math.Vector3D;
-import org.firstinspires.ftc.teamcode.misc.AutoTransitioner;
 import org.firstinspires.ftc.teamcode.misc.HSVRGB;
 
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.FullInitWithCV;
