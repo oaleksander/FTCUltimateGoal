@@ -4,6 +4,8 @@ import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.superclasses.Drivetrain;
+import org.firstinspires.ftc.teamcode.superclasses.Odometry;
 import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
 import org.openftc.revextensions2.ExpansionHubEx;
 
@@ -18,8 +20,10 @@ public class WoENrobot {
     public static rpm shooter = new rpm();
     public static TelemetryDebugging telemetryDebugging = new TelemetryDebugging();
 
-    public static ThreeWheelOdometry odometry = new ThreeWheelOdometry();
-    public static MecanumDrivetrain drivetrain = new MecanumDrivetrain();
+    //public static FakeRobot fakeRobot = new FakeRobot();
+
+    public static Odometry odometry = new ThreeWheelOdometry(); // = fakeRobot
+    public static Drivetrain drivetrain = new MecanumDrivetrain(); // = fakeRobot
     public static Movement movement = new Movement(odometry, drivetrain);
     public static LinearOpMode opMode = null;
     public static boolean robotIsInitialized = false;
@@ -76,10 +80,10 @@ public class WoENrobot {
             opMode.telemetry.update();
         } else {
             opMode = OpMode;
-            for (RobotModule robotModule : activeRobotModules) {
-                robotModule.setOpMode(opMode);
+            Arrays.stream(activeRobotModules).forEach(robotModule -> {
+                robotModule.initialize(opMode);
                 robotModule.reset();
-            }
+            });
             if (regulatorUpdater.getState() != Thread.State.NEW) {
                 regulatorUpdater.interrupt();
                 regulatorUpdater = new Thread(updateRegulators);
@@ -101,10 +105,7 @@ public class WoENrobot {
         expansionHub2 = opMode.hardwareMap.get(ExpansionHubEx.class, "Expansion Hub 2");
         setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
 
-        for (RobotModule robotModule : activeRobotModules) {
-            robotModule.initialize(opMode);
-            robotModule.reset();
-        }
+        Arrays.stream(activeRobotModules).forEach(robotModule -> robotModule.initialize(opMode));
 
         if (regulatorUpdater.getState() != Thread.State.NEW) {
             regulatorUpdater.interrupt();
@@ -130,15 +131,13 @@ public class WoENrobot {
     }
     public static void setBulkCachingMode(LynxModule.BulkCachingMode mode)
     {
-        for (LynxModule module : allHubs) {
+        for (LynxModule module : allHubs)
             module.setBulkCachingMode(mode);
-        }
     }
     public static void clearBulkCaches()
     {
-        for (LynxModule module : allHubs) {
+        for (LynxModule module : allHubs)
             module.clearBulkCache();
-        }
     }
     public static void FullInit(LinearOpMode OpMode) {
         forceInitRobot(opMode);

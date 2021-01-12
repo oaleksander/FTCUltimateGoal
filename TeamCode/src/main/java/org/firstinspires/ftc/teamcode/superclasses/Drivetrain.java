@@ -2,10 +2,12 @@ package org.firstinspires.ftc.teamcode.superclasses;
 
 import org.firstinspires.ftc.teamcode.math.Vector3D;
 
-public interface Drivetrain {
+public interface Drivetrain extends RobotModule{
     void setRobotVelocity(double frontways, double sideways, double turn);
 
     default void setRobotVelocity(Vector3D move) {
         setRobotVelocity(move.y, move.x, move.z);
     }
+
+    Vector3D getMaxVelocity();
 }

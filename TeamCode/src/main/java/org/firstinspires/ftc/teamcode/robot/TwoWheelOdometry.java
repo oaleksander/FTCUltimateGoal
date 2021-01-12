@@ -20,7 +20,7 @@ import static java.lang.Math.cos;
 import static java.lang.Math.toRadians;
 import static org.firstinspires.ftc.teamcode.math.MathUtil.angleWrap;
 
-public class TwoWheelOdometry implements Odometry, RobotModule {
+public class TwoWheelOdometry implements Odometry{
     private static final double odometryWheelDiameterCm = 4.8;
     private static final double odometryCountsPerCM = (1440) / (odometryWheelDiameterCm * PI);
     private static final double odometryCMPerCounts = (odometryWheelDiameterCm * PI) / 1440;

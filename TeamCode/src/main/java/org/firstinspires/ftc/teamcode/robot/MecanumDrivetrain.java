@@ -20,7 +20,7 @@ import static java.lang.Math.abs;
 import static java.lang.Math.max;
 import static java.lang.Math.signum;
 
-public class MecanumDrivetrain implements RobotModule, Drivetrain {
+public class MecanumDrivetrain implements Drivetrain {
 
 
     /* Physical constants */
@@ -190,7 +190,7 @@ public class MecanumDrivetrain implements RobotModule, Drivetrain {
         return clip(abs(speed), minMotorSpeed, maxMotorSpeed) * signum(speed);
     }
 
-    public Vector3D getMaxRobotVelocity() {
+    public Vector3D getMaxVelocity() {
         return new Vector3D(maxMotorSpeed / forwardMultiplier, maxMotorSpeed / forwardMultiplier, maxMotorSpeed / turnMultiplier);
     }
 
