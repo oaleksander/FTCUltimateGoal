@@ -13,6 +13,7 @@ import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
 public class rpm implements RobotModule {
     private final ElapsedTime rpmTime = new ElapsedTime();
     private final ElapsedTime feederTime = new ElapsedTime();
+    private final ElapsedTime encoderFailureDetectionTime = new ElapsedTime();
     private final double time = 125;
     private final double lowRpm = 3500;
     private final double highRpm = 3800;
@@ -20,6 +21,7 @@ public class rpm implements RobotModule {
     private final double feederClose = 0.06;
     private final double feederOpen = 0.3;
     private LinearOpMode opMode;
+    PIDFCoefficients shooterPIDF = new PIDFCoefficients(25.5, 0.075, 16, 15.23);
     private DcMotorEx shooterMotor = null;
     private final CommandSender shooterVelocitySender = new CommandSender(p -> shooterMotor.setVelocity(p));
     private Servo feeder = null;
@@ -38,6 +40,7 @@ public class rpm implements RobotModule {
     private double rpmTarget = 6000;
     private double currentVelocity = 0;
     private double velocityTarget = 2400;
+    private boolean encoderFailureMode = false;
 
     public void setOpMode(LinearOpMode OpMode) {
         opMode = OpMode;
@@ -52,9 +55,8 @@ public class rpm implements RobotModule {
         motorConfigurationType.setGearing(1);
         motorConfigurationType.setMaxRPM(6000);
         shooterMotor.setMotorType(motorConfigurationType);
-        PIDFCoefficients pidNew = new PIDFCoefficients(25.5, 0.075, 16, 15.23);
         try {
-            shooterMotor.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidNew);
+            shooterMotor.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, shooterPIDF);
         } catch (UnsupportedOperationException e) {
             opMode.telemetry.addData("Shooter PIDF error ", e.getMessage());
         }
@@ -79,14 +81,36 @@ public class rpm implements RobotModule {
 
     public void update() {
         if (ringsToShoot > 0 && feederTime.milliseconds() > time * 2.5) {
-            if(velocityTarget!=0) feederTime.reset();
+            if (velocityTarget != 0) feederTime.reset();
             ringsToShoot--;
         }
         setFeederPosition(feederTime.milliseconds() < time);
-        currentVelocity = rpmTime.milliseconds() >= timeToAccelerate_ms?
+        currentVelocity = rpmTime.milliseconds() >= timeToAccelerate_ms ?
                 velocityTarget
-                :rpmTime.milliseconds() * accelerationIncrement * velocityTarget;
+                : rpmTime.milliseconds() * accelerationIncrement * velocityTarget;
         shooterVelocitySender.send(currentVelocity);
+
+        if(encoderFailureDetectionTime.seconds() > 1)
+        if (velocityTarget == 0 || getCurrentRpm() != 0)
+            encoderFailureDetectionTime.reset();
+        setEncoderFailureMode(encoderFailureDetectionTime.seconds() > 3);
+    }
+    private void setEncoderFailureMode(boolean mode)
+    {
+        if(mode!=encoderFailureMode)
+        {
+            encoderFailureMode = mode;
+            try {
+                if (encoderFailureMode)
+                    shooterMotor.setVelocityPIDFCoefficients(0,0,0,shooterPIDF.f);
+                    else
+                    shooterMotor.setVelocityPIDFCoefficients(shooterPIDF.p,shooterPIDF.i,shooterPIDF.d,shooterPIDF.f);
+            }catch (UnsupportedOperationException ignored){}
+        }
+    }
+    public boolean getEncoderFailureMode()
+    {
+        return encoderFailureMode;
     }
 
     private void setFeederPosition(boolean push) {
