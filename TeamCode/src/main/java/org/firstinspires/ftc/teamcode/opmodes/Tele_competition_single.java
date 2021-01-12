@@ -66,6 +66,6 @@ public class Tele_competition_single extends LinearOpMode {
             x = -1;
         if (gamepad1.dpad_right)
             x += 1;
-        return new Vector3D(x, y, turn).multiply(drivetrain.getMaxRobotVelocity());
+        return new Vector3D(x, y, turn).multiply(drivetrain.getMaxVelocity());
     }
 }

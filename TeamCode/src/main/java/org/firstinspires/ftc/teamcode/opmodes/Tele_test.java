@@ -43,7 +43,7 @@ public class Tele_test extends LinearOpMode {
         //wobbleManipulator2.changepos(WobbleManipulator2.positions.down);
         // wobbleManipulator2.setAngle(1);
         while (opModeIsActive()) {
-            drivetrain.setSmartMode(smartModeSwitch.isTriggered(gamepad1.left_stick_button));
+           // drivetrain.setSmartMode(smartModeSwitch.isTriggered(gamepad1.left_stick_button));
             wobbleManipulator2.setposclose(buttonAswitch.isTriggered(gamepad1.a));
             wobbleManipulator2.upmediumdown(gamepad1.y, gamepad1.x); // correct
             shooter.setShootingMode(buttonStartswitch.isTriggered(gamepad1.start)?
@@ -74,6 +74,6 @@ public class Tele_test extends LinearOpMode {
             x = -1;
         if (gamepad1.dpad_right)
             x += 1;
-        return new Vector3D(x, y, turn).multiply(drivetrain.getMaxRobotVelocity());
+        return new Vector3D(x, y, turn).multiply(drivetrain.getMaxVelocity());
     }
 }
