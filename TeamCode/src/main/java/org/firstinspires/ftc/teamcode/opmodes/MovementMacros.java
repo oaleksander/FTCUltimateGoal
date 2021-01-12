@@ -44,7 +44,25 @@ public class MovementMacros {
         delay(900);
         shooter.setShootingMode(rpm.ShooterMode.OFF);
     }
-
+    public static void ShootPOWERSHOT() {  //rename
+        shooter.setShootingMode(rpm.ShooterMode.POWERSHOT);
+        double pos = 120;
+        for (short i = 0; i < 3; i++){
+           if (xSign == 1) {
+               movement.Pos(new Pose2D(xSign * pos, -5, toRadians(-7)));
+           }
+           else {
+               movement.Pos(new Pose2D(xSign * pos, -5, toRadians(3)));
+           }
+           pos += 18;
+            ElapsedTime shooterAccelerationTimeout = new ElapsedTime();
+            while (opMode.opModeIsActive() && !shooter.isCorrectRpm() && shooterAccelerationTimeout.seconds()<3)
+                spinOnce();
+            shooter.feedRing();
+            delay(200);
+        }
+        shooter.setShootingMode(rpm.ShooterMode.OFF);
+    }
     public static void MoveWobble() {
         wobbleManipulator2.setposclose(true);
         wobbleManipulator2.changepos(WobbleManipulator2.positions.medium);
