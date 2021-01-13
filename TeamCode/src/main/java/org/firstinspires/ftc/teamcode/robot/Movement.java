@@ -19,7 +19,7 @@ import static org.firstinspires.ftc.teamcode.math.MathUtil.angleWrapHalf;
 
 public class Movement implements RobotModule {
     // private static final double kP_distance = 0.010, kD_distance = 0.00034;
-    private static final double kP_distance = 1.38544236023, kD_distance = 0.04710504024;
+    private static final double kP_distance = 1.88544236023, kD_distance = 0.04710504024;
     private static final double kF_distance = 0.1;
     private static final double minError_distance = 3;
     // private static final double kP_angle = 0.40, kD_angle = 0;

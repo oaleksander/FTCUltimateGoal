@@ -81,10 +81,10 @@ public class rpm implements RobotModule {
 
     public void update() {
         if (ringsToShoot > 0 && feederTime.milliseconds() > time * 2.5) {
-            if (velocityTarget != 0) feederTime.reset();
+            feedRing();
             ringsToShoot--;
         }
-        setFeederPosition(feederTime.milliseconds() < time);
+        setFeederPosition(feederTime.milliseconds() < time && (velocityTarget!=0));
         currentVelocity = rpmTime.milliseconds() >= timeToAccelerate_ms ?
                 velocityTarget
                 : rpmTime.milliseconds() * accelerationIncrement * velocityTarget;
@@ -169,7 +169,7 @@ public class rpm implements RobotModule {
         return Math.abs(currentVelocity - shooterMotor.getVelocity()) < error;
     }
     public void feedRing() {
-        ringsToShoot = 1;
+      //  ringsToShoot = 1;
         feederTime.reset();
     }
 

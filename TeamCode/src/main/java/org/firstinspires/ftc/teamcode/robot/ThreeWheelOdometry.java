@@ -34,9 +34,9 @@ public class ThreeWheelOdometry implements Odometry{
     private static double angleOffset = 0;
     private static ExpansionHubEx expansionHub;
     private static BNO055IMU imu;
-    private static DcMotorEx odometerYL = null;
-    private static DcMotorEx odometerYR = null;
-    private static DcMotorEx odometerX = null;
+    public static DcMotorEx odometerYL = null;
+    public static DcMotorEx odometerYR = null;
+    public static DcMotorEx odometerX = null;
     private static LinearOpMode opMode = null;
   //  public RevBulkData bulkData;
     private float IMUoffset = 0;
@@ -61,7 +61,7 @@ public class ThreeWheelOdometry implements Odometry{
             if(abs(angleDivergence)>0.05) encoderHeadingCovariance = angleDivergence;
             IMUAccessTimer.reset();
         }
-        return angleWrap((double) (L - R) * radiansPerEncoderDifference - angleOffset- encoderHeadingCovariance);
+        return angleWrap((double) (L - R) * radiansPerEncoderDifference - angleOffset - encoderHeadingCovariance);
     }
 
     private double calculateIncrementalHeading(double L, double R) {
@@ -69,11 +69,12 @@ public class ThreeWheelOdometry implements Odometry{
     }
 
     private void initIMU() {
-        imu = opMode.hardwareMap.get(BNO055IMU.class, "imu 1");
+        imu = opMode.hardwareMap.get(BNO055IMU.class, "imu");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.mode = BNO055IMU.SensorMode.NDOF;
         imu.initialize(parameters);
-        IMUoffset = (float) getIMUheading();
+        WoENrobot.delay(100);
+        IMUoffset = 0;//(float) getIMUheading();
         encoderHeadingCovariance = 0;
         IMUAccessTimer.reset();
     }

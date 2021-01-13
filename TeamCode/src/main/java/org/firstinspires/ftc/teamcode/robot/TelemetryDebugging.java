@@ -61,16 +61,16 @@ public class TelemetryDebugging implements RobotModule {
             telemetry.addData("Loop frequency", 1 / (measurementTime.seconds() / loopCount) + " Hz");
             Pose2D robotPosition = odometry.getRobotCoordinates();
 
-           // telemetry.addLine("Odometry encoders").addData("odYL", odometry.bulkData.getMotorCurrentPosition(0)).addData("odYR", odometry.bulkData.getMotorCurrentPosition(1)).addData("odX", odometry.bulkData.getMotorCurrentPosition(2));
+            telemetry.addLine("Odometry encoders").addData("odYL", odometry.odometerYL.getCurrentPosition()).addData("odYR", odometry.odometerYR.getCurrentPosition()).addData("odX", odometry.odometerX.getCurrentPosition());
             telemetry.addLine("Robot position ").addData("Y", robotPosition.y).addData("X", robotPosition.x).addData("Head", Math.toDegrees(robotPosition.heading));
-           // Vector3D velocity = odometry.getRobotVelocity();
-          //  telemetry.addLine("Robot velocity ").addData("Y", velocity.y).addData("X", velocity.x).addData("Head", Math.toDegrees(velocity.z));
+            Vector3D velocity = odometry.getRobotVelocity();
+            telemetry.addLine("Robot velocity ").addData("Y", velocity.y).addData("X", velocity.x).addData("Head", Math.toDegrees(velocity.z));
             telemetry.addLine("Shooter ").addData("Mode",shooter.getShootingMode()).addData("Current", shooter.getCurrentRpm()).addData("Target",shooter.getRpmTarget());
           //telemetry.addData("conpower", conveyor.conveyorPower);
 
 
             //telemetry.addData("OpenCV stack size", openCVNode.getStackSize());
-/*
+
             double by = -robotPosition.x / 2.54;
             double bx = robotPosition.y / 2.54;
             double l = ROBOT_SIDE_LENGTH / 2;
@@ -92,7 +92,7 @@ public class TelemetryDebugging implements RobotModule {
                     .setStroke("blue")
                     .setStrokeWidth(3)
                     .strokeLine(bx,by,(bxPoints[0]+bxPoints[3])/2,(byPoints[0]+byPoints[3])/2);
-            dashboard.sendTelemetryPacket(packet);*/
+            dashboard.sendTelemetryPacket(packet);
 
 
             measurementTime.reset();

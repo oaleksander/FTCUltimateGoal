@@ -46,7 +46,7 @@ public class MovementMacros {
     }
     public static void ShootPOWERSHOT() {  //rename
         shooter.setShootingMode(rpm.ShooterMode.POWERSHOT);
-        double pos = 120;
+        double pos = 50;
         for (short i = 0; i < 3; i++){
            if (xSign == 1) {
                movement.Pos(new Pose2D(xSign * pos, -5, toRadians(-7)));
@@ -54,7 +54,7 @@ public class MovementMacros {
            else {
                movement.Pos(new Pose2D(xSign * pos, -5, toRadians(3)));
            }
-           pos += 18;
+           pos -= 18;
             ElapsedTime shooterAccelerationTimeout = new ElapsedTime();
             while (opMode.opModeIsActive() && !shooter.isCorrectRpm() && shooterAccelerationTimeout.seconds()<3)
                 spinOnce();
