@@ -32,7 +32,7 @@ public class MecanumDrivetrain implements Drivetrain {
     private static final double sidewaysMultiplier = forwardMultiplier * strafingMultiplier;
     private static final double turnMultiplier = (wheelCenterOffset.x + wheelCenterOffset.y) * rotationDecrepancy / wheelRadius;
     /* Motor parameters constatnts. */
-    private static final PIDFCoefficients drivePIDFCoefficients = new PIDFCoefficients(15.00, 0.075, 15, 15.00);
+    private static final PIDFCoefficients drivePIDFCoefficients = new PIDFCoefficients(15.00, 0.7, 15, 15.00);
     private static final double achieveableMaxRPMFraction = 0.9;
     private static final double tickPerRev = 480;
     private static final double gearing = 20;

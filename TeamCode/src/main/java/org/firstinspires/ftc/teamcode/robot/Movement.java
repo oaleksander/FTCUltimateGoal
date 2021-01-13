@@ -19,12 +19,12 @@ import static org.firstinspires.ftc.teamcode.math.MathUtil.angleWrapHalf;
 
 public class Movement implements RobotModule {
     // private static final double kP_distance = 0.010, kD_distance = 0.00034;
-    private static final double kP_distance = 1.88544236023, kD_distance = 0.04710504024;
+    private static final double kP_distance = 1.9, kD_distance = 0;
     private static final double kF_distance = 0.1;
     private static final double minError_distance = 3;
     // private static final double kP_angle = 0.40, kD_angle = 0;
-    private static final double kP_angle = 1.66657076647, kD_angle = 0;
-    private static final double minError_angle = Math.toRadians(0.5);
+    private static final double kP_angle = 3.7, kD_angle = 0;
+    private static final double minError_angle = Math.toRadians(0.4);
     private static Odometry odometry;
     private static Drivetrain drivetrain;
     private LinearOpMode opMode = null;
@@ -51,7 +51,7 @@ public class Movement implements RobotModule {
         double distanceError = error.radius();
 
         ElapsedTime movementTime = new ElapsedTime();
-        while (opMode.opModeIsActive() && (distanceError >= minError_distance || abs(error.heading) >= minError_angle) && movementTime.seconds() < 4) {
+        while (opMode.opModeIsActive() && (distanceError >= minError_distance || abs(error.heading) >= minError_angle) && movementTime.seconds() < 4 &&!opMode.gamepad1.y) {
 
             errold = error;
             error = target.substract(odometry.getRobotCoordinates());

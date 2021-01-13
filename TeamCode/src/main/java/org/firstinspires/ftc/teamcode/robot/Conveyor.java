@@ -20,7 +20,7 @@ public class Conveyor implements RobotModule {
 
     private LinearOpMode opMode;
     private DcMotorEx conveyorm = null;
-    private final CommandSender conveyorPowerSender = new CommandSender(p -> conveyorm.setPower(p));
+    private final CommandSender conveyorPowerSender = new CommandSender(p -> conveyorm.setPower(-p));
     private DistanceSensor sensorDistance;
     private boolean full = false;
     private boolean backOn = false, stop = false;

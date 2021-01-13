@@ -55,7 +55,7 @@ public class ThreeWheelOdometry implements Odometry{
 
     private ElapsedTime IMUAccessTimer = new ElapsedTime();
     private double calculateHeading(int L, int R) {
-        if(IMUAccessTimer.seconds()>2)
+        if(false)//IMUAccessTimer.seconds()>2)
         {
             double angleDivergence = angleWrap (angleWrap((double) (L - R) * radiansPerEncoderDifference)-getIMUheading());
             if(abs(angleDivergence)>0.05) encoderHeadingCovariance = angleDivergence;
@@ -71,7 +71,7 @@ public class ThreeWheelOdometry implements Odometry{
     private void initIMU() {
         imu = opMode.hardwareMap.get(BNO055IMU.class, "imu");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.mode = BNO055IMU.SensorMode.NDOF;
+        parameters.mode = BNO055IMU.SensorMode.IMU;
         imu.initialize(parameters);
         WoENrobot.delay(100);
         IMUoffset = 0;//(float) getIMUheading();
