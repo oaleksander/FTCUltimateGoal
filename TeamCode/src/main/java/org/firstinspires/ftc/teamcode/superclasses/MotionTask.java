@@ -5,11 +5,18 @@ import org.firstinspires.ftc.teamcode.math.Pose2D;
 public class MotionTask extends Pose2D {
 
 
-    public ActionOnCompletion actionOnConpletion = () -> {
+    public Runnable actionOnConpletion = () -> {
     };
 
-    public MotionTask(double x, double y, double heading, ActionOnCompletion actionOncompletion) {
+    public MotionTask(Pose2D pose) {super (pose.x, pose.y, pose.heading);}
+
+    public MotionTask(double x, double y, double heading, Runnable actionOncompletion) {
         super(x, y, heading);
+        this.actionOnConpletion = actionOncompletion;
+    }
+
+    public MotionTask(Pose2D pose, Runnable actionOncompletion) {
+        super (pose.x, pose.y, pose.heading);
         this.actionOnConpletion = actionOncompletion;
     }
 
@@ -17,7 +24,7 @@ public class MotionTask extends Pose2D {
         super(x, y, heading);
     }
 
-    public MotionTask(double x, double y, ActionOnCompletion actionOncompletion) {
+    public MotionTask(double x, double y, Runnable actionOncompletion) {
         super(x, y, Double.NaN);
         this.actionOnConpletion = actionOncompletion;
     }
@@ -27,7 +34,4 @@ public class MotionTask extends Pose2D {
     }
 
 
-    public interface ActionOnCompletion {
-        void execute();
-    }
 }

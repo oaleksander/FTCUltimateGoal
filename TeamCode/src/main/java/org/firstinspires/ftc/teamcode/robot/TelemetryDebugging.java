@@ -19,12 +19,12 @@ import static org.firstinspires.ftc.teamcode.robot.WoENrobot.shooter;
 
 public class TelemetryDebugging implements RobotModule {
 
-    public static double ROBOT_SIDE_LENGTH = 20;
+    public static double ROBOT_SIDE_LENGTH = 44.4;
     FtcDashboard dashboard = null;
     Telemetry telemetry;
     TelemetryPacket packet = null;
     long loopCount = 0;
-    int refreshTimeMs = 333;
+    int refreshTimeMs = 33;
     private LinearOpMode opMode = null;
     private final ElapsedTime measurementTime = new ElapsedTime();
 
@@ -60,8 +60,7 @@ public class TelemetryDebugging implements RobotModule {
             telemetry.addData("Status", "Running");
             telemetry.addData("Loop frequency", 1 / (measurementTime.seconds() / loopCount) + " Hz");
             Pose2D robotPosition = odometry.getRobotCoordinates();
-
-            telemetry.addLine("Odometry encoders").addData("odYL", odometry.odometerYL.getCurrentPosition()).addData("odYR", odometry.odometerYR.getCurrentPosition()).addData("odX", odometry.odometerX.getCurrentPosition());
+           // telemetry.addLine("Odometry encoders").addData("odYL", odometry.odometerYL.getCurrentPosition()).addData("odYR", odometry.odometerYR.getCurrentPosition()).addData("odX", odometry.odometerX.getCurrentPosition());
             telemetry.addLine("Robot position ").addData("Y", robotPosition.y).addData("X", robotPosition.x).addData("Head", Math.toDegrees(robotPosition.heading));
             Vector3D velocity = odometry.getRobotVelocity();
             telemetry.addLine("Robot velocity ").addData("Y", velocity.y).addData("X", velocity.x).addData("Head", Math.toDegrees(velocity.z));
@@ -73,10 +72,11 @@ public class TelemetryDebugging implements RobotModule {
 
             double by = -robotPosition.x / 2.54;
             double bx = robotPosition.y / 2.54;
-            double l = ROBOT_SIDE_LENGTH / 2;
+            double l = ROBOT_SIDE_LENGTH / (2.54*2);
+            double l2 = l*435.55/444;
 
             double[] bxPoints = {l, -l, -l, l};
-            double[] byPoints = {l, l, -l, -l};
+            double[] byPoints = {l2, l2, -l2, -l2};
             rotatePoints(bxPoints, byPoints, -odometry.getRobotCoordinates().heading);
             for (int i = 0; i < 4; i++) {
                 bxPoints[i] += bx;
@@ -85,13 +85,17 @@ public class TelemetryDebugging implements RobotModule {
 
             packet = new TelemetryPacket();
             packet.fieldOverlay()
-                    .setStroke("black")
+                    .setStroke("cyan")
                     .setStrokeWidth(2)
-                    .strokePolygon(bxPoints, byPoints);
-            packet.fieldOverlay()
-                    .setStroke("blue")
-                    .setStrokeWidth(3)
                     .strokeLine(bx,by,(bxPoints[0]+bxPoints[3])/2,(byPoints[0]+byPoints[3])/2);
+            packet.fieldOverlay()
+                    .setStroke("orange")
+                    .setStrokeWidth(1)
+                    .strokeLine(bx,by,(bxPoints[0]+bxPoints[3])/2,(byPoints[0]+byPoints[3])/2);
+            packet.fieldOverlay()
+                    .setStroke("black")
+                    .setStrokeWidth(1)
+                    .strokePolygon(bxPoints, byPoints);
             dashboard.sendTelemetryPacket(packet);
 
 

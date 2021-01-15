@@ -14,8 +14,10 @@ public class Auto_sandbox extends AutonomousOpMode {
     public void main() {
         ElapsedTime et = new ElapsedTime();
         while(opModeIsActive()) {
-            movement.Pos(new Pose2D(odometry.getRobotCoordinates().x, odometry.getRobotCoordinates().y, Math.toRadians(90)));
-            movement.Pos(new Pose2D(odometry.getRobotCoordinates().x, odometry.getRobotCoordinates().y, Math.toRadians(0)));
+            movement.Pos(new Pose2D(Double.NaN, 120, Double.NaN));
+            movement.Pos(new Pose2D(-120, Double.NaN, Double.NaN));
+            movement.Pos(new Pose2D(Double.NaN, -120, Double.NaN));
+            movement.Pos(new Pose2D(120, Double.NaN, Double.NaN));
         }
     }
 }

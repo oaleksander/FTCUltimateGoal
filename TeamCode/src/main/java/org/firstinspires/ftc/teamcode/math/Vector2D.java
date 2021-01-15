@@ -28,13 +28,21 @@ public class Vector2D implements Comparable {
         return new Vector2D(newX, newY);
     }
 
-    public void normalize() {
+    public Vector2D normalize(){
+        double r = radius();
+        if(radius()!=0) {
+            return new Vector2D(x /= radius(), y /= radius());
+        }
+        return this;
+    }
+
+    /*public void normalize() {
         double r = radius();
         if (radius() != 0) {
             x /= radius();
             y /= radius();
         }
-    }
+    }*/
 
     public Vector2D add(Vector2D p) {
         return new Vector2D(this.x + p.x, this.y + p.y);
@@ -55,6 +63,12 @@ public class Vector2D implements Comparable {
     public double radius() {
         return Math.sqrt(x * x + y * y);
     }
+
+    public Vector2D scale(double d) {
+        return new Vector2D(x * d, y * d);
+    }
+
+    public Vector2D multiply(double d) {return new Vector2D(this.x*d, this.y*d); }
 
     public double distance(Vector2D p) {
         return minus(p).radius();

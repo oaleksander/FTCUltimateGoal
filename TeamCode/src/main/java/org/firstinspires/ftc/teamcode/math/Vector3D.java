@@ -46,13 +46,21 @@ public class Vector3D extends Vector2D implements Cloneable {
         return new Vector3D(x * d, y * d, z * d);
     }
 
-    public void normalize() {
+/*    public void normalize() {
         double r = radius();
         if (radius() != 0) {
             x /= radius();
             y /= radius();
             z /= radius();
         }
+    }*/
+
+    public Vector3D normalize() {
+        double r = radius();
+        if (radius() != 0) {
+            return new Vector3D(x /= radius(), y /= radius(), z /= radius());
+        }
+        return this;
     }
 
     public double radius() {

@@ -22,9 +22,11 @@ public class FakeRobot implements Drivetrain, Odometry {
     private Vector3D targetVelocity = new Vector3D(0,0,0);
     private Vector3D targetVelocityFC = new Vector3D(0,0,0);
     private Vector3D realVelocityFC = new Vector3D(0,0,0);
-    private final motorAccelerationLimiter xLimiter = new motorAccelerationLimiter(v -> realVelocityFC.x = v,maxVelocity.x/0.25);
-    private final motorAccelerationLimiter yLimiter = new motorAccelerationLimiter(v -> realVelocityFC.y = v,maxVelocity.y/0.25);
-    private final motorAccelerationLimiter zLimiter = new motorAccelerationLimiter(v -> realVelocityFC.z = v,maxVelocity.z/0.25);
+
+
+    private final motorAccelerationLimiter zLimiter = new motorAccelerationLimiter(v -> realVelocityFC.z = v,maxVelocity.z/0.5);
+    private final motorAccelerationLimiter yLimiter = new motorAccelerationLimiter(v -> realVelocityFC.y = v,maxVelocity.y/0.5);
+    private final motorAccelerationLimiter xLimiter = new motorAccelerationLimiter(v -> realVelocityFC.x = v,maxVelocity.x/0.5);
 
     private Pose2D currentPosition = new Pose2D(0,0,0);
     private LinearOpMode opMode;
@@ -59,15 +61,14 @@ public class FakeRobot implements Drivetrain, Odometry {
             started = true;
             updateTimer.reset();
         }
-        if(updateTimer.milliseconds()>4) {
-            xLimiter.setVelocity(targetVelocityFC.x);
-            yLimiter.setVelocity(targetVelocityFC.y);
-            zLimiter.setVelocity(targetVelocityFC.z);
+      // realVelocityFC.x = targetVelocityFC.x;
+        zLimiter.setVelocity(targetVelocityFC.z);
+        yLimiter.setVelocity(targetVelocityFC.y);
+        xLimiter.setVelocity(targetVelocityFC.x);
             currentPosition.y += realVelocityFC.y * updateTimer.seconds();
             currentPosition.x += realVelocityFC.x * updateTimer.seconds();
             currentPosition.heading = MathUtil.angleWrap(currentPosition.heading + realVelocityFC.z * updateTimer.seconds());
-        }
-        updateTimer.reset();
+            updateTimer.reset();
     }
 
     @Override
@@ -97,6 +98,6 @@ public class FakeRobot implements Drivetrain, Odometry {
 
     @Override
     public Vector3D getRobotVelocity() {
-        return targetVelocity;
+        return realVelocityFC;
     }
 }

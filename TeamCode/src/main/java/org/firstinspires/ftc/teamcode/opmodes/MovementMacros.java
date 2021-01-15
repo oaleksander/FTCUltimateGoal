@@ -47,6 +47,7 @@ public class MovementMacros {
     }
     public static void ShootPOWERSHOT() {  //rename
         shooter.setShootingMode(rpm.ShooterMode.POWERSHOT);
+        movement.Pos(new Pose2D(Double.NaN, -15, Double.NaN));
         double pos = 27;
         double angle = 5.5;
         for (short i = 0; i < 3; i++){

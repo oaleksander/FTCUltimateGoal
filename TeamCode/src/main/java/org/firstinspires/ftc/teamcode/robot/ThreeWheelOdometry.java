@@ -2,7 +2,9 @@ package org.firstinspires.ftc.teamcode.robot;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -12,7 +14,6 @@ import org.firstinspires.ftc.teamcode.math.Pose2D;
 import org.firstinspires.ftc.teamcode.math.Vector2D;
 import org.firstinspires.ftc.teamcode.math.Vector3D;
 import org.firstinspires.ftc.teamcode.superclasses.Odometry;
-import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
 import org.openftc.revextensions2.ExpansionHubEx;
 
 import static java.lang.Math.PI;
@@ -26,10 +27,9 @@ public class ThreeWheelOdometry implements Odometry{
     private static final double odometryWheelDiameterCm = 4.8;
     private static final double odometryCountsPerCM = (1440) / (odometryWheelDiameterCm * PI);
     private static final double odometryCMPerCounts = (odometryWheelDiameterCm * PI) / 1440;
-    private static final double odometerXcenterOffset = 36.8862986805 * odometryCountsPerCM * cos(toRadians(67.021303041)) / 2;
-    private static final double yWheelPairRadiusCm = 18.70558;//1870425;//18.1275;
-    private static final double radiansPerEncoderDifference = ((odometryCMPerCounts)*1.0214214782 / (yWheelPairRadiusCm * 2));
-   // private static final int odometerYL = 0, odometerYR = 1, odometerX = 2;
+    private static final double odometerXcenterOffset = -36.8862986805 * odometryCountsPerCM * cos(toRadians(67.021303041)) / 2;
+    private static final double yWheelPairRadiusCm = 18.2425;
+    private static final double radiansPerEncoderDifference = ((odometryCMPerCounts) / (yWheelPairRadiusCm * 2));
     public static Pose2D worldPosition = new Pose2D();
     private static double angleOffset = 0;
     private static ExpansionHubEx expansionHub;
@@ -44,6 +44,7 @@ public class ThreeWheelOdometry implements Odometry{
     private int YL_old = 0;
     private int YR_old = 0;
     private int X_old = 0;
+    private Vector2D YWheelPairCenterOffset = new Vector2D(0, 6.40008);
 
     /**
      * Class initializer
@@ -54,17 +55,17 @@ public class ThreeWheelOdometry implements Odometry{
 
 
     private ElapsedTime IMUAccessTimer = new ElapsedTime();
-    private double calculateHeading(int L, int R) {
+    private double calculateHeading() {
         if(false)//IMUAccessTimer.seconds()>2)
         {
-            double angleDivergence = angleWrap (angleWrap((double) (L - R) * radiansPerEncoderDifference)-getIMUheading());
+            double angleDivergence = angleWrap (getEncoderHeading(odometerYL.getCurrentPosition(),odometerYR.getTargetPosition())-getIMUheading());
             if(abs(angleDivergence)>0.05) encoderHeadingCovariance = angleDivergence;
             IMUAccessTimer.reset();
         }
-        return angleWrap((double) (L - R) * radiansPerEncoderDifference - angleOffset - encoderHeadingCovariance);
+        return angleWrap(getEncoderHeading(odometerYL.getCurrentPosition(),odometerYR.getTargetPosition()) - angleOffset - encoderHeadingCovariance);
     }
 
-    private double calculateIncrementalHeading(double L, double R) {
+    private double getEncoderHeading(double L, double R) {
         return (double) (L - R) * radiansPerEncoderDifference;
     }
 
@@ -74,14 +75,12 @@ public class ThreeWheelOdometry implements Odometry{
         parameters.mode = BNO055IMU.SensorMode.IMU;
         imu.initialize(parameters);
         WoENrobot.delay(100);
-        IMUoffset = 0;//(float) getIMUheading();
+        IMUoffset = -imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZXY, AngleUnit.RADIANS).firstAngle;
         encoderHeadingCovariance = 0;
         IMUAccessTimer.reset();
     }
 
     private double getIMUheading() {
-       // float angle1 = -imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZXY, AngleUnit.RADIANS).firstAngle;
-     //   float angle2 = -imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZXY, AngleUnit.RADIANS).firstAngle;
             return angleWrap(-imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZXY, AngleUnit.RADIANS).firstAngle - IMUoffset);
     }
 
@@ -94,13 +93,11 @@ public class ThreeWheelOdometry implements Odometry{
 
         worldPosition = initialPose;
 
-     //   bulkData = expansionHub.getBulkInputData();
-
-        double deltaWorldHeading = angleWrap(calculateHeading(odometerYL.getCurrentPosition(), -odometerYR.getCurrentPosition()) - worldPosition.heading);
+        double deltaWorldHeading = angleWrap(calculateHeading() - worldPosition.heading);
 
         Vector2D deltaPosition = new Vector2D(
-                (double) (-odometerX.getCurrentPosition() - X_old) - deltaWorldHeading * odometerXcenterOffset,
-                (double) ((odometerYL.getCurrentPosition() - YL_old) + (-odometerYR.getCurrentPosition() - YR_old)) / 2);
+                (double) (odometerX.getCurrentPosition() - X_old) - deltaWorldHeading * odometerXcenterOffset,
+                (double) ((odometerYL.getCurrentPosition() - YL_old) + (odometerYR.getCurrentPosition() - YR_old)) / 2);
 
         if (deltaWorldHeading != 0) {   //if deltaAngle = 0 radius of the arc is = Inf which causes model degeneracy
             double arcAngle = deltaWorldHeading * 2;
@@ -110,7 +107,6 @@ public class ThreeWheelOdometry implements Odometry{
                     arcRadius * (1 - cos(arcAngle)),
                     arcRadius * sin(arcAngle))
                     .rotatedCW(deltaPosition.acot());
-
         }
 
         worldPosition = worldPosition.add(
@@ -118,8 +114,8 @@ public class ThreeWheelOdometry implements Odometry{
                         deltaWorldHeading));
 
         YL_old = odometerYL.getCurrentPosition();
-        YR_old = -odometerYR.getCurrentPosition();
-        X_old = -odometerX.getCurrentPosition();
+        YR_old = odometerYR.getCurrentPosition();
+        X_old = odometerX.getCurrentPosition();
     }
 
     public void setOpMode(LinearOpMode opMode) {
@@ -128,15 +124,24 @@ public class ThreeWheelOdometry implements Odometry{
 
     public void initialize() {
         initIMU();
-        //expansionHub = opMode.hardwareMap.get(ExpansionHubEx.class, "Expansion Hub 2");
-        //bulkData = expansionHub.getBulkInputData();
+
         odometerYL = opMode.hardwareMap.get(DcMotorEx.class, "odometerYL");
         odometerYR = opMode.hardwareMap.get(DcMotorEx.class, "odometerYR");
         odometerX = opMode.hardwareMap.get(DcMotorEx.class, "odometerXConveyor");
 
+        odometerYL.setDirection(DcMotorEx.Direction.FORWARD);
+        odometerYR.setDirection(DcMotorEx.Direction.REVERSE);
+        odometerX.setDirection(DcMotorEx.Direction.REVERSE);
+        odometerYL.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        odometerYR.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        odometerX.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        odometerYL.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        odometerYR.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        odometerX.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+
         YL_old = odometerYL.getCurrentPosition();
-        YR_old = -odometerYR.getCurrentPosition();
-        X_old = -odometerX.getCurrentPosition();
+        YR_old = odometerYR.getCurrentPosition();
+        X_old = odometerX.getCurrentPosition();
     }
 
     /**
@@ -146,20 +151,21 @@ public class ThreeWheelOdometry implements Odometry{
      */
     public Pose2D getRobotCoordinates() {
         Vector2D poseTranslation = new Vector2D(worldPosition.x * odometryCMPerCounts, worldPosition.y * odometryCMPerCounts
-        );//.add(new Vector2D(0, 1).rotatedCW(worldPosition.heading));
+        ).minus(YWheelPairCenterOffset.rotatedCW(worldPosition.heading));
         return new Pose2D(poseTranslation, worldPosition.heading);
     }
 
     public void setRobotCoordinates(Pose2D coordinates) {
-        angleOffset = (double) angleWrap(calculateHeading(odometerYL.getCurrentPosition(), -odometerYR.getCurrentPosition()) + angleOffset - coordinates.heading);
-        this.calculatePosition(new Pose2D(coordinates.x * odometryCountsPerCM, coordinates.y * odometryCountsPerCM, coordinates.heading));
+        angleOffset = (double) angleWrap(calculateHeading() + angleOffset - coordinates.heading);
+        this.calculatePosition(new Pose2D( new Vector2D(coordinates.x * odometryCountsPerCM, coordinates.y * odometryCountsPerCM)
+                .add(YWheelPairCenterOffset.scale(odometryCountsPerCM).rotatedCW(worldPosition.heading)), coordinates.heading));
     }
 
     public Vector3D getRobotVelocity() {
-        double angularVelocity = calculateIncrementalHeading(odometerYL.getVelocity(), -odometerYR.getVelocity());
+        double angularVelocity = getEncoderHeading(odometerYL.getVelocity(), odometerYR.getVelocity());
         return new Vector3D(new Vector2D(
-                ((double) -odometerX.getVelocity() - angularVelocity * odometerXcenterOffset) * odometryCMPerCounts,
-                (double) (odometerYL.getVelocity() - odometerYR.getVelocity()) * odometryCMPerCounts / 2)
+                ((double) odometerX.getVelocity() - angularVelocity * odometerXcenterOffset) * odometryCMPerCounts,
+                (double) (odometerYL.getVelocity() + odometerYR.getVelocity()) * odometryCMPerCounts / 2)
                 .rotatedCW(worldPosition.heading),
                 angularVelocity);
     }

@@ -12,6 +12,7 @@ import static org.firstinspires.ftc.teamcode.opmodes.MovementMacros.ShootPOWERSH
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.conveyor;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.drivetrain;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.initRobot;
+import static org.firstinspires.ftc.teamcode.robot.WoENrobot.movement;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.shooter;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.spinOnce;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.startRobot;
@@ -53,29 +54,26 @@ public class Tele_competition extends LinearOpMode {
             if (threeRingPresser.isTriggered(gamepad1.right_stick_button))
                 shooter.feedRings();
 
-            drivetrain.setRobotVelocity(calculateDrivingVelocity());
-                  spinOnce();
+            double turn = 0;
+            double y;
+            double x;
+            if (gamepad1.left_bumper) turn -= 0.25;
+            else turn -= gamepad1.left_trigger;
+            if (gamepad1.right_bumper) turn += 0.25;
+            else turn += gamepad1.right_trigger;
+            //  turn +=gamepad1.right_stick_x;
+            y = -gamepad1.left_stick_y;
+            x = gamepad1.left_stick_x;
+            if (gamepad1.dpad_up)
+                y += 1;
+            if (gamepad1.dpad_down)
+                y = -1;
+            if (gamepad1.dpad_left)
+                x = -1;
+            if (gamepad1.dpad_right)
+                x += 1;
+            movement.humanSetVelocity(x,y,turn);
+            spinOnce();
         }
-    }
-
-    Vector3D calculateDrivingVelocity() {
-        double turn = 0;
-        double y;
-        double x;
-        if (gamepad1.left_bumper) turn -= 0.25;
-        else turn -= gamepad1.left_trigger;
-        if (gamepad1.right_bumper) turn += 0.25;
-        else turn += gamepad1.right_trigger;
-        y = -gamepad1.left_stick_y;
-        x = gamepad1.left_stick_x;
-        if (gamepad1.dpad_up)
-            y += 1;
-        if (gamepad1.dpad_down)
-            y = -1;
-        if (gamepad1.dpad_left)
-            x = -1;
-        if (gamepad1.dpad_right)
-            x += 1;
-        return new Vector3D(x, y, turn).multiply(drivetrain.getMaxVelocity());
     }
 }

@@ -166,6 +166,7 @@ public class rpm implements RobotModule {
     }
 
     public boolean isCorrectRpm(double error) {
+        if(encoderFailureMode) return true;
         return Math.abs(currentVelocity - shooterMotor.getVelocity()) < error;
     }
     public void feedRing() {
