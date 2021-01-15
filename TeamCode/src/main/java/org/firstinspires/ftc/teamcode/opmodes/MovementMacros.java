@@ -8,6 +8,7 @@ import org.firstinspires.ftc.teamcode.robot.WobbleManipulator2;
 import org.firstinspires.ftc.teamcode.robot.rpm;
 
 import static java.lang.Math.toRadians;
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.gamepad1;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.delay;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.movement;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.opMode;
@@ -56,6 +57,9 @@ public class MovementMacros {
                movement.Pos(new Pose2D(xSign * pos, -5, toRadians(3)));
            }
            angle -= 6.6;
+           if(gamepad1.x) {
+               break;
+           }
            //pos -= 18;
            // ElapsedTime shooterAccelerationTimeout = new ElapsedTime();
            // while (opMode.opModeIsActive() && !shooter.isCorrectRpm() && shooterAccelerationTimeout.seconds()<3)
