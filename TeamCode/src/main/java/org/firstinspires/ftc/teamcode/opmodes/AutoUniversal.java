@@ -20,9 +20,9 @@ public class AutoUniversal extends AutonomousOpMode {
     @Override
     public void main() {
         delay(0);
-        //if (xSign * sideSign == 1)
-        //    ShootTargets();
-       // else
+        if (xSign * sideSign == 1)
+            ShootTargets();
+        else
             ShootPOWERSHOT();
         MoveWobble();
         //movement.Pos(new Pose2D(getStartPosition().x, 25, 0));

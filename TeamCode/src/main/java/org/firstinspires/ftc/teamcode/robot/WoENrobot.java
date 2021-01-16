@@ -20,10 +20,10 @@ public class WoENrobot {
     public static rpm shooter = new rpm();
     public static TelemetryDebugging telemetryDebugging = new TelemetryDebugging();
 
-    public static FakeRobot fakeRobot = new FakeRobot();
+   // public static FakeRobot fakeRobot = new FakeRobot();
 
-    public static Odometry odometry = fakeRobot;//new ThreeWheelOdometry(); // = fakeRobot
-    public static Drivetrain drivetrain = fakeRobot;//new MecanumDrivetrain(); // = fakeRobot
+    public static ThreeWheelOdometry odometry = new ThreeWheelOdometry(); // = fakeRobot
+    public static Drivetrain drivetrain = new MecanumDrivetrain(); // = fakeRobot
     public static Movement movement = new Movement(odometry, drivetrain);
     public static LinearOpMode opMode = null;
     public static boolean robotIsInitialized = false;

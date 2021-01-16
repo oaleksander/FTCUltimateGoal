@@ -41,13 +41,14 @@ public class MovementMacros {
         ElapsedTime shooterAccelerationTimeout = new ElapsedTime();
         while (opMode.opModeIsActive() && !shooter.isCorrectRpm() && shooterAccelerationTimeout.seconds()<3)
             spinOnce();
+        delay(300);
         shooter.feedRings();
-        delay(900);
+        delay(700);
         shooter.setShootingMode(rpm.ShooterMode.OFF);
     }
     public static void ShootPOWERSHOT() {  //rename
-        shooter.setShootingMode(rpm.ShooterMode.POWERSHOT);
         movement.Pos(new Pose2D(Double.NaN, -15, Double.NaN));
+        shooter.setShootingMode(rpm.ShooterMode.POWERSHOT);
         double pos = 27;
         double angle = 5.5;
         for (short i = 0; i < 3; i++){
@@ -57,10 +58,10 @@ public class MovementMacros {
            else {
                movement.Pos(new Pose2D(xSign * pos, -5, toRadians(3)));
            }
-           angle -= 6.6;
-           if(gamepad1.x) {
-               break;
-           }
+           angle -= 6.4;
+         //  if(gamepad1.x) {
+         //      break;
+         //  }
            //pos -= 18;
            // ElapsedTime shooterAccelerationTimeout = new ElapsedTime();
            // while (opMode.opModeIsActive() && !shooter.isCorrectRpm() && shooterAccelerationTimeout.seconds()<3)
@@ -99,9 +100,9 @@ public class MovementMacros {
                     movement.Pos(new Pose2D(xSign * 120, 0, toRadians(50 * xSign)));
             }
         wobbleManipulator2.changepos(WobbleManipulator2.positions.down);
-        WoENrobot.delay(1800);
+        WoENrobot.delay(800);
         wobbleManipulator2.setposclose(false);
-        WoENrobot.delay(1000);
+        WoENrobot.delay(600);
     }
 
     public static void PutRingsToLowGoal() {

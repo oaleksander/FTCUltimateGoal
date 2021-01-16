@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.robot;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.math.Pose2D;
@@ -22,12 +23,12 @@ import static org.firstinspires.ftc.teamcode.robot.WoENrobot.movement;
 
 public class Movement implements RobotModule {
     // private static final double kP_distance = 0.010, kD_distance = 0.00034;
-    private static final double kP_distance = 1.9, kD_distance = 0;
+    private static final double kP_distance = 3.45, kD_distance = 0;
     private static final double kF_distance = 0.1;
-    private static final double minError_distance = 3;
+    private static final double minError_distance = 3.2;
     // private static final double kP_angle = 0.40, kD_angle = 0;
-    private static final double kP_angle = 3.7, kD_angle = 0;
-    private static final double minError_angle = Math.toRadians(0.4);
+    private static final double kP_angle = 3.9, kD_angle = 0;
+    private static final double minError_angle = Math.toRadians(0.45);
     private static Odometry odometry;
     private static Drivetrain drivetrain;
     private LinearOpMode opMode = null;
@@ -72,17 +73,23 @@ public class Movement implements RobotModule {
     boolean bPathFollowerEnabled = false;
     boolean bPathFollowingFinished = false;
 
+    private ElapsedTime pathFollowingTimer = new ElapsedTime();
     public void update() {
         if(opMode.gamepad1.y) stopPathFollowing();
         bPathFollowingFinished = nTargetPoint >= pathToFollow.size();
         if (pathFollowerIsActive() && requestedVelocityPercent.radius()<0.1) {
-            Pose2D currentTarget = removeNaN(pathToFollow.get(nTargetPoint));
-            Pose2D previousTarget = removeNaN(pathToFollow.get(nTargetPoint-1));
-            if(movement.movePurePursuit(previousTarget, currentTarget, 45.72*1.5)) {
-                if (movement.moveLinear(currentTarget)) {
-                    drivetrain.setRobotVelocity(0, 0, 0);
-                    pathToFollow.get(nTargetPoint).actionOnConpletion.run();
-                    nTargetPoint++;
+            if(pathFollowingTimer.seconds()>4)
+                nTargetPoint++;
+            else {
+                Pose2D currentTarget = removeNaN(pathToFollow.get(nTargetPoint));
+                Pose2D previousTarget = removeNaN(pathToFollow.get(nTargetPoint - 1));
+                if (movement.movePurePursuit(previousTarget, currentTarget, 45.72 * 1.5)) {
+                    if (movement.moveLinear(currentTarget)) {
+                        drivetrain.setRobotVelocity(0, 0, 0);
+                        pathFollowingTimer.reset();
+                        pathToFollow.get(nTargetPoint).actionOnConpletion.run();
+                        nTargetPoint++;
+                    }
                 }
             }
         }
@@ -134,6 +141,7 @@ public class Movement implements RobotModule {
         nTargetPoint = 1;
         bPathFollowerEnabled = true;
         bPathFollowingFinished = false;
+        pathFollowingTimer.reset();
     }
 
     /**

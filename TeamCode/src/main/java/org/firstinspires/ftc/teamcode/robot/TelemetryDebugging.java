@@ -49,7 +49,7 @@ public class TelemetryDebugging implements RobotModule {
         loopCount = 0;
         telemetry = opMode.telemetry;
       //  telemetry = dashboard.getTelemetry();
-       // telemetry = new MultipleTelemetry(opMode.telemetry,dashboard.getTelemetry());
+      //  telemetry = new MultipleTelemetry(opMode.telemetry,dashboard.getTelemetry());
         telemetry.setMsTransmissionInterval(refreshTimeMs);
       //   dashboard.startCameraStream(openCVNode.getWebcam(),0);
     }
@@ -59,13 +59,14 @@ public class TelemetryDebugging implements RobotModule {
         if (measurementTime.milliseconds() > refreshTimeMs) {
             telemetry.addData("Status", "Running");
             telemetry.addData("Loop frequency", 1 / (measurementTime.seconds() / loopCount) + " Hz");
-            Pose2D robotPosition = odometry.getRobotCoordinates();
-           // telemetry.addLine("Odometry encoders").addData("odYL", odometry.odometerYL.getCurrentPosition()).addData("odYR", odometry.odometerYR.getCurrentPosition()).addData("odX", odometry.odometerX.getCurrentPosition());
+           Pose2D robotPosition = odometry.getRobotCoordinates();
+            telemetry.addLine("Odometry encoders").addData("odYL", odometry.odometerYL.getCurrentPosition()).addData("odYR", odometry.odometerYR.getCurrentPosition()).addData("odX", odometry.odometerX.getCurrentPosition());
             telemetry.addLine("Robot position ").addData("Y", robotPosition.y).addData("X", robotPosition.x).addData("Head", Math.toDegrees(robotPosition.heading));
             Vector3D velocity = odometry.getRobotVelocity();
-            telemetry.addLine("Robot velocity ").addData("Y", velocity.y).addData("X", velocity.x).addData("Head", Math.toDegrees(velocity.z));
+         //   telemetry.addLine("Robot velocity ").addData("Y", velocity.y).addData("X", velocity.x).addData("Head", Math.toDegrees(velocity.z));
             telemetry.addLine("Shooter ").addData("Mode",shooter.getShootingMode()).addData("Current", shooter.getCurrentRpm()).addData("Target",shooter.getRpmTarget());
           //telemetry.addData("conpower", conveyor.conveyorPower);
+        //    telemetry.addData("Shooter Velo",shooter.getCurrentRpm());
 
 
             //telemetry.addData("OpenCV stack size", openCVNode.getStackSize());
