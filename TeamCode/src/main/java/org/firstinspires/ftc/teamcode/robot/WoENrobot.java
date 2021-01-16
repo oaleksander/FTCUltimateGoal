@@ -43,6 +43,11 @@ public class WoENrobot {
     private static List<LynxModule> allHubs = null;
     private static Thread regulatorUpdater = new Thread(updateRegulators);
 
+    public static LinearOpMode getOpMode()
+    {
+        return opMode;
+    }
+
     public static void FullInitWithCV(LinearOpMode opMode) {
         openCVNode.initialize(opMode);
         forceInitRobot(opMode);

@@ -59,9 +59,9 @@ public class MovementMacros {
                movement.Pos(new Pose2D(xSign * pos, -5, toRadians(3)));
            }
            angle -= 6.4;
-         //  if(gamepad1.x) {
-         //      break;
-         //  }
+           if(WoENrobot.getOpMode().gamepad1.x) {
+               break;
+           }
            //pos -= 18;
            // ElapsedTime shooterAccelerationTimeout = new ElapsedTime();
            // while (opMode.opModeIsActive() && !shooter.isCorrectRpm() && shooterAccelerationTimeout.seconds()<3)
