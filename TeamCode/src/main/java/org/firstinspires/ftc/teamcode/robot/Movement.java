@@ -79,7 +79,7 @@ public class Movement implements RobotModule {
         if(opMode.gamepad1.y) stopPathFollowing();
         bPathFollowingFinished = nTargetPoint >= pathToFollow.size();
         if (pathFollowerIsActive() && requestedVelocityPercent.radius()<0.01) {
-            if(pathFollowingTimer.seconds()>4)
+            if(pathFollowingTimer.seconds()>5)
                 nTargetPoint++;
             else {
                 Pose2D currentTarget = removeNaN(pathToFollow.get(nTargetPoint));

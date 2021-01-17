@@ -116,14 +116,16 @@ public class MovementMacros {
     private static final Vector2D wobblePlacementOffset = new Vector2D(11.8425,33.25);
 
     public static void MoveWobble_experimental() {
+        wobbleManipulator2.setposclose(true);
+        wobbleManipulator2.changepos(WobbleManipulator2.positions.medium);
         Vector2D wobblePose = getWobblePose();
         Vector2D error = (Vector2D)movement.getError(new Pose2D(wobblePose,Double.NaN));
         ArrayList<MotionTask> trajectoryPoints = new ArrayList<MotionTask>();
         movement.followPath(new MotionTask(wobblePose.minus(wobblePlacementOffset.rotatedCW(error.acot())),error.acot(), ()->{
                     wobbleManipulator2.changepos(WobbleManipulator2.positions.down);
-                    WoENrobot.delay(800);
+                    WoENrobot.delay(666);
                     wobbleManipulator2.setposclose(false);
-                    WoENrobot.delay(600);}));
+                    WoENrobot.delay(666);}));
         while(movement.pathFollowerIsActive()&&getOpMode().opModeIsActive()) {spinOnce();}
     }
 

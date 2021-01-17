@@ -15,20 +15,20 @@ import java.util.List;
 public class WoENrobot {
 
     public static WobbleManipulator2 wobbleManipulator2 = new WobbleManipulator2();
-    public static OpenCVNode openCVNode = new OpenCVNode();
+    public static OpenCVNode openCVNode = new OpenCVNodeWebcam();
     public static Conveyor conveyor = new Conveyor();
     public static rpm shooter = new rpm();
     public static TelemetryDebugging telemetryDebugging = new TelemetryDebugging();
 
-   // public static FakeRobot fakeRobot = new FakeRobot();
+    //public static FakeRobot fakeRobot = new FakeRobot();
 
-    public static ThreeWheelOdometry odometry = new ThreeWheelOdometry(); // = fakeRobot
+    public static Odometry odometry = new ThreeWheelOdometry(); // = fakeRobot
     public static Drivetrain drivetrain = new MecanumDrivetrain(); // = fakeRobot
     public static Movement movement = new Movement(odometry, drivetrain);
     public static LinearOpMode opMode = null;
     public static boolean robotIsInitialized = false;
     public static ElapsedTime runTime = new ElapsedTime();
-    protected static RobotModule[] activeRobotModules = {odometry, drivetrain, movement, shooter, wobbleManipulator2,conveyor, telemetryDebugging}; //conveyor, odometry, shooter, wobbleManipulator, drivetrain
+    protected static RobotModule[] activeRobotModules = {odometry, movement, drivetrain, shooter, wobbleManipulator2, conveyor, telemetryDebugging}; //conveyor, odometry, shooter, wobbleManipulator, drivetrain
     static boolean spinCompleted = false;
     static Runnable updateRegulators = () -> {
         setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
