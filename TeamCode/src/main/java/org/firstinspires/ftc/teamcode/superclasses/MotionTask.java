@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.superclasses;
 
 import org.firstinspires.ftc.teamcode.math.Pose2D;
+import org.firstinspires.ftc.teamcode.math.Vector2D;
 
 public class MotionTask extends Pose2D {
 
@@ -13,6 +14,15 @@ public class MotionTask extends Pose2D {
     public MotionTask(double x, double y, double heading, Runnable actionOncompletion) {
         super(x, y, heading);
         this.actionOnConpletion = actionOncompletion;
+    }
+
+    public MotionTask(Vector2D vector, double heading, Runnable actionOncompletion) {
+        super(vector.x,vector.y, heading);
+        this.actionOnConpletion = actionOncompletion;
+    }
+
+    public MotionTask(Vector2D vector, double heading) {
+        super(vector.x,vector.y, heading);
     }
 
     public MotionTask(Pose2D pose, Runnable actionOncompletion) {

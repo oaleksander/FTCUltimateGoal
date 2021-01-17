@@ -72,12 +72,13 @@ public class Movement implements RobotModule {
     ArrayList<MotionTask> pathToFollow = new ArrayList<>();
     boolean bPathFollowerEnabled = false;
     boolean bPathFollowingFinished = false;
+    private Thread actionOnCompletionExecutor = new Thread();
 
     private ElapsedTime pathFollowingTimer = new ElapsedTime();
     public void update() {
         if(opMode.gamepad1.y) stopPathFollowing();
         bPathFollowingFinished = nTargetPoint >= pathToFollow.size();
-        if (pathFollowerIsActive() && requestedVelocityPercent.radius()<0.1) {
+        if (pathFollowerIsActive() && requestedVelocityPercent.radius()<0.01) {
             if(pathFollowingTimer.seconds()>4)
                 nTargetPoint++;
             else {
@@ -85,16 +86,23 @@ public class Movement implements RobotModule {
                 Pose2D previousTarget = removeNaN(pathToFollow.get(nTargetPoint - 1));
                 if (movement.movePurePursuit(previousTarget, currentTarget, 45.72 * 1.5)) {
                     if (movement.moveLinear(currentTarget)) {
-                        drivetrain.setRobotVelocity(0, 0, 0);
                         pathFollowingTimer.reset();
-                        pathToFollow.get(nTargetPoint).actionOnConpletion.run();
-                        nTargetPoint++;
+                        if(actionOnCompletionExecutor.getState() == Thread.State.NEW)
+                        actionOnCompletionExecutor.start();
+                        else if(actionOnCompletionExecutor.getState() == Thread.State.TERMINATED) {
+                            nTargetPoint++;
+                            if(nTargetPoint<pathToFollow.size())
+                            actionOnCompletionExecutor = new Thread(pathToFollow.get(nTargetPoint).actionOnConpletion);
+                        }
                     }
                 }
             }
         }
         else
+            if(requestedVelocityPercent.radius()>0.01)
         drivetrain.setRobotVelocity(requestedVelocityPercent.multiply(drivetrain.getMaxVelocity()));
+            else
+                drivetrain.setRobotVelocity(0,0,0);
     }
 
     /**
@@ -135,12 +143,13 @@ public class Movement implements RobotModule {
     {
         bPathFollowerEnabled = false;
         Thread.yield();
-        pathToFollow.add(0,new MotionTask(odometry.getRobotCoordinates()));
         this.pathToFollow = pathToFollow;
+        pathToFollow.add(0,new MotionTask(odometry.getRobotCoordinates()));
         Thread.yield();
         nTargetPoint = 1;
         bPathFollowerEnabled = true;
         bPathFollowingFinished = false;
+        actionOnCompletionExecutor = new Thread(pathToFollow.get(nTargetPoint).actionOnConpletion);
         pathFollowingTimer.reset();
     }
 
@@ -180,12 +189,12 @@ public class Movement implements RobotModule {
 
         previousError = error;
         previousTarget = target;
+        approachPosition(error, error.radius() * kP_distance + ((Vector2D)diffError).radius() * kD_distance,
+                error.heading * kP_angle + diffError.z*kD_angle);
         if (abs(error.heading) >= minError_angle || error.radius() >= minError_distance) {
-            approachPosition(error, error.radius() * kP_distance + ((Vector2D)diffError).radius() * kD_distance,
-                    error.heading * kP_angle + diffError.z*kD_angle);
             return false;
         }
-        drivetrain.setRobotVelocity(0, 0, 0);
+        //drivetrain.setRobotVelocity(0, 0, 0);
         return true;
     }
 
@@ -196,6 +205,7 @@ public class Movement implements RobotModule {
      */
     public Pose2D getError(Pose2D target)
     {
+        target = removeNaN(target);
         return target.substract(odometry.getRobotCoordinates());
     }
 
