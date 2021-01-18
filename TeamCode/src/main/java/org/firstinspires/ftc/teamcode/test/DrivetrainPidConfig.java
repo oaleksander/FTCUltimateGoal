@@ -21,6 +21,8 @@ import org.firstinspires.ftc.teamcode.misc.motorAccelerationLimiter;
 import org.firstinspires.ftc.teamcode.robot.ThreeWheelOdometry;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 import static com.qualcomm.robotcore.util.Range.clip;
 import static java.lang.Math.abs;
 import static java.lang.Math.max;
@@ -115,10 +117,10 @@ public class DrivetrainPidConfig extends LinearOpMode {
         public static double achieveableMinRPMFraction = 0.05;
         public static double strafingMultiplier = 1 / 0.8;
         public static double rotationDecrepancy = 1.0;
-        public static double kP = 1;
-        public static double kD = 1;
-        public static double kI = 1;
-        public static double kF = 1;
+        public static double kP = 1.5;
+        public static double kD = 0;
+        public static double kI = 0.15;
+        public static double kF = 15;
     }
 
 
@@ -135,6 +137,7 @@ public class DrivetrainPidConfig extends LinearOpMode {
 
     static ThreeWheelOdometry odometry = new ThreeWheelOdometry();
     FtcDashboard dashboard;
+    List<LynxModule> allHubs;
     @Override
     public void runOpMode() throws InterruptedException {
         odometry.initialize(this);
@@ -156,44 +159,58 @@ public class DrivetrainPidConfig extends LinearOpMode {
         driveFrontRight.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         driveRearLeft.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         driveRearRight.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        telemetry = new MultipleTelemetry(dashboard.getTelemetry(),telemetry);
-        for (LynxModule module : hardwareMap.getAll(LynxModule.class))
-            module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
-        setPIDFCoefficients(new PIDFCoefficients(Constants.kP,Constants.kD,Constants.kI,Constants.kF));
+        telemetry = new MultipleTelemetry(dashboard.getTelemetry(), telemetry);
+        allHubs = hardwareMap.getAll(LynxModule.class);
+        for (LynxModule module : allHubs)
+            module.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        setPIDFCoefficients(new PIDFCoefficients(Constants.kP, Constants.kD, Constants.kI, Constants.kF));
         SinglePressButton sineResetter = new SinglePressButton();
         ElapsedTime sineWaveTimer = new ElapsedTime();
-        while(opModeIsActive())
-        {
+        while (opModeIsActive()) {
+            for (LynxModule module : allHubs)
+                module.clearBulkCache();
             odometry.update();
-            Vector3D targetVelocity = new Vector3D(gamepad1.right_stick_x,-gamepad1.right_stick_y,gamepad1.right_stick_x)
+            Vector3D targetVelocity = new Vector3D(gamepad1.right_stick_x, -gamepad1.right_stick_y, gamepad1.right_stick_x)
                     .multiply(getMaxVelocity());
-            if(sineResetter.isTriggered(gamepad1.b))
+            if (sineResetter.isTriggered(gamepad1.b))
                 sineWaveTimer.reset();
-            if(gamepad1.b)
-                targetVelocity = new Vector3D(0,Math.sin(sineWaveTimer.seconds()*Math.PI/3),0).multiply(getMaxVelocity());
-            telemetry.addData("targetX",targetVelocity.x);
-            telemetry.addData("targety",targetVelocity.y);
-            telemetry.addData("targetz",targetVelocity.z);
-            setRobotVelocity(targetVelocity.y,targetVelocity.x,targetVelocity.z);
+            if (gamepad1.b)
+                targetVelocity = new Vector3D(0, Math.sin(sineWaveTimer.seconds() * Math.PI / 3), 0).multiply(getMaxVelocity());
+            telemetry.addData("targetX", targetVelocity.x);
+            telemetry.addData("targety", targetVelocity.y);
+            telemetry.addData("targetz", targetVelocity.z);
+            setRobotVelocity(targetVelocity.y, targetVelocity.x, targetVelocity.z);
+            Vector3D expectedVelocity = calculateEncoderDelta(powerFrontLeft, powerFrontRight, powerRearLeft, powerRearRight);
+            telemetry.addData("commandX", expectedVelocity.x);
+            telemetry.addData("commandY", expectedVelocity.y);
+            telemetry.addData("commandZ", expectedVelocity.z);
             mFLProfiler.setVelocity(powerFrontLeft);
             mFRProfiler.setVelocity(powerFrontRight);
             mRLProfiler.setVelocity(powerRearLeft);
             mRRProfiler.setVelocity(powerRearRight);
-            if(gamepad1.back)
-            {
-                setPIDFCoefficients(new PIDFCoefficients(Constants.kP,Constants.kD,Constants.kI,Constants.kF));
-                setMotorConfiguration(Constants.achieveableMaxRPMFraction,tickPerRev,gearing,maxRPM);
+            Vector3D wheelVelocity = calculateEncoderDelta(driveFrontLeft.getVelocity(AngleUnit.RADIANS),driveFrontRight.getVelocity(AngleUnit.RADIANS),driveRearLeft.getVelocity(AngleUnit.RADIANS),driveRearRight.getVelocity(AngleUnit.RADIANS));
+            telemetry.addData("wheelX", wheelVelocity.x);
+            telemetry.addData("wheelY", wheelVelocity.y);
+            telemetry.addData("wheelZ", wheelVelocity.z);
+            if (gamepad1.back) {
+                setPIDFCoefficients(new PIDFCoefficients(Constants.kP, Constants.kD, Constants.kI, Constants.kF));
+                setMotorConfiguration(Constants.achieveableMaxRPMFraction, tickPerRev, gearing, maxRPM);
                 maxMotorSpeed = Constants.achieveableMaxRPMFraction * theoreticalMaxSpeed;
                 minMotorSpeed = Constants.achieveableMinRPMFraction * theoreticalMaxSpeed;
                 sidewaysMultiplier = forwardMultiplier * Constants.strafingMultiplier;
                 turnMultiplier = (wheelCenterOffset.x + wheelCenterOffset.y) * Constants.rotationDecrepancy / wheelRadius;
             }
             Vector3D velocity = odometry.getRobotVelocity();
-            telemetry.addData("VelX",velocity.x);
-            telemetry.addData("VelY",velocity.y);
-            telemetry.addData("VelZ",velocity.z);
+            telemetry.addData("VelX", velocity.x);
+            telemetry.addData("VelY", velocity.y);
+            telemetry.addData("VelZ", velocity.z);
             telemetry.update();
         }
+    }
+
+    public Vector3D calculateEncoderDelta(double frontLeft, double frontRight, double rearLeft, double rearRight)
+    {
+        return new Vector3D((frontLeft-frontRight-rearLeft-frontRight)/(4*sidewaysMultiplier),(frontLeft+frontRight+rearLeft+rearRight)/(4*forwardMultiplier),(frontLeft-frontRight+rearLeft-rearRight)/(4*turnMultiplier));
     }
 
 }
