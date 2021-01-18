@@ -7,7 +7,7 @@ import org.firstinspires.ftc.teamcode.robot.Movement;
 import org.firstinspires.ftc.teamcode.robot.WobbleManipulator2;
 
 import static org.firstinspires.ftc.teamcode.opmodes.MovementMacros.MoveWobble;
-import static org.firstinspires.ftc.teamcode.opmodes.MovementMacros.ShootPOWERSHOT;
+import static org.firstinspires.ftc.teamcode.opmodes.MovementMacros.ShootPOWERSHOTAngle;
 import static org.firstinspires.ftc.teamcode.opmodes.MovementMacros.ShootTargets;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.delay;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.movement;
@@ -23,7 +23,7 @@ public class AutoUniversal extends AutonomousOpMode {
         if (xSign * sideSign == 1)
             ShootTargets();
         else
-            ShootPOWERSHOT();
+            ShootPOWERSHOTAngle();
         MoveWobble();
         //movement.Pos(new Pose2D(getStartPosition().x, 25, 0));
         if (xSign * sideSign == 1)

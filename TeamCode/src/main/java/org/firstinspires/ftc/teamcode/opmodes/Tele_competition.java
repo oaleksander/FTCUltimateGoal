@@ -8,7 +8,7 @@ import org.firstinspires.ftc.teamcode.misc.ButtonSwitch;
 import org.firstinspires.ftc.teamcode.misc.SinglePressButton;
 import org.firstinspires.ftc.teamcode.robot.rpm;
 
-import static org.firstinspires.ftc.teamcode.opmodes.MovementMacros.ShootPOWERSHOT;
+import static org.firstinspires.ftc.teamcode.opmodes.MovementMacros.ShootPOWERSHOTAngle;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.conveyor;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.drivetrain;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.initRobot;
@@ -47,7 +47,7 @@ public class Tele_competition extends LinearOpMode {
             conveyor.setBackmust(gamepad2.right_trigger > 0.5);
             //   powerconveyor = (buttonspeedConveyor.isTriggered(gamepad2.right_bumper)?-1:1);
             if (gamepad1.x) {
-                ShootPOWERSHOT();
+                ShootPOWERSHOTAngle();
             }
             if (gamepad1.b)
                 shooter.feedRing();
