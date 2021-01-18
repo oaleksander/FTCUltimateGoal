@@ -112,6 +112,19 @@ public class MovementMacros {
         WoENrobot.delay(600);
     }
 
+    private static Vector2D getWobblePose()
+    {
+        switch(openCVNode.getStackSize())
+        {
+            case FOUR:
+                return new Vector2D(xSign * 150.3809, 150.2761);
+            case ONE:
+                return new Vector2D(xSign * 89.9835, 90.3346);
+            case ZERO:
+            default:
+                return new Vector2D(xSign * 150.3809, 30.1596);
+        }
+    }
 
     private static final Vector2D wobblePlacementOffset = new Vector2D(11.8425,33.25);
 
@@ -120,7 +133,6 @@ public class MovementMacros {
         wobbleManipulator2.changepos(WobbleManipulator2.positions.medium);
         Vector2D wobblePose = getWobblePose();
         Vector2D error = (Vector2D)movement.getError(new Pose2D(wobblePose,Double.NaN));
-        ArrayList<MotionTask> trajectoryPoints = new ArrayList<MotionTask>();
         movement.followPath(new MotionTask(wobblePose.minus(wobblePlacementOffset.rotatedCW(error.acot())),error.acot(), ()->{
                     wobbleManipulator2.changepos(WobbleManipulator2.positions.down);
                     WoENrobot.delay(666);
@@ -142,20 +154,6 @@ public class MovementMacros {
             wobbleManipulator2.changepos(WobbleManipulator2.positions.medium);
             movement.Pos(new Pose2D(89.6372*xSign+67.3092*sideSign, yParkLine-robotYfrontLength+parkingTolerance, 0));
             delay(50);
-        }
-    }
-
-    private static Vector2D getWobblePose()
-    {
-        switch(openCVNode.getStackSize())
-        {
-            case FOUR:
-                return new Vector2D(xSign * 150.3809, 150.2761);
-            case ONE:
-                return new Vector2D(xSign * 89.9835, 90.3346);
-            case ZERO:
-            default:
-                return new Vector2D(xSign * 150.3809, 30.1596);
         }
     }
 

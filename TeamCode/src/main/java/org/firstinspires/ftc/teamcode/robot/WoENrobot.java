@@ -23,7 +23,7 @@ public class WoENrobot {
     //public static FakeRobot fakeRobot = new FakeRobot();
 
     public static Odometry odometry = new ThreeWheelOdometry(); // = fakeRobot
-    public static Drivetrain drivetrain = new MecanumDrivetrain(); // = fakeRobot
+    public static MecanumDrivetrain drivetrain = new MecanumDrivetrain(); // = fakeRobot
     public static Movement movement = new Movement(odometry, drivetrain);
     public static LinearOpMode opMode = null;
     public static boolean robotIsInitialized = false;
