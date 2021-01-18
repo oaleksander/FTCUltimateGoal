@@ -166,6 +166,7 @@ public class DrivetrainPidConfig extends LinearOpMode {
         setPIDFCoefficients(new PIDFCoefficients(Constants.kP, Constants.kD, Constants.kI, Constants.kF));
         SinglePressButton sineResetter = new SinglePressButton();
         ElapsedTime sineWaveTimer = new ElapsedTime();
+        telemetry.setMsTransmissionInterval(40);
         while (opModeIsActive()) {
             for (LynxModule module : allHubs)
                 module.clearBulkCache();
