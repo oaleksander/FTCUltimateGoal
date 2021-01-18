@@ -4,8 +4,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.misc.AutoTransitioner;
 
-import static org.firstinspires.ftc.teamcode.opmodes.MovementMacros.ShootPOWERSHOT;
-
 @Autonomous
 public class AutoNothing extends AutonomousOpMode {
 

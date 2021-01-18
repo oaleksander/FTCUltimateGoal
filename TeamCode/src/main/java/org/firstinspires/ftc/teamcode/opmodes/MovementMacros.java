@@ -53,7 +53,9 @@ public class MovementMacros {
         delay(700);
         shooter.setShootingMode(rpm.ShooterMode.OFF);
     }
-    public static void ShootPOWERSHOT() {  //rename
+
+
+    public static void ShootPOWERSHOTAngle() {  //rename
         movement.Pos(new Pose2D(Double.NaN, -15, Double.NaN));
         shooter.setShootingMode(rpm.ShooterMode.POWERSHOT);
         double pos = 27;
@@ -78,6 +80,35 @@ public class MovementMacros {
         }
         shooter.setShootingMode(rpm.ShooterMode.OFF);
     }
+
+
+    public static void ShootPOWERSHOTPos() {  //rename
+        movement.Pos(new Pose2D(Double.NaN, -15, Double.NaN));
+        shooter.setShootingMode(rpm.ShooterMode.POWERSHOT);
+        double pos = 50;
+        double angle = 5.5;
+        for (short i = 0; i < 3; i++){
+            if (xSign == 1) {
+                movement.Pos(new Pose2D(xSign * pos, -5, toRadians(angle)));
+            }
+            else {
+                movement.Pos(new Pose2D(xSign * pos, -5, toRadians(3)));
+            }
+            //angle -= 6.4;
+            if(WoENrobot.getOpMode().gamepad1.x) {
+                break;
+            }
+            pos -= 18;
+            // ElapsedTime shooterAccelerationTimeout = new ElapsedTime();
+            // while (opMode.opModeIsActive() && !shooter.isCorrectRpm() && shooterAccelerationTimeout.seconds()<3)
+            //    spinOnce();
+            shooter.feedRing();
+            delay(200);
+        }
+        shooter.setShootingMode(rpm.ShooterMode.OFF);
+    }
+
+
     public static void MoveWobble() {
         wobbleManipulator2.setposclose(true);
         wobbleManipulator2.changepos(WobbleManipulator2.positions.medium);
