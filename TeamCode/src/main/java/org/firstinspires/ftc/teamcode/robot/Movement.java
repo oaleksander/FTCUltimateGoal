@@ -23,12 +23,12 @@ import static org.firstinspires.ftc.teamcode.robot.WoENrobot.movement;
 
 public class Movement implements RobotModule {
     // private static final double kP_distance = 0.010, kD_distance = 0.00034;
-    private static final double kP_distance = 3.45, kD_distance = 0;
+    private static final double kP_distance = 3.6, kD_distance = 0;
     private static final double kF_distance = 0.1;
-    private static final double minError_distance = 3.2;
+    private static final double minError_distance = 3.6;
     // private static final double kP_angle = 0.40, kD_angle = 0;
-    private static final double kP_angle = 3.9, kD_angle = 0;
-    private static final double minError_angle = Math.toRadians(0.45);
+    private static final double kP_angle = 3.95, kD_angle = 0;
+    private static final double minError_angle = Math.toRadians(0.6);
     private static Odometry odometry;
     private static Drivetrain drivetrain;
     private LinearOpMode opMode = null;
@@ -79,7 +79,7 @@ public class Movement implements RobotModule {
         if(opMode.gamepad1.y) stopPathFollowing();
         bPathFollowingFinished = nTargetPoint >= pathToFollow.size();
         if (pathFollowerIsActive() && requestedVelocityPercent.radius()<0.01) {
-            if(pathFollowingTimer.seconds()>5)
+            if(pathFollowingTimer.seconds()>6)
                 nTargetPoint++;
             else {
                 Pose2D currentTarget = removeNaN(pathToFollow.get(nTargetPoint));

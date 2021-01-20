@@ -25,9 +25,9 @@ public class MecanumDrivetrain implements Drivetrain {
 
     /* Physical constants */
     private static final double wheelRadius = 9.8 / 2;
-    private static final double strafingMultiplier = 1 / 0.8;
+    private static final double strafingMultiplier = 1 / 0.7;
     private static final Vector2D wheelCenterOffset = new Vector2D(18.05253, 15.20000);
-    private static final double rotationDecrepancy = 1.0;
+    private static final double rotationDecrepancy = 1.2;
     private static final double forwardMultiplier = 1 / wheelRadius;
     private static final double sidewaysMultiplier = forwardMultiplier * strafingMultiplier;
     private static final double turnMultiplier = (wheelCenterOffset.x + wheelCenterOffset.y) * rotationDecrepancy / wheelRadius;
@@ -39,7 +39,7 @@ public class MecanumDrivetrain implements Drivetrain {
     private static final double maxRPM = 300;
     public static final double theoreticalMaxSpeed = (maxRPM / 60) * Math.PI * 2;
     private static double maxMotorSpeed = achieveableMaxRPMFraction * theoreticalMaxSpeed;
-    private static double minMotorSpeed = 0.05 * theoreticalMaxSpeed;
+    private static double minMotorSpeed = 0.10 * theoreticalMaxSpeed;
     private final double maxAcceleration = theoreticalMaxSpeed / 0.25;
     /* Drivetrain hardware members. */
     DcMotorEx driveFrontLeft = null;
@@ -75,7 +75,7 @@ public class MecanumDrivetrain implements Drivetrain {
         } catch (UnsupportedOperationException e) {
             opMode.telemetry.addData("Drivetrain PIDF error ", e.getMessage());
         }
-        setSmartMode(true);
+        setSmartMode(false);
         setRobotVelocity(0, 0, 0);
     }
 
