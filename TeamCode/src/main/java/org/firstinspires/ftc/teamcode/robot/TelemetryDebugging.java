@@ -25,7 +25,7 @@ public class TelemetryDebugging implements RobotModule {
     Telemetry telemetry;
     TelemetryPacket packet = null;
     long loopCount = 0;
-    int refreshTimeMs = 33;
+    int refreshTimeMs = 200;
     private LinearOpMode opMode = null;
 
     private static void rotatePoints(double[] xPoints, double[] yPoints, double angle) {
