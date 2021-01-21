@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.math.Pose2D;
 import org.firstinspires.ftc.teamcode.math.Vector2D;
@@ -34,25 +35,72 @@ public class MovementMacros {
         MovementMacros.sideSign = sideSign;
     }
 
-    public static void ShootTargets() {
-        //shooter.setShootersetings(3850, 500);
+    private static Vector2D getHighGoalPose()
+    {
+        return new Vector2D(93.9174*xSign,182.691);
+    }
+
+    private static final double highGoalShootingDistance = 233.4089;
+    private static final double highGoalShootingAngle = toRadians(-0.6);
+
+    public static void ShootHighGoal() {
+        movement.Pos(new Pose2D(Double.NaN, -70, Double.NaN));
         shooter.setShootingMode(rpm.ShooterMode.HIGHGOAL);
-        if (sideSign == 1 && xSign == 1)
-            movement.Pos(new Pose2D(xSign * 121, -48.5, toRadians(-8.5)));
-        else if (sideSign == -1 && xSign == 1)
-            movement.Pos(new Pose2D(xSign * 53, -30, toRadians(3)));
-        else if (sideSign == -1 && xSign == -1)
-            movement.Pos(new Pose2D(xSign * 147.5, -9.5, toRadians(10.5)));
-        else // if (sideSign == 1 &&  xSign == -1)
-            movement.Pos(new Pose2D(xSign * 61.5, -28, toRadians(-11.5)));
+        Pose2D error = movement.getError(new Pose2D(getHighGoalPose(),Double.NaN));
+        double angle = Range.clip(error.acot(),-13,13);
+        movement.Pos(new Pose2D(getHighGoalPose().minus(new Vector2D(0,highGoalShootingDistance).rotatedCW(angle)),angle+highGoalShootingAngle));
         ElapsedTime shooterAccelerationTimeout = new ElapsedTime();
         while (opMode.opModeIsActive() && !shooter.isCorrectRpm() && shooterAccelerationTimeout.seconds()<3)
             spinOnce();
         shooter.feedRings();
-        delay(900);
+        delay(950);
         shooter.setShootingMode(rpm.ShooterMode.OFF);
     }
 
+    private static Vector2D getWobblePose()
+    {
+        switch(openCVNode.getStackSize())
+        {
+            case FOUR:
+                return new Vector2D(xSign * 150.3809, 150.2761);
+            case ONE:
+                return new Vector2D(xSign * 89.9835, 90.3346);
+            case ZERO:
+            default:
+                return new Vector2D(xSign * 150.3809, 30.1596);
+        }
+    }
+
+    private static final Vector2D wobblePlacementOffset = new Vector2D(11.8425,33.25);
+
+    public static void MoveWobble_experimental() {
+        wobbleManipulator2.setposclose(true);
+        wobbleManipulator2.changepos(WobbleManipulator2.positions.medium);
+        Vector2D wobblePose = getWobblePose();
+        Vector2D error = (Vector2D)movement.getError(new Pose2D(wobblePose,Double.NaN));
+        movement.followPath(new MotionTask(wobblePose.minus(wobblePlacementOffset.rotatedCW(error.acot())),error.acot(), ()->{}));
+        while(movement.pathFollowerIsActive()&&getOpMode().opModeIsActive()) {spinOnce();}
+        wobbleManipulator2.changepos(WobbleManipulator2.positions.down);
+        WoENrobot.delay(666);
+        wobbleManipulator2.setposclose(false);
+        WoENrobot.delay(666);
+    }
+
+    private static final double yParkLine = 26.462;
+    private static final double robotYbackLength = 29.85498;
+    private static final double robotYfrontLength = 37.2;
+    private static final double parkingTolerance = 10;
+
+    public static void Park() {
+        if(odometry.getRobotCoordinates().y>yParkLine) {
+            movement.Pos(new Pose2D(89.6372*xSign+67.3092*sideSign, yParkLine+robotYbackLength-parkingTolerance, 0));
+        }
+        else {
+            wobbleManipulator2.changepos(WobbleManipulator2.positions.medium);
+            movement.Pos(new Pose2D(89.6372*xSign+67.3092*sideSign, yParkLine-robotYfrontLength+parkingTolerance, 0));
+            delay(50);
+        }
+    }
 
     public static void ShootPOWERSHOTAngle() {  //rename
         movement.Pos(new Pose2D(Double.NaN, -20, Double.NaN));
@@ -107,7 +155,27 @@ public class MovementMacros {
         shooter.setShootingMode(rpm.ShooterMode.OFF);
     }
 
+    @Deprecated
+    public static void ShootTargets() {
+        //shooter.setShootersetings(3850, 500);
+        shooter.setShootingMode(rpm.ShooterMode.HIGHGOAL);
+        if (sideSign == 1 && xSign == 1)
+            movement.Pos(new Pose2D(xSign * 121, -48.5, toRadians(-8.5)));
+        else if (sideSign == -1 && xSign == 1)
+            movement.Pos(new Pose2D(xSign * 53, -30, toRadians(3)));
+        else if (sideSign == -1 && xSign == -1)
+            movement.Pos(new Pose2D(xSign * 147.5, -9.5, toRadians(10.5)));
+        else // if (sideSign == 1 &&  xSign == -1)
+            movement.Pos(new Pose2D(xSign * 61.5, -28, toRadians(-11.5)));
+        ElapsedTime shooterAccelerationTimeout = new ElapsedTime();
+        while (opMode.opModeIsActive() && !shooter.isCorrectRpm() && shooterAccelerationTimeout.seconds()<3)
+            spinOnce();
+        shooter.feedRings();
+        delay(900);
+        shooter.setShootingMode(rpm.ShooterMode.OFF);
+    }
 
+    @Deprecated
     public static void MoveWobble() {
         wobbleManipulator2.setposclose(true);
         wobbleManipulator2.changepos(WobbleManipulator2.positions.medium);
@@ -142,51 +210,7 @@ public class MovementMacros {
         WoENrobot.delay(600);
     }
 
-    private static Vector2D getWobblePose()
-    {
-        switch(openCVNode.getStackSize())
-        {
-            case FOUR:
-                return new Vector2D(xSign * 150.3809, 150.2761);
-            case ONE:
-                return new Vector2D(xSign * 89.9835, 90.3346);
-            case ZERO:
-            default:
-                return new Vector2D(xSign * 150.3809, 30.1596);
-        }
-    }
-
-    private static final Vector2D wobblePlacementOffset = new Vector2D(11.8425,33.25);
-
-    public static void MoveWobble_experimental() {
-        wobbleManipulator2.setposclose(true);
-        wobbleManipulator2.changepos(WobbleManipulator2.positions.medium);
-        Vector2D wobblePose = getWobblePose();
-        Vector2D error = (Vector2D)movement.getError(new Pose2D(wobblePose,Double.NaN));
-        movement.followPath(new MotionTask(wobblePose.minus(wobblePlacementOffset.rotatedCW(error.acot())),error.acot(), ()->{}));
-        while(movement.pathFollowerIsActive()&&getOpMode().opModeIsActive()) {spinOnce();}
-        wobbleManipulator2.changepos(WobbleManipulator2.positions.down);
-        WoENrobot.delay(666);
-        wobbleManipulator2.setposclose(false);
-        WoENrobot.delay(666);
-    }
-
-    private static final double yParkLine = 26.462;
-    private static final double robotYbackLength = 29.85498;
-    private static final double robotYfrontLength = 37.2;
-    private static final double parkingTolerance = 10;
-
-    public static void Park() {
-        if(odometry.getRobotCoordinates().y>yParkLine) {
-            movement.Pos(new Pose2D(89.6372*xSign+67.3092*sideSign, yParkLine+robotYbackLength-parkingTolerance, 0));
-        }
-        else {
-            wobbleManipulator2.changepos(WobbleManipulator2.positions.medium);
-            movement.Pos(new Pose2D(89.6372*xSign+67.3092*sideSign, yParkLine-robotYfrontLength+parkingTolerance, 0));
-            delay(50);
-        }
-    }
-
+    @Deprecated
     public static void PutRingsToLowGoal() {
         movement.Pos(new Pose2D((93.75 + 11.25 * xSign) * xSign, 150, toRadians(0)));
         wobbleManipulator2.setAngle(0.55);

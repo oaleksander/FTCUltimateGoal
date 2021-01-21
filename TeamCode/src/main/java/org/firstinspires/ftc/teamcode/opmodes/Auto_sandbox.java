@@ -12,7 +12,7 @@ import static org.firstinspires.ftc.teamcode.robot.WoENrobot.*;
 public class Auto_sandbox extends AutonomousOpMode {
     @Override
     public void main() {
-        MovementMacros.ShootTargets();
+        MovementMacros.ShootHighGoal();
         MovementMacros.MoveWobble_experimental();
         MovementMacros.Park();
     }
