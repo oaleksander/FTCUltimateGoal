@@ -43,17 +43,30 @@ public class MovementMacros {
     private static final double highGoalShootingDistance = 233.4089;
     private static final double highGoalShootingAngle = toRadians(-0.6);
 
-    public static void ShootHighGoal() {
-        shooter.setShootingMode(rpm.ShooterMode.HIGHGOAL);
+    private static Pose2D getHighGoalShootingPose()
+    {
         Pose2D error = movement.getError(new Pose2D(getHighGoalPose(),Double.NaN));
         double angle = Range.clip(error.acot(),-13,13);
-        movement.Pos(new Pose2D(getHighGoalPose().minus(new Vector2D(0,highGoalShootingDistance).rotatedCW(angle)),angle+highGoalShootingAngle));
+        return new Pose2D(getHighGoalPose().minus(new Vector2D(0,highGoalShootingDistance).rotatedCW(angle)),angle+highGoalShootingAngle);
+    }
+    public static void ShootHighGoal() {
+        shooter.setShootingMode(rpm.ShooterMode.HIGHGOAL);
+        movement.Pos(getHighGoalShootingPose());
         ElapsedTime shooterAccelerationTimeout = new ElapsedTime();
         while (opMode.opModeIsActive() && !shooter.isCorrectRpm() && shooterAccelerationTimeout.seconds()<3)
             spinOnce();
         shooter.feedRings();
         delay(950);
         shooter.setShootingMode(rpm.ShooterMode.OFF);
+    }
+    public static void ShootHighGoalAsync() {
+        shooter.setShootingMode(rpm.ShooterMode.HIGHGOAL);
+        movement.followPath(new MotionTask(getHighGoalShootingPose(), ()->{
+            ElapsedTime shooterAccelerationTimeout = new ElapsedTime();
+            while (opMode.opModeIsActive() && !shooter.isCorrectRpm() && shooterAccelerationTimeout.seconds()<2 && movement.pathFollowerIsActive())
+                spinOnce();
+            shooter.feedRings();}));
+      //  while(movement.pathFollowerIsActive()&&getOpMode().opModeIsActive()) {spinOnce();}
     }
 
     private static Vector2D getWobblePose()

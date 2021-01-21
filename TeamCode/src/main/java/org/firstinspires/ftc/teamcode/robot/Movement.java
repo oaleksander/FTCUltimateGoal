@@ -97,8 +97,10 @@ public class Movement implements RobotModule {
                     }
                 }
             }
-        } else if (requestedVelocityPercent.radius() > 0.01)
+        } else if (requestedVelocityPercent.radius() > 0.01) {
+            if(pathFollowerIsActive()) stopPathFollowing();
             drivetrain.setRobotVelocity(requestedVelocityPercent.multiply(drivetrain.getMaxVelocity()));
+        }
         else
             drivetrain.setRobotVelocity(0, 0, 0);
     }
