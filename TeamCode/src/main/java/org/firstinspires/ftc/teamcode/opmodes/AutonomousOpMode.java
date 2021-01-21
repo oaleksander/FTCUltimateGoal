@@ -32,7 +32,7 @@ public class AutonomousOpMode extends LinearOpMode {
     }
 
     public Pose2D getStartPosition() {
-        return new Pose2D(93.75 * getXSign() + 31.25 * getSideSign(), -156.5, 0);
+        return new Pose2D(93.91741046 * getXSign() + 30.1416 * getSideSign(), -156.12089687, 0);
 
     }
 

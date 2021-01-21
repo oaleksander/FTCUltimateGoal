@@ -57,7 +57,7 @@ public class Vector2D implements Comparable {
     }
 
     public double acot() {
-        return MathUtil.angleWrap(Math.PI / 2 - Math.atan2(y, x));
+        return Math.atan2(x, y);
     }
 
     public double radius() {
