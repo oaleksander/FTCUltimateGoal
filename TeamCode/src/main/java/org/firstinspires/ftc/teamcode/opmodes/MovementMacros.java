@@ -44,7 +44,6 @@ public class MovementMacros {
     private static final double highGoalShootingAngle = toRadians(-0.6);
 
     public static void ShootHighGoal() {
-        movement.Pos(new Pose2D(Double.NaN, -70, Double.NaN));
         shooter.setShootingMode(rpm.ShooterMode.HIGHGOAL);
         Pose2D error = movement.getError(new Pose2D(getHighGoalPose(),Double.NaN));
         double angle = Range.clip(error.acot(),-13,13);
@@ -69,6 +68,31 @@ public class MovementMacros {
             default:
                 return new Vector2D(xSign * 150.3809, 30.1596);
         }
+    }
+
+    private static Vector2D getRingStackPose()
+    {
+        return new Vector2D(90.3747*xSign,-56.9019);
+    }
+
+    public static boolean PickupRings()
+    {
+        Pose2D error = movement.getError(new Pose2D(getRingStackPose(),Double.NaN));
+        switch (openCVNode.getStackSize())
+        {
+            case FOUR:
+                movement.Pos(new Pose2D(getRingStackPose().minus(new Vector2D(0,10).rotatedCW(error.acot())),error.acot()+Math.PI));
+                movement.Pos(new Pose2D(getRingStackPose().minus(new Vector2D(0,10-13).rotatedCW(error.acot())),error.acot()+Math.PI));
+                movement.Pos(new Pose2D(getRingStackPose().minus(new Vector2D(0,10-26).rotatedCW(error.acot())),error.acot()+Math.PI));
+                break;
+            case ONE:
+                movement.Pos(new Pose2D(getRingStackPose().minus(new Vector2D(0,10).rotatedCW(error.acot())),error.acot()+Math.PI));
+                break;
+            case ZERO:
+            default:
+                return false;
+        }
+        return true;
     }
 
     private static final Vector2D wobblePlacementOffset = new Vector2D(11.8425,33.25);
