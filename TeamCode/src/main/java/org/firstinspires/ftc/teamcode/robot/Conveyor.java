@@ -17,6 +17,7 @@ public class Conveyor implements RobotModule {
     private final ElapsedTime conveyorTime = new ElapsedTime();
     private final ElapsedTime backOnTime = new ElapsedTime();
     private final ElapsedTime pauseTime = new ElapsedTime();
+    private final ElapsedTime BackOnAftertime = new ElapsedTime();
 
     private LinearOpMode opMode;
     private DcMotorEx conveyorm = null;
@@ -25,6 +26,7 @@ public class Conveyor implements RobotModule {
     private boolean full = false;
     private boolean backOn = false, stop = false;
     private boolean backMust = false;
+    private boolean backOnAfter = false;
 
     private double timelock = 0;
     private double conveyorPower = 0;
@@ -94,6 +96,7 @@ public class Conveyor implements RobotModule {
                         backOn = true;
                     }
                     timelock = backOnTime.milliseconds();
+                    BackOnAftertime.reset();
                 } else {
                     if (backOn && (backOnTime.milliseconds() >= (timelock + 500))) {
                         backOnTime.reset();
@@ -103,9 +106,13 @@ public class Conveyor implements RobotModule {
                 }
             } else {
                 if (stop) {
+                    if (backOnAfter && BackOnAftertime.milliseconds() < 500)
+                        setConveyorMotorPower(-conveyorPower);
+                    else {
                     setConveyorMotorPower(0);
                     stop = false;
                     backOn = false;
+                    }
                 }
             }
         } else {
@@ -115,6 +122,9 @@ public class Conveyor implements RobotModule {
         }
     }
 
+    public void setBackOnAfter (boolean BackOnAfter) {
+        backOnAfter = BackOnAfter;
+    }
 
     public void setConveyorPower(double power) {
         conveyorPower = power;
