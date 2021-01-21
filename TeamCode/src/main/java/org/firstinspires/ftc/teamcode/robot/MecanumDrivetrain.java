@@ -25,15 +25,15 @@ public class MecanumDrivetrain implements Drivetrain {
 
     /* Physical constants */
     private static final double wheelRadius = 9.8 / 2;
-    private static final double strafingMultiplier = 1 / 0.8;
+    private static final double strafingMultiplier = 1.35;
     private static final Vector2D wheelCenterOffset = new Vector2D(18.05253, 15.20000);
     private static final double rotationDecrepancy = 1.0;
     private static final double forwardMultiplier = 1 / wheelRadius;
     private static final double sidewaysMultiplier = forwardMultiplier * strafingMultiplier;
     private static final double turnMultiplier = (wheelCenterOffset.x + wheelCenterOffset.y) * rotationDecrepancy / wheelRadius;
     /* Motor parameters constatnts. */
-    private static final PIDFCoefficients drivePIDFCoefficients = new PIDFCoefficients(15.00, 0.7, 15, 15.00);
-    private static final double achieveableMaxRPMFraction = 0.9;
+    private static final PIDFCoefficients drivePIDFCoefficients = new PIDFCoefficients(26, 0.1, 0, 15.10);
+    private static final double achieveableMaxRPMFraction = 0.885;
     private static final double tickPerRev = 480;
     private static final double gearing = 20;
     private static final double maxRPM = 300;
@@ -43,14 +43,13 @@ public class MecanumDrivetrain implements Drivetrain {
     private final double maxAcceleration = theoreticalMaxSpeed / 0.25;
     /* Drivetrain hardware members. */
     DcMotorEx driveFrontLeft = null;
-    DcMotorEx driveFrontRight = null;
-    DcMotorEx driveRearLeft = null;
-    DcMotorEx driveRearRight = null;
-
     /* Motor controllers */
     private final motorAccelerationLimiter mFLProfiler = new motorAccelerationLimiter(new CommandSender(v -> driveFrontLeft.setVelocity(v, AngleUnit.RADIANS))::send, maxAcceleration);
+    DcMotorEx driveFrontRight = null;
     private final motorAccelerationLimiter mFRProfiler = new motorAccelerationLimiter(new CommandSender(v -> driveFrontRight.setVelocity(v, AngleUnit.RADIANS))::send, maxAcceleration);
+    DcMotorEx driveRearLeft = null;
     private final motorAccelerationLimiter mRLProfiler = new motorAccelerationLimiter(new CommandSender(v -> driveRearLeft.setVelocity(v, AngleUnit.RADIANS))::send, maxAcceleration);
+    DcMotorEx driveRearRight = null;
     private final motorAccelerationLimiter mRRProfiler = new motorAccelerationLimiter(new CommandSender(v -> driveRearRight.setVelocity(v, AngleUnit.RADIANS))::send, maxAcceleration);
 
 
@@ -81,7 +80,7 @@ public class MecanumDrivetrain implements Drivetrain {
 
     public void setSmartMode(boolean SmartMode) {
         smartMode = SmartMode;
-        setMotorMode(SmartMode?DcMotorEx.RunMode.RUN_USING_ENCODER:DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        setMotorMode(SmartMode ? DcMotorEx.RunMode.RUN_USING_ENCODER : DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     private void assignNames() {
@@ -148,18 +147,16 @@ public class MecanumDrivetrain implements Drivetrain {
     }
 
     public void update() {
-        if(smartMode)
-        {
+        if (smartMode) {
             mFLProfiler.setVelocity(powerFrontLeft);
             mFRProfiler.setVelocity(powerFrontRight);
             mRLProfiler.setVelocity(powerRearLeft);
             mRRProfiler.setVelocity(powerRearRight);
-        }
-        else
-        driveMotorPowers_direct(powerFrontLeft/maxMotorSpeed,
-                powerFrontRight/maxMotorSpeed,
-                powerRearLeft/maxMotorSpeed,
-                powerRearRight/maxMotorSpeed);
+        } else
+            driveMotorPowers_direct(powerFrontLeft / maxMotorSpeed,
+                    powerFrontRight / maxMotorSpeed,
+                    powerRearLeft / maxMotorSpeed,
+                    powerRearRight / maxMotorSpeed);
     }
 
     public void driveMotorPowers_direct(double frontLeft, double frontRight, double rearLeft, double rearRight) {

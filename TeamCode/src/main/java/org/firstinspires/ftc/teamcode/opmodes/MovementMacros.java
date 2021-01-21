@@ -38,7 +38,7 @@ public class MovementMacros {
         //shooter.setShootersetings(3850, 500);
         shooter.setShootingMode(rpm.ShooterMode.HIGHGOAL);
         if (sideSign == 1 && xSign == 1)
-            movement.Pos(new Pose2D(xSign * 121, -48.5, toRadians(-10.5)));
+            movement.Pos(new Pose2D(xSign * 121, -48.5, toRadians(-8.5)));
         else if (sideSign == -1 && xSign == 1)
             movement.Pos(new Pose2D(xSign * 53, -30, toRadians(3)));
         else if (sideSign == -1 && xSign == -1)
@@ -48,24 +48,23 @@ public class MovementMacros {
         ElapsedTime shooterAccelerationTimeout = new ElapsedTime();
         while (opMode.opModeIsActive() && !shooter.isCorrectRpm() && shooterAccelerationTimeout.seconds()<3)
             spinOnce();
-        delay(300);
         shooter.feedRings();
-        delay(700);
+        delay(900);
         shooter.setShootingMode(rpm.ShooterMode.OFF);
     }
 
 
     public static void ShootPOWERSHOTAngle() {  //rename
-        movement.Pos(new Pose2D(Double.NaN, -15, Double.NaN));
+        movement.Pos(new Pose2D(Double.NaN, -20, Double.NaN));
         shooter.setShootingMode(rpm.ShooterMode.POWERSHOT);
-        double pos = 27;
-        double angle = 5.5;
+        double pos = 31;
+        double angle = 6.5;
         for (short i = 0; i < 3; i++){
            if (xSign == 1) {
-               movement.Pos(new Pose2D(xSign * pos, -5, toRadians(angle)));
+               movement.Pos(new Pose2D(xSign * pos, -7.5, toRadians(angle)));
            }
            else {
-               movement.Pos(new Pose2D(xSign * pos, -5, toRadians(3)));
+               movement.Pos(new Pose2D(xSign * pos, -7.5, toRadians(3)));
            }
            angle -= 6.4;
            if(WoENrobot.getOpMode().gamepad1.x) {
@@ -164,12 +163,12 @@ public class MovementMacros {
         wobbleManipulator2.changepos(WobbleManipulator2.positions.medium);
         Vector2D wobblePose = getWobblePose();
         Vector2D error = (Vector2D)movement.getError(new Pose2D(wobblePose,Double.NaN));
-        movement.followPath(new MotionTask(wobblePose.minus(wobblePlacementOffset.rotatedCW(error.acot())),error.acot(), ()->{
-                    wobbleManipulator2.changepos(WobbleManipulator2.positions.down);
-                    WoENrobot.delay(666);
-                    wobbleManipulator2.setposclose(false);
-                    WoENrobot.delay(666);}));
+        movement.followPath(new MotionTask(wobblePose.minus(wobblePlacementOffset.rotatedCW(error.acot())),error.acot(), ()->{}));
         while(movement.pathFollowerIsActive()&&getOpMode().opModeIsActive()) {spinOnce();}
+        wobbleManipulator2.changepos(WobbleManipulator2.positions.down);
+        WoENrobot.delay(666);
+        wobbleManipulator2.setposclose(false);
+        WoENrobot.delay(666);
     }
 
     private static final double yParkLine = 26.462;

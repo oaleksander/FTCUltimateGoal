@@ -23,28 +23,30 @@ import static java.lang.Math.sin;
 import static java.lang.Math.toRadians;
 import static org.firstinspires.ftc.teamcode.math.MathUtil.angleWrap;
 
-public class ThreeWheelOdometry implements Odometry{
+public class ThreeWheelOdometry implements Odometry {
     private static final double odometryWheelDiameterCm = 4.8;
     private static final double odometryCountsPerCM = (1440) / (odometryWheelDiameterCm * PI);
     private static final double odometryCMPerCounts = (odometryWheelDiameterCm * PI) / 1440;
     private static final double odometerXcenterOffset = -36.8862986805 * odometryCountsPerCM * cos(toRadians(67.021303041)) / 2;
     private static final double yWheelPairRadiusCm = 18.2425;
-    private static final double radiansPerEncoderDifference = ((odometryCMPerCounts) / (yWheelPairRadiusCm * 2));
+    private static final double radiansPerEncoderDifference = 1.004604437*((odometryCMPerCounts) / (yWheelPairRadiusCm * 2));
     public static Pose2D worldPosition = new Pose2D();
-    private static double angleOffset = 0;
-    private static ExpansionHubEx expansionHub;
-    private static BNO055IMU imu;
     public static DcMotorEx odometerYL = null;
     public static DcMotorEx odometerYR = null;
     public static DcMotorEx odometerX = null;
+    private static double angleOffset = 0;
+    private static ExpansionHubEx expansionHub;
+    private static BNO055IMU imu;
     private static LinearOpMode opMode = null;
-  //  public RevBulkData bulkData;
+    //  public RevBulkData bulkData;
     private float IMUoffset = 0;
     private double encoderHeadingCovariance = 0;
     private int YL_old = 0;
     private int YR_old = 0;
     private int X_old = 0;
-    private Vector2D YWheelPairCenterOffset = new Vector2D(0, 6.40008);
+    private final Vector2D YWheelPairCenterOffset = new Vector2D(0, 6.40008);
+    private final ElapsedTime IMUAccessTimer = new ElapsedTime();
+
 
     /**
      * Class initializer
@@ -53,16 +55,14 @@ public class ThreeWheelOdometry implements Odometry{
     public ThreeWheelOdometry() {
     }
 
-
-    private ElapsedTime IMUAccessTimer = new ElapsedTime();
     private double calculateHeading() {
-        if(false)//IMUAccessTimer.seconds()>2)
+        if (false)//IMUAccessTimer.seconds()>2)
         {
-            double angleDivergence = angleWrap (getEncoderHeading(odometerYL.getCurrentPosition(),odometerYR.getTargetPosition())-getIMUheading());
-            if(abs(angleDivergence)>0.05) encoderHeadingCovariance = angleDivergence;
+            double angleDivergence = angleWrap(getEncoderHeading(odometerYL.getCurrentPosition(), odometerYR.getTargetPosition()) - getIMUheading());
+            if (abs(angleDivergence) > 0.05) encoderHeadingCovariance = angleDivergence;
             IMUAccessTimer.reset();
         }
-        return angleWrap(getEncoderHeading(odometerYL.getCurrentPosition(),odometerYR.getCurrentPosition()) - angleOffset - encoderHeadingCovariance);
+        return angleWrap(getEncoderHeading(odometerYL.getCurrentPosition(), odometerYR.getCurrentPosition()) - angleOffset - encoderHeadingCovariance);
     }
 
     private double getEncoderHeading(double L, double R) {
@@ -81,7 +81,7 @@ public class ThreeWheelOdometry implements Odometry{
     }
 
     private double getIMUheading() {
-            return angleWrap(-imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZXY, AngleUnit.RADIANS).firstAngle - IMUoffset);
+        return angleWrap(-imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZXY, AngleUnit.RADIANS).firstAngle - IMUoffset);
     }
 
 
@@ -157,7 +157,7 @@ public class ThreeWheelOdometry implements Odometry{
 
     public void setRobotCoordinates(Pose2D coordinates) {
         angleOffset = (double) angleWrap(calculateHeading() + angleOffset - coordinates.heading);
-        this.calculatePosition(new Pose2D( new Vector2D(coordinates.x * odometryCountsPerCM, coordinates.y * odometryCountsPerCM)
+        this.calculatePosition(new Pose2D(new Vector2D(coordinates.x * odometryCountsPerCM, coordinates.y * odometryCountsPerCM)
                 .add(YWheelPairCenterOffset.scale(odometryCountsPerCM).rotatedCW(worldPosition.heading)), coordinates.heading));
     }
 

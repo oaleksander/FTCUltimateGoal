@@ -14,10 +14,10 @@ public class WobbleManipulator implements RobotModule {
     private final double closeClose = 0.73;
     private final double closeOpen = 0.19;
     private final double minerror = 15, maxspeed = 0.7, kofP = 0.0015, kofd = 0.00001;
+    private final ElapsedTime leverTime = new ElapsedTime();
     private LinearOpMode opMode;
     private DcMotorEx lever = null;
     private Servo close = null;
-    private final ElapsedTime leverTime = new ElapsedTime();
     private boolean ismed = false, isdown = false;
     private boolean isGrabbed = true;
     private byte posangle = 0;

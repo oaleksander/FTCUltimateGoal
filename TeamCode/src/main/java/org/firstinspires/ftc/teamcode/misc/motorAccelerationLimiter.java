@@ -11,7 +11,7 @@ import static java.lang.Math.signum;
 public class motorAccelerationLimiter {
     private final DoubleConsumer motorToControl;
     private final ElapsedTime looptime = new ElapsedTime();
-    private double maxAcceleration;
+    private final double maxAcceleration;
     private double currentVelocity = 0;
 
     public motorAccelerationLimiter(DoubleConsumer motorToControl, double maxAcceleration) {

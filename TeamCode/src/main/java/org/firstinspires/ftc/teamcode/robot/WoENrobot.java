@@ -30,21 +30,20 @@ public class WoENrobot {
     public static ElapsedTime runTime = new ElapsedTime();
     protected static RobotModule[] activeRobotModules = {odometry, movement, drivetrain, shooter, wobbleManipulator2, conveyor, telemetryDebugging}; //conveyor, odometry, shooter, wobbleManipulator, drivetrain
     static boolean spinCompleted = false;
-    static Runnable updateRegulators = () -> {
-        setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
-        while (opMode.opModeIsActive() && !Thread.interrupted()) {
-           clearBulkCaches();
-           Arrays.stream(activeRobotModules).forEach(RobotModule::update);
-           spinCompleted = true;
-        }
-    };
     private static ExpansionHubEx expansionHub1 = null;
     private static ExpansionHubEx expansionHub2 = null;
     private static List<LynxModule> allHubs = null;
+    static Runnable updateRegulators = () -> {
+        setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        while (opMode.opModeIsActive() && !Thread.interrupted()) {
+            clearBulkCaches();
+            Arrays.stream(activeRobotModules).forEach(RobotModule::update);
+            spinCompleted = true;
+        }
+    };
     private static Thread regulatorUpdater = new Thread(updateRegulators);
 
-    public static LinearOpMode getOpMode()
-    {
+    public static LinearOpMode getOpMode() {
         return opMode;
     }
 
@@ -134,16 +133,17 @@ public class WoENrobot {
         expansionHub1.setLedColor(r, g, b);
         expansionHub2.setLedColor(r, g, b);
     }
-    public static void setBulkCachingMode(LynxModule.BulkCachingMode mode)
-    {
+
+    public static void setBulkCachingMode(LynxModule.BulkCachingMode mode) {
         for (LynxModule module : allHubs)
             module.setBulkCachingMode(mode);
     }
-    public static void clearBulkCaches()
-    {
+
+    public static void clearBulkCaches() {
         for (LynxModule module : allHubs)
             module.clearBulkCache();
     }
+
     public static void FullInit(LinearOpMode OpMode) {
         forceInitRobot(opMode);
     }

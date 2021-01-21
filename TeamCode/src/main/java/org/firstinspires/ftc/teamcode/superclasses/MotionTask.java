@@ -9,7 +9,9 @@ public class MotionTask extends Pose2D {
     public Runnable actionOnConpletion = () -> {
     };
 
-    public MotionTask(Pose2D pose) {super (pose.x, pose.y, pose.heading);}
+    public MotionTask(Pose2D pose) {
+        super(pose.x, pose.y, pose.heading);
+    }
 
     public MotionTask(double x, double y, double heading, Runnable actionOncompletion) {
         super(x, y, heading);
@@ -17,16 +19,16 @@ public class MotionTask extends Pose2D {
     }
 
     public MotionTask(Vector2D vector, double heading, Runnable actionOncompletion) {
-        super(vector.x,vector.y, heading);
+        super(vector.x, vector.y, heading);
         this.actionOnConpletion = actionOncompletion;
     }
 
     public MotionTask(Vector2D vector, double heading) {
-        super(vector.x,vector.y, heading);
+        super(vector.x, vector.y, heading);
     }
 
     public MotionTask(Pose2D pose, Runnable actionOncompletion) {
-        super (pose.x, pose.y, pose.heading);
+        super(pose.x, pose.y, pose.heading);
         this.actionOnConpletion = actionOncompletion;
     }
 

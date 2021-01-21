@@ -14,25 +14,18 @@ public class rpm implements RobotModule {
     private final ElapsedTime rpmTime = new ElapsedTime();
     private final ElapsedTime feederTime = new ElapsedTime();
     private final ElapsedTime encoderFailureDetectionTime = new ElapsedTime();
-    private final double time = 125;
-    private final double lowRpm = 3500;
+    private final double time = 135;
+    private final double lowRpm = 3440;
     private final double highRpm = 3800;
     private final double timeRpm = 500;
     private final double feederClose = 0.06;
     private final double feederOpen = 0.3;
+    PIDFCoefficients shooterPIDF = new PIDFCoefficients(25, 0.07, 9, 15.3);
     private LinearOpMode opMode;
-    PIDFCoefficients shooterPIDF = new PIDFCoefficients(33, 0.061, 15, 15.25);
-    private DcMotorEx shooterMotor = null;
+    public DcMotorEx shooterMotor = null;
     private final CommandSender shooterVelocitySender = new CommandSender(p -> shooterMotor.setVelocity(p));
     private Servo feeder = null;
     private final CommandSender feederPositionSender = new CommandSender(p -> feeder.setPosition(p));
-    //private boolean shooterIsOn = false;
-    public enum ShooterMode
-    {
-        HIGHGOAL,
-        POWERSHOT,
-        OFF
-    }
     private ShooterMode shooterMode = ShooterMode.OFF;
     private byte ringsToShoot = 0;
     private double timeToAccelerate_ms = 1;
@@ -67,6 +60,7 @@ public class rpm implements RobotModule {
         initializedservo();
         feederTime.reset();
     }
+
     private void initializedservo() {
         feeder = opMode.hardwareMap.get(Servo.class, "feeder");
         feeder.setPosition(feederClose);
@@ -84,37 +78,46 @@ public class rpm implements RobotModule {
             feedRing();
             ringsToShoot--;
         }
-        setFeederPosition(feederTime.milliseconds() < time && (velocityTarget!=0));
+        setFeederPosition(feederTime.milliseconds() < time && (velocityTarget != 0));
         currentVelocity = rpmTime.milliseconds() >= timeToAccelerate_ms ?
                 velocityTarget
                 : rpmTime.milliseconds() * accelerationIncrement * velocityTarget;
         shooterVelocitySender.send(currentVelocity);
 
-        if(encoderFailureDetectionTime.seconds() > 1)
-        if (velocityTarget == 0 || getCurrentRpm() != 0)
-            encoderFailureDetectionTime.reset();
+        if (encoderFailureDetectionTime.seconds() > 1)
+            if (velocityTarget == 0 || getCurrentRpm() != 0)
+                encoderFailureDetectionTime.reset();
         setEncoderFailureMode(encoderFailureDetectionTime.seconds() > 3);
     }
-    private void setEncoderFailureMode(boolean mode)
-    {
-        if(mode!=encoderFailureMode)
-        {
-            encoderFailureMode = mode;
-            try {
-                if (encoderFailureMode)
-                    shooterMotor.setVelocityPIDFCoefficients(0,0,0,shooterPIDF.f);
-                    else
-                    shooterMotor.setVelocityPIDFCoefficients(shooterPIDF.p,shooterPIDF.i,shooterPIDF.d,shooterPIDF.f);
-            }catch (UnsupportedOperationException ignored){}
-        }
-    }
-    public boolean getEncoderFailureMode()
-    {
+
+    public boolean getEncoderFailureMode() {
         return encoderFailureMode;
     }
 
+    private void setEncoderFailureMode(boolean mode) {
+        if (mode != encoderFailureMode) {
+            encoderFailureMode = mode;
+            try {
+                if (encoderFailureMode)
+                    shooterMotor.setVelocityPIDFCoefficients(0, 0, 0, shooterPIDF.f);
+                else
+                    shooterMotor.setVelocityPIDFCoefficients(shooterPIDF.p, shooterPIDF.i, shooterPIDF.d, shooterPIDF.f);
+            } catch (UnsupportedOperationException ignored) {
+            }
+        }
+    }
+
     private void setFeederPosition(boolean push) {
-        feederPositionSender.send(push?feederOpen:feederClose);
+        feederPositionSender.send(push ? feederOpen : feederClose);
+    }
+
+    private void setShootersetings(double Rpm, double time) {
+        if (Rpm != rpmTarget || time != timeToAccelerate_ms) {
+            rpmTarget = Rpm;
+            if (time != 0) timeToAccelerate_ms = Math.abs(time);
+            accelerationIncrement = rpmTarget / timeToAccelerate_ms / 6000;
+            velocityTarget = rpmTarget * 0.4;
+        }
     }
 
  /*  public void onshooter(boolean On) {
@@ -122,15 +125,6 @@ public class rpm implements RobotModule {
             rpmTime.reset();
         shooterIsOn = On;
     }*/
-
-    private void setShootersetings(double Rpm, double time) {
-        if (Rpm != rpmTarget || time != timeToAccelerate_ms) {
-            rpmTarget = Rpm;
-            if(time!=0) timeToAccelerate_ms = Math.abs(time);
-            accelerationIncrement = rpmTarget / timeToAccelerate_ms / 6000;
-            velocityTarget = rpmTarget * 0.4;
-        }
-    }
 
     public boolean isCorrectRpm() {
         return isCorrectRpm(25);
@@ -147,34 +141,41 @@ public class rpm implements RobotModule {
     public ShooterMode getShootingMode() {
         return shooterMode;
     }
-    public void setShootingMode(ShooterMode mode)
-    {
-        if(mode!=ShooterMode.OFF && shooterMode==ShooterMode.OFF)
+
+    public void setShootingMode(ShooterMode mode) {
+        if (mode != ShooterMode.OFF && shooterMode == ShooterMode.OFF)
             rpmTime.reset();
         shooterMode = mode;
-        switch (mode)
-        {
+        switch (mode) {
             case HIGHGOAL:
                 setShootersetings(highRpm, timeRpm);
                 break;
             case POWERSHOT:
-                setShootersetings(lowRpm,timeRpm);
+                setShootersetings(lowRpm, timeRpm);
                 break;
             case OFF:
-                setShootersetings(0,timeRpm);
+                setShootersetings(0, timeRpm);
         }
     }
 
     public boolean isCorrectRpm(double error) {
-        if(encoderFailureMode) return true;
+        if (encoderFailureMode) return true;
         return Math.abs(currentVelocity - shooterMotor.getVelocity()) < error;
     }
+
     public void feedRing() {
-      //  ringsToShoot = 1;
+        //  ringsToShoot = 1;
         feederTime.reset();
     }
 
     public void feedRings() {
         ringsToShoot = 3;
+    }
+
+    //private boolean shooterIsOn = false;
+    public enum ShooterMode {
+        HIGHGOAL,
+        POWERSHOT,
+        OFF
     }
 }

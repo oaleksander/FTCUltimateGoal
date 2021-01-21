@@ -64,7 +64,6 @@ public class Conveyor implements RobotModule {
     }
 
 
-
     private double getdistance() {
         return sensorDistance.getDistance(DistanceUnit.CM);
     }
@@ -115,7 +114,6 @@ public class Conveyor implements RobotModule {
             stop = true;
         }
     }
-
 
 
     public void setConveyorPower(double power) {

@@ -45,11 +45,11 @@ public class AutonomousOpMode extends LinearOpMode {
     }
 
     void start_loop() {
-        Vector3D color = HSVRGB.convert((float)(runTime.seconds()*50)%360,100,50);
-        setLedColors((int)color.x,(int)color.y,(int)color.z);
+        Vector3D color = HSVRGB.convert((float) (runTime.seconds() * 50) % 360, 100, 50);
+        setLedColors((int) color.x, (int) color.y, (int) color.z);
         telemetry.addLine("Use gamedad 1 X/B to select alliance color, dpad L/R to select alliance side");
         xSign = gamepad1.b ? 1 : gamepad1.x ? -1 : xSign;
-        sideSign = gamepad1.dpad_right||gamepad1.left_stick_x>0.5 ? 1 : gamepad1.dpad_left||gamepad1.left_stick_x<-0.5 ? -1 : sideSign;
+        sideSign = gamepad1.dpad_right || gamepad1.left_stick_x > 0.5 ? 1 : gamepad1.dpad_left || gamepad1.left_stick_x < -0.5 ? -1 : sideSign;
         telemetry.addData("Alliance", getXSign() == 1 ? "RED" : "BLUE");
         telemetry.addData("SIDE", getSideSign() == 1 ? "RIGHT" : "LEFT");
         thereAreTwoGamepads = gamepad2.start || gamepad2.b || thereAreTwoGamepads;
@@ -58,7 +58,7 @@ public class AutonomousOpMode extends LinearOpMode {
     }
 
     @Override
-    public void runOpMode(){
+    public void runOpMode() {
         FullInitWithCV(this);
         startRobot();
         openCVNode.stopCam();

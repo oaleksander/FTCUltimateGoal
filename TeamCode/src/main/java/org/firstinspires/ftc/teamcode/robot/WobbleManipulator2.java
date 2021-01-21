@@ -35,7 +35,7 @@ public class WobbleManipulator2 implements RobotModule {
     }
 
     public void setposclose(boolean dograb) {
-        closePositionSender.send(dograb?closeClose:closeOpen);
+        closePositionSender.send(dograb ? closeClose : closeOpen);
     }
 
     public void reset() {

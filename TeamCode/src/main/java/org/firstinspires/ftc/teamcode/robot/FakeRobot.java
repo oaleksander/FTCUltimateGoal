@@ -18,67 +18,63 @@ import static java.lang.Math.signum;
 public class FakeRobot implements Drivetrain, Odometry {
 
     private final Vector3D maxVelocity = new MecanumDrivetrain().getMaxVelocity();
-
-    private Vector3D targetVelocity = new Vector3D(0,0,0);
-    private Vector3D targetVelocityFC = new Vector3D(0,0,0);
-    private Vector3D realVelocityFC = new Vector3D(0,0,0);
-
-
-    private final motorAccelerationLimiter zLimiter = new motorAccelerationLimiter(v -> realVelocityFC.z = v,maxVelocity.z/0.5);
-    private final motorAccelerationLimiter yLimiter = new motorAccelerationLimiter(v -> realVelocityFC.y = v,maxVelocity.y/0.5);
-    private final motorAccelerationLimiter xLimiter = new motorAccelerationLimiter(v -> realVelocityFC.x = v,maxVelocity.x/0.5);
-
-    private Pose2D currentPosition = new Pose2D(0,0,0);
+    boolean started = false;
+    private Vector3D targetVelocity = new Vector3D(0, 0, 0);
+    private Vector3D targetVelocityFC = new Vector3D(0, 0, 0);
+    private Vector3D realVelocityFC = new Vector3D(0, 0, 0);
+    private final motorAccelerationLimiter zLimiter = new motorAccelerationLimiter(v -> realVelocityFC.z = v, maxVelocity.z / 0.5);
+    private final motorAccelerationLimiter yLimiter = new motorAccelerationLimiter(v -> realVelocityFC.y = v, maxVelocity.y / 0.5);
+    private final motorAccelerationLimiter xLimiter = new motorAccelerationLimiter(v -> realVelocityFC.x = v, maxVelocity.x / 0.5);
+    private Pose2D currentPosition = new Pose2D(0, 0, 0);
     private LinearOpMode opMode;
-    private ElapsedTime updateTimer = new ElapsedTime();
+    private final ElapsedTime updateTimer = new ElapsedTime();
+
     @Override
     public void setOpMode(LinearOpMode opMode) {
         this.opMode = opMode;
     }
 
-    boolean started = false;
     @Override
     public void initialize() {
-        targetVelocity = new Vector3D(0,0,0);
-        realVelocityFC = new Vector3D(0,0,0);
-        currentPosition = new Pose2D(0,0,0);
+        targetVelocity = new Vector3D(0, 0, 0);
+        realVelocityFC = new Vector3D(0, 0, 0);
+        currentPosition = new Pose2D(0, 0, 0);
         updateTimer.reset();
     }
 
     @Override
     public void reset() {
-        targetVelocity = new Vector3D(0,0,0);
-        realVelocityFC = new Vector3D(0,0,0);
-        currentPosition = new Pose2D(0,0,0);
+        targetVelocity = new Vector3D(0, 0, 0);
+        realVelocityFC = new Vector3D(0, 0, 0);
+        currentPosition = new Pose2D(0, 0, 0);
         updateTimer.reset();
         started = false;
     }
 
     @Override
     public void update() {
-        if(!started)
-        {
+        if (!started) {
             started = true;
             updateTimer.reset();
         }
-      // realVelocityFC.x = targetVelocityFC.x;
+        // realVelocityFC.x = targetVelocityFC.x;
         zLimiter.setVelocity(targetVelocityFC.z);
         yLimiter.setVelocity(targetVelocityFC.y);
         xLimiter.setVelocity(targetVelocityFC.x);
-            currentPosition.y += realVelocityFC.y * updateTimer.seconds();
-            currentPosition.x += realVelocityFC.x * updateTimer.seconds();
-            currentPosition.heading = MathUtil.angleWrap(currentPosition.heading + realVelocityFC.z * updateTimer.seconds());
-            updateTimer.reset();
+        currentPosition.y += realVelocityFC.y * updateTimer.seconds();
+        currentPosition.x += realVelocityFC.x * updateTimer.seconds();
+        currentPosition.heading = MathUtil.angleWrap(currentPosition.heading + realVelocityFC.z * updateTimer.seconds());
+        updateTimer.reset();
     }
 
     @Override
     public void setRobotVelocity(double frontways, double sideways, double turn) {
-        if(abs(frontways)>maxVelocity.y) frontways = maxVelocity.y*signum(frontways);
-        if(abs(sideways)>maxVelocity.x) sideways = maxVelocity.x*signum(sideways);
-        if(abs(turn)>maxVelocity.z) turn = maxVelocity.z*signum(turn);
+        if (abs(frontways) > maxVelocity.y) frontways = maxVelocity.y * signum(frontways);
+        if (abs(sideways) > maxVelocity.x) sideways = maxVelocity.x * signum(sideways);
+        if (abs(turn) > maxVelocity.z) turn = maxVelocity.z * signum(turn);
 
-        targetVelocity = new Vector3D(sideways,frontways,turn);
-        targetVelocityFC = new Vector3D(new Vector2D(sideways,frontways).rotatedCW(currentPosition.heading),turn);
+        targetVelocity = new Vector3D(sideways, frontways, turn);
+        targetVelocityFC = new Vector3D(new Vector2D(sideways, frontways).rotatedCW(currentPosition.heading), turn);
     }
 
     @Override

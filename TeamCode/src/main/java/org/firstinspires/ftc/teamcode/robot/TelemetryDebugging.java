@@ -20,13 +20,13 @@ import static org.firstinspires.ftc.teamcode.robot.WoENrobot.shooter;
 public class TelemetryDebugging implements RobotModule {
 
     public static double ROBOT_SIDE_LENGTH = 44.4;
+    private final ElapsedTime measurementTime = new ElapsedTime();
     FtcDashboard dashboard = null;
     Telemetry telemetry;
     TelemetryPacket packet = null;
     long loopCount = 0;
     int refreshTimeMs = 33;
     private LinearOpMode opMode = null;
-    private final ElapsedTime measurementTime = new ElapsedTime();
 
     private static void rotatePoints(double[] xPoints, double[] yPoints, double angle) {
         for (int i = 0; i < xPoints.length; i++) {
@@ -48,10 +48,10 @@ public class TelemetryDebugging implements RobotModule {
         measurementTime.reset();
         loopCount = 0;
         telemetry = opMode.telemetry;
-      //  telemetry = dashboard.getTelemetry();
-      //  telemetry = new MultipleTelemetry(opMode.telemetry,dashboard.getTelemetry());
+        //  telemetry = dashboard.getTelemetry();
+        //  telemetry = new MultipleTelemetry(opMode.telemetry,dashboard.getTelemetry());
         telemetry.setMsTransmissionInterval(refreshTimeMs);
-      //   dashboard.startCameraStream(openCVNode.getWebcam(),0);
+        //   dashboard.startCameraStream(openCVNode.getWebcam(),0);
     }
 
 
@@ -59,22 +59,22 @@ public class TelemetryDebugging implements RobotModule {
         if (measurementTime.milliseconds() > refreshTimeMs) {
             telemetry.addData("Status", "Running");
             telemetry.addData("Loop frequency", 1 / (measurementTime.seconds() / loopCount) + " Hz");
-           Pose2D robotPosition = odometry.getRobotCoordinates();
-           // telemetry.addLine("Odometry encoders").addData("odYL", odometry.odometerYL.getCurrentPosition()).addData("odYR", odometry.odometerYR.getCurrentPosition()).addData("odX", odometry.odometerX.getCurrentPosition());
+            Pose2D robotPosition = odometry.getRobotCoordinates();
+            // telemetry.addLine("Odometry encoders").addData("odYL", odometry.odometerYL.getCurrentPosition()).addData("odYR", odometry.odometerYR.getCurrentPosition()).addData("odX", odometry.odometerX.getCurrentPosition());
             telemetry.addLine("Robot position ").addData("Y", robotPosition.y).addData("X", robotPosition.x).addData("Head", Math.toDegrees(robotPosition.heading));
             Vector3D velocity = odometry.getRobotVelocity();
-         //   telemetry.addLine("Robot velocity ").addData("Y", velocity.y).addData("X", velocity.x).addData("Head", Math.toDegrees(velocity.z));
-            telemetry.addLine("Shooter ").addData("Mode",shooter.getShootingMode()).addData("Current", shooter.getCurrentRpm()).addData("Target",shooter.getRpmTarget());
-          //telemetry.addData("conpower", conveyor.conveyorPower);
-        //    telemetry.addData("Shooter Velo",shooter.getCurrentRpm());
+            //   telemetry.addLine("Robot velocity ").addData("Y", velocity.y).addData("X", velocity.x).addData("Head", Math.toDegrees(velocity.z));
+            telemetry.addLine("Shooter ").addData("Mode", shooter.getShootingMode()).addData("Current", shooter.getCurrentRpm()).addData("Target", shooter.getRpmTarget());
+            //telemetry.addData("conpower", conveyor.conveyorPower);
+            //    telemetry.addData("Shooter Velo",shooter.getCurrentRpm());
 
 
             //telemetry.addData("OpenCV stack size", openCVNode.getStackSize());
 
             double by = -robotPosition.x / 2.54;
             double bx = robotPosition.y / 2.54;
-            double l = ROBOT_SIDE_LENGTH / (2.54*2);
-            double l2 = l*435.55/444;
+            double l = ROBOT_SIDE_LENGTH / (2.54 * 2);
+            double l2 = l * 435.55 / 444;
 
             double[] bxPoints = {l, -l, -l, l};
             double[] byPoints = {l2, l2, -l2, -l2};
@@ -88,11 +88,11 @@ public class TelemetryDebugging implements RobotModule {
             packet.fieldOverlay()
                     .setStroke("cyan")
                     .setStrokeWidth(2)
-                    .strokeLine(bx,by,(bxPoints[0]+bxPoints[3])/2,(byPoints[0]+byPoints[3])/2);
+                    .strokeLine(bx, by, (bxPoints[0] + bxPoints[3]) / 2, (byPoints[0] + byPoints[3]) / 2);
             packet.fieldOverlay()
                     .setStroke("orange")
                     .setStrokeWidth(1)
-                    .strokeLine(bx,by,(bxPoints[0]+bxPoints[3])/2,(byPoints[0]+byPoints[3])/2);
+                    .strokeLine(bx, by, (bxPoints[0] + bxPoints[3]) / 2, (byPoints[0] + byPoints[3]) / 2);
             packet.fieldOverlay()
                     .setStroke("black")
                     .setStrokeWidth(1)

@@ -99,7 +99,7 @@ public class Vector3D extends Vector2D implements Cloneable {
 
     @Override
     public String toString() {
-        return String.format(Locale.getDefault(),"{x: %.3f, y: %.3f, z: %.3f}", x, y, z);
+        return String.format(Locale.getDefault(), "{x: %.3f, y: %.3f, z: %.3f}", x, y, z);
     }
 
     @Override

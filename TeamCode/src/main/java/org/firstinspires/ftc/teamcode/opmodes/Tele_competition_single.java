@@ -30,14 +30,14 @@ public class Tele_competition_single extends LinearOpMode {
 
         SinglePressButton threeRingPresser = new SinglePressButton();
 
-       //shooter.setShootersetings(3800, 500);
+        //shooter.setShootersetings(3800, 500);
         while (opModeIsActive()) {
 
             wobbleManipulator2.setposclose(buttonAswitch.isTriggered(gamepad1.a));
             wobbleManipulator2.upmediumdown(gamepad1.y, gamepad1.x); // correct
-            shooter.setShootingMode(buttonStartswitch.isTriggered(gamepad1.start)?
+            shooter.setShootingMode(buttonStartswitch.isTriggered(gamepad1.start) ?
                     rpm.ShooterMode.HIGHGOAL
-                    :rpm.ShooterMode.OFF);
+                    : rpm.ShooterMode.OFF);
             conveyor.setConveyorPower(buttonBackswitch.isTriggered(gamepad1.back) ? 1 : 0);
             if (gamepad1.b)
                 shooter.feedRing();
@@ -62,7 +62,7 @@ public class Tele_competition_single extends LinearOpMode {
                 x = -1;
             if (gamepad1.dpad_right)
                 x += 1;
-            movement.humanSetVelocity(x,y,turn);
+            movement.humanSetVelocity(x, y, turn);
             spinOnce();
         }
     }

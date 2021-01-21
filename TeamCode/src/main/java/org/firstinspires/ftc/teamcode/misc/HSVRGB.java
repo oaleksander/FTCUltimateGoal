@@ -4,12 +4,9 @@ import org.firstinspires.ftc.teamcode.math.Vector3D;
 
 public class HSVRGB {
     /**
-     * @param H
-     *            0-360
-     * @param S
-     *            0-100
-     * @param V
-     *            0-100
+     * @param H 0-360
+     * @param S 0-100
+     * @param V 0-100
      * @return color in hex string
      */
     public static Vector3D convert(float H, float S, float V) {
@@ -20,8 +17,7 @@ public class HSVRGB {
         S /= 100f;
         V /= 100f;
 
-        if (S == 0)
-        {
+        if (S == 0) {
             R = V * 255;
             G = V * 255;
             B = V * 255;
@@ -69,6 +65,6 @@ public class HSVRGB {
             B = var_b * 255;
         }
 
-        return new Vector3D(R,G,B);
+        return new Vector3D(R, G, B);
     }
 }

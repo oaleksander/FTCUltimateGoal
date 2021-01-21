@@ -140,8 +140,8 @@ public class DrivetrainPidConfig extends LinearOpMode {
     List<LynxModule> allHubs;
     @Override
     public void runOpMode() throws InterruptedException {
-        odometry.initialize(this);
         waitForStart();
+        odometry.initialize(this);
         dashboard = FtcDashboard.getInstance();
         driveFrontLeft = hardwareMap.get(DcMotorEx.class, "driveFrontLeft");
         driveFrontRight = hardwareMap.get(DcMotorEx.class, "driveFrontRight");
@@ -167,11 +167,14 @@ public class DrivetrainPidConfig extends LinearOpMode {
         SinglePressButton sineResetter = new SinglePressButton();
         ElapsedTime sineWaveTimer = new ElapsedTime();
         telemetry.setMsTransmissionInterval(40);
+        for (LynxModule module : allHubs)
+            module.clearBulkCache();
+        odometry.update();
         while (opModeIsActive()) {
             for (LynxModule module : allHubs)
                 module.clearBulkCache();
-            odometry.update();
-            Vector3D targetVelocity = new Vector3D(gamepad1.right_stick_x, -gamepad1.right_stick_y, gamepad1.right_stick_x)
+           // odometry.update();
+            Vector3D targetVelocity = new Vector3D(gamepad1.left_stick_x, -gamepad1.left_stick_y, gamepad1.right_stick_x)
                     .multiply(getMaxVelocity());
             if (sineResetter.isTriggered(gamepad1.b))
                 sineWaveTimer.reset();
