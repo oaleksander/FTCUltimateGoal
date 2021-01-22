@@ -41,7 +41,7 @@ public class MovementMacros {
     }
 
     private static final double highGoalShootingDistance = 233.4089;
-    private static final double highGoalShootingAngle = toRadians(-0.6);
+    private static final double highGoalShootingAngle = toRadians(-2.1);
 
     private static Pose2D getHighGoalShootingPose()
     {
