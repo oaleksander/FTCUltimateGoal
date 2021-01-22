@@ -61,10 +61,11 @@ public class ThreeWheelOdometry implements Odometry {
     private double calculateHeading() {
         if(IMUAccessTimer.seconds()>2)
         {
-            double angleDivergence = angleWrap (getEncoderHeading(odometerYL.getCurrentPosition(),odometerYR.getTargetPosition())-angleAverage(getIMUheading_1(),getIMUheading_2()));
-            if(abs(angleDivergence)>0.05) encoderHeadingCovariance = angleDivergence*(2.0/3.0);
+            double angleDivergence = angleWrap (getEncoderHeading(odometerYL.getCurrentPosition(),odometerYR.getCurrentPosition())-angleAverage(getIMUheading_1(),getIMUheading_2()));
+            if(abs(angleDivergence)>0.05) encoderHeadingCovariance = angleDivergence;//*(2.0/3.0);
             IMUAccessTimer.reset();
         }
+       // return angleAverage(getIMUheading_1(),getIMUheading_2());
         return angleWrap(getEncoderHeading(odometerYL.getCurrentPosition(), odometerYR.getCurrentPosition()) - angleOffset - encoderHeadingCovariance);
     }
 
