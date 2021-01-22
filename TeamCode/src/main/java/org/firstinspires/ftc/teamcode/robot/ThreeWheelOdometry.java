@@ -76,11 +76,13 @@ public class ThreeWheelOdometry implements Odometry {
         imu1 = opMode.hardwareMap.get(BNO055IMU.class, "imu");
         BNO055IMU.Parameters parameters1 = new BNO055IMU.Parameters();
         parameters1.mode = BNO055IMU.SensorMode.IMU;
+        parameters1.calibrationDataFile = "BNO055IMUCalibration_1.json";
         imu1.initialize(parameters1);
         IMUoffset1 = -imu1.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZXY, AngleUnit.RADIANS).firstAngle;
         imu2 = opMode.hardwareMap.get(BNO055IMU.class, "imu 1");
         BNO055IMU.Parameters parameters2 = new BNO055IMU.Parameters();
         parameters2.mode = BNO055IMU.SensorMode.NDOF;
+        parameters2.calibrationDataFile = "BNO055IMUCalibration_2.json";
         imu2.initialize(parameters2);
         IMUoffset2 = -imu2.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZXY, AngleUnit.RADIANS).firstAngle;
         encoderHeadingCovariance = 0;

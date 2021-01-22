@@ -23,7 +23,7 @@ dependencies {
 }
 
 dependencies {
-   implementation 'org.openftc:easyopencv:1.4.3'
+   implementation 'org.openftc:easyopencv:1.4.4'
 }
 
 repositories {
@@ -36,7 +36,7 @@ repositories {
 
 dependencies {
     // This will get the latest compatible version
-    implementation 'com.spartronics4915.lib:ftc265:2.1.2'
+   // implementation 'com.spartronics4915.lib:ftc265:2.1.2' RIP
 }
 
 dependencies {

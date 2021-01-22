@@ -65,10 +65,13 @@ public class AutonomousOpMode extends LinearOpMode {
         openCVNode.stopCam();
         new MovementMacros(getXSign(), getSideSign());
         odometry.setRobotCoordinates(getStartPosition());
-        main();
-        setLedColors(0, 128, 128);
-        telemetry.addData("Status", "Program finished (" + getRuntime() + ")");
-        telemetry.update();
+        try {
+            main();
+        } finally {
+            setLedColors(0, 128, 128);
+            telemetry.addData("Status", "Program finished (" + getRuntime() + ")");
+            telemetry.update();
+        }
     }
 
 }
