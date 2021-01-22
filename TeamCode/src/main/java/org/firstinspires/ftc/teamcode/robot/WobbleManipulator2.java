@@ -82,11 +82,12 @@ public class WobbleManipulator2 implements RobotModule {
                 setAngle(angleMedium);
                 break;
         }
-
     }
+    @Deprecated
     public void offAngle(){
         angle.getController().pwmDisable();
     }
+    @Deprecated
     public void offClose() {
         close.getController().pwmDisable();
     }

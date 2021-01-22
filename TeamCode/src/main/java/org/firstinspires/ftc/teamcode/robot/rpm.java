@@ -171,7 +171,7 @@ public class rpm implements RobotModule {
     public void feedRings() {
         ringsToShoot = 3;
     }
-
+    @Deprecated
     public void offFeeder() {
         feeder.getController().pwmDisable();
     }

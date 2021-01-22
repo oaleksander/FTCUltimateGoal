@@ -152,7 +152,21 @@ public class MovementMacros {
             delay(50);
         }
     }
-
+    public static void Shooting() {
+        Shooting(true);
+    }
+    public static void Shooting(boolean NeedAngle) {
+        if (sideSign == 1) {
+            ShootHighGoal();
+        }
+        else if (NeedAngle){
+            ShootPOWERSHOTAngle();
+        }
+        else
+        {
+            ShootPOWERSHOTPos();
+        }
+    }
     public static void ShootPOWERSHOTAngle() {  //rename
         movement.Pos(new Pose2D(Double.NaN, -20, Double.NaN));
         shooter.setShootingMode(rpm.ShooterMode.POWERSHOT);
