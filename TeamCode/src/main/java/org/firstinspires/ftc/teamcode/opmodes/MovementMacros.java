@@ -15,6 +15,7 @@ import java.util.ArrayList;
 
 import static java.lang.Math.toRadians;
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.gamepad1;
+import static org.firstinspires.ftc.teamcode.robot.WoENrobot.conveyor;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.delay;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.getOpMode;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.movement;
@@ -40,20 +41,20 @@ public class MovementMacros {
         return new Vector2D(93.9174*xSign,182.691);
     }
 
-    private static final double highGoalShootingDistance = 233.4089;
-    private static final double highGoalShootingAngle = toRadians(-2.1);
+    private static final double highGoalShootingDistance = 236.4089;
+    private static final double highGoalShootingAngle = toRadians(-2.8);
 
     private static Pose2D getHighGoalShootingPose()
     {
         Pose2D error = movement.getError(new Pose2D(getHighGoalPose(),Double.NaN));
-        double angle = Range.clip(error.acot(),-13,13);
+        double angle = Range.clip(error.acot(),-11,11);
         return new Pose2D(getHighGoalPose().minus(new Vector2D(0,highGoalShootingDistance).rotatedCW(angle)),angle+highGoalShootingAngle);
     }
     public static void ShootHighGoal() {
         shooter.setShootingMode(rpm.ShooterMode.HIGHGOAL);
         movement.Pos(getHighGoalShootingPose());
         ElapsedTime shooterAccelerationTimeout = new ElapsedTime();
-        while (opMode.opModeIsActive() && !shooter.isCorrectRpm() && shooterAccelerationTimeout.seconds()<3)
+        while (WoENrobot.getOpMode().opModeIsActive() &&(( !shooter.isCorrectRpm(10) && shooterAccelerationTimeout.seconds()<3)))
             spinOnce();
         shooter.feedRings();
         delay(950);
@@ -94,12 +95,25 @@ public class MovementMacros {
         switch (openCVNode.getStackSize())
         {
             case FOUR:
-                movement.Pos(new Pose2D(getRingStackPose().minus(new Vector2D(0,10).rotatedCW(error.acot())),error.acot()+Math.PI));
-                movement.Pos(new Pose2D(getRingStackPose().minus(new Vector2D(0,10-13).rotatedCW(error.acot())),error.acot()+Math.PI));
-                movement.Pos(new Pose2D(getRingStackPose().minus(new Vector2D(0,10-26).rotatedCW(error.acot())),error.acot()+Math.PI));
+                conveyor.setConveyorPower(1);
+                movement.speedmultipler = 0.4;
+                movement.Pos(new Pose2D(getRingStackPose().minus(new Vector2D(0,17).rotatedCW(error.acot())),error.acot()+Math.PI));
+                movement.speedmultipler = 1;
+                movement.Pos(new Pose2D(getRingStackPose().minus(new Vector2D(0,15-16).rotatedCW(error.acot())),error.acot()+Math.PI));
+                movement.Pos(new Pose2D(getRingStackPose().minus(new Vector2D(0,15-40).rotatedCW(error.acot())),error.acot()+Math.PI));
+                ShootHighGoal();
+                movement.speedmultipler = 0.66;
+                movement.Pos(new Pose2D(getRingStackPose().minus(new Vector2D(0,15-60).rotatedCW(error.acot())),error.acot()+Math.PI));
+                movement.speedmultipler = 1;
+                ShootHighGoal();
+                conveyor.setConveyorPower(0);
                 break;
             case ONE:
-                movement.Pos(new Pose2D(getRingStackPose().minus(new Vector2D(0,10).rotatedCW(error.acot())),error.acot()+Math.PI));
+                movement.speedmultipler = 0.4;
+                movement.Pos(new Pose2D(getRingStackPose().minus(new Vector2D(0,17).rotatedCW(error.acot())),error.acot()+Math.PI));
+                movement.speedmultipler = 1;
+                ShootHighGoal();
+                conveyor.setConveyorPower(0);
                 break;
             case ZERO:
             default:
@@ -149,7 +163,7 @@ public class MovementMacros {
                movement.Pos(new Pose2D(xSign * pos, -7.5, toRadians(angle)));
            }
            else {
-               movement.Pos(new Pose2D(xSign * pos, -7.5, toRadians(3)));
+               movement.Pos(new Pose2D(xSign * (pos + 5) , -7.5, toRadians(-angle+3)));
            }
            angle -= 6.4;
            if(WoENrobot.getOpMode().gamepad1.x) {

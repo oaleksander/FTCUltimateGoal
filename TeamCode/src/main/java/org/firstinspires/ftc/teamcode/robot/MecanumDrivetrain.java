@@ -39,7 +39,7 @@ public class MecanumDrivetrain implements Drivetrain {
     private static final double maxRPM = 300;
     public static final double theoreticalMaxSpeed = (maxRPM / 60) * Math.PI * 2;
     private static double maxMotorSpeed = achieveableMaxRPMFraction * theoreticalMaxSpeed;
-    private static double minMotorSpeed = 0.05 * theoreticalMaxSpeed;
+    private static double minMotorSpeed = 0.095 * theoreticalMaxSpeed; //http://b1-srv-kms-1.sch239.net:8239
     private final double maxAcceleration = theoreticalMaxSpeed / 0.25;
     /* Drivetrain hardware members. */
     DcMotorEx driveFrontLeft = null;

@@ -130,9 +130,9 @@ public class SensorBNO055IMUCalibration2 extends LinearOpMode
 
         // We are expecting the IMU to be attached to an I2C port on a Core Device Interface Module and named "imu".
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.mode = BNO055IMU.SensorMode.NDOF;
+        parameters.mode = BNO055IMU.SensorMode.IMU;
         parameters.loggingEnabled = true;
-        parameters.loggingTag     = "NDOF";
+        parameters.loggingTag     = "IMU";
         imu = hardwareMap.get(BNO055IMU.class, "imu 1");
         imu.initialize(parameters);
 

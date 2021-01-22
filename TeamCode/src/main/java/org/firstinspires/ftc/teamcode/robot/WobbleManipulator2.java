@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.robot;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.PwmControl;
 
 import org.firstinspires.ftc.teamcode.misc.CommandSender;
 import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
@@ -83,7 +84,12 @@ public class WobbleManipulator2 implements RobotModule {
         }
 
     }
-
+    public void offAngle(){
+        angle.getController().pwmDisable();
+    }
+    public void offClose() {
+        close.getController().pwmDisable();
+    }
     public void setAngle(double posa) {
         anglePositionSender.send(posa);
     }

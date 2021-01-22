@@ -23,6 +23,7 @@ import static org.firstinspires.ftc.teamcode.robot.WoENrobot.movement;
 
 public class Movement implements RobotModule {
     // private static final double kP_distance = 0.010, kD_distance = 0.00034;
+    public double speedmultipler = 1;
     private static final double kP_distance = 3.8, kD_distance = 0;
     private static final double kF_distance = 0.1;
     private static final double minError_distance = 2;
@@ -377,7 +378,7 @@ public class Movement implements RobotModule {
      */
     public void holonomicMoveFC(Vector3D move) {
         Vector2D coordinates = new Vector2D(move.x, move.y).rotatedCW(-odometry.getRobotCoordinates().heading);
-        drivetrain.setRobotVelocity(coordinates.y, coordinates.x, move.z);
+        drivetrain.setRobotVelocity(coordinates.y*speedmultipler, coordinates.x*speedmultipler, move.z);
     }
 
    /* public void holonomicMovePolar(double heading, double speed, double turn) {
