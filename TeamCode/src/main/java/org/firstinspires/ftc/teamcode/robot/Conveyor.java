@@ -27,6 +27,7 @@ public class Conveyor implements RobotModule {
     private boolean backOn = false, stop = false;
     private boolean backMust = false;
     private boolean backOnAfter = false;
+    private boolean colorLock = false;
 
     private double timelock = 0;
     private double conveyorPower = 0;
@@ -67,15 +68,18 @@ public class Conveyor implements RobotModule {
 
 
     private double getdistance() {
-        return 10;
-       // return sensorDistance.getDistance(DistanceUnit.CM);
+        //return 10;
+         return sensorDistance.getDistance(DistanceUnit.CM);
     }
 
     public void update() {
 
-        if (pauseTime.milliseconds() >= 320) {
+        if (pauseTime.milliseconds() >= 100) {
             pauseTime.reset();
-            distance = getdistance();
+            if (!colorLock)
+                distance = getdistance();
+            else
+                distance = 10;
             current = conveyorm.getCurrent(CurrentUnit.AMPS);
         }
         if (distance < 6) {
@@ -130,7 +134,9 @@ public class Conveyor implements RobotModule {
     public void setConveyorPower(double power) {
         conveyorPower = power;
     }
-
+    public void OFFcolorlock(boolean colorlock){
+        colorLock = colorlock;
+    }
     private void setConveyorMotorPower(double power) {
         conveyorPowerSender.send(power);
     }

@@ -25,6 +25,7 @@ public class Tele_competition extends LinearOpMode {
     public void runOpMode() {
         initRobot(this);
         startRobot();
+      //  conveyor.setBackOnAfter(true);
         ButtonSwitch buttonAswitch = new ButtonSwitch();
         ButtonSwitch buttonBackswitch = new ButtonSwitch();
         ButtonSwitch shooterSpeedSwitch = new ButtonSwitch();
@@ -37,10 +38,10 @@ public class Tele_competition extends LinearOpMode {
 
         //shooter.setShootersetings(3800, 500);
         while (opModeIsActive()) {
-            if (gamepad2.left_bumper) {
+        /*    if (gamepad2.left_bumper) {
                 MovementMacros.ShootHighGoalAsync();
                 //   wobbleManipulator2.offAngle();
-            }
+            }*/
             if(!movement.pathFollowerIsActive()) {
                 wobbleManipulator2.setposclose(buttonAswitch.isTriggered(gamepad1.a));
                 wobbleManipulator2.upmediumdown(gamepad2.b, gamepad2.x); // correct
@@ -52,6 +53,7 @@ public class Tele_competition extends LinearOpMode {
                         : rpm.ShooterMode.OFF);
                 conveyor.setBackmust(gamepad2.right_trigger > 0.5);
              //   telemetry.addData("correct",shooter.isCorrectRpm());
+                conveyor.OFFcolorlock(gamepad2.left_bumper);
                 //   powerconveyor = (buttonspeedConveyor.isTriggered(gamepad2.right_bumper)?-1:1);
                 if (gamepad1.x) {
                     ShootPOWERSHOTAngle();
