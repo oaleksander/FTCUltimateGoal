@@ -41,8 +41,8 @@ public class MovementMacros {
         return new Vector2D(93.9174*xSign,182.691);
     }
 
-    private static final double highGoalShootingDistance = 236.4089;
-    private static final double highGoalShootingAngle = toRadians(-2.8);
+    private static final double highGoalShootingDistance = 233.4089;
+    private static final double highGoalShootingAngle = toRadians(-2);
 
     private static Pose2D getHighGoalShootingPose()
     {
@@ -84,10 +84,15 @@ public class MovementMacros {
         }
     }
 
+    //private static Vector2D getRingStackPose()
+//    {
+  //      return new Vector2D(90.3747*xSign,-56.9019);
+  //  }
     private static Vector2D getRingStackPose()
     {
         return new Vector2D(90.3747*xSign,-56.9019);
     }
+
 
     public static boolean PickupRings()
     {
@@ -97,17 +102,17 @@ public class MovementMacros {
             case FOUR:
                 movement.Pos(new Pose2D(getRingStackPose().minus(new Vector2D(0,30).rotatedCW(error.acot())),error.acot()+Math.PI));
                 conveyor.setConveyorPower(1);
-                movement.Pos(new Pose2D(getRingStackPose().minus(new Vector2D(0,20-40).rotatedCW(error.acot())),error.acot()+Math.PI),0.35,1);
+                movement.Pos(new Pose2D(getRingStackPose().minus(new Vector2D(0,20-45).rotatedCW(error.acot())),error.acot()+Math.PI),0.4,1);
                 ShootHighGoal();
-                movement.Pos(new Pose2D(getRingStackPose().minus(new Vector2D(0,20-60).rotatedCW(error.acot())),error.acot()+Math.PI),0.5,1);
+                movement.Pos(new Pose2D(getRingStackPose().minus(new Vector2D(0,20-65).rotatedCW(error.acot())),error.acot()+Math.PI),0.6,1);
                 ShootHighGoal();
-                conveyor.setConveyorPower(0);
+                //conveyor.setConveyorPower(0);
                 break;
             case ONE:
                 conveyor.setConveyorPower(1);
                 movement.Pos(new Pose2D(getRingStackPose().minus(new Vector2D(0,20-40).rotatedCW(error.acot())),error.acot()+Math.PI),0.85,1);
                 ShootHighGoal();
-                conveyor.setConveyorPower(0);
+                //conveyor.setConveyorPower(0);
                 break;
             case ZERO:
             default:
@@ -150,7 +155,7 @@ public class MovementMacros {
         Shooting(true);
     }
     public static void Shooting(boolean NeedAngle) {
-        if (sideSign == 1) {
+        if (sideSign*xSign == 1) {
             ShootHighGoal();
         }
         else if (NeedAngle){
@@ -171,9 +176,10 @@ public class MovementMacros {
                movement.Pos(new Pose2D(xSign * pos, -7.5, toRadians(angle)));
            }
            else {
-               movement.Pos(new Pose2D(xSign * (pos + 5) , -7.5, toRadians(-angle+3)));
+               movement.Pos(new Pose2D(xSign * (pos + 5) , -7.5, toRadians(-angle)));
            }
-           angle -= 6.4;
+           angle -= 5.4;
+           delay(200);
            if(WoENrobot.getOpMode().gamepad1.x) {
                break;
            }

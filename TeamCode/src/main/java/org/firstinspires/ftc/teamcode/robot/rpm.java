@@ -15,8 +15,8 @@ public class rpm implements RobotModule {
     private final ElapsedTime feederTime = new ElapsedTime();
     private final ElapsedTime encoderFailureDetectionTime = new ElapsedTime();
     private final double time = 130;
-    private final double lowRpm = 3440;
-    private final double highRpm = 3800;
+    private final double lowRpm = 3470;
+    private final double highRpm = 3950;
     private final double timeRpm = 100;
     private final double feederClose = 0.075;
     private final double feederOpen = 0.35;

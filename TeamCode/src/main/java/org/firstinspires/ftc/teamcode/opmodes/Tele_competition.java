@@ -43,7 +43,7 @@ public class Tele_competition extends LinearOpMode {
                 //   wobbleManipulator2.offAngle();
             }*/
             if(!movement.pathFollowerIsActive()) {
-                wobbleManipulator2.setposclose(buttonAswitch.isTriggered(gamepad1.a));
+                wobbleManipulator2.setposclose(buttonAswitch.isTriggered(gamepad2.right_bumper));
                 wobbleManipulator2.upmediumdown(gamepad2.b, gamepad2.x); // correct
                 conveyor.setConveyorPower(buttonBackswitch.isTriggered(gamepad2.left_trigger > 0.5) ? 1 : 0);
                 shooter.setShootingMode(shooterOnOffSwitch.isTriggered(gamepad2.a) ?
@@ -58,7 +58,7 @@ public class Tele_competition extends LinearOpMode {
                 if (gamepad1.x) {
                     ShootPOWERSHOTAngle();
                 }
-                if (gamepad1.b)
+                if (gamepad1.a)
                     shooter.feedRing();
                 if (threeRingPresser.isTriggered(gamepad1.right_stick_button))
                     shooter.feedRings();

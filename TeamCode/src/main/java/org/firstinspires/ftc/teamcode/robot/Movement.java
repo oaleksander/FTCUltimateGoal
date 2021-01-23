@@ -28,7 +28,7 @@ public class Movement implements RobotModule {
     private double minLinearVelocityFraction = 0.15;
     private static final double minError_distance = 2;
     // private static final double kP_angle = 0.40, kD_angle = 0;
-    private static final double kP_angle = 4.1, kD_angle = 0;
+    private static final double kP_angle = 3.8, kD_angle = 0;
     private double maxAngleVelocityFraction = 1;
     private double minAngleVelocityFraction = 0.15;
     private static final double minError_angle = Math.toRadians(0.45);

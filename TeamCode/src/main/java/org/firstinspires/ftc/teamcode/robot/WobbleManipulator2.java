@@ -8,7 +8,7 @@ import org.firstinspires.ftc.teamcode.misc.CommandSender;
 import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
 
 public class WobbleManipulator2 implements RobotModule {
-    private final double closeClose = 0.73;
+    private final double closeClose = 0.90;
     private final double closeOpen = 0.19;
     private final double angleDown = 0.18;
     private final double angleMedium = 0.6;
