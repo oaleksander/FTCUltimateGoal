@@ -64,7 +64,7 @@ public class MovementMacros {
         shooter.setShootingMode(rpm.ShooterMode.HIGHGOAL);
         movement.followPath(new MotionTask(getHighGoalShootingPose(), ()->{
             ElapsedTime shooterAccelerationTimeout = new ElapsedTime();
-            while (opMode.opModeIsActive() && !shooter.isCorrectRpm() && shooterAccelerationTimeout.seconds()<2 && movement.pathFollowerIsActive())
+            while (opMode.opModeIsActive() && !shooter.isCorrectRpm() && shooterAccelerationTimeout.seconds()<3 && movement.pathFollowerIsActive())
                 spinOnce();
             shooter.feedRings();}));
       //  while(movement.pathFollowerIsActive()&&getOpMode().opModeIsActive()) {spinOnce();}
@@ -95,23 +95,17 @@ public class MovementMacros {
         switch (openCVNode.getStackSize())
         {
             case FOUR:
+                movement.Pos(new Pose2D(getRingStackPose().minus(new Vector2D(0,30).rotatedCW(error.acot())),error.acot()+Math.PI));
                 conveyor.setConveyorPower(1);
-                movement.speedmultipler = 0.4;
-                movement.Pos(new Pose2D(getRingStackPose().minus(new Vector2D(0,17).rotatedCW(error.acot())),error.acot()+Math.PI));
-                movement.speedmultipler = 1;
-                movement.Pos(new Pose2D(getRingStackPose().minus(new Vector2D(0,15-16).rotatedCW(error.acot())),error.acot()+Math.PI));
-                movement.Pos(new Pose2D(getRingStackPose().minus(new Vector2D(0,15-40).rotatedCW(error.acot())),error.acot()+Math.PI));
+                movement.Pos(new Pose2D(getRingStackPose().minus(new Vector2D(0,20-40).rotatedCW(error.acot())),error.acot()+Math.PI),0.35,1);
                 ShootHighGoal();
-                movement.speedmultipler = 0.66;
-                movement.Pos(new Pose2D(getRingStackPose().minus(new Vector2D(0,15-60).rotatedCW(error.acot())),error.acot()+Math.PI));
-                movement.speedmultipler = 1;
+                movement.Pos(new Pose2D(getRingStackPose().minus(new Vector2D(0,20-60).rotatedCW(error.acot())),error.acot()+Math.PI),0.5,1);
                 ShootHighGoal();
                 conveyor.setConveyorPower(0);
                 break;
             case ONE:
-                movement.speedmultipler = 0.4;
-                movement.Pos(new Pose2D(getRingStackPose().minus(new Vector2D(0,17).rotatedCW(error.acot())),error.acot()+Math.PI));
-                movement.speedmultipler = 1;
+                conveyor.setConveyorPower(1);
+                movement.Pos(new Pose2D(getRingStackPose().minus(new Vector2D(0,20-40).rotatedCW(error.acot())),error.acot()+Math.PI),0.85,1);
                 ShootHighGoal();
                 conveyor.setConveyorPower(0);
                 break;

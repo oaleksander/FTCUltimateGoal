@@ -23,12 +23,14 @@ import static org.firstinspires.ftc.teamcode.robot.WoENrobot.movement;
 
 public class Movement implements RobotModule {
     // private static final double kP_distance = 0.010, kD_distance = 0.00034;
-    public double speedmultipler = 1;
     private static final double kP_distance = 3.8, kD_distance = 0;
-    private static final double kF_distance = 0.1;
+    private double maxLinearVelocityFraction = 1;
+    private double minLinearVelocityFraction = 0.15;
     private static final double minError_distance = 2;
     // private static final double kP_angle = 0.40, kD_angle = 0;
     private static final double kP_angle = 4.1, kD_angle = 0;
+    private double maxAngleVelocityFraction = 1;
+    private double minAngleVelocityFraction = 0.15;
     private static final double minError_angle = Math.toRadians(0.45);
     private static Odometry odometry;
     private static Drivetrain drivetrain;
@@ -123,20 +125,45 @@ public class Movement implements RobotModule {
      */
 
     public void Pos(Pose2D target) {
-        followPath(new MotionTask(target));
+        Pos(target,1,1);
+    }
+
+    /**
+     * Legacy synchronous go-to-point (with custom speeds)
+     *
+     * @param target Point to approach
+     * @param linearVelocityFraction Array of points (motion tasks)
+     * @param angularVelocityFraction Array of points (motion tasks)
+     */
+
+    public void Pos(Pose2D target, double linearVelocityFraction, double angularVelocityFraction) {
+        followPath(new MotionTask(target),linearVelocityFraction,angularVelocityFraction);
         while (pathFollowerIsActive() && opMode.opModeIsActive()) {
             Thread.yield();
         }
     }
 
     /**
-     * Give path follower a task to go to point
+     * Give path follower a task to go to point (with custom speeds)
      *
      * @param motionTask Points (motion tasks)
      */
 
-    public void followPath(MotionTask motionTask) {
-        followPath(new ArrayList<>(Arrays.asList(motionTask)));
+    public void followPath(MotionTask motionTask)
+    {
+        followPath(motionTask, 1, 1);
+    }
+
+    /**
+     * Give path follower a task to go to point
+     *
+     * @param motionTask Points (motion tasks)
+     * @param linearVelocityFraction Array of points (motion tasks)
+     * @param angularVelocityFraction Array of points (motion tasks)
+     */
+
+    public void followPath(MotionTask motionTask, double linearVelocityFraction, double angularVelocityFraction) {
+        followPath(new ArrayList<>(Arrays.asList(motionTask)), linearVelocityFraction, angularVelocityFraction);
     }
 
     /**
@@ -144,7 +171,22 @@ public class Movement implements RobotModule {
      *
      * @param pathToFollow Array of points (motion tasks)
      */
-    public void followPath(ArrayList<MotionTask> pathToFollow) {
+
+    public void followPath(ArrayList<MotionTask> pathToFollow)
+    {
+        followPath(pathToFollow, 1, 1);
+    }
+
+    /**
+     * Give path follower a task to follow an array of points (with custom speeds)
+     *
+     * @param pathToFollow Array of points (motion tasks)
+     * @param linearVelocityFraction Array of points (motion tasks)
+     * @param angularVelocityFraction Array of points (motion tasks)
+     */
+    public void followPath(ArrayList<MotionTask> pathToFollow, double linearVelocityFraction, double angularVelocityFraction) {
+        setMaxLinearVelocityFraction(linearVelocityFraction);
+        setMaxAngleVelocityFraction(angularVelocityFraction);
         bPathFollowerEnabled = false;
         Thread.yield();
         this.pathToFollow = pathToFollow;
@@ -163,6 +205,49 @@ public class Movement implements RobotModule {
 
     public void stopPathFollowing() {
         bPathFollowerEnabled = false;
+    }
+
+    public void setMaxLinearVelocityFraction(double maxLinearVelocityFraction) {
+        this.maxLinearVelocityFraction = maxLinearVelocityFraction;
+    }
+
+    public void setMinLinearVelocityFraction(double minLinearVelocityFraction) {
+        this.minLinearVelocityFraction = minLinearVelocityFraction;
+    }
+
+    public void setMaxAngleVelocityFraction(double maxAngleVelocityFraction) {
+        this.maxAngleVelocityFraction = maxAngleVelocityFraction;
+    }
+
+    public void setMinAngleVelocityFraction(double minAngleVelocityFraction) {
+        this.minAngleVelocityFraction = minAngleVelocityFraction;
+    }
+
+    /**
+     * Set drivetrain speeds to approach given point
+     *
+     * @param targetPose      Target point (robot-centric)
+     * @param linearVelocity  Robot linear velocity
+     * @param angularVelocity Robot angular velocity
+     */
+
+    public void approachPosition(Pose2D targetPose, double linearVelocity, double angularVelocity) {
+
+        linearVelocity = Range.clip(abs(linearVelocity),
+                abs(linearVelocity)>kP_distance*minError_distance/2?drivetrain.getMaxVelocity().y*minLinearVelocityFraction:0,
+                drivetrain.getMaxVelocity().y*maxLinearVelocityFraction);
+        angularVelocity = Range.clip(abs(angularVelocity),
+                abs(angularVelocity)>kP_angle*minError_angle/2?drivetrain.getMaxVelocity().z*minAngleVelocityFraction:0,
+                drivetrain.getMaxVelocity().z*maxAngleVelocityFraction);
+
+        Vector2D movementControl = new Vector2D(
+                targetPose.x,
+                targetPose.y).normalize().multiply(linearVelocity);
+
+        Vector3D control = new Vector3D(movementControl,
+                angularVelocity * signum(targetPose.heading));
+
+        holonomicMoveFC(control);
     }
 
     /**
@@ -205,29 +290,6 @@ public class Movement implements RobotModule {
         return target.substract(odometry.getRobotCoordinates());
     }
 
-    /**
-     * Set drivetrain speeds to approach given point
-     *
-     * @param targetPose      Target point (robot-centric)
-     * @param linearVelocity  Robot linear velocity
-     * @param angularVelocity Robot anguklar velocity
-     */
-
-    public void approachPosition(Pose2D targetPose, double linearVelocity, double angularVelocity) {
-
-        linearVelocity = Range.clip(abs(linearVelocity), 0, drivetrain.getMaxVelocity().y);
-        angularVelocity = Range.clip(abs(angularVelocity), 0, drivetrain.getMaxVelocity().z);
-
-        Vector2D movementControl = new Vector2D(
-                targetPose.x,
-                targetPose.y).normalize().multiply(linearVelocity);
-
-        Vector3D control = new Vector3D(movementControl,
-                angularVelocity * signum(targetPose.heading));
-        control = new Vector3D(control, control.z);
-
-        holonomicMoveFC(control);
-    }
 /*
     public void Pos(Pose2D target) {
 
@@ -378,7 +440,7 @@ public class Movement implements RobotModule {
      */
     public void holonomicMoveFC(Vector3D move) {
         Vector2D coordinates = new Vector2D(move.x, move.y).rotatedCW(-odometry.getRobotCoordinates().heading);
-        drivetrain.setRobotVelocity(coordinates.y*speedmultipler, coordinates.x*speedmultipler, move.z);
+        drivetrain.setRobotVelocity(coordinates.y, coordinates.x, move.z);
     }
 
    /* public void holonomicMovePolar(double heading, double speed, double turn) {
