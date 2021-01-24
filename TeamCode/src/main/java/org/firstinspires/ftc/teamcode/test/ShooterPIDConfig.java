@@ -43,9 +43,9 @@ public class ShooterPIDConfig extends LinearOpMode {
     @Config
     static class shooterParams
     {
-        public static double kP = 1;
-        public static double kI = 1;
-        public static double kD = 1;
-        public static double kF = 1;
+        public static double kP = 55;
+        public static double kI = 0.045;
+        public static double kD = 4;
+        public static double kF = 14.8;
     }
 }

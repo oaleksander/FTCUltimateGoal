@@ -23,21 +23,22 @@ import static org.firstinspires.ftc.teamcode.robot.WoENrobot.movement;
 
 public class Movement implements RobotModule {
     // private static final double kP_distance = 0.010, kD_distance = 0.00034;
-    private static final double kP_distance = 3.8, kD_distance = 0;
+    private static final double kP_distance = 3.1, kD_distance = 0;
     private double maxLinearVelocityFraction = 1;
-    private double minLinearVelocityFraction = 0.15;
-    private static final double minError_distance = 2;
+    private double minLinearVelocityFraction = 0.125;
+    private static final double minError_distance = 1;
     // private static final double kP_angle = 0.40, kD_angle = 0;
-    private static final double kP_angle = 3.8, kD_angle = 0;
+    private static final double kP_angle = 2.7, kD_angle = 0;
     private double maxAngleVelocityFraction = 1;
-    private double minAngleVelocityFraction = 0.15;
-    private static final double minError_angle = Math.toRadians(0.45);
+    private double minAngleVelocityFraction = 0.125;
+    private static final double minError_angle = Math.toRadians(0.32);
     private static Odometry odometry;
     private static Drivetrain drivetrain;
     int nTargetPoint = 1;
     ArrayList<MotionTask> pathToFollow = new ArrayList<>();
     boolean bPathFollowerEnabled = false;
     boolean bPathFollowingFinished = false;
+    boolean doActiveBraking = false;
     Pose2D previousTarget = new Pose2D();
     Pose2D previousError = new Pose2D();
     Vector3D requestedVelocityPercent = new Vector3D(0, 0, 0);
@@ -71,11 +72,16 @@ public class Movement implements RobotModule {
         reset();
     }
 
+    public void setActiveBraking(boolean doActiveBraking) {
+        this.doActiveBraking = doActiveBraking;
+    }
+
     public void reset() {
         requestedVelocityPercent = new Vector3D(0, 0, 0);
         nTargetPoint = 1;
         bPathFollowerEnabled = false;
         bPathFollowingFinished = false;
+        doActiveBraking = false;
     }
 
     public void update() {
@@ -105,6 +111,9 @@ public class Movement implements RobotModule {
             drivetrain.setRobotVelocity(requestedVelocityPercent.multiply(drivetrain.getMaxVelocity()));
         }
         else
+            if(pathToFollow.size()>0 && doActiveBraking)
+                moveLinear(pathToFollow.get(pathToFollow.size()-1));
+            else
             drivetrain.setRobotVelocity(0, 0, 0);
     }
 

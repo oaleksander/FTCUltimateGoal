@@ -7,6 +7,7 @@ import org.firstinspires.ftc.teamcode.math.Vector3D;
 import org.firstinspires.ftc.teamcode.misc.HSVRGB;
 
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.FullInitWithCV;
+import static org.firstinspires.ftc.teamcode.robot.WoENrobot.movement;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.odometry;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.openCVNode;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.runTime;
@@ -61,6 +62,7 @@ public class AutonomousOpMode extends LinearOpMode {
     public void runOpMode() {
         FullInitWithCV(this);
         startRobot();
+        movement.setActiveBraking(false);
         if(isStopRequested()) return;
         openCVNode.stopCam();
         new MovementMacros(getXSign(), getSideSign());

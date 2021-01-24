@@ -83,7 +83,7 @@ public class Conveyor implements RobotModule {
             current = conveyorm.getCurrent(CurrentUnit.AMPS);
         }
         if (distance < 6) {
-            if (conveyorTime.milliseconds() >= 1000) {
+            if (conveyorTime.milliseconds() >= 1300) {
                 full = true;
             }
         } else {
@@ -95,7 +95,7 @@ public class Conveyor implements RobotModule {
                 if (!stop) {
                     stop = true;
                 }
-                if (current <= 4 && backOnTime.milliseconds() >= 1000) {
+                if (current <= 5 && backOnTime.milliseconds() >= 1000) {
                     if (!backOn) {
                         setConveyorMotorPower(conveyorPower);
                         backOn = true;
@@ -103,7 +103,7 @@ public class Conveyor implements RobotModule {
                     timelock = backOnTime.milliseconds();
                     BackOnAftertime.reset();
                 } else {
-                    if (backOn && (backOnTime.milliseconds() >= (timelock + 500))) {
+                    if (backOn && (backOnTime.milliseconds() >= (timelock + 1000))) {
                         backOnTime.reset();
                         setConveyorMotorPower(-conveyorPower);
                         backOn = false;

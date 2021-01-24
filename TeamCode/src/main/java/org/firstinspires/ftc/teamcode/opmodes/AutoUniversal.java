@@ -21,10 +21,11 @@ public class AutoUniversal extends AutonomousOpMode {
     @Override
     public void main() {
         movement.Pos(new Pose2D(odometry.getRobotCoordinates().x+10*sideSign, -60, Double.NaN));
-        //Shooting();
         ShootHighGoal();
+       // delay(3000);
         MoveWobble_experimental();
         PickupRings();
         Park();
     }
 }
+//Shooting();
