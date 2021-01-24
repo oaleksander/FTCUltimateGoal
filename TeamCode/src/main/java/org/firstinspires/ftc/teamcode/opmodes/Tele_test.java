@@ -34,7 +34,7 @@ public class Tele_test extends LinearOpMode {
         SinglePressButton threeRingPresser = new SinglePressButton();
 
         //odometry.setRobotCoordinates(new Pose2D(0, 0, 0));
-        odometry.setRobotCoordinates(new Pose2D(93.75 * 1 + 31.25 * (-1), -156.5, 0));
+        odometry.setRobotCoordinates(new Pose2D(0, 0, 0));
         //shooter.setShootersetings(4444, 2000);
         buttonAswitch.isTriggered(true);
         buttonAswitch.isTriggered(false);

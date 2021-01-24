@@ -28,9 +28,9 @@ public class ThreeWheelOdometry implements Odometry {
     private static final double odometryWheelDiameterCm = 4.8;
     private static final double odometryCountsPerCM = (1440) / (odometryWheelDiameterCm * PI);
     private static final double odometryCMPerCounts = (odometryWheelDiameterCm * PI) / 1440;
-    private static final double odometerXcenterOffset = -36.8862986805 * odometryCountsPerCM * cos(toRadians(67.021303041)) / 2;
+    private static final double odometerXcenterOffset = -21.7562349 * odometryCountsPerCM * cos(toRadians(51.293002));
     private static final double yWheelPairRadiusCm = 18.2425;
-    private static final double radiansPerEncoderDifference = 1.004604437*((odometryCMPerCounts) / (yWheelPairRadiusCm * 2));
+    private static final double radiansPerEncoderDifference =1.01259089312*((odometryCMPerCounts) / (yWheelPairRadiusCm * 2));//1.004604437*
     public static Pose2D worldPosition = new Pose2D();
     private static double angleOffset = 0;
     private static ExpansionHubEx expansionHub;
@@ -59,14 +59,18 @@ public class ThreeWheelOdometry implements Odometry {
     }
 
     private double calculateHeading() {
-        if(IMUAccessTimer.seconds()>0.2)
+        if(IMUAccessTimer.seconds()>1)
         {
-            double angleDivergence = angleWrap (getEncoderHeading(odometerYL.getCurrentPosition(),odometerYR.getCurrentPosition())-angleAverage(getIMUheading_1(),getIMUheading_2()));
-            encoderHeadingCovariance = angleDivergence;//*(2.0/3.0);
+            double angleDivergence = angleWrap (getEncoderHeading()-angleAverage(getIMUheading_1(),getIMUheading_2()));
+            encoderHeadingCovariance = angleDivergence*(1.0/2.0);
             IMUAccessTimer.reset();
         }
-       // return angleAverage(getIMUheading_1(),getIMUheading_2());
-        return angleWrap(getEncoderHeading(odometerYL.getCurrentPosition(), odometerYR.getCurrentPosition()) - angleOffset - encoderHeadingCovariance);
+        return angleWrap(getEncoderHeading() - angleOffset - encoderHeadingCovariance);
+    }
+
+    public double getEncoderHeading()
+    {
+        return getEncoderHeading(odometerYL.getCurrentPosition(),odometerYR.getCurrentPosition());
     }
 
     private double getEncoderHeading(double L, double R) {
@@ -76,24 +80,28 @@ public class ThreeWheelOdometry implements Odometry {
     private void initIMU() {
         imu1 = opMode.hardwareMap.get(BNO055IMU.class, "imu");
         BNO055IMU.Parameters parameters1 = new BNO055IMU.Parameters();
+        parameters1.accelRange = BNO055IMU.AccelRange.G2;
+        parameters1.gyroRange = BNO055IMU.GyroRange.DPS500;
         parameters1.mode = BNO055IMU.SensorMode.IMU;
-        //parameters1.calibrationDataFile = "BNO055IMUCalibration_1.json";
+        parameters1.calibrationDataFile = "BNO055IMUCalibration_1.json";
         imu1.initialize(parameters1);
-        IMUoffset1 = -imu1.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZXY, AngleUnit.RADIANS).firstAngle;
         imu2 = opMode.hardwareMap.get(BNO055IMU.class, "imu 1");
         BNO055IMU.Parameters parameters2 = new BNO055IMU.Parameters();
+        parameters2.accelRange = BNO055IMU.AccelRange.G2;
+        parameters2.gyroRange = BNO055IMU.GyroRange.DPS500;
         parameters2.mode = BNO055IMU.SensorMode.IMU;
-       // parameters2.calibrationDataFile = "BNO055IMUCalibration_2.json";
+        parameters2.calibrationDataFile = "BNO055IMUCalibration_2.json";
         imu2.initialize(parameters2);
+        IMUoffset1 = -imu1.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZXY, AngleUnit.RADIANS).firstAngle;
         IMUoffset2 = -imu2.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZXY, AngleUnit.RADIANS).firstAngle;
         encoderHeadingCovariance = 0;
         IMUAccessTimer.reset();
     }
 
-    private double getIMUheading_1() {
+    public double getIMUheading_1() {
             return angleWrap(-imu1.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZXY, AngleUnit.RADIANS).firstAngle - IMUoffset1);
     }
-    private double getIMUheading_2() {
+    public double getIMUheading_2() {
         return angleWrap(-imu2.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZXY, AngleUnit.RADIANS).firstAngle - IMUoffset2);
     }
 

@@ -12,10 +12,9 @@ import static org.firstinspires.ftc.teamcode.robot.WoENrobot.*;
 public class Auto_sandbox extends AutonomousOpMode {
     @Override
     public void main() {
-        movement.Pos(new Pose2D(odometry.getRobotCoordinates().x+10*sideSign, -60, Double.NaN));
-        MovementMacros.ShootHighGoal();
-        MovementMacros.MoveWobble_experimental();
-        MovementMacros.PickupRings();
-        MovementMacros.Park();
+        movement.Pos(new Pose2D(Double.NaN,Double.NaN,Math.toRadians(90)));
+        movement.Pos(new Pose2D(Double.NaN,Double.NaN,Math.toRadians(180)));
+        movement.Pos(new Pose2D(Double.NaN,Double.NaN,Math.toRadians(-90)));
+        movement.Pos(new Pose2D(Double.NaN,Double.NaN,Math.toRadians(0)));
     }
 }

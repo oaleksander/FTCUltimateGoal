@@ -37,6 +37,38 @@ public class TelemetryDebugging implements RobotModule {
         }
     }
 
+    private void displayDashboardRectangle(Pose2D position)
+    {
+        double by = -position.x / 2.54;
+        double bx = position.y / 2.54;
+        double l = ROBOT_SIDE_LENGTH / (2.54 * 2);
+        double l2 = l * 435.55 / 444;
+
+        double[] bxPoints = {l, -l, -l, l};
+        double[] byPoints = {l2, l2, -l2, -l2};
+        rotatePoints(bxPoints, byPoints, -position.heading);
+        for (int i = 0; i < 4; i++) {
+            bxPoints[i] += bx;
+            byPoints[i] += by;
+        }
+
+        packet = new TelemetryPacket();
+        packet.fieldOverlay()
+                .setStroke("cyan")
+                .setStrokeWidth(2)
+                .strokeLine(bx, by, (bxPoints[0] + bxPoints[3]) / 2, (byPoints[0] + byPoints[3]) / 2);
+        packet.fieldOverlay()
+                .setStroke("orange")
+                .setStrokeWidth(1)
+                .strokeLine(bx, by, (bxPoints[0] + bxPoints[3]) / 2, (byPoints[0] + byPoints[3]) / 2);
+        packet.fieldOverlay()
+                .setStroke("black")
+                .setStrokeWidth(1)
+                .strokePolygon(bxPoints, byPoints);
+        dashboard.sendTelemetryPacket(packet);
+    }
+
+
     public void setOpMode(LinearOpMode opMode) {
         this.opMode = opMode;
 
@@ -60,44 +92,18 @@ public class TelemetryDebugging implements RobotModule {
             telemetry.addData("Status", "Running");
             telemetry.addData("Loop frequency", 1 / (measurementTime.seconds() / loopCount) + " Hz");
             Pose2D robotPosition = odometry.getRobotCoordinates();
-             telemetry.addLine("Odometry encoders").addData("odYL", odometry.odometerYL.getCurrentPosition()).addData("odYR", odometry.odometerYR.getCurrentPosition()).addData("odX", odometry.odometerX.getCurrentPosition());
-            telemetry.addLine("Robot position ").addData("Y", robotPosition.y).addData("X", robotPosition.x).addData("Head", Math.toDegrees(robotPosition.heading));
-            Vector3D velocity = odometry.getRobotVelocity();
-            //   telemetry.addLine("Robot velocity ").addData("Y", velocity.y).addData("X", velocity.x).addData("Head", Math.toDegrees(velocity.z));
+            telemetry.addLine("Odometry encoders").addData("odYL", odometry.odometerYL.getCurrentPosition()).addData("odYR", odometry.odometerYR.getCurrentPosition()).addData("odX", odometry.odometerX.getCurrentPosition());
+          //  telemetry.addLine("Robot position ").addData("Y", robotPosition.y).addData("X", robotPosition.x).addData("Head", Math.toDegrees(robotPosition.heading));
+         //   Vector3D velocity = odometry.getRobotVelocity();
+          //     telemetry.addLine("Robot velocity ").addData("Y", velocity.y).addData("X", velocity.x).addData("Head", Math.toDegrees(velocity.z));
             telemetry.addLine("Shooter ").addData("Mode", shooter.getShootingMode()).addData("Current", shooter.getCurrentRpm()).addData("Target", shooter.getRpmTarget());
             //telemetry.addData("conpower", conveyor.conveyorPower);
+            telemetry.addLine("headings").addData("Encoder",Math.toDegrees(odometry.getEncoderHeading())).addData("IMU1",Math.toDegrees(odometry.getIMUheading_1())).addData("IMU2",Math.toDegrees(odometry.getIMUheading_2()));
             //    telemetry.addData("Shooter Velo",shooter.getCurrentRpm());
 
+            displayDashboardRectangle(robotPosition);
 
             //telemetry.addData("OpenCV stack size", openCVNode.getStackSize());
-
-            double by = -robotPosition.x / 2.54;
-            double bx = robotPosition.y / 2.54;
-            double l = ROBOT_SIDE_LENGTH / (2.54 * 2);
-            double l2 = l * 435.55 / 444;
-
-            double[] bxPoints = {l, -l, -l, l};
-            double[] byPoints = {l2, l2, -l2, -l2};
-            rotatePoints(bxPoints, byPoints, -odometry.getRobotCoordinates().heading);
-            for (int i = 0; i < 4; i++) {
-                bxPoints[i] += bx;
-                byPoints[i] += by;
-            }
-
-            packet = new TelemetryPacket();
-            packet.fieldOverlay()
-                    .setStroke("cyan")
-                    .setStrokeWidth(2)
-                    .strokeLine(bx, by, (bxPoints[0] + bxPoints[3]) / 2, (byPoints[0] + byPoints[3]) / 2);
-            packet.fieldOverlay()
-                    .setStroke("orange")
-                    .setStrokeWidth(1)
-                    .strokeLine(bx, by, (bxPoints[0] + bxPoints[3]) / 2, (byPoints[0] + byPoints[3]) / 2);
-            packet.fieldOverlay()
-                    .setStroke("black")
-                    .setStrokeWidth(1)
-                    .strokePolygon(bxPoints, byPoints);
-            dashboard.sendTelemetryPacket(packet);
 
 
             measurementTime.reset();
