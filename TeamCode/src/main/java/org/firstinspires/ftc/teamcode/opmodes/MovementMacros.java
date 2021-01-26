@@ -151,6 +151,27 @@ public class MovementMacros {
             delay(50);
         }
     }
+    public enum posPowerShots {
+        LEFT,
+        MEDIUM,
+        RIGHT
+    }
+    private static Vector2D getPowerShotPos(MovementMacros.posPowerShots PosPowerShots)
+    {
+        switch (PosPowerShots) {
+            case LEFT:
+                return new Vector2D(9.600*xSign,182.691);
+            case MEDIUM:
+                return new Vector2D(28.595*xSign,182.691);
+            case RIGHT:
+            default:
+                return new Vector2D(47.603*xSign,182.691);
+        }
+    }
+    /*
+    private static Vector2D getPowerShotShootingPose() {
+        return  getPowerShotPose();
+    }*/
     public static void Shooting() {
         Shooting(true);
     }
