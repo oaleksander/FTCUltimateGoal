@@ -168,10 +168,13 @@ public class MovementMacros {
                 return new Vector2D(47.603*xSign,182.691);
         }
     }
-    /*
+    private static final double PowerShotShootingDistance = 200.4089;
+    private static final double PowerShotShootingAngle = toRadians(-4.7);
     private static Vector2D getPowerShotShootingPose() {
-        return  getPowerShotPose();
-    }*/
+    Pose2D error = movement.getError(new Pose2D(getPowerShotPos(posPowerShots.MEDIUM),Double.NaN));
+        double angle = Range.clip(error.acot(),-11,11);
+        return new Pose2D(getPowerShotPos(posPowerShots.MEDIUM).minus(new Vector2D(0,PowerShotShootingDistance).rotatedCW(angle)),angle+PowerShotShootingAngle);
+    }
     public static void Shooting() {
         Shooting(true);
     }
