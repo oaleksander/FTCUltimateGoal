@@ -16,11 +16,11 @@ public class rpm implements RobotModule {
     private final ElapsedTime encoderFailureDetectionTime = new ElapsedTime();
     private final double time = 137;
     private final double lowRpm = 3470;
-    private final double highRpm = 4000;
-    private final double timeRpm = 250;
+    private final double highRpm = 4600;
+    private final double timeRpm = 137;
     private final double feederClose = 0.0735;
     private final double feederOpen = 0.35;
-    PIDFCoefficients shooterPIDF = new PIDFCoefficients(54, 0.020, 1.4, 14.54);
+    PIDFCoefficients shooterPIDF = new PIDFCoefficients(36, 0.03, 7, 15);
     private LinearOpMode opMode;
     public DcMotorEx shooterMotor = null;
     private final CommandSender shooterVelocitySender = new CommandSender(p -> shooterMotor.setVelocity(p));
@@ -171,10 +171,7 @@ public class rpm implements RobotModule {
     public void feedRings() {
         ringsToShoot = 3;
     }
-    @Deprecated
-    public void offFeeder() {
-        feeder.getController().pwmDisable();
-    }
+
     //private boolean shooterIsOn = false;
     public enum ShooterMode {
         HIGHGOAL,
