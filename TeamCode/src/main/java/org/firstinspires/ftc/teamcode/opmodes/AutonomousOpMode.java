@@ -62,7 +62,7 @@ public class AutonomousOpMode extends LinearOpMode {
     public void runOpMode() {
         FullInitWithCV(this);
         startRobot();
-        movement.setActiveBraking(false);
+        movement.setActiveBraking(true);
         if(isStopRequested()) return;
         openCVNode.stopCam();
         new MovementMacros(getXSign(), getSideSign());

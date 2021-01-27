@@ -20,18 +20,19 @@ import static java.lang.Math.abs;
 import static java.lang.Math.signum;
 import static org.firstinspires.ftc.teamcode.math.MathUtil.angleWrap;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.movement;
+import static org.firstinspires.ftc.teamcode.robot.WoENrobot.telemetryDebugging;
 
 public class Movement implements RobotModule {
     // private static final double kP_distance = 0.010, kD_distance = 0.00034;
-    private static final double kP_distance = 3.1, kD_distance = 0;
+    private static final double kP_distance = 3.9, kD_distance = 0;
     private double maxLinearVelocityFraction = 1;
-    private double minLinearVelocityFraction = 0.125;
+    private double minLinearVelocityFraction = 0.085;
     private static final double minError_distance = 1;
     // private static final double kP_angle = 0.40, kD_angle = 0;
-    private static final double kP_angle = 2.7, kD_angle = 0;
+    private static final double kP_angle = 4.6, kD_angle = 0;
     private double maxAngleVelocityFraction = 1;
-    private double minAngleVelocityFraction = 0.125;
-    private static final double minError_angle = Math.toRadians(0.32);
+    private double minAngleVelocityFraction = 0.085;
+    private static final double minError_angle = Math.toRadians(0.5);
     private static Odometry odometry;
     private static Drivetrain drivetrain;
     int nTargetPoint = 1;
@@ -88,7 +89,7 @@ public class Movement implements RobotModule {
         if (opMode.gamepad1.y) stopPathFollowing();
         bPathFollowingFinished = nTargetPoint >= pathToFollow.size();
         if (pathFollowerIsActive() && requestedVelocityPercent.radius() < 0.01) {
-            if (pathFollowingTimer.seconds() > 5)
+            if (pathFollowingTimer.seconds() > 4)
                 nTargetPoint++;
             else {
                 Pose2D currentTarget = removeNaN(pathToFollow.get(nTargetPoint));
@@ -111,8 +112,9 @@ public class Movement implements RobotModule {
             drivetrain.setRobotVelocity(requestedVelocityPercent.multiply(drivetrain.getMaxVelocity()));
         }
         else
-            if(pathToFollow.size()>0 && doActiveBraking)
-                moveLinear(pathToFollow.get(pathToFollow.size()-1));
+            if(pathToFollow.size()>0 && doActiveBraking) {
+                moveLinear(pathToFollow.get(pathToFollow.size() - 1));
+            }
             else
             drivetrain.setRobotVelocity(0, 0, 0);
     }
@@ -242,12 +244,12 @@ public class Movement implements RobotModule {
 
     public void approachPosition(Pose2D targetPose, double linearVelocity, double angularVelocity) {
 
-        linearVelocity = Range.clip(abs(linearVelocity),
-                abs(linearVelocity)>kP_distance*minError_distance/2?drivetrain.getMaxVelocity().y*minLinearVelocityFraction:0,
-                drivetrain.getMaxVelocity().y*maxLinearVelocityFraction);
-        angularVelocity = Range.clip(abs(angularVelocity),
-                abs(angularVelocity)>kP_angle*minError_angle/2?drivetrain.getMaxVelocity().z*minAngleVelocityFraction:0,
-                drivetrain.getMaxVelocity().z*maxAngleVelocityFraction);
+
+        linearVelocity = Range.clip(abs(linearVelocity), drivetrain.getMaxVelocity().y*minLinearVelocityFraction,
+                drivetrain.getMaxVelocity().y*maxLinearVelocityFraction)*(abs(linearVelocity)>kP_distance*minError_distance*0.5?1:0);
+        angularVelocity = Range.clip(abs(angularVelocity),drivetrain.getMaxVelocity().z*minAngleVelocityFraction,
+                drivetrain.getMaxVelocity().z*maxAngleVelocityFraction)*(abs(angularVelocity)>kP_angle*minError_angle*0.5?1:0);
+
 
         Vector2D movementControl = new Vector2D(
                 targetPose.x,

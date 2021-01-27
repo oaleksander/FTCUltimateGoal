@@ -41,8 +41,8 @@ public class MovementMacros {
         return new Vector2D(93.9174*xSign,182.691);
     }
 
-    private static final double highGoalShootingDistance = 236.4089;
-    private static final double highGoalShootingAngle = toRadians(-4.7);
+    private static final double highGoalShootingDistance = 234.0;
+    private static final double highGoalShootingAngle = toRadians(-5.3);
 
     private static Pose2D getHighGoalShootingPose()
     {
@@ -56,7 +56,6 @@ public class MovementMacros {
         ElapsedTime shooterAccelerationTimeout = new ElapsedTime();
         while (WoENrobot.getOpMode().opModeIsActive() &&(( !shooter.isCorrectRpm(10) && shooterAccelerationTimeout.seconds()<3)))
             spinOnce();
-        delay(300);
         shooter.feedRings();
         delay(1050);
         shooter.setShootingMode(rpm.ShooterMode.OFF);
@@ -99,17 +98,17 @@ public class MovementMacros {
             case FOUR:
                 movement.Pos(new Pose2D(getRingStackPose().minus(new Vector2D(0,48).rotatedCW(error.acot())),error.acot()+Math.PI));
                 conveyor.setConveyorPower(1);
-                movement.Pos(new Pose2D(getRingStackPose().minus(new Vector2D(0,20-38).rotatedCW(error.acot())),error.acot()+Math.PI),0.25,1);
-                delay(1250);
+                movement.Pos(new Pose2D(getRingStackPose().minus(new Vector2D(0,20-18).rotatedCW(error.acot())),error.acot()+Math.PI),0.3,1);
+                delay(1000);
                 ShootHighGoal();
-                movement.Pos(new Pose2D(getRingStackPose().minus(new Vector2D(0,20-65).rotatedCW(error.acot())),error.acot()+Math.PI),0.4,1);
+                movement.Pos(new Pose2D(getRingStackPose().minus(new Vector2D(0,20-39).rotatedCW(error.acot())),error.acot()+Math.PI),0.6,1);
                 delay(750);
                 ShootHighGoal();
                 //conveyor.setConveyorPower(0);
                 break;
             case ONE:
                 conveyor.setConveyorPower(1);
-                movement.Pos(new Pose2D(getRingStackPose().minus(new Vector2D(0,20-40).rotatedCW(error.acot())),error.acot()+Math.PI),0.6,1);
+                movement.Pos(new Pose2D(getRingStackPose().minus(new Vector2D(0,20-30).rotatedCW(error.acot())),error.acot()+Math.PI),0.8,1);
                 delay(1000);
                 ShootHighGoal();
                 //conveyor.setConveyorPower(0);
@@ -129,11 +128,14 @@ public class MovementMacros {
         Vector2D wobblePose = getWobblePose();
         Vector2D error = (Vector2D)movement.getError(new Pose2D(wobblePose,Double.NaN));
         movement.followPath(new MotionTask(wobblePose.minus(wobblePlacementOffset.rotatedCW(error.acot())),error.acot(), ()->{}));
-        while(movement.pathFollowerIsActive()&&getOpMode().opModeIsActive()) {spinOnce();}
+        while(movement.pathFollowerIsActive()&&getOpMode().opModeIsActive()) {
+            if (movement.getError(new Pose2D(wobblePose,Double.NaN)).radius()<75)
+                wobbleManipulator2.changepos(WobbleManipulator2.positions.down);
+            spinOnce();
+        }
         wobbleManipulator2.changepos(WobbleManipulator2.positions.down);
-        WoENrobot.delay(550);
         wobbleManipulator2.setposclose(false);
-        WoENrobot.delay(550);
+        WoENrobot.delay(300);
     }
 
     private static final double yParkLine = 26.462;

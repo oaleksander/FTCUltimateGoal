@@ -38,10 +38,10 @@ public class Tele_competition extends LinearOpMode {
 
         //shooter.setShootersetings(3800, 500);
         while (opModeIsActive()) {
-        /*    if (gamepad2.left_bumper) {
+           if (gamepad2.left_bumper) {
                 MovementMacros.ShootHighGoalAsync();
                 //   wobbleManipulator2.offAngle();
-            }*/
+            }
             if(!movement.pathFollowerIsActive()) {
                 wobbleManipulator2.setposclose(buttonAswitch.isTriggered(gamepad2.right_bumper));
                 wobbleManipulator2.upmediumdown(gamepad2.b, gamepad2.x); // correct

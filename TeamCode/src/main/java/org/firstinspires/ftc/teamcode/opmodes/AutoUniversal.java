@@ -10,6 +10,7 @@ import static org.firstinspires.ftc.teamcode.opmodes.MovementMacros.MoveWobble;
 import static org.firstinspires.ftc.teamcode.opmodes.MovementMacros.ShootPOWERSHOTAngle;
 import static org.firstinspires.ftc.teamcode.opmodes.MovementMacros.ShootTargets;
 import static org.firstinspires.ftc.teamcode.opmodes.MovementMacros.*;
+import static org.firstinspires.ftc.teamcode.robot.WoENrobot.conveyor;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.delay;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.movement;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.odometry;
@@ -20,7 +21,8 @@ public class AutoUniversal extends AutonomousOpMode {
 
     @Override
     public void main() {
-        movement.Pos(new Pose2D(odometry.getRobotCoordinates().x+10*sideSign, -60, Double.NaN));
+        conveyor.setBackOnAfter(true);
+        movement.Pos(new Pose2D(odometry.getRobotCoordinates().x+13*sideSign, -60, Double.NaN));
         ShootHighGoal();
        // delay(3000);
         MoveWobble_experimental();
