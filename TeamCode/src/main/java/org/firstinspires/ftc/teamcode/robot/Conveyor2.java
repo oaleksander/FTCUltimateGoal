@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.robot;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -10,9 +10,12 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.misc.CommandSender;
+import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
+
+import static java.lang.Math.abs;
 
 @Deprecated
-public class Conveyor2 {
+public class Conveyor2 implements RobotModule {
     private LinearOpMode opMode;
     private DcMotorEx conveyor = null;
     private final CommandSender conveyorPowerSender = new CommandSender(p -> conveyor.setPower(-p));
@@ -24,6 +27,26 @@ public class Conveyor2 {
     private static final double stackDetectionTimeout = 500;
     private static final double stackDetectionReverseTime = 1000;
     private boolean doAutomaticConveyorStopping = true;
+    private boolean doReverseOnStop = true;
+
+    public void setOpMode(LinearOpMode opMode) {
+        this.opMode = opMode;
+    }
+
+    public void setAutomaticConveyorStopping(boolean doAutomaticConveyorStopping) {
+        this.doAutomaticConveyorStopping = doAutomaticConveyorStopping;
+    }
+
+
+    public void setReverseOnStop(boolean doReverseOnStop) {
+        this.doReverseOnStop = doReverseOnStop;
+    }
+
+
+    public void setForceReverse(boolean forceReverse) {
+        this.forceReverse = forceReverse;
+    }
+
     private boolean forceReverse = false;
     private double currentMotorPower = 0;
 
@@ -58,7 +81,8 @@ public class Conveyor2 {
             lastKnownDistance = sensorDistance.getDistance(DistanceUnit.CM);
             distanceQueryTimer.reset();
         }
-        return lastKnownDistance;
+        return 10;
+     //   return lastKnownDistance;
     }
 
     private static double motorCurrentQueryTimeout = 500;
@@ -67,7 +91,7 @@ public class Conveyor2 {
 
     private double getAMPS() {
         if (motorCurrentQueryTimer.milliseconds() > motorCurrentQueryTimeout) {
-            lastKnownMotorCurrent = conveyor.getCurrent(CurrentUnit.AMPS);
+            lastKnownMotorCurrent = abs(conveyor.getCurrent(CurrentUnit.AMPS));
             motorCurrentQueryTimer.reset();
         }
         return lastKnownMotorCurrent;
@@ -76,10 +100,10 @@ public class Conveyor2 {
     public void update() {
         if (!forceReverse) {
             if (doAutomaticConveyorStopping)
-                if (getdistance() > 3) {
+                if (!(doReverseOnStop && requestedPower == 0) && getdistance() >= 2) {
                     stackDetectionTimer.reset(); //Full collector detection
                 }
-            if (stackDetectionTimer.milliseconds() > stackDetectionTimeout && doAutomaticConveyorStopping) { //reverse+stop in case of ring detection
+            if ((stackDetectionTimer.milliseconds() > stackDetectionTimeout || (doReverseOnStop && requestedPower == 0)) && doAutomaticConveyorStopping) { //reverse+stop in case of ring detection
                 motorCurrentTimer.reset();
                 if (stackDetectionTimer.milliseconds() < stackDetectionTimeout + stackDetectionReverseTime) {
                     currentMotorPower = -1;
@@ -93,7 +117,7 @@ public class Conveyor2 {
                     motorCurrentTimer.reset();
             } else {
                 currentMotorPower = +requestedPower;
-                if (getAMPS() > 4) { //locking detection
+                if (getAMPS() < 4) { //locking detection
                     motorCurrentTimer.reset();
                 }
             }

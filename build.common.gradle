@@ -21,8 +21,7 @@ apply plugin: 'com.android.application'
 
 android {
 
-    compileSdkVersion 29
-
+    compileSdkVersion 25
     signingConfigs {
         debug {
             keyAlias 'androiddebugkey'
@@ -40,7 +39,8 @@ android {
         signingConfig signingConfigs.debug
         applicationId 'com.qualcomm.ftcrobotcontroller'
         minSdkVersion 25
-        targetSdkVersion 28
+        //noinspection ExpiredTargetSdkVersion
+        targetSdkVersion 25
 
         /**
          * We keep the versionCode and versionName of robot controller applications in sync with
