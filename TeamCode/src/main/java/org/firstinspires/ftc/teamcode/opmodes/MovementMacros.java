@@ -47,7 +47,7 @@ public class MovementMacros {
     private static Pose2D getHighGoalShootingPose()
     {
         Pose2D error = movement.getError(new Pose2D(getHighGoalPose(),Double.NaN));
-        double angle = Range.clip(error.acot(),-11,11);
+        double angle = Range.clip(error.acot(),toRadians(-13),toRadians(13));
         return new Pose2D(getHighGoalPose().minus(new Vector2D(0,highGoalShootingDistance).rotatedCW(angle)),angle+highGoalShootingAngle);
     }
     public static void ShootHighGoal() {
@@ -107,18 +107,20 @@ public class MovementMacros {
                 conveyor.setConveyorPower(1);
                 movement.Pos(new Pose2D(getRingStackPose().minus(new Vector2D(0,20-18).rotatedCW(error.acot())),error.acot()+Math.PI),0.3,1,3,toRadians(3));
                 delay(1000);
+                conveyor.setConveyorPower(0);
                 ShootHighGoal();
+                conveyor.setConveyorPower(1);
                 movement.Pos(new Pose2D(getRingStackPose().minus(new Vector2D(0,20-39).rotatedCW(error.acot())),error.acot()+Math.PI),0.6,1,3,toRadians(3));
                 delay(750);
                 ShootHighGoal();
-                //conveyor.setConveyorPower(0);
+                conveyor.setConveyorPower(0);
                 break;
             case ONE:
                 conveyor.setConveyorPower(1);
                 movement.Pos(new Pose2D(getRingStackPose().minus(new Vector2D(0,20-30).rotatedCW(error.acot())),error.acot()+Math.PI),0.8,1,3,toRadians(3));
                 delay(1000);
                 ShootHighGoal();
-                //conveyor.setConveyorPower(0);
+                conveyor.setConveyorPower(0);
                 break;
             case ZERO:
             default:
@@ -197,10 +199,17 @@ public class MovementMacros {
     }
     private static final double PowerShotShootingDistance = 200.4089;
     private static final double PowerShotShootingAngle = toRadians(-4.7);
-    private static Vector2D getPowerShotShootingPose() {
-    Pose2D error = movement.getError(new Pose2D(getPowerShotPos(posPowerShots.MEDIUM),Double.NaN));
-        double angle = Range.clip(error.acot(),-11,11);
-        return new Pose2D(getPowerShotPos(posPowerShots.MEDIUM).minus(new Vector2D(0,PowerShotShootingDistance).rotatedCW(angle)),angle+PowerShotShootingAngle);
+    private static Pose2D[] getPowerShotShootingPoses() {
+        double angle = Range.clip(movement.getError(new Pose2D(getPowerShotPos(posPowerShots.MEDIUM),Double.NaN)).acot(),toRadians(-17),toRadians(17));
+        Vector2D shootingCoordinates = getPowerShotPos(posPowerShots.MEDIUM).minus(new Vector2D(0,PowerShotShootingDistance).rotatedCW(angle));
+        double angleLeft = getPowerShotPos(posPowerShots.LEFT).minus(shootingCoordinates).acot()-getPowerShotPos(posPowerShots.MEDIUM).minus(shootingCoordinates).acot();
+        double angleRight = getPowerShotPos(posPowerShots.RIGHT).minus(shootingCoordinates).acot()-getPowerShotPos(posPowerShots.MEDIUM).minus(shootingCoordinates).acot();
+        return new Pose2D[]
+                {
+                        new Pose2D(shootingCoordinates,angle+PowerShotShootingAngle+angleLeft),
+                        new Pose2D(shootingCoordinates,angle+PowerShotShootingAngle),
+                        new Pose2D(shootingCoordinates,angle+PowerShotShootingAngle+angleRight)
+                };
     }
     public static void Shooting() {
         Shooting(true);
@@ -263,6 +272,22 @@ public class MovementMacros {
             // ElapsedTime shooterAccelerationTimeout = new ElapsedTime();
             // while (opMode.opModeIsActive() && !shooter.isCorrectRpm() && shooterAccelerationTimeout.seconds()<3)
             //    spinOnce();
+            shooter.feedRing();
+            delay(200);
+        }
+        shooter.setShootingMode(rpm.ShooterMode.OFF);
+    }
+
+    public static void ShootPowerShotAngle_experimental()
+    {
+        shooter.setShootingMode(rpm.ShooterMode.POWERSHOT);
+        for (Pose2D shootingPose: getPowerShotShootingPoses()){
+            movement.Pos(shootingPose);
+            delay(200);
+            ElapsedTime shooterAccelerationTimeout = new ElapsedTime();
+            shooterAccelerationTimeout.reset();
+             while (opMode.opModeIsActive() && !shooter.isCorrectRpm() && shooterAccelerationTimeout.seconds()<2)
+                spinOnce();
             shooter.feedRing();
             delay(200);
         }
