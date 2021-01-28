@@ -66,6 +66,7 @@ public class MovementMacros {
             ElapsedTime shooterAccelerationTimeout = new ElapsedTime();
             while (opMode.opModeIsActive() && !shooter.isCorrectRpm() && shooterAccelerationTimeout.seconds()<3 && movement.pathFollowerIsActive())
                 spinOnce();
+            if(movement.pathFollowerIsActive())
             shooter.feedRings();}));
       //  while(movement.pathFollowerIsActive()&&getOpMode().opModeIsActive()) {spinOnce();}
     }
@@ -84,6 +85,12 @@ public class MovementMacros {
         }
     }
 
+    private static Vector2D getPartnerWobblePose()
+    {
+        return new Pose2D(93.91741046 * xSign - 30.1416 * sideSign, -120.3139, 0);
+    }
+
+
     private static Vector2D getRingStackPose()
     {
         return new Vector2D(90.3747*xSign-2,-56.9019);
@@ -96,19 +103,19 @@ public class MovementMacros {
         switch (openCVNode.getStackSize())
         {
             case FOUR:
-                movement.Pos(new Pose2D(getRingStackPose().minus(new Vector2D(0,48).rotatedCW(error.acot())),error.acot()+Math.PI));
+                movement.Pos(new Pose2D(getRingStackPose().minus(new Vector2D(0,48).rotatedCW(error.acot())),error.acot()+Math.PI),1,1,5,toRadians(5));
                 conveyor.setConveyorPower(1);
-                movement.Pos(new Pose2D(getRingStackPose().minus(new Vector2D(0,20-18).rotatedCW(error.acot())),error.acot()+Math.PI),0.3,1);
+                movement.Pos(new Pose2D(getRingStackPose().minus(new Vector2D(0,20-18).rotatedCW(error.acot())),error.acot()+Math.PI),0.3,1,3,toRadians(3));
                 delay(1000);
                 ShootHighGoal();
-                movement.Pos(new Pose2D(getRingStackPose().minus(new Vector2D(0,20-39).rotatedCW(error.acot())),error.acot()+Math.PI),0.6,1);
+                movement.Pos(new Pose2D(getRingStackPose().minus(new Vector2D(0,20-39).rotatedCW(error.acot())),error.acot()+Math.PI),0.6,1,3,toRadians(3));
                 delay(750);
                 ShootHighGoal();
                 //conveyor.setConveyorPower(0);
                 break;
             case ONE:
                 conveyor.setConveyorPower(1);
-                movement.Pos(new Pose2D(getRingStackPose().minus(new Vector2D(0,20-30).rotatedCW(error.acot())),error.acot()+Math.PI),0.8,1);
+                movement.Pos(new Pose2D(getRingStackPose().minus(new Vector2D(0,20-30).rotatedCW(error.acot())),error.acot()+Math.PI),0.8,1,3,toRadians(3));
                 delay(1000);
                 ShootHighGoal();
                 //conveyor.setConveyorPower(0);
@@ -122,12 +129,12 @@ public class MovementMacros {
 
     private static final Vector2D wobblePlacementOffset = new Vector2D(11.8425,39.25);//new Vector2D(11.8425,33.25);
 
-    public static void MoveWobble_experimental() {
+    public static void MoveWobble() {
         wobbleManipulator2.setposclose(true);
         wobbleManipulator2.changepos(WobbleManipulator2.positions.medium);
         Vector2D wobblePose = getWobblePose();
         Vector2D error = (Vector2D)movement.getError(new Pose2D(wobblePose,Double.NaN));
-        movement.followPath(new MotionTask(wobblePose.minus(wobblePlacementOffset.rotatedCW(error.acot())),error.acot(), ()->{}));
+        movement.followPath(new MotionTask(wobblePose.minus(new Vector2D(0,wobblePlacementOffset.radius()).rotatedCW(error.acot())),error.acot()-wobblePlacementOffset.acot()),1,1,2,toRadians(2));
         while(movement.pathFollowerIsActive()&&getOpMode().opModeIsActive()) {
             if (movement.getError(new Pose2D(wobblePose,Double.NaN)).radius()<75)
                 wobbleManipulator2.changepos(WobbleManipulator2.positions.down);
@@ -135,21 +142,39 @@ public class MovementMacros {
         }
         wobbleManipulator2.changepos(WobbleManipulator2.positions.down);
         wobbleManipulator2.setposclose(false);
-        WoENrobot.delay(300);
+        delay(300);
+    }
+
+    public static void PickSecondWobble() {
+        wobbleManipulator2.setposclose(false);
+        wobbleManipulator2.changepos(WobbleManipulator2.positions.medium);
+        Vector2D wobblePose = getPartnerWobblePose();
+        Vector2D error = (Vector2D)movement.getError(new Pose2D(wobblePose,Double.NaN));
+        movement.Pos(new Pose2D(Double.NaN,Double.NaN,error.acot()),1,1,1,toRadians(45));
+        movement.followPath(new MotionTask(wobblePose.minus(new Vector2D(0,wobblePlacementOffset.radius()).rotatedCW(error.acot())),error.acot()-wobblePlacementOffset.acot()),1,1,1.5,toRadians(1));
+        while(movement.pathFollowerIsActive()&&getOpMode().opModeIsActive()) {
+            if (movement.getError(new Pose2D(wobblePose,Double.NaN)).radius()<75)
+                wobbleManipulator2.changepos(WobbleManipulator2.positions.down);
+            spinOnce();
+        }
+        wobbleManipulator2.changepos(WobbleManipulator2.positions.down);
+        delay(200);
+        wobbleManipulator2.setposclose(true);
+        delay(300);
     }
 
     private static final double yParkLine = 26.462;
     private static final double robotYbackLength = 29.85498;
     private static final double robotYfrontLength = 37.2;
-    private static final double parkingTolerance = 10;
+    private static final double parkingTolerance = 5;
 
     public static void Park() {
         if(odometry.getRobotCoordinates().y>yParkLine) {
-            movement.Pos(new Pose2D(89.6372*xSign+67.3092*sideSign, yParkLine+robotYbackLength-parkingTolerance, 0));
+            movement.Pos(new Pose2D(89.6372*xSign+67.3092*sideSign, yParkLine+robotYbackLength-parkingTolerance, 0),1,1,parkingTolerance,toRadians(5));
         }
         else {
             wobbleManipulator2.changepos(WobbleManipulator2.positions.medium);
-            movement.Pos(new Pose2D(89.6372*xSign+67.3092*sideSign, yParkLine-robotYfrontLength+parkingTolerance, 0));
+            movement.Pos(new Pose2D(89.6372*xSign+67.3092*sideSign, yParkLine-robotYfrontLength+parkingTolerance, 0),1,1,parkingTolerance,toRadians(5));
             delay(50);
         }
     }
@@ -193,7 +218,6 @@ public class MovementMacros {
         }
     }
     public static void ShootPOWERSHOTAngle() {  //rename
-        movement.Pos(new Pose2D(Double.NaN, -20, Double.NaN));
         shooter.setShootingMode(rpm.ShooterMode.POWERSHOT);
         double pos = 31;
         double angle = 6.5;
@@ -221,7 +245,6 @@ public class MovementMacros {
 
 
     public static void ShootPOWERSHOTPos() {  //rename
-        movement.Pos(new Pose2D(Double.NaN, -15, Double.NaN));
         shooter.setShootingMode(rpm.ShooterMode.POWERSHOT);
         double pos = 50;
         double angle = 5.5;
@@ -266,40 +289,7 @@ public class MovementMacros {
         shooter.setShootingMode(rpm.ShooterMode.OFF);
     }
 
-    @Deprecated
-    public static void MoveWobble() {
-        wobbleManipulator2.setposclose(true);
-        wobbleManipulator2.changepos(WobbleManipulator2.positions.medium);
-        if (sideSign * xSign == 1)
-            switch (openCVNode.getStackSize()) {
-                case FOUR:
-                    movement.Pos(new Pose2D(xSign * 154, 113, toRadians(-8 * xSign)));
-                    break;
-                case ONE:
-                    movement.Pos(new Pose2D(xSign * 144, 63, toRadians(-45 * xSign)));
-                    break;
-                case ZERO:
-                default:
-                    movement.Pos(new Pose2D(xSign * 145, -15, toRadians(0 * xSign)));
-            }
-        else
 
-            switch (openCVNode.getStackSize()) {
-                case FOUR:
-                    movement.Pos(new Pose2D(xSign * 110, 116, toRadians(50 * xSign)));
-                    break;
-                case ONE:
-                    movement.Pos(new Pose2D(xSign * 54.5 + 8.5, 63 + 3 * xSign, toRadians(50 * xSign)));
-                    break;
-                case ZERO:
-                default:
-                    movement.Pos(new Pose2D(xSign * 120, 0, toRadians(50 * xSign)));
-            }
-        wobbleManipulator2.changepos(WobbleManipulator2.positions.down);
-        WoENrobot.delay(800);
-        wobbleManipulator2.setposclose(false);
-        WoENrobot.delay(600);
-    }
 
     @Deprecated
     public static void PutRingsToLowGoal() {
