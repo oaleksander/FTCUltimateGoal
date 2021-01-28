@@ -30,7 +30,7 @@ public class ThreeWheelOdometry implements Odometry {
     private static final double odometryCMPerCounts = (odometryWheelDiameterCm * PI) / 1440;
     private static final double odometerXcenterOffset = -21.7562349 * odometryCountsPerCM * cos(toRadians(51.293002));
     private static final double yWheelPairRadiusCm = 18.2425;
-    private static final double radiansPerEncoderDifference =(18000.0/17972.0)*(1800.0/1818.5)*1.01259089312*((odometryCMPerCounts) / (yWheelPairRadiusCm * 2));//1.004604437*
+    private static final double radiansPerEncoderDifference = 1.003851129713462*((odometryCMPerCounts) / (yWheelPairRadiusCm * 2));//1.004604437*
     public static Pose2D worldPosition = new Pose2D();
     private static double angleOffset = 0;
     private static ExpansionHubEx expansionHub;
