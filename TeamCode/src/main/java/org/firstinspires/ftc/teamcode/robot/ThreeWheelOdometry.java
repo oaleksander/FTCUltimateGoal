@@ -14,6 +14,7 @@ import org.firstinspires.ftc.teamcode.math.Pose2D;
 import org.firstinspires.ftc.teamcode.math.Vector2D;
 import org.firstinspires.ftc.teamcode.math.Vector3D;
 import org.firstinspires.ftc.teamcode.superclasses.Odometry;
+import org.jetbrains.annotations.NotNull;
 import org.openftc.revextensions2.ExpansionHubEx;
 
 import static java.lang.Math.PI;
@@ -177,7 +178,7 @@ public class ThreeWheelOdometry implements Odometry {
         return new Pose2D(poseTranslation, worldPosition.heading);
     }
 
-    public void setRobotCoordinates(Pose2D coordinates) {
+    public void setRobotCoordinates(@NotNull Pose2D coordinates) {
         angleOffset = (double) angleWrap(calculateHeading() + angleOffset - coordinates.heading);
         this.calculatePosition(new Pose2D(new Vector2D(coordinates.x * odometryCountsPerCM, coordinates.y * odometryCountsPerCM)
                 .add(YWheelPairCenterOffset.scale(odometryCountsPerCM).rotatedCW(worldPosition.heading)), coordinates.heading));
