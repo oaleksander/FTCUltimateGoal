@@ -1,8 +1,8 @@
 package org.firstinspires.ftc.teamcode.robot;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -20,7 +20,16 @@ public class rpm implements RobotModule {
     private final double timeRpm = 137;
     private final double feederClose = 0.0735;
     private final double feederOpen = 0.35;
-    PIDFCoefficients shooterPIDF = new PIDFCoefficients(36, 0.03, 7, 15);
+
+    @Config
+    static class shooterPIDF {
+        public static double kP = 36;
+        public static double kI = 0.03;
+        public static double kD = 7;
+        public static double kF = 14.8;
+        public static double kF_referenceVoltage = 13;
+    }
+
     private LinearOpMode opMode;
     public DcMotorEx shooterMotor = null;
     private final CommandSender shooterVelocitySender = new CommandSender(p -> shooterMotor.setVelocity(p));
@@ -49,7 +58,7 @@ public class rpm implements RobotModule {
         motorConfigurationType.setMaxRPM(6000);
         shooterMotor.setMotorType(motorConfigurationType);
         try {
-            shooterMotor.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, shooterPIDF);
+            shooterMotor.setVelocityPIDFCoefficients(shooterPIDF.kP, shooterPIDF.kI, shooterPIDF.kD, shooterPIDF.kF * shooterPIDF.kF_referenceVoltage / opMode.hardwareMap.voltageSensor.iterator().next().getVoltage());
         } catch (UnsupportedOperationException e) {
             opMode.telemetry.addData("Shooter PIDF error ", e.getMessage());
         }
@@ -87,21 +96,25 @@ public class rpm implements RobotModule {
         if (encoderFailureDetectionTime.seconds() > 1)
             if (velocityTarget == 0 || getCurrentRpm() != 0)
                 encoderFailureDetectionTime.reset();
-        setEncoderFailureMode(encoderFailureDetectionTime.seconds() > 3);
+        if (velocityTarget != 0 && ringsToShoot == 0)
+            updatePIDFCoeffs(encoderFailureDetectionTime.seconds() > 2);
     }
 
     public boolean getEncoderFailureMode() {
         return encoderFailureMode;
     }
 
-    private void setEncoderFailureMode(boolean mode) {
-        if (mode != encoderFailureMode) {
-            encoderFailureMode = mode;
+    private final ElapsedTime PIDFUpdateTimer = new ElapsedTime();
+
+    private void updatePIDFCoeffs(boolean encoderFailureMode) {
+        if (encoderFailureMode != this.encoderFailureMode || PIDFUpdateTimer.seconds() > 0.5) {
+            this.encoderFailureMode = encoderFailureMode;
+            PIDFUpdateTimer.reset();
             try {
-                if (encoderFailureMode)
-                    shooterMotor.setVelocityPIDFCoefficients(0, 0, 0, shooterPIDF.f);
+                if (this.encoderFailureMode)
+                    shooterMotor.setVelocityPIDFCoefficients(0, 0, 0, shooterPIDF.kF * shooterPIDF.kF_referenceVoltage / opMode.hardwareMap.voltageSensor.iterator().next().getVoltage());
                 else
-                    shooterMotor.setVelocityPIDFCoefficients(shooterPIDF.p, shooterPIDF.i, shooterPIDF.d, shooterPIDF.f);
+                    shooterMotor.setVelocityPIDFCoefficients(shooterPIDF.kP, shooterPIDF.kI, shooterPIDF.kD, shooterPIDF.kF * shooterPIDF.kF_referenceVoltage / opMode.hardwareMap.voltageSensor.iterator().next().getVoltage());
             } catch (UnsupportedOperationException ignored) {
             }
         }

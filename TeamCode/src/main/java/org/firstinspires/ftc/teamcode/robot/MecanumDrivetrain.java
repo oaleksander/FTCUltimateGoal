@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.robot;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -25,22 +26,31 @@ public class MecanumDrivetrain implements Drivetrain {
 
     /* Physical constants */
     private static final double wheelRadius = 9.8 / 2;
-    private static final double strafingMultiplier = 1.35;
     private static final Vector2D wheelCenterOffset = new Vector2D(18.05253, 15.20000);
-    private static final double rotationDecrepancy = 1.0;
     private static final double forwardMultiplier = 1 / wheelRadius;
-    private static final double sidewaysMultiplier = forwardMultiplier * strafingMultiplier;
-    private static final double turnMultiplier = (wheelCenterOffset.x + wheelCenterOffset.y) * rotationDecrepancy / wheelRadius;
+    private static double sidewaysMultiplier = forwardMultiplier * DrivetrainConfig.strafingMultiplier;
+    private static double turnMultiplier = (wheelCenterOffset.x + wheelCenterOffset.y) * DrivetrainConfig.rotationDecrepancy / wheelRadius;
     /* Motor parameters constatnts. */
-    private static final PIDFCoefficients drivePIDFCoefficients = new PIDFCoefficients(26, 0.1, 0, 15.10);
-    private static final double achieveableMaxRPMFraction = 0.885;
+    @Config
+    public static class DrivetrainConfig
+    {
+        public static double achieveableMaxRPMFraction = 0.885;
+        public static double achieveableMinRPMFraction = 0.045;
+        public static double strafingMultiplier = 1.35;
+        public static double rotationDecrepancy = 1;
+        public static double kP = 26;
+        public static double kD = 0;
+        public static double kI = 0.1;
+        public static double kF = 15.10;
+        public static double kF_referenceVoltage = 13;
+    }
     private static final double tickPerRev = 480;
     private static final double gearing = 20;
     private static final double maxRPM = 300;
     public static final double theoreticalMaxSpeed = (maxRPM / 60) * Math.PI * 2;
-    private static double maxMotorSpeed = achieveableMaxRPMFraction * theoreticalMaxSpeed;
-    private static double minMotorSpeed = 0.045 * theoreticalMaxSpeed; //http://b1-srv-kms-1.sch239.net:8239
-    private final double maxAcceleration = theoreticalMaxSpeed / 0.25;
+    private static double maxMotorSpeed = DrivetrainConfig.achieveableMaxRPMFraction * theoreticalMaxSpeed;
+    private static double minMotorSpeed = DrivetrainConfig.achieveableMinRPMFraction * theoreticalMaxSpeed; //http://b1-srv-kms-1.sch239.net:8239
+    private final double maxAcceleration = theoreticalMaxSpeed / 0.33;
     /* Drivetrain hardware members. */
     DcMotorEx driveFrontLeft = null;
     /* Motor controllers */
@@ -67,10 +77,14 @@ public class MecanumDrivetrain implements Drivetrain {
     public void initialize() {
         assignNames();
         setMotorDirections();
+        maxMotorSpeed = DrivetrainConfig.achieveableMaxRPMFraction * theoreticalMaxSpeed;
+        minMotorSpeed = DrivetrainConfig.achieveableMinRPMFraction * theoreticalMaxSpeed;
+        sidewaysMultiplier = forwardMultiplier * DrivetrainConfig.strafingMultiplier;
+        turnMultiplier = (wheelCenterOffset.x + wheelCenterOffset.y) * DrivetrainConfig.rotationDecrepancy / wheelRadius;
         setMotor0PowerBehaviors(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        setMotorConfiguration(achieveableMaxRPMFraction, tickPerRev, gearing, maxRPM);
+        setMotorConfiguration(DrivetrainConfig.achieveableMaxRPMFraction, tickPerRev, gearing, maxRPM);
         try {
-            setPIDFCoefficients(drivePIDFCoefficients);
+            setPIDFCoefficients(new PIDFCoefficients(DrivetrainConfig.kP,DrivetrainConfig.kD,DrivetrainConfig.kI,DrivetrainConfig.kF * DrivetrainConfig.kF_referenceVoltage / opMode.hardwareMap.voltageSensor.iterator().next().getVoltage()));
         } catch (UnsupportedOperationException e) {
             opMode.telemetry.addData("Drivetrain PIDF error ", e.getMessage());
         }
