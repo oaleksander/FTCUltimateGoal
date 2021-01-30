@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.robot;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -25,7 +26,10 @@ public class TelemetryDebugging implements RobotModule {
     Telemetry telemetry;
     TelemetryPacket packet = null;
     long loopCount = 0;
-    int refreshTimeMs = 200;
+    @Config
+    static class TelemetryConfig {
+        public static int refreshTimeMs = 100;
+    }
     private LinearOpMode opMode = null;
 
     private static void rotatePoints(double[] xPoints, double[] yPoints, double angle) {
@@ -82,23 +86,23 @@ public class TelemetryDebugging implements RobotModule {
         telemetry = opMode.telemetry;
         //  telemetry = dashboard.getTelemetry();
         //  telemetry = new MultipleTelemetry(opMode.telemetry,dashboard.getTelemetry());
-        telemetry.setMsTransmissionInterval(refreshTimeMs);
+        telemetry.setMsTransmissionInterval(TelemetryConfig.refreshTimeMs);
         //   dashboard.startCameraStream(openCVNode.getWebcam(),0);
     }
 
 
     public void update() {
-        if (measurementTime.milliseconds() > refreshTimeMs) {
+        if (measurementTime.milliseconds() > TelemetryConfig.refreshTimeMs) {
             telemetry.addData("Status", "Running");
             telemetry.addData("Loop frequency", 1 / (measurementTime.seconds() / loopCount) + " Hz");
             Pose2D robotPosition = odometry.getRobotCoordinates();
-            telemetry.addLine("Odometry encoders").addData("odYL", odometry.odometerYL.getCurrentPosition()).addData("odYR", odometry.odometerYR.getCurrentPosition()).addData("odX", odometry.odometerX.getCurrentPosition());
+         //   telemetry.addLine("Odometry encoders").addData("odYL", odometry.odometerYL.getCurrentPosition()).addData("odYR", odometry.odometerYR.getCurrentPosition()).addData("odX", odometry.odometerX.getCurrentPosition());
           //  telemetry.addLine("Robot position ").addData("Y", robotPosition.y).addData("X", robotPosition.x).addData("Head", Math.toDegrees(robotPosition.heading));
          //   Vector3D velocity = odometry.getRobotVelocity();
           //     telemetry.addLine("Robot velocity ").addData("Y", velocity.y).addData("X", velocity.x).addData("Head", Math.toDegrees(velocity.z));
             telemetry.addLine("Shooter ").addData("Mode", shooter.getShootingMode()).addData("Current", shooter.getCurrentRpm()).addData("Target", shooter.getRpmTarget());
             //telemetry.addData("conpower", conveyor.conveyorPower);
-            telemetry.addLine("headings").addData("Encoder",Math.toDegrees(odometry.getEncoderHeading())).addData("IMU1",Math.toDegrees(odometry.getIMUheading_1())).addData("IMU2",Math.toDegrees(odometry.getIMUheading_2()));
+        //    telemetry.addLine("headings").addData("Encoder",Math.toDegrees(odometry.getEncoderHeading())).addData("IMU1",Math.toDegrees(odometry.getIMUheading_1())).addData("IMU2",Math.toDegrees(odometry.getIMUheading_2()));
             //    telemetry.addData("Shooter Velo",shooter.getCurrentRpm());
 
             displayDashboardRectangle(robotPosition);

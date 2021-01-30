@@ -4,6 +4,7 @@ import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.superclasses.Conveyor;
 import org.firstinspires.ftc.teamcode.superclasses.Drivetrain;
 import org.firstinspires.ftc.teamcode.superclasses.Odometry;
 import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
@@ -15,9 +16,9 @@ import java.util.List;
 
 public class WoENrobot {
 
-    public static WobbleManipulator2 wobbleManipulator2 = new WobbleManipulator2();
-    public static OpenCVNode openCVNode = new OpenCVNodeWebcam();
-    public static Conveyor conveyor = new Conveyor();
+    public static WobbleManipulator wobbleManipulator = new ServoWobbleManipulator();
+    public static OpenCVNodeWebcam openCVNode = new OpenCVNodeWebcam();
+    public static Conveyor conveyor = new Conveyor2();
     public static rpm shooter = new rpm();
     public static TelemetryDebugging telemetryDebugging = new TelemetryDebugging();
 
