@@ -9,20 +9,23 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.misc.CommandSender;
 import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
+import org.openftc.revextensions2.ExpansionHubServo;
 
 public class rpm implements RobotModule {
     private final ElapsedTime rpmTime = new ElapsedTime();
     private final ElapsedTime feederTime = new ElapsedTime();
     private final ElapsedTime encoderFailureDetectionTime = new ElapsedTime();
-    private final double time = 137;
-    private final double lowRpm = 3470;
-    private final double highRpm = 4600;
-    private final double timeRpm = 137;
-    private final double feederClose = 0.0735;
-    private final double feederOpen = 0.35;
+
 
     @Config
-    static class shooterPIDF {
+    static class ShooterConfig {
+        public static final double servoTime = 137;
+        public static final double servoReturnMultiplier = 2.6;
+        public static final double lowRpm = 3470;
+        public static final double highRpm = 4600;
+        public static final double timeRpm = 150;
+        public static final double feederClose = 0.0735;
+        public static final double feederOpen = 0.35;
         public static double kP = 36;
         public static double kI = 0.03;
         public static double kD = 7;
@@ -33,7 +36,7 @@ public class rpm implements RobotModule {
     private LinearOpMode opMode;
     public DcMotorEx shooterMotor = null;
     private final CommandSender shooterVelocitySender = new CommandSender(p -> shooterMotor.setVelocity(p));
-    private Servo feeder = null;
+    private ExpansionHubServo feeder = null;
     private final CommandSender feederPositionSender = new CommandSender(p -> feeder.setPosition(p));
     private ShooterMode shooterMode = ShooterMode.OFF;
     private byte ringsToShoot = 0;
@@ -58,36 +61,36 @@ public class rpm implements RobotModule {
         motorConfigurationType.setMaxRPM(6000);
         shooterMotor.setMotorType(motorConfigurationType);
         try {
-            shooterMotor.setVelocityPIDFCoefficients(shooterPIDF.kP, shooterPIDF.kI, shooterPIDF.kD, shooterPIDF.kF * shooterPIDF.kF_referenceVoltage / opMode.hardwareMap.voltageSensor.iterator().next().getVoltage());
+            shooterMotor.setVelocityPIDFCoefficients(ShooterConfig.kP, ShooterConfig.kI, ShooterConfig.kD, ShooterConfig.kF * ShooterConfig.kF_referenceVoltage / opMode.hardwareMap.voltageSensor.iterator().next().getVoltage());
         } catch (UnsupportedOperationException e) {
             opMode.telemetry.addData("Shooter PIDF error ", e.getMessage());
         }
         shooterMotor.setDirection(DcMotorEx.Direction.FORWARD);
         shooterMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         shooterMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        setShootingMode(ShooterMode.HIGHGOAL);
+        setShootingMode(ShooterMode.OFF);
         initializedservo();
         feederTime.reset();
     }
 
     private void initializedservo() {
-        feeder = opMode.hardwareMap.get(Servo.class, "feeder");
-        feeder.setPosition(feederClose);
+        feeder = (ExpansionHubServo)opMode.hardwareMap.get(Servo.class, "feeder");
+        feeder.setPosition(ShooterConfig.feederClose);
     }
 
     public void reset() {
-        feeder.setPosition(feederClose);
+        feeder.setPosition(ShooterConfig.feederClose);
         shooterMotor.setVelocity(0);
         setShootingMode(ShooterMode.OFF);
         ringsToShoot = 0;
     }
 
     public void update() {
-        if (ringsToShoot > 0 && feederTime.milliseconds() > time * 2.60) {
+        if (ringsToShoot > 0 && feederTime.milliseconds() > ShooterConfig.servoTime * ShooterConfig.servoReturnMultiplier) {
             feedRing();
             ringsToShoot--;
         }
-        setFeederPosition(feederTime.milliseconds() < time && (velocityTarget != 0));
+        setFeederPosition(feederTime.milliseconds() < ShooterConfig.servoTime && (velocityTarget != 0));
         currentVelocity = rpmTime.milliseconds() >= timeToAccelerate_ms ?
                 velocityTarget
                 : rpmTime.milliseconds() * accelerationIncrement * velocityTarget;
@@ -112,16 +115,16 @@ public class rpm implements RobotModule {
             PIDFUpdateTimer.reset();
             try {
                 if (this.encoderFailureMode)
-                    shooterMotor.setVelocityPIDFCoefficients(0, 0, 0, shooterPIDF.kF * shooterPIDF.kF_referenceVoltage / opMode.hardwareMap.voltageSensor.iterator().next().getVoltage());
+                    shooterMotor.setVelocityPIDFCoefficients(0, 0, 0, ShooterConfig.kF * ShooterConfig.kF_referenceVoltage / opMode.hardwareMap.voltageSensor.iterator().next().getVoltage());
                 else
-                    shooterMotor.setVelocityPIDFCoefficients(shooterPIDF.kP, shooterPIDF.kI, shooterPIDF.kD, shooterPIDF.kF * shooterPIDF.kF_referenceVoltage / opMode.hardwareMap.voltageSensor.iterator().next().getVoltage());
+                    shooterMotor.setVelocityPIDFCoefficients(ShooterConfig.kP, ShooterConfig.kI, ShooterConfig.kD, ShooterConfig.kF * ShooterConfig.kF_referenceVoltage / opMode.hardwareMap.voltageSensor.iterator().next().getVoltage());
             } catch (UnsupportedOperationException ignored) {
             }
         }
     }
 
     private void setFeederPosition(boolean push) {
-        feederPositionSender.send(push ? feederOpen : feederClose);
+        feederPositionSender.send(push ? ShooterConfig.feederOpen : ShooterConfig.feederClose);
     }
 
     private void setShootersetings(double Rpm, double time) {
@@ -161,13 +164,13 @@ public class rpm implements RobotModule {
         shooterMode = mode;
         switch (mode) {
             case HIGHGOAL:
-                setShootersetings(highRpm, timeRpm);
+                setShootersetings(ShooterConfig.highRpm, ShooterConfig.timeRpm);
                 break;
             case POWERSHOT:
-                setShootersetings(lowRpm, timeRpm);
+                setShootersetings(ShooterConfig.lowRpm, ShooterConfig.timeRpm);
                 break;
             case OFF:
-                setShootersetings(0, timeRpm);
+                setShootersetings(0, ShooterConfig.timeRpm);
         }
     }
 

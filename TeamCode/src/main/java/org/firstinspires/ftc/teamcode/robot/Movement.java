@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.robot;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
@@ -22,14 +23,20 @@ import static org.firstinspires.ftc.teamcode.math.MathUtil.angleWrap;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.movement;
 
 public class Movement implements RobotModule {
-   private static final double kP_distance = 3.9, kD_distance = 0;
+
+    @Config
+    static class MovementConfig {
+        public static double kP_distance = 3.9;
+        public static double kD_distance = 0;
+        public static double kP_angle = 4.6;
+        public static double kD_angle = 0;
+        public static double minLinearVelocityFraction = 0.085;
+        public static double minAngleVelocityFraction = 0.085;
+    }
     private double maxLinearVelocityFraction = 1;
-    private double minLinearVelocityFraction = 0.085;
+    private double maxAngleVelocityFraction = 1;
     private static final double minError_distance_default = 1;
     private double minError_distance_current = minError_distance_default;
-    private static final double kP_angle = 4.6, kD_angle = 0;
-    private double maxAngleVelocityFraction = 1;
-    private double minAngleVelocityFraction = 0.085;
     private static final double minError_angle_default = Math.toRadians(0.32);
     private double minError_angle_current = minError_angle_default;
     private static Odometry odometry;
@@ -244,7 +251,7 @@ public class Movement implements RobotModule {
     }
 
     public void setMinLinearVelocityFraction(double minLinearVelocityFraction) {
-        this.minLinearVelocityFraction = minLinearVelocityFraction;
+        MovementConfig.minLinearVelocityFraction = minLinearVelocityFraction;
     }
 
     public void setMaxAngleVelocityFraction(double maxAngleVelocityFraction) {
@@ -252,7 +259,7 @@ public class Movement implements RobotModule {
     }
 
     public void setMinAngleVelocityFraction(double minAngleVelocityFraction) {
-        this.minAngleVelocityFraction = minAngleVelocityFraction;
+        MovementConfig.minAngleVelocityFraction = minAngleVelocityFraction;
     }
 
     /**
@@ -266,10 +273,10 @@ public class Movement implements RobotModule {
     public void approachPosition(Pose2D targetPose, double linearVelocity, double angularVelocity) {
 
 
-        linearVelocity = Range.clip(abs(linearVelocity), drivetrain.getMaxVelocity().y*minLinearVelocityFraction,
-                drivetrain.getMaxVelocity().y*maxLinearVelocityFraction)*(abs(linearVelocity)>kP_distance*minError_distance_current*0.5?1:0);
-        angularVelocity = Range.clip(abs(angularVelocity),drivetrain.getMaxVelocity().z*minAngleVelocityFraction,
-                drivetrain.getMaxVelocity().z*maxAngleVelocityFraction)*(abs(angularVelocity)>kP_angle*minError_angle_current*0.5?1:0);
+        linearVelocity = Range.clip(abs(linearVelocity), drivetrain.getMaxVelocity().y*MovementConfig.minLinearVelocityFraction,
+                drivetrain.getMaxVelocity().y*maxLinearVelocityFraction)*(abs(linearVelocity)>MovementConfig.kP_distance*minError_distance_current*0.5?1:0);
+        angularVelocity = Range.clip(abs(angularVelocity),drivetrain.getMaxVelocity().z*MovementConfig.minAngleVelocityFraction,
+                drivetrain.getMaxVelocity().z*maxAngleVelocityFraction)*(abs(angularVelocity)>MovementConfig.kP_angle*minError_angle_current*0.5?1:0);
 
 
         Vector2D movementControl = new Vector2D(
@@ -305,8 +312,8 @@ public class Movement implements RobotModule {
 
         previousError = error;
         previousTarget = target;
-        approachPosition(error, error.radius() * kP_distance + ((Vector2D) diffError).radius() * kD_distance,
-                error.heading * kP_angle + diffError.z * kD_angle);
+        approachPosition(error, error.radius() * MovementConfig.kP_distance + ((Vector2D) diffError).radius() * MovementConfig.kD_distance,
+                error.heading * MovementConfig.kP_angle + diffError.z * MovementConfig.kD_angle);
         return !(abs(error.heading) >= minError_angle_current) && !(error.radius() >= minError_distance_current);
         //drivetrain.setRobotVelocity(0, 0, 0);
     }
@@ -321,92 +328,6 @@ public class Movement implements RobotModule {
         target = removeNaN(target);
         return target.substract(odometry.getRobotCoordinates());
     }
-
-/*
-    public void Pos(Pose2D target) {
-
-
-        Pose2D error = target.substract(odometry.getRobotCoordinates());
-        Pose2D errold;
-        double distanceError = error.radius();
-
-        ElapsedTime movementTime = new ElapsedTime();
-        while (opMode.opModeIsActive() && (distanceError >= minError_distance || abs(error.heading) >= minError_angle) && movementTime.seconds() < 4 &&!opMode.gamepad1.y) {
-
-            errold = error;
-            error = target.substract(odometry.getRobotCoordinates());
-
-            distanceError = error.radius();
-            if (distanceError > 100) {
-                error.heading = angleWrapHalf(error.acot());
-            }
-
-            Pose2D deltaError = error.substract(errold);
-
-            Vector3D currentVelocity = odometry.getRobotVelocity();
-            Vector3D diffError = new Vector3D(currentVelocity.x * signum(deltaError.x),
-                    currentVelocity.y * signum(deltaError.y),
-                    currentVelocity.z * signum(deltaError.heading));
-
-            Vector2D movementControl = new Vector2D(
-                    error.x * kP_distance + diffError.x * kD_distance,
-                    error.y * kP_distance + diffError.y * kD_distance);
-          //  if (movementControl.radius() > drivetrain)
-          //      movementControl.normalize();
-
-            Vector3D control = new Vector3D(movementControl,
-                    error.heading * kP_angle + diffError.z * kD_angle);
-
-            holonomicMoveFC(control);
-
-
-        }
-        drivetrain.setRobotVelocity(0, 0, 0);
-    }
-    /*
-        public boolean Pos(Pose2D target) {
-
-
-        Pose2D error = target.substract(odometry.getRobotCoordinates());
-        Pose2D errold = error;
-        double distanceError = error.radius();
-
-        ElapsedTime looptime = new ElapsedTime();
-        if ((distanceError > minError_distance || abs(error.heading) > minError_angle) && looptime.seconds() < 4) {
-
-
-            distanceError = error.radius();
-
-
-            error = target.substract(odometry.getRobotCoordinates());
-            if(distanceError>60)
-            {
-                error.heading=angleWrapHalf(error.acot());
-            }
-
-            Vector3D differr = new Vector3D(0,0,0);
-            looptime.reset();
-
-            Vector3D control = new Vector3D(
-                    error.x * kP_distance + differr.x * kD_distance,
-                    error.y * kP_distance + differr.y * kD_distance,
-                    error.heading * kP_angle + differr.z * kP_angle);
-
-            holonomicMoveFC(control);
-
-
-
-
-
-            errold = error;
-            return false;
-        }
-        else {
-             return true;
-        }
-    }
-
-     */
 
     /**
      * Move to point using Pure Pursuit
@@ -447,9 +368,9 @@ public class Movement implements RobotModule {
             error = getError(new Pose2D(targetPoint, angle));
             if (error.radius() < lookaheadRadius)
                 return true;
-            approachPosition(error, error.radius() * kP_distance, error.heading * kP_angle);
+            approachPosition(error, error.radius() * MovementConfig.kP_distance, error.heading * MovementConfig.kP_angle);
         } else {
-            approachPosition(error, drivetrain.getMaxVelocity().y, error.heading * kP_angle);
+            approachPosition(error, drivetrain.getMaxVelocity().y, error.heading * MovementConfig.kP_angle);
         }
         return false;
     }

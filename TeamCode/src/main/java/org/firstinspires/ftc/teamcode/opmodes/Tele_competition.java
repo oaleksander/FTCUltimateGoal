@@ -3,21 +3,18 @@ package org.firstinspires.ftc.teamcode.opmodes;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.math.Vector3D;
 import org.firstinspires.ftc.teamcode.misc.ButtonSwitch;
 import org.firstinspires.ftc.teamcode.misc.SinglePressButton;
-import org.firstinspires.ftc.teamcode.robot.Movement;
 import org.firstinspires.ftc.teamcode.robot.rpm;
 
 import static org.firstinspires.ftc.teamcode.opmodes.MovementMacros.ShootPOWERSHOTAngle;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.conveyor;
-import static org.firstinspires.ftc.teamcode.robot.WoENrobot.drivetrain;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.initRobot;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.movement;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.shooter;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.spinOnce;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.startRobot;
-import static org.firstinspires.ftc.teamcode.robot.WoENrobot.wobbleManipulator2;
+import static org.firstinspires.ftc.teamcode.robot.WoENrobot.wobbleManipulator;
 
 @TeleOp(name = "TeleOp COMPETITION", group = "Competition")
 public class Tele_competition extends LinearOpMode {
@@ -43,17 +40,16 @@ public class Tele_competition extends LinearOpMode {
                 //   wobbleManipulator2.offAngle();
             }
             if(!movement.pathFollowerIsActive()) {
-                wobbleManipulator2.setposclose(buttonAswitch.isTriggered(gamepad2.right_bumper));
-                wobbleManipulator2.upmediumdown(gamepad2.b, gamepad2.x); // correct
+                wobbleManipulator.grabWobble(buttonAswitch.isTriggered(gamepad2.right_bumper));
+                wobbleManipulator.upmediumdown(gamepad2.b, gamepad2.x); // correct
                 conveyor.setConveyorPower(buttonBackswitch.isTriggered(gamepad2.left_trigger > 0.5) ? 1 : 0);
                 shooter.setShootingMode(shooterOnOffSwitch.isTriggered(gamepad2.a) ?
                         shooterSpeedSwitch.isTriggered(gamepad2.y) ?
                                 rpm.ShooterMode.POWERSHOT
                                 : rpm.ShooterMode.HIGHGOAL
                         : rpm.ShooterMode.OFF);
-                conveyor.setBackmust(gamepad2.right_trigger > 0.5);
-             //   telemetry.addData("correct",shooter.isCorrectRpm());
-                conveyor.OFFcolorlock(gamepad2.left_bumper);
+                conveyor.setForceReverse(gamepad2.right_trigger > 0.5);
+              //  conveyor.OFFcolorlock(gamepad2.left_bumper);
                 //   powerconveyor = (buttonspeedConveyor.isTriggered(gamepad2.right_bumper)?-1:1);
                 if (gamepad1.x) {
                     ShootPOWERSHOTAngle();

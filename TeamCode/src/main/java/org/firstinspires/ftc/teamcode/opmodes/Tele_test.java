@@ -4,19 +4,17 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.math.Pose2D;
-import org.firstinspires.ftc.teamcode.math.Vector3D;
 import org.firstinspires.ftc.teamcode.misc.ButtonSwitch;
 import org.firstinspires.ftc.teamcode.misc.SinglePressButton;
 import org.firstinspires.ftc.teamcode.robot.rpm;
 
-import static org.firstinspires.ftc.teamcode.robot.WoENrobot.drivetrain;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.forceInitRobot;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.movement;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.odometry;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.shooter;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.spinOnce;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.startRobot;
-import static org.firstinspires.ftc.teamcode.robot.WoENrobot.wobbleManipulator2;
+import static org.firstinspires.ftc.teamcode.robot.WoENrobot.wobbleManipulator;
 
 @TeleOp(name = "Teleop TEST/PRACTICE", group = "Debugging")
 
@@ -45,8 +43,8 @@ public class Tele_test extends LinearOpMode {
         // wobbleManipulator2.setAngle(1);
         while (opModeIsActive()) {
             // drivetrain.setSmartMode(smartModeSwitch.isTriggered(gamepad1.left_stick_button));
-            wobbleManipulator2.setposclose(buttonAswitch.isTriggered(gamepad1.a));
-            wobbleManipulator2.upmediumdown(gamepad1.y, gamepad1.x); // correct
+            wobbleManipulator.grabWobble(buttonAswitch.isTriggered(gamepad1.a));
+            wobbleManipulator.upmediumdown(gamepad1.y, gamepad1.x); // correct
             shooter.setShootingMode(buttonStartswitch.isTriggered(gamepad1.start) ?
                     rpm.ShooterMode.HIGHGOAL
                     : rpm.ShooterMode.OFF);
@@ -72,6 +70,7 @@ public class Tele_test extends LinearOpMode {
             if (gamepad1.dpad_right)
                 x += 1;
             movement.humanSetVelocity(x, y, turn);
+            telemetry.addData("y",y);
             spinOnce();
         }
     }

@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.math.Pose2D;
@@ -15,9 +16,10 @@ public class AutoUniversal extends AutonomousOpMode {
 
     @Override
     public void main() {
-        conveyor.setBackOnAfter(true);
-        movement.Pos(new Pose2D(odometry.getRobotCoordinates().x+15*sideSign, -60, Double.NaN),1,1,10,0.1);
-        Shooting();
+        conveyor.setAutomaticConveyorStopping(true);
+        movement.Pos(new Pose2D(odometry.getRobotCoordinates().x+15*sideSign, -50, Double.NaN),1,1,10,0.1);
+      //  Shooting();
+        ShootPowerShotAngle_experimental();
         MoveWobble();
         PickupRings();
         Park();

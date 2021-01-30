@@ -7,10 +7,10 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
+import org.firstinspires.ftc.teamcode.superclasses.WobbleManipulator;
 
 @Deprecated
-public class WobbleManipulator implements RobotModule {
+public class MotorWobbleManipulator implements WobbleManipulator {
     private final double closeClose = 0.73;
     private final double closeOpen = 0.19;
     private final double minerror = 15, maxspeed = 0.7, kofP = 0.0015, kofd = 0.00001;
@@ -39,10 +39,10 @@ public class WobbleManipulator implements RobotModule {
         lever.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         lever.setDirection(DcMotorSimple.Direction.REVERSE);
         lever.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        setposclose(true);
+        grabWobble(true);
     }
 
-    public void setposclose(boolean dograb) {
+    public void grabWobble(boolean dograb) {
         if (dograb != isGrabbed) {
             isGrabbed = dograb;
             if (dograb) close.setPosition(closeClose);
@@ -78,10 +78,10 @@ public class WobbleManipulator implements RobotModule {
                 ismed = true;
                 if (posangle == 1) {
                     posangle = 0;
-                    changepos(positions.up);
+                    setAngle(Position.UP);
                 } else {
                     posangle = 1;
-                    changepos(positions.medium);
+                    setAngle(Position.MEDIUM);
                 }
             }
         } else ismed = false;
@@ -90,24 +90,24 @@ public class WobbleManipulator implements RobotModule {
                 isdown = true;
                 if (posangle == 2) {
                     posangle = 0;
-                    changepos(positions.up);
+                    setAngle(Position.UP);
                 } else {
                     posangle = 2;
-                    changepos(positions.down);
+                    setAngle(Position.DOWN);
                 }
             }
         } else isdown = false;
     }
 
-    public void changepos(positions Positions) {
+    public void setAngle(Position Positions) {
         switch (Positions) {
-            case up:
+            case UP:
                 setposlever(0);
                 break;
-            case down:
+            case DOWN:
                 setposlever(920);
                 break;
-            case medium:
+            case MEDIUM:
                 setposlever(550);
                 break;
         }
@@ -117,7 +117,5 @@ public class WobbleManipulator implements RobotModule {
     public void setposlever(double Pos) {
         pos = Pos;
     }
-
-    enum positions {up, down, medium}
 
 }

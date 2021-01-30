@@ -13,6 +13,7 @@ import org.firstinspires.ftc.teamcode.math.Vector3D;
 import org.firstinspires.ftc.teamcode.superclasses.Odometry;
 import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
 import org.openftc.revextensions2.ExpansionHubEx;
+import org.openftc.revextensions2.ExpansionHubMotor;
 import org.openftc.revextensions2.RevBulkData;
 
 import static java.lang.Math.PI;
@@ -20,6 +21,7 @@ import static java.lang.Math.cos;
 import static java.lang.Math.toRadians;
 import static org.firstinspires.ftc.teamcode.math.MathUtil.angleWrap;
 
+@Deprecated
 public class TwoWheelOdometry implements Odometry {
     private static final double odometryWheelDiameterCm = 4.8;
     private static final double odometryCountsPerCM = (1440) / (odometryWheelDiameterCm * PI);

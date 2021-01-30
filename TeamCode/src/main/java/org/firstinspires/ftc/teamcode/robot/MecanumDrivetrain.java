@@ -32,12 +32,13 @@ public class MecanumDrivetrain implements Drivetrain {
     private static double turnMultiplier = (wheelCenterOffset.x + wheelCenterOffset.y) * DrivetrainConfig.rotationDecrepancy / wheelRadius;
     /* Motor parameters constatnts. */
     @Config
-    public static class DrivetrainConfig
+    static class DrivetrainConfig
     {
         public static double achieveableMaxRPMFraction = 0.885;
         public static double achieveableMinRPMFraction = 0.045;
         public static double strafingMultiplier = 1.35;
         public static double rotationDecrepancy = 1;
+        public static double secondsToAccelerate = 0.33;
         public static double kP = 26;
         public static double kD = 0;
         public static double kI = 0.1;
@@ -50,7 +51,7 @@ public class MecanumDrivetrain implements Drivetrain {
     public static final double theoreticalMaxSpeed = (maxRPM / 60) * Math.PI * 2;
     private static double maxMotorSpeed = DrivetrainConfig.achieveableMaxRPMFraction * theoreticalMaxSpeed;
     private static double minMotorSpeed = DrivetrainConfig.achieveableMinRPMFraction * theoreticalMaxSpeed; //http://b1-srv-kms-1.sch239.net:8239
-    private final double maxAcceleration = theoreticalMaxSpeed / 0.33;
+    private double maxAcceleration = theoreticalMaxSpeed / DrivetrainConfig.secondsToAccelerate;
     /* Drivetrain hardware members. */
     DcMotorEx driveFrontLeft = null;
     /* Motor controllers */
@@ -80,6 +81,7 @@ public class MecanumDrivetrain implements Drivetrain {
         maxMotorSpeed = DrivetrainConfig.achieveableMaxRPMFraction * theoreticalMaxSpeed;
         minMotorSpeed = DrivetrainConfig.achieveableMinRPMFraction * theoreticalMaxSpeed;
         sidewaysMultiplier = forwardMultiplier * DrivetrainConfig.strafingMultiplier;
+        maxAcceleration = theoreticalMaxSpeed / DrivetrainConfig.secondsToAccelerate;
         turnMultiplier = (wheelCenterOffset.x + wheelCenterOffset.y) * DrivetrainConfig.rotationDecrepancy / wheelRadius;
         setMotor0PowerBehaviors(DcMotorEx.ZeroPowerBehavior.BRAKE);
         setMotorConfiguration(DrivetrainConfig.achieveableMaxRPMFraction, tickPerRev, gearing, maxRPM);

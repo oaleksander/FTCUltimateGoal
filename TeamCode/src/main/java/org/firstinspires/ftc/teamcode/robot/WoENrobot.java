@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.superclasses.Drivetrain;
 import org.firstinspires.ftc.teamcode.superclasses.Odometry;
 import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
+import org.firstinspires.ftc.teamcode.superclasses.WobbleManipulator;
 import org.openftc.revextensions2.ExpansionHubEx;
 
 import java.util.Arrays;
@@ -29,8 +30,8 @@ public class WoENrobot {
     public static Movement movement = new Movement(odometry, drivetrain);
     public static LinearOpMode opMode = null;
     public static boolean robotIsInitialized = false;
-    public static ElapsedTime runTime = new ElapsedTime();
-    protected static RobotModule[] activeRobotModules = {odometry, movement, drivetrain, shooter, wobbleManipulator2, conveyor, telemetryDebugging}; //conveyor, odometry, shooter, wobbleManipulator, drivetrain
+    public static final ElapsedTime runTime = new ElapsedTime();
+    protected static RobotModule[] activeRobotModules = {odometry, movement, drivetrain, shooter, wobbleManipulator, conveyor, telemetryDebugging}; //conveyor, odometry, shooter, wobbleManipulator, drivetrain
     static boolean spinCompleted = false;
     private static ExpansionHubEx expansionHub1 = null;
     private static ExpansionHubEx expansionHub2 = null;
@@ -86,10 +87,7 @@ public class WoENrobot {
             opMode.telemetry.update();
         } else {
             opMode = OpMode;
-            Arrays.stream(activeRobotModules).forEach(robotModule -> {
-                robotModule.initialize(opMode);
-                robotModule.reset();
-            });
+            Arrays.stream(activeRobotModules).forEach(RobotModule::reset);
             if (regulatorUpdater.getState() != Thread.State.NEW) {
                 regulatorUpdater.interrupt();
                 regulatorUpdater = new Thread(updateRegulators);

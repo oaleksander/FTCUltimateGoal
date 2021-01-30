@@ -10,10 +10,11 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.misc.CommandSender;
+import org.firstinspires.ftc.teamcode.superclasses.Conveyor;
 import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
 
 
-public class Conveyor implements RobotModule {
+public class Conveyor1 implements Conveyor {
     private final ElapsedTime conveyorTime = new ElapsedTime();
     private final ElapsedTime backOnTime = new ElapsedTime();
     private final ElapsedTime pauseTime = new ElapsedTime();
@@ -127,21 +128,21 @@ public class Conveyor implements RobotModule {
         }
     }
 
-    public void setBackOnAfter (boolean BackOnAfter) {
+    public void setReverseAfterStop(boolean BackOnAfter) {
         backOnAfter = BackOnAfter;
     }
 
     public void setConveyorPower(double power) {
         conveyorPower = power;
     }
-    public void OFFcolorlock(boolean colorlock){
-        colorLock = colorlock;
+    public void setAutomaticConveyorStopping(boolean doAutomaticConveyorStopping){
+        colorLock = !doAutomaticConveyorStopping;
     }
     private void setConveyorMotorPower(double power) {
         conveyorPowerSender.send(power);
     }
 
-    public void setBackmust(boolean Backmust) {
+    public void setForceReverse(boolean Backmust) {
         backMust = Backmust;
     }
 
