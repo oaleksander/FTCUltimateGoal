@@ -74,7 +74,7 @@ public class rpm implements RobotModule {
     }
 
     private void initializedservo() {
-        feeder = (ExpansionHubServo)opMode.hardwareMap.get(Servo.class, "feeder");
+        feeder = (ExpansionHubServo) opMode.hardwareMap.get(Servo.class, "feeder");
         feeder.setPosition(ShooterConfig.feederClose);
     }
 

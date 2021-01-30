@@ -25,7 +25,7 @@ public class HSVRGB {
             float var_h = H * 6;
             if (var_h == 6)
                 var_h = 0; // H must be < 1
-            int var_i = (int) Math.floor((double) var_h); // Or ... var_i =
+            int var_i = (int) Math.floor(var_h); // Or ... var_i =
             // floor( var_h )
             float var_1 = V * (1 - S);
             float var_2 = V * (1 - S * (var_h - var_i));

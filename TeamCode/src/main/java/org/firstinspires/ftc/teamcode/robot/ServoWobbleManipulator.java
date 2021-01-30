@@ -18,6 +18,7 @@ public class ServoWobbleManipulator implements WobbleManipulator {
         public static double angleMedium = 0.6;
         public static double angleUp = 1;
     }
+
     private ExpansionHubServo close = null;
     private final CommandSender closePositionSender = new CommandSender(p -> close.setPosition(p));
     private ExpansionHubServo angle = null;
@@ -31,8 +32,8 @@ public class ServoWobbleManipulator implements WobbleManipulator {
     }
 
     public void initialize() {
-        close = (ExpansionHubServo)opMode.hardwareMap.get(Servo.class, "wobbleGrabber");
-        angle = (ExpansionHubServo)opMode.hardwareMap.get(Servo.class, "angle");
+        close = (ExpansionHubServo) opMode.hardwareMap.get(Servo.class, "wobbleGrabber");
+        angle = (ExpansionHubServo) opMode.hardwareMap.get(Servo.class, "angle");
         close.setPosition(WobbleServoPositions.gripperClose);
         grabWobble(false);
         angle.setPosition(WobbleServoPositions.angleUp);
@@ -57,7 +58,7 @@ public class ServoWobbleManipulator implements WobbleManipulator {
                 isDown = true;
                 if (posAngle != Position.MEDIUM)
                     setAngle(Position.MEDIUM);
-                    else
+                else
                     setAngle(Position.DOWN);
             }
         } else isDown = false;
@@ -77,6 +78,7 @@ public class ServoWobbleManipulator implements WobbleManipulator {
                 break;
         }
     }
+
     private void setAngleServoPosition(double posa) {
         anglePositionSender.send(posa);
     }

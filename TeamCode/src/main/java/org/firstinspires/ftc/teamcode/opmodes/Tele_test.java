@@ -70,7 +70,7 @@ public class Tele_test extends LinearOpMode {
             if (gamepad1.dpad_right)
                 x += 1;
             movement.humanSetVelocity(x, y, turn);
-            telemetry.addData("y",y);
+            telemetry.addData("y", y);
             spinOnce();
         }
     }

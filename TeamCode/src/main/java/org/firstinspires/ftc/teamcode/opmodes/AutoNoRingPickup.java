@@ -15,9 +15,9 @@ public class AutoNoRingPickup extends AutonomousOpMode {
 
     @Override
     public void main() {
-        movement.Pos(new Pose2D(odometry.getRobotCoordinates().x+10*sideSign, -60, Double.NaN));
+        movement.Pos(new Pose2D(odometry.getRobotCoordinates().x + 10 * sideSign, -60, Double.NaN));
         ShootHighGoal();
-       // delay(3000);
+        // delay(3000);
         MoveWobble();
         Park();
     }

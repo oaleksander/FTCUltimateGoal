@@ -24,16 +24,17 @@ public class Conveyor2 implements Conveyor {
     private DistanceSensor sensorDistance;
     private final ElapsedTime motorCurrentTimer = new ElapsedTime();
     private final ElapsedTime stackDetectionTimer = new ElapsedTime();
+
     @Config
-    static class ConveyorConfig
-    {
-    public static double motorLockingCurrentTimeout = 500;
-    public static double motorLockingReverseTime = 1000;
-    public static double stackDetectionTimeout = 500;
-    public static double stackDetectionReverseTime = 1000;
-    public static double distanceThreshold = 2;
-    public static double currentThreshold = 4;
+    static class ConveyorConfig {
+        public static double motorLockingCurrentTimeout = 500;
+        public static double motorLockingReverseTime = 1000;
+        public static double stackDetectionTimeout = 500;
+        public static double stackDetectionReverseTime = 1000;
+        public static double distanceThreshold = 2;
+        public static double currentThreshold = 4;
     }
+
     private boolean doAutomaticConveyorStopping = true;
     private boolean doReverseOnStop = true;
 
@@ -112,7 +113,7 @@ public class Conveyor2 implements Conveyor {
                 }
             if ((stackDetectionTimer.milliseconds() > ConveyorConfig.stackDetectionTimeout || (doReverseOnStop && requestedPower == 0)) && doAutomaticConveyorStopping) { //reverse+stop in case of ring detection
                 motorCurrentTimer.reset();
-                currentMotorPower = stackDetectionTimer.milliseconds() < ConveyorConfig.stackDetectionTimeout + ConveyorConfig.stackDetectionReverseTime && doReverseOnStop?-1:0;
+                currentMotorPower = stackDetectionTimer.milliseconds() < ConveyorConfig.stackDetectionTimeout + ConveyorConfig.stackDetectionReverseTime && doReverseOnStop ? -1 : 0;
             } else if (motorCurrentTimer.milliseconds() > ConveyorConfig.motorLockingCurrentTimeout) //reverse after locking
             {
                 if (motorCurrentTimer.milliseconds() < ConveyorConfig.motorLockingReverseTime + ConveyorConfig.motorLockingCurrentTimeout) {

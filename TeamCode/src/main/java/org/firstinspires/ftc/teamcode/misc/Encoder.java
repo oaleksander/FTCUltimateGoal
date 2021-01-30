@@ -22,7 +22,7 @@ public class Encoder {
         FORWARD(1),
         REVERSE(-1);
 
-        private int multiplier;
+        private final int multiplier;
 
         Direction(int multiplier) {
             this.multiplier = multiplier;
@@ -33,8 +33,8 @@ public class Encoder {
         }
     }
 
-    private DcMotorEx motor;
-    private ElapsedTime clock;
+    private final DcMotorEx motor;
+    private final ElapsedTime clock;
 
     private Direction direction;
 
@@ -59,6 +59,7 @@ public class Encoder {
 
     /**
      * Allows you to set the direction of the counts and velocity without modifying the motor's direction state
+     *
      * @param direction either reverse or forward depending on if encoder counts should be negated
      */
     public void setDirection(Direction direction) {

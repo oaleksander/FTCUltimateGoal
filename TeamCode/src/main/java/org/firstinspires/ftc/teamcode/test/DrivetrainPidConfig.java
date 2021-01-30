@@ -36,7 +36,6 @@ public class DrivetrainPidConfig extends LinearOpMode {
     DcMotorEx driveRearRight = null;
 
 
-
     public void setPIDFCoefficients(PIDFCoefficients pidfCoefficients) {
         driveFrontLeft.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoefficients);
         driveFrontRight.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoefficients);
@@ -91,6 +90,7 @@ public class DrivetrainPidConfig extends LinearOpMode {
         setMotorConfiguration(driveRearLeft, achieveableMaxRPMFraction, tickPerRev, gearing, maxRPM);
         setMotorConfiguration(driveRearRight, achieveableMaxRPMFraction, tickPerRev, gearing, maxRPM);
     }
+
     private void setMotorConfiguration(@NotNull DcMotorEx dcMotor, double achieveableMaxRPMFraction, double tickPerRev, double gearing, double maxRPM) {
         MotorConfigurationType motorConfigurationType = dcMotor.getMotorType().clone();
         motorConfigurationType.setAchieveableMaxRPMFraction(achieveableMaxRPMFraction);
@@ -110,9 +110,9 @@ public class DrivetrainPidConfig extends LinearOpMode {
     private static final double theoreticalMaxSpeed = (maxRPM / 60) * Math.PI * 2;
     private static double maxMotorSpeed = Constants.achieveableMaxRPMFraction * theoreticalMaxSpeed;
     private static double minMotorSpeed = Constants.achieveableMinRPMFraction * theoreticalMaxSpeed;
+
     @Config
-    public static class Constants
-    {
+    public static class Constants {
         public static double achieveableMaxRPMFraction = 0.9;
         public static double achieveableMinRPMFraction = 0.05;
         public static double strafingMultiplier = 1 / 0.8;
@@ -138,6 +138,7 @@ public class DrivetrainPidConfig extends LinearOpMode {
     static ThreeWheelOdometry odometry = new ThreeWheelOdometry();
     FtcDashboard dashboard;
     List<LynxModule> allHubs;
+
     @Override
     public void runOpMode() throws InterruptedException {
         waitForStart();
@@ -173,7 +174,7 @@ public class DrivetrainPidConfig extends LinearOpMode {
         while (opModeIsActive()) {
             for (LynxModule module : allHubs)
                 module.clearBulkCache();
-           // odometry.update();
+            // odometry.update();
             Vector3D targetVelocity = new Vector3D(gamepad1.left_stick_x, -gamepad1.left_stick_y, gamepad1.right_stick_x)
                     .multiply(getMaxVelocity());
             if (sineResetter.isTriggered(gamepad1.b))
@@ -192,7 +193,7 @@ public class DrivetrainPidConfig extends LinearOpMode {
             mFRProfiler.setVelocity(powerFrontRight);
             mRLProfiler.setVelocity(powerRearLeft);
             mRRProfiler.setVelocity(powerRearRight);
-            Vector3D wheelVelocity = calculateEncoderDelta(driveFrontLeft.getVelocity(AngleUnit.RADIANS),driveFrontRight.getVelocity(AngleUnit.RADIANS),driveRearLeft.getVelocity(AngleUnit.RADIANS),driveRearRight.getVelocity(AngleUnit.RADIANS));
+            Vector3D wheelVelocity = calculateEncoderDelta(driveFrontLeft.getVelocity(AngleUnit.RADIANS), driveFrontRight.getVelocity(AngleUnit.RADIANS), driveRearLeft.getVelocity(AngleUnit.RADIANS), driveRearRight.getVelocity(AngleUnit.RADIANS));
             telemetry.addData("wheelX", wheelVelocity.x);
             telemetry.addData("wheelY", wheelVelocity.y);
             telemetry.addData("wheelZ", wheelVelocity.z);
@@ -212,9 +213,8 @@ public class DrivetrainPidConfig extends LinearOpMode {
         }
     }
 
-    public Vector3D calculateEncoderDelta(double frontLeft, double frontRight, double rearLeft, double rearRight)
-    {
-        return new Vector3D((frontLeft-frontRight-rearLeft-frontRight)/(4*sidewaysMultiplier),(frontLeft+frontRight+rearLeft+rearRight)/(4*forwardMultiplier),(frontLeft-frontRight+rearLeft-rearRight)/(4*turnMultiplier));
+    public Vector3D calculateEncoderDelta(double frontLeft, double frontRight, double rearLeft, double rearRight) {
+        return new Vector3D((frontLeft - frontRight - rearLeft - frontRight) / (4 * sidewaysMultiplier), (frontLeft + frontRight + rearLeft + rearRight) / (4 * forwardMultiplier), (frontLeft - frontRight + rearLeft - rearRight) / (4 * turnMultiplier));
     }
 
 }

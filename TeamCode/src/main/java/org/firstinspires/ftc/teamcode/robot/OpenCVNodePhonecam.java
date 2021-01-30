@@ -13,7 +13,7 @@ public class OpenCVNodePhonecam extends OpenCVNodeWebcam {
             webcam = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
             webcam.setPipeline(pipeline);
             webcam.openCameraDeviceAsync(() -> webcam.startStreaming(rows, cols, OpenCvCameraRotation.SIDEWAYS_LEFT));
-        }catch (Exception e) {
+        } catch (Exception e) {
             opMode.telemetry.addData("OpenCVNode Error", e.getMessage());
         }
     }

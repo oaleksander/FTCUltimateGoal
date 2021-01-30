@@ -22,7 +22,7 @@ public class Tele_competition extends LinearOpMode {
     public void runOpMode() {
         initRobot(this);
         startRobot();
-      //  conveyor.setBackOnAfter(true);
+        //  conveyor.setBackOnAfter(true);
         ButtonSwitch buttonAswitch = new ButtonSwitch();
         ButtonSwitch buttonBackswitch = new ButtonSwitch();
         ButtonSwitch shooterSpeedSwitch = new ButtonSwitch();
@@ -35,11 +35,11 @@ public class Tele_competition extends LinearOpMode {
 
         //shooter.setShootersetings(3800, 500);
         while (opModeIsActive()) {
-           if (gamepad2.left_bumper) {
+            if (gamepad2.left_bumper) {
                 MovementMacros.ShootHighGoalAsync();
                 //   wobbleManipulator2.offAngle();
             }
-            if(!movement.pathFollowerIsActive()) {
+            if (!movement.pathFollowerIsActive()) {
                 wobbleManipulator.grabWobble(buttonAswitch.isTriggered(gamepad2.right_bumper));
                 wobbleManipulator.upmediumdown(gamepad2.b, gamepad2.x); // correct
                 conveyor.setConveyorPower(buttonBackswitch.isTriggered(gamepad2.left_trigger > 0.5) ? 1 : 0);
@@ -49,7 +49,7 @@ public class Tele_competition extends LinearOpMode {
                                 : rpm.ShooterMode.HIGHGOAL
                         : rpm.ShooterMode.OFF);
                 conveyor.setForceReverse(gamepad2.right_trigger > 0.5);
-              //  conveyor.OFFcolorlock(gamepad2.left_bumper);
+                //  conveyor.OFFcolorlock(gamepad2.left_bumper);
                 //   powerconveyor = (buttonspeedConveyor.isTriggered(gamepad2.right_bumper)?-1:1);
                 if (gamepad1.x) {
                     ShootPOWERSHOTAngle();
@@ -59,24 +59,24 @@ public class Tele_competition extends LinearOpMode {
                 if (threeRingPresser.isTriggered(gamepad1.right_stick_button))
                     shooter.feedRings();
             }
-                double turn = 0;
-                double y;
-                double x;
-                if (gamepad1.left_bumper) turn -= 0.25;
-                else turn -= gamepad1.left_trigger;
-                if (gamepad1.right_bumper) turn += 0.25;
-                else turn += gamepad1.right_trigger;
-                //  turn +=gamepad1.right_stick_x;
-                y = -gamepad1.left_stick_y;
-                x = gamepad1.left_stick_x;
-                if (gamepad1.dpad_up)
-                    y += 1;
-                if (gamepad1.dpad_down)
-                    y = -1;
-                if (gamepad1.dpad_left)
-                    x = -1;
-                if (gamepad1.dpad_right)
-                    x += 1;
+            double turn = 0;
+            double y;
+            double x;
+            if (gamepad1.left_bumper) turn -= 0.25;
+            else turn -= gamepad1.left_trigger;
+            if (gamepad1.right_bumper) turn += 0.25;
+            else turn += gamepad1.right_trigger;
+            //  turn +=gamepad1.right_stick_x;
+            y = -gamepad1.left_stick_y;
+            x = gamepad1.left_stick_x;
+            if (gamepad1.dpad_up)
+                y += 1;
+            if (gamepad1.dpad_down)
+                y = -1;
+            if (gamepad1.dpad_left)
+                x = -1;
+            if (gamepad1.dpad_right)
+                x += 1;
 
             movement.humanSetVelocity(x, y, turn);
             spinOnce();

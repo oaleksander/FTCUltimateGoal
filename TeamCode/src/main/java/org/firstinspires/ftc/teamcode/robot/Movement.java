@@ -33,6 +33,7 @@ public class Movement implements RobotModule {
         public static double minLinearVelocityFraction = 0.085;
         public static double minAngleVelocityFraction = 0.085;
     }
+
     private double maxLinearVelocityFraction = 1;
     private double maxAngleVelocityFraction = 1;
     private static final double minError_distance_default = 1;
@@ -52,6 +53,7 @@ public class Movement implements RobotModule {
     private LinearOpMode opMode = null;
     private Thread actionOnCompletionExecutor = new Thread();
     private final ElapsedTime pathFollowingTimer = new ElapsedTime();
+
     public Movement(Odometry Odometry, Drivetrain Drivetrain) {
         odometry = Odometry;
         drivetrain = Drivetrain;
@@ -114,13 +116,11 @@ public class Movement implements RobotModule {
                 }
             }
         } else if (requestedVelocityPercent.radius() > 0.005) {
-            if(pathFollowerIsActive()) stopPathFollowing();
+            if (pathFollowerIsActive()) stopPathFollowing();
             drivetrain.setRobotVelocity(requestedVelocityPercent.multiply(drivetrain.getMaxVelocity()));
-        }
+        } else if (pathToFollow.size() > 0 && doActiveBraking)
+            moveLinear(pathToFollow.get(pathToFollow.size() - 1));
         else
-            if(pathToFollow.size()>0 && doActiveBraking)
-                moveLinear(pathToFollow.get(pathToFollow.size()-1));
-            else
             drivetrain.setRobotVelocity(0, 0, 0);
     }
 
@@ -141,19 +141,19 @@ public class Movement implements RobotModule {
      */
 
     public void Pos(Pose2D target) {
-        Pos(target,1,1);
+        Pos(target, 1, 1);
     }
 
     /**
      * Legacy synchronous go-to-point (with custom speeds)
      *
-     * @param target Point to approach
-     * @param linearVelocityFraction Array of points (motion tasks)
+     * @param target                  Point to approach
+     * @param linearVelocityFraction  Array of points (motion tasks)
      * @param angularVelocityFraction Array of points (motion tasks)
      */
 
     public void Pos(Pose2D target, double linearVelocityFraction, double angularVelocityFraction) {
-        followPath(new MotionTask(target),linearVelocityFraction,angularVelocityFraction, minError_distance_default, minError_angle_default);
+        followPath(new MotionTask(target), linearVelocityFraction, angularVelocityFraction, minError_distance_default, minError_angle_default);
         while (pathFollowerIsActive() && opMode.opModeIsActive()) {
             Thread.yield();
         }
@@ -162,15 +162,15 @@ public class Movement implements RobotModule {
     /**
      * Legacy synchronous go-to-point (with custom speeds and tolerances)
      *
-     * @param target Point to approach
-     * @param linearVelocityFraction Array of points (motion tasks)
+     * @param target                  Point to approach
+     * @param linearVelocityFraction  Array of points (motion tasks)
      * @param angularVelocityFraction Array of points (motion tasks)
-     * @param distanceTolerance Minimum distance error
-     * @param angularTolerance Minimum angular error
+     * @param distanceTolerance       Minimum distance error
+     * @param angularTolerance        Minimum angular error
      */
 
     public void Pos(Pose2D target, double linearVelocityFraction, double angularVelocityFraction, double distanceTolerance, double angularTolerance) {
-        followPath(new MotionTask(target),linearVelocityFraction,angularVelocityFraction, distanceTolerance, angularTolerance);
+        followPath(new MotionTask(target), linearVelocityFraction, angularVelocityFraction, distanceTolerance, angularTolerance);
         while (pathFollowerIsActive() && opMode.opModeIsActive()) {
             Thread.yield();
         }
@@ -182,23 +182,22 @@ public class Movement implements RobotModule {
      * @param motionTask Points (motion tasks)
      */
 
-    public void followPath(MotionTask motionTask)
-    {
+    public void followPath(MotionTask motionTask) {
         followPath(motionTask, 1, 1, minError_distance_default, minError_angle_default);
     }
 
     /**
      * Give path follower a task to go to point (with custom speeds and tolerances)
      *
-     * @param motionTask Points (motion tasks)
-     * @param linearVelocityFraction Array of points (motion tasks)
+     * @param motionTask              Points (motion tasks)
+     * @param linearVelocityFraction  Array of points (motion tasks)
      * @param angularVelocityFraction Array of points (motion tasks)
-     * @param distanceTolerance Minimum distance error
-     * @param angularTolerance Minimum angular error
+     * @param distanceTolerance       Minimum distance error
+     * @param angularTolerance        Minimum angular error
      */
 
     public void followPath(MotionTask motionTask, double linearVelocityFraction, double angularVelocityFraction, double distanceTolerance, double angularTolerance) {
-        followPath(new ArrayList<>(Arrays.asList(motionTask)), linearVelocityFraction, angularVelocityFraction,distanceTolerance,angularTolerance);
+        followPath(new ArrayList<>(Arrays.asList(motionTask)), linearVelocityFraction, angularVelocityFraction, distanceTolerance, angularTolerance);
     }
 
     /**
@@ -207,19 +206,18 @@ public class Movement implements RobotModule {
      * @param pathToFollow Array of points (motion tasks)
      */
 
-    public void followPath(ArrayList<MotionTask> pathToFollow)
-    {
-        followPath(pathToFollow, 1, 1,minError_distance_default,minError_angle_default);
+    public void followPath(ArrayList<MotionTask> pathToFollow) {
+        followPath(pathToFollow, 1, 1, minError_distance_default, minError_angle_default);
     }
 
     /**
      * Give path follower a task to follow an array of points (with custom speeds)
      *
-     * @param pathToFollow Array of points (motion tasks)
-     * @param linearVelocityFraction Array of points (motion tasks)
+     * @param pathToFollow            Array of points (motion tasks)
+     * @param linearVelocityFraction  Array of points (motion tasks)
      * @param angularVelocityFraction Array of points (motion tasks)
-     * @param distanceTolerance Minimum distance error
-     * @param angularTolerance Minimum angular error
+     * @param distanceTolerance       Minimum distance error
+     * @param angularTolerance        Minimum angular error
      */
     public void followPath(ArrayList<MotionTask> pathToFollow, double linearVelocityFraction, double angularVelocityFraction, double distanceTolerance, double angularTolerance) {
         minError_distance_current = distanceTolerance;
@@ -273,10 +271,10 @@ public class Movement implements RobotModule {
     public void approachPosition(Pose2D targetPose, double linearVelocity, double angularVelocity) {
 
 
-        linearVelocity = Range.clip(abs(linearVelocity), drivetrain.getMaxVelocity().y*MovementConfig.minLinearVelocityFraction,
-                drivetrain.getMaxVelocity().y*maxLinearVelocityFraction)*(abs(linearVelocity)>MovementConfig.kP_distance*minError_distance_current*0.5?1:0);
-        angularVelocity = Range.clip(abs(angularVelocity),drivetrain.getMaxVelocity().z*MovementConfig.minAngleVelocityFraction,
-                drivetrain.getMaxVelocity().z*maxAngleVelocityFraction)*(abs(angularVelocity)>MovementConfig.kP_angle*minError_angle_current*0.5?1:0);
+        linearVelocity = Range.clip(abs(linearVelocity), drivetrain.getMaxVelocity().y * MovementConfig.minLinearVelocityFraction,
+                drivetrain.getMaxVelocity().y * maxLinearVelocityFraction) * (abs(linearVelocity) > MovementConfig.kP_distance * minError_distance_current * 0.5 ? 1 : 0);
+        angularVelocity = Range.clip(abs(angularVelocity), drivetrain.getMaxVelocity().z * MovementConfig.minAngleVelocityFraction,
+                drivetrain.getMaxVelocity().z * maxAngleVelocityFraction) * (abs(angularVelocity) > MovementConfig.kP_angle * minError_angle_current * 0.5 ? 1 : 0);
 
 
         Vector2D movementControl = new Vector2D(

@@ -31,7 +31,7 @@ public class ThreeWheelOdometry implements Odometry {
     private static final double odometryCMPerCounts = (odometryWheelDiameterCm * PI) / 1440;
     private static final double odometerXcenterOffset = -21.7562349 * odometryCountsPerCM * cos(toRadians(51.293002));
     private static final double yWheelPairRadiusCm = 18.2425;
-    private static final double radiansPerEncoderDifference = 1.003851129713462*((odometryCMPerCounts) / (yWheelPairRadiusCm * 2));//1.004604437*
+    private static final double radiansPerEncoderDifference = 1.003851129713462 * ((odometryCMPerCounts) / (yWheelPairRadiusCm * 2));//1.004604437*
     public static Pose2D worldPosition = new Pose2D();
     private static double angleOffset = 0;
     private static ExpansionHubEx expansionHub;
@@ -41,7 +41,7 @@ public class ThreeWheelOdometry implements Odometry {
     public static DcMotorEx odometerYR = null;
     public static DcMotorEx odometerX = null;
     private static LinearOpMode opMode = null;
-  //  public RevBulkData bulkData;
+    //  public RevBulkData bulkData;
     private float IMUoffset1 = 0;
     private float IMUoffset2 = 0;
     private double encoderHeadingCovariance = 0;
@@ -60,22 +60,21 @@ public class ThreeWheelOdometry implements Odometry {
     }
 
     private double calculateHeading() {
-        if(false)//IMUAccessTimer.seconds()>1)
+        if (false)//IMUAccessTimer.seconds()>1)
         {
-            double angleDivergence = angleWrap (getEncoderHeading()-angleAverage(getIMUheading_1(),getIMUheading_2()));
-            encoderHeadingCovariance = angleDivergence*(1.0/2.0);
+            double angleDivergence = angleWrap(getEncoderHeading() - angleAverage(getIMUheading_1(), getIMUheading_2()));
+            encoderHeadingCovariance = angleDivergence * (1.0 / 2.0);
             IMUAccessTimer.reset();
         }
         return angleWrap(getEncoderHeading() - angleOffset - encoderHeadingCovariance);
     }
 
-    public double getEncoderHeading()
-    {
-        return getEncoderHeading(odometerYL.getCurrentPosition(),odometerYR.getCurrentPosition());
+    public double getEncoderHeading() {
+        return getEncoderHeading(odometerYL.getCurrentPosition(), odometerYR.getCurrentPosition());
     }
 
     private double getEncoderHeading(double L, double R) {
-        return (double) (L - R) * radiansPerEncoderDifference;
+        return (L - R) * radiansPerEncoderDifference;
     }
 
     private void initIMU() {
@@ -100,12 +99,12 @@ public class ThreeWheelOdometry implements Odometry {
     }
 
     public double getIMUheading_1() {
-            return angleWrap(-imu1.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZXY, AngleUnit.RADIANS).firstAngle - IMUoffset1);
+        return angleWrap(-imu1.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZXY, AngleUnit.RADIANS).firstAngle - IMUoffset1);
     }
+
     public double getIMUheading_2() {
         return angleWrap(-imu2.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZXY, AngleUnit.RADIANS).firstAngle - IMUoffset2);
     }
-
 
 
     public void update() {
@@ -179,7 +178,7 @@ public class ThreeWheelOdometry implements Odometry {
     }
 
     public void setRobotCoordinates(@NotNull Pose2D coordinates) {
-        angleOffset = (double) angleWrap(calculateHeading() + angleOffset - coordinates.heading);
+        angleOffset = angleWrap(calculateHeading() + angleOffset - coordinates.heading);
         this.calculatePosition(new Pose2D(new Vector2D(coordinates.x * odometryCountsPerCM, coordinates.y * odometryCountsPerCM)
                 .add(YWheelPairCenterOffset.scale(odometryCountsPerCM).rotatedCW(worldPosition.heading)), coordinates.heading));
     }
@@ -187,8 +186,8 @@ public class ThreeWheelOdometry implements Odometry {
     public Vector3D getRobotVelocity() {
         double angularVelocity = getEncoderHeading(odometerYL.getVelocity(), odometerYR.getVelocity());
         return new Vector3D(new Vector2D(
-                ((double) odometerX.getVelocity() - angularVelocity * odometerXcenterOffset) * odometryCMPerCounts,
-                (double) (odometerYL.getVelocity() + odometerYR.getVelocity()) * odometryCMPerCounts / 2)
+                (odometerX.getVelocity() - angularVelocity * odometerXcenterOffset) * odometryCMPerCounts,
+                (odometerYL.getVelocity() + odometerYR.getVelocity()) * odometryCMPerCounts / 2)
                 .rotatedCW(worldPosition.heading),
                 angularVelocity);
     }

@@ -30,10 +30,10 @@ public class MecanumDrivetrain implements Drivetrain {
     private static final double forwardMultiplier = 1 / wheelRadius;
     private static double sidewaysMultiplier = forwardMultiplier * DrivetrainConfig.strafingMultiplier;
     private static double turnMultiplier = (wheelCenterOffset.x + wheelCenterOffset.y) * DrivetrainConfig.rotationDecrepancy / wheelRadius;
+
     /* Motor parameters constatnts. */
     @Config
-    static class DrivetrainConfig
-    {
+    static class DrivetrainConfig {
         public static double achieveableMaxRPMFraction = 0.885;
         public static double achieveableMinRPMFraction = 0.045;
         public static double strafingMultiplier = 1.35;
@@ -45,6 +45,7 @@ public class MecanumDrivetrain implements Drivetrain {
         public static double kF = 15.10;
         public static double kF_referenceVoltage = 13;
     }
+
     private static final double tickPerRev = 480;
     private static final double gearing = 20;
     private static final double maxRPM = 300;
@@ -86,7 +87,7 @@ public class MecanumDrivetrain implements Drivetrain {
         setMotor0PowerBehaviors(DcMotorEx.ZeroPowerBehavior.BRAKE);
         setMotorConfiguration(DrivetrainConfig.achieveableMaxRPMFraction, tickPerRev, gearing, maxRPM);
         try {
-            setPIDFCoefficients(new PIDFCoefficients(DrivetrainConfig.kP,DrivetrainConfig.kD,DrivetrainConfig.kI,DrivetrainConfig.kF * DrivetrainConfig.kF_referenceVoltage / opMode.hardwareMap.voltageSensor.iterator().next().getVoltage()));
+            setPIDFCoefficients(new PIDFCoefficients(DrivetrainConfig.kP, DrivetrainConfig.kD, DrivetrainConfig.kI, DrivetrainConfig.kF * DrivetrainConfig.kF_referenceVoltage / opMode.hardwareMap.voltageSensor.iterator().next().getVoltage()));
         } catch (UnsupportedOperationException e) {
             opMode.telemetry.addData("Drivetrain PIDF error ", e.getMessage());
         }

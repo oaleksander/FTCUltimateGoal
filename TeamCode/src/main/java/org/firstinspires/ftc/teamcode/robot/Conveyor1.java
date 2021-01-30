@@ -70,7 +70,7 @@ public class Conveyor1 implements Conveyor {
 
     private double getdistance() {
         //return 10;
-         return sensorDistance.getDistance(DistanceUnit.CM);
+        return sensorDistance.getDistance(DistanceUnit.CM);
     }
 
     public void update() {
@@ -115,9 +115,9 @@ public class Conveyor1 implements Conveyor {
                     if (backOnAfter && BackOnAftertime.milliseconds() < 500)
                         setConveyorMotorPower(-conveyorPower);
                     else {
-                    setConveyorMotorPower(0);
-                    stop = false;
-                    backOn = false;
+                        setConveyorMotorPower(0);
+                        stop = false;
+                        backOn = false;
                     }
                 }
             }
@@ -135,9 +135,11 @@ public class Conveyor1 implements Conveyor {
     public void setConveyorPower(double power) {
         conveyorPower = power;
     }
-    public void setAutomaticConveyorStopping(boolean doAutomaticConveyorStopping){
+
+    public void setAutomaticConveyorStopping(boolean doAutomaticConveyorStopping) {
         colorLock = !doAutomaticConveyorStopping;
     }
+
     private void setConveyorMotorPower(double power) {
         conveyorPowerSender.send(power);
     }

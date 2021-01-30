@@ -17,8 +17,8 @@ public class AutoUniversal extends AutonomousOpMode {
     @Override
     public void main() {
         conveyor.setAutomaticConveyorStopping(true);
-        movement.Pos(new Pose2D(odometry.getRobotCoordinates().x+15*sideSign, -50, Double.NaN),1,1,10,0.1);
-      //  Shooting();
+        movement.Pos(new Pose2D(odometry.getRobotCoordinates().x + 15 * sideSign, -50, Double.NaN), 1, 1, 10, 0.1);
+        //  Shooting();
         ShootPowerShotAngle_experimental();
         MoveWobble();
         PickupRings();

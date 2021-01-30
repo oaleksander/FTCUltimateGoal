@@ -16,11 +16,11 @@ public class AutoTwoWobble extends AutonomousOpMode {
     @Override
     public void main() {
         conveyor.setAutomaticConveyorStopping(true);
-        movement.Pos(new Pose2D(odometry.getRobotCoordinates().x+15*sideSign, -50, Double.NaN),1,1,10,0.1);
+        movement.Pos(new Pose2D(odometry.getRobotCoordinates().x + 15 * sideSign, -50, Double.NaN), 1, 1, 10, 0.1);
         Shooting();
         MoveWobble();
         PickupRings();
-        if(WoENrobot.runTime.seconds()<23) {
+        if (WoENrobot.runTime.seconds() < 23) {
             PickSecondWobble();
             MoveWobble();
         }

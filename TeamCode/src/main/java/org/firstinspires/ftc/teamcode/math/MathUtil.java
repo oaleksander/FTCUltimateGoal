@@ -27,7 +27,7 @@ public class MathUtil {
     }
 
     public static double angleAverage(double angle1, double angle2) {
-        return angleWrap(angle1+angleWrap(angle2-angle1)/2);
+        return angleWrap(angle1 + angleWrap(angle2 - angle1) / 2);
     }
 
     public static double cosFromSin(double sin, double angle) {
