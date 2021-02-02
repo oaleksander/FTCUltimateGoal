@@ -16,7 +16,7 @@ import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
 
 import static java.lang.Math.abs;
 
-@Deprecated
+
 public class Conveyor2 implements Conveyor {
     private LinearOpMode opMode;
     private DcMotorEx conveyor = null;
