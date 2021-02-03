@@ -1,11 +1,11 @@
 package org.firstinspires.ftc.teamcode.robot;
 
-import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.teamcode.math.MathUtil;
 import org.firstinspires.ftc.teamcode.math.Pose2D;
 import org.firstinspires.ftc.teamcode.math.Vector2D;
 import org.firstinspires.ftc.teamcode.math.Vector3D;
@@ -27,11 +27,13 @@ public class Movement implements RobotModule {
     @Config
     static class MovementConfig {
         public static double kP_distance = 3.9;
-        public static double kD_distance = 0;
-        public static double kP_angle = 4.6;
-        public static double kD_angle = 0;
-        public static double minLinearVelocityFraction = 0.085;
-        public static double minAngleVelocityFraction = 0.085;
+        public static double kD_distance = 0.05;
+        public static double kI_distance = 0.5;
+        public static double kP_angle = 3.6;
+        public static double kD_angle = 0.05;
+        public static double kI_angle = 0.5;
+        public static double antiWindupFraction_distance = 0.17;
+        public static double antiWindupFraction_angle = 0.17;
     }
 
     private double maxLinearVelocityFraction = 1;
@@ -49,6 +51,7 @@ public class Movement implements RobotModule {
     boolean doActiveBraking = false;
     Pose2D previousTarget = new Pose2D();
     Pose2D previousError = new Pose2D();
+    Vector3D integralError = new Vector3D();
     Vector3D requestedVelocityPercent = new Vector3D(0, 0, 0);
     private LinearOpMode opMode = null;
     private Thread actionOnCompletionExecutor = new Thread();
@@ -91,8 +94,9 @@ public class Movement implements RobotModule {
         bPathFollowerEnabled = false;
         bPathFollowingFinished = false;
         doActiveBraking = false;
+        pathToFollow = new ArrayList<>();
     }
-
+// * 1.5
     public void update() {
         if (opMode.gamepad1.y) stopPathFollowing();
         bPathFollowingFinished = nTargetPoint >= pathToFollow.size();
@@ -102,7 +106,7 @@ public class Movement implements RobotModule {
             else {
                 Pose2D currentTarget = removeNaN(pathToFollow.get(nTargetPoint));
                 Pose2D previousTarget = removeNaN(pathToFollow.get(nTargetPoint - 1));
-                if (movement.movePurePursuit(previousTarget, currentTarget, 45.72 * 1.5)) {
+                if (movement.movePurePursuit(previousTarget, currentTarget, 45.72)) {
                     if (movement.moveLinear(currentTarget)) {
                         pathFollowingTimer.reset();
                         if (actionOnCompletionExecutor.getState() == Thread.State.NEW)
@@ -249,7 +253,7 @@ public class Movement implements RobotModule {
     }
 
     public void setMinLinearVelocityFraction(double minLinearVelocityFraction) {
-        MovementConfig.minLinearVelocityFraction = minLinearVelocityFraction;
+        MovementConfig.antiWindupFraction_distance = minLinearVelocityFraction;
     }
 
     public void setMaxAngleVelocityFraction(double maxAngleVelocityFraction) {
@@ -257,7 +261,7 @@ public class Movement implements RobotModule {
     }
 
     public void setMinAngleVelocityFraction(double minAngleVelocityFraction) {
-        MovementConfig.minAngleVelocityFraction = minAngleVelocityFraction;
+        MovementConfig.antiWindupFraction_angle = minAngleVelocityFraction;
     }
 
     /**
@@ -271,10 +275,10 @@ public class Movement implements RobotModule {
     public void approachPosition(Pose2D targetPose, double linearVelocity, double angularVelocity) {
 
 
-        linearVelocity = Range.clip(abs(linearVelocity), drivetrain.getMaxVelocity().y * MovementConfig.minLinearVelocityFraction,
-                drivetrain.getMaxVelocity().y * maxLinearVelocityFraction) * (abs(linearVelocity) > MovementConfig.kP_distance * minError_distance_current * 0.5 ? 1 : 0);
-        angularVelocity = Range.clip(abs(angularVelocity), drivetrain.getMaxVelocity().z * MovementConfig.minAngleVelocityFraction,
-                drivetrain.getMaxVelocity().z * maxAngleVelocityFraction) * (abs(angularVelocity) > MovementConfig.kP_angle * minError_angle_current * 0.5 ? 1 : 0);
+        linearVelocity = Range.clip(abs(linearVelocity), 0,
+                drivetrain.getMaxVelocity().y * maxLinearVelocityFraction);
+        angularVelocity = Range.clip(abs(angularVelocity), 0,
+                drivetrain.getMaxVelocity().z * maxAngleVelocityFraction);
 
 
         Vector2D movementControl = new Vector2D(
@@ -286,6 +290,8 @@ public class Movement implements RobotModule {
 
         holonomicMoveFC(control);
     }
+
+    private final ElapsedTime moveControllerTimer = new ElapsedTime();
 
     /**
      * Move to point Linearly
@@ -301,17 +307,23 @@ public class Movement implements RobotModule {
         Vector3D diffError = new Vector3D(0, 0, 0);
         if (target.equals(previousTarget)) {
             Pose2D deltaError = error.substract(previousError);
+            integralError = integralError.add(new Vector3D((error.x+previousError.x)*0.5,(error.y+previousError.y)*0.5, MathUtil.angleAverage(error.heading,previousError.heading)).scale(moveControllerTimer.seconds()));
+            integralError = new Vector3D(Range.clip(abs(integralError.x),0,MovementConfig.antiWindupFraction_distance*drivetrain.getMaxVelocity().x)*signum(integralError.x),
+                    Range.clip(abs(integralError.y),0,MovementConfig.antiWindupFraction_distance*drivetrain.getMaxVelocity().y)*signum(integralError.y),
+                    Range.clip(abs(integralError.z),0,MovementConfig.antiWindupFraction_angle*drivetrain.getMaxVelocity().z)*signum(integralError.z));
 
             Vector3D currentVelocity = odometry.getRobotVelocity();
-            diffError = new Vector3D(currentVelocity.x * signum(deltaError.x),
-                    currentVelocity.y * signum(deltaError.y),
-                    currentVelocity.z * signum(deltaError.heading));
-        }
+            diffError = new Vector3D(abs(currentVelocity.x) * (signum(error.x)+signum(previousError.x))/2,
+                    abs(currentVelocity.y) * (signum(error.y)+signum(previousError.y))/2,
+                    abs(currentVelocity.z) * (signum(error.heading)+signum(previousError.heading))/2);
+        } else
+            integralError = new Vector3D();
+        moveControllerTimer.reset();
 
         previousError = error;
         previousTarget = target;
-        approachPosition(error, error.radius() * MovementConfig.kP_distance + ((Vector2D) diffError).radius() * MovementConfig.kD_distance,
-                error.heading * MovementConfig.kP_angle + diffError.z * MovementConfig.kD_angle);
+        approachPosition(error, error.radius() * MovementConfig.kP_distance + ((Vector2D) diffError).radius() * MovementConfig.kD_distance + ((Vector2D) integralError).radius() * MovementConfig.kI_distance,
+                error.heading * MovementConfig.kP_angle + diffError.z * MovementConfig.kD_angle + integralError.z * MovementConfig.kI_angle);
         return !(abs(error.heading) >= minError_angle_current) && !(error.radius() >= minError_distance_current);
         //drivetrain.setRobotVelocity(0, 0, 0);
     }
@@ -335,9 +347,8 @@ public class Movement implements RobotModule {
      * @param lookaheadRadius Pure pursuit lookahead radius
      * @return If robotPosition is within lookahead radius of the target
      */
-    public boolean movePurePursuit(Vector2D originPoint, Vector2D targetPoint, double lookaheadRadius) {
+    public boolean movePurePursuit(Vector2D originPoint, Pose2D targetPoint, double lookaheadRadius) {
         //   ComputerDebugging.sendLine(new FloatPoint(originPoint.x + 356.0 / 2, originPoint.y + 356.0 / 2), new FloatPoint(targetPoint.x + 356.0 / 2, targetPoint.y + 356.0 / 2));
-
         Pose2D robotPosition = odometry.getRobotCoordinates();
         if (originPoint.x == targetPoint.x && originPoint.y == targetPoint.y)
             return true;
@@ -352,16 +363,18 @@ public class Movement implements RobotModule {
                 (a * (-b * robotPosition.x + a * robotPosition.y) - b * c) / (a * a + b * b)
         ).add(new Vector2D(0, lookaheadRadius).rotatedCW(angle));
 
-        if (abs(angleWrap(angle - robotPosition.heading)) > Math.PI / 2) {
-            angle += Math.PI;
+
+        if (abs(angleWrap(angle - (originPoint.minus(robotPosition).radius()>lookaheadRadius?targetPoint.heading:robotPosition.heading))) > Math.PI / 2) {
+            angle = angleWrap(angle+Math.PI);
         }
 
         //  ComputerDebugging.sendKeyPoint(new FloatPoint(lookAheadPoint.x + 356.0 / 2, lookAheadPoint.y + 356.0 / 2));
 
-        Pose2D error = getError(new Pose2D(lookAheadPoint, lookAheadPoint.minus(robotPosition).acot()));
-        if (abs(angleWrap(error.heading)) > Math.PI / 2) {
-            error.heading = angleWrap(error.heading + Math.PI);
-        }
+      //  Pose2D error = getError(new Pose2D(lookAheadPoint, lookAheadPoint.minus(robotPosition).acot()));
+        Pose2D error = getError(new Pose2D(lookAheadPoint, angle));
+       // if (abs(angleWrap(error.heading)) > Math.PI / 2) {
+       //     error.heading = angleWrap(error.heading + Math.PI);
+       // }
         if (targetPoint.minus(originPoint).radius() <= lookAheadPoint.minus(originPoint).radius()) {
             error = getError(new Pose2D(targetPoint, angle));
             if (error.radius() < lookaheadRadius)
