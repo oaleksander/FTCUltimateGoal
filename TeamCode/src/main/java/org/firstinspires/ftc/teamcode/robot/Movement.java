@@ -27,13 +27,13 @@ public class Movement implements RobotModule {
     @Config
     static class MovementConfig {
         public static double kP_distance = 3.9;
-        public static double kD_distance = 0;
-        public static double kI_distance = 0;
-        public static double kP_angle = 4.6;
-        public static double kD_angle = 0;
-        public static double kI_angle = 0;
-        public static double antiWindupFraction_distance = 0.25;
-        public static double antiWindupFraction_angle = 0.25;
+        public static double kD_distance = 0.05;
+        public static double kI_distance = 0.5;
+        public static double kP_angle = 3.6;
+        public static double kD_angle = 0.05;
+        public static double kI_angle = 0.5;
+        public static double antiWindupFraction_distance = 0.17;
+        public static double antiWindupFraction_angle = 0.17;
     }
 
     private double maxLinearVelocityFraction = 1;
@@ -94,8 +94,9 @@ public class Movement implements RobotModule {
         bPathFollowerEnabled = false;
         bPathFollowingFinished = false;
         doActiveBraking = false;
+        pathToFollow = new ArrayList<>();
     }
-
+// * 1.5
     public void update() {
         if (opMode.gamepad1.y) stopPathFollowing();
         bPathFollowingFinished = nTargetPoint >= pathToFollow.size();
@@ -105,7 +106,7 @@ public class Movement implements RobotModule {
             else {
                 Pose2D currentTarget = removeNaN(pathToFollow.get(nTargetPoint));
                 Pose2D previousTarget = removeNaN(pathToFollow.get(nTargetPoint - 1));
-                if (movement.movePurePursuit(previousTarget, currentTarget, 45.72 * 1.5)) {
+                if (movement.movePurePursuit(previousTarget, currentTarget, 45.72)) {
                     if (movement.moveLinear(currentTarget)) {
                         pathFollowingTimer.reset();
                         if (actionOnCompletionExecutor.getState() == Thread.State.NEW)
@@ -346,9 +347,8 @@ public class Movement implements RobotModule {
      * @param lookaheadRadius Pure pursuit lookahead radius
      * @return If robotPosition is within lookahead radius of the target
      */
-    public boolean movePurePursuit(Vector2D originPoint, Vector2D targetPoint, double lookaheadRadius) {
+    public boolean movePurePursuit(Vector2D originPoint, Pose2D targetPoint, double lookaheadRadius) {
         //   ComputerDebugging.sendLine(new FloatPoint(originPoint.x + 356.0 / 2, originPoint.y + 356.0 / 2), new FloatPoint(targetPoint.x + 356.0 / 2, targetPoint.y + 356.0 / 2));
-
         Pose2D robotPosition = odometry.getRobotCoordinates();
         if (originPoint.x == targetPoint.x && originPoint.y == targetPoint.y)
             return true;
@@ -363,16 +363,18 @@ public class Movement implements RobotModule {
                 (a * (-b * robotPosition.x + a * robotPosition.y) - b * c) / (a * a + b * b)
         ).add(new Vector2D(0, lookaheadRadius).rotatedCW(angle));
 
-        if (abs(angleWrap(angle - robotPosition.heading)) > Math.PI / 2) {
-            angle += Math.PI;
+
+        if (abs(angleWrap(angle - (originPoint.minus(robotPosition).radius()>lookaheadRadius?targetPoint.heading:robotPosition.heading))) > Math.PI / 2) {
+            angle = angleWrap(angle+Math.PI);
         }
 
         //  ComputerDebugging.sendKeyPoint(new FloatPoint(lookAheadPoint.x + 356.0 / 2, lookAheadPoint.y + 356.0 / 2));
 
-        Pose2D error = getError(new Pose2D(lookAheadPoint, lookAheadPoint.minus(robotPosition).acot()));
-        if (abs(angleWrap(error.heading)) > Math.PI / 2) {
-            error.heading = angleWrap(error.heading + Math.PI);
-        }
+      //  Pose2D error = getError(new Pose2D(lookAheadPoint, lookAheadPoint.minus(robotPosition).acot()));
+        Pose2D error = getError(new Pose2D(lookAheadPoint, angle));
+       // if (abs(angleWrap(error.heading)) > Math.PI / 2) {
+       //     error.heading = angleWrap(error.heading + Math.PI);
+       // }
         if (targetPoint.minus(originPoint).radius() <= lookAheadPoint.minus(originPoint).radius()) {
             error = getError(new Pose2D(targetPoint, angle));
             if (error.radius() < lookaheadRadius)

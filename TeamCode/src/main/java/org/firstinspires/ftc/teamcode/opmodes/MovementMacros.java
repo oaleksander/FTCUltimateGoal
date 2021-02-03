@@ -143,7 +143,7 @@ public class MovementMacros {
         wobbleManipulator.setAngle(WobbleManipulator.Position.MEDIUM);
         Vector2D wobblePose = getPartnerWobblePose();
         Vector2D error = movement.getError(new Pose2D(wobblePose, Double.NaN));
-        movement.Pos(new Pose2D(Double.NaN, Double.NaN, error.acot()), 1, 1, 1, toRadians(45));
+        movement.Pos(new Pose2D(Double.NaN, Double.NaN, error.acot()), 1, 1, 1, toRadians(75));
         movement.followPath(new MotionTask(wobblePose.minus(new Vector2D(0, wobblePlacementOffset.radius()).rotatedCW(error.acot())), error.acot() - wobblePlacementOffset.acot()), 1, 1, 1.5, toRadians(1));
         while (movement.pathFollowerIsActive() && getOpMode().opModeIsActive()) {
             if (movement.getError(new Pose2D(wobblePose, Double.NaN)).radius() < 75)
