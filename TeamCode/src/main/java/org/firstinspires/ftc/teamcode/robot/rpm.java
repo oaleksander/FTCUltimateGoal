@@ -18,19 +18,19 @@ public class rpm implements RobotModule {
 
 
     @Config
-    static class ShooterConfig {
-        public static final double servoTime = 137;
-        public static final double servoReturnMultiplier = 2.6;
-        public static final double lowRpm = 3470;
-        public static final double highRpm = 4600;
-        public static final double timeRpm = 150;
-        public static final double feederClose = 0.0735;
-        public static final double feederOpen = 0.35;
-        public static double kP = 36;
-        public static double kI = 0.03;
-        public static double kD = 7;
-        public static double kF = 14.8;
-        public static double kF_referenceVoltage = 13;
+    public static class ShooterConfig {
+        public static double servoTime = 137;
+        public static double servoReturnMultiplier = 2.6;
+        public static double lowRpm = 3470;
+        public static double highRpm = 4000;
+        public static double timeRpm = 150;
+        public static double feederClose = 0.0735;
+        public static double feederOpen = 0.35;
+        public static double kP = 58;
+        public static double kI = 0.001;//0.03
+        public static double kD = 0.05;
+        public static double kF = 14.89;
+        public static double kF_referenceVoltage = 12.485;
     }
 
     private LinearOpMode opMode;

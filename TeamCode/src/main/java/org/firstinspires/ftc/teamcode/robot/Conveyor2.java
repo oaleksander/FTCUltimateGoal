@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.misc.CommandSender;
+import org.firstinspires.ftc.teamcode.misc.motorAccelerationLimiter;
 import org.firstinspires.ftc.teamcode.superclasses.Conveyor;
 import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
 
@@ -20,19 +21,19 @@ import static java.lang.Math.abs;
 public class Conveyor2 implements Conveyor {
     private LinearOpMode opMode;
     private DcMotorEx conveyor = null;
-    private final CommandSender conveyorPowerSender = new CommandSender(p -> conveyor.setPower(-p));
+    private final motorAccelerationLimiter conveyorPowerSender = new motorAccelerationLimiter(new CommandSender(p -> conveyor.setPower(-p))::send,6);
     private DistanceSensor sensorDistance;
     private final ElapsedTime motorCurrentTimer = new ElapsedTime();
     private final ElapsedTime stackDetectionTimer = new ElapsedTime();
 
     @Config
     static class ConveyorConfig {
-        public static double motorLockingCurrentTimeout = 500;
-        public static double motorLockingReverseTime = 1000;
+        public static double motorLockingCurrentTimeout = 750;
+        public static double motorLockingReverseTime = 750;
         public static double stackDetectionTimeout = 500;
-        public static double stackDetectionReverseTime = 1000;
-        public static double distanceThreshold = 2;
-        public static double currentThreshold = 4;
+        public static double stackDetectionReverseTime = 750;
+        public static double distanceThreshold = -5.6;
+        public static double currentThreshold = 3;
     }
 
     private boolean doAutomaticConveyorStopping = true;
@@ -60,7 +61,8 @@ public class Conveyor2 implements Conveyor {
     private double currentMotorPower = 0;
 
     public void setConveyorPower(double requestedPower) {
-        motorCurrentTimer.reset();
+        if(this.requestedPower!= requestedPower)
+            motorCurrentTimer.reset();
         this.requestedPower = requestedPower;
     }
 
@@ -122,14 +124,14 @@ public class Conveyor2 implements Conveyor {
                     motorCurrentTimer.reset();
             } else {
                 currentMotorPower = +requestedPower;
-                if (getAMPS() < ConveyorConfig.currentThreshold) { //locking detection
+                if (getAMPS() < ConveyorConfig.currentThreshold)  //locking detection
                     motorCurrentTimer.reset();
-                }
             }
         } else {
             currentMotorPower = -1;
             motorCurrentTimer.reset();
         }
-        conveyorPowerSender.send(currentMotorPower);
+        conveyorPowerSender.setVelocity(currentMotorPower);
+
     }
 }
