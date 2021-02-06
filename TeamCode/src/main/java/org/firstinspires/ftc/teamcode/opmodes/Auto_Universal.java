@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
-import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.math.Pose2D;
@@ -12,7 +11,7 @@ import static org.firstinspires.ftc.teamcode.robot.WoENrobot.movement;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.odometry;
 
 @Autonomous
-public class AutoUniversal extends AutonomousOpMode {
+public class Auto_Universal extends AutoOpMode {
 
     @Override
     public void main() {

@@ -2,10 +2,8 @@ package org.firstinspires.ftc.teamcode.opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-import org.firstinspires.ftc.teamcode.misc.AutoTransitioner;
-
 @Autonomous
-public class AutoNothing extends AutonomousOpMode {
+public class Auto_Nothing extends AutoOpMode {
 
     @Override
     public void main() {

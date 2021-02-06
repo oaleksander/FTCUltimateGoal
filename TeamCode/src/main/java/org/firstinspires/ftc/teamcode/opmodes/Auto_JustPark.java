@@ -3,12 +3,11 @@ package org.firstinspires.ftc.teamcode.opmodes;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.math.Pose2D;
-import org.firstinspires.ftc.teamcode.misc.AutoTransitioner;
 
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.movement;
 
 @Autonomous
-public class AutoPark extends AutonomousOpMode {
+public class Auto_JustPark extends AutoOpMode {
 
     @Override
     public void main() {

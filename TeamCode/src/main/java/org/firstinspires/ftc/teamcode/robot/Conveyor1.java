@@ -46,7 +46,7 @@ public class Conveyor1 implements Conveyor {
         initializedrive();
     }
 
-    public void reset() {
+    public void start() {
 
         conveyorm.setPower(0);
         backOn = false;

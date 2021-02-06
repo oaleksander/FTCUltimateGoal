@@ -11,7 +11,7 @@ import static org.firstinspires.ftc.teamcode.robot.WoENrobot.movement;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.odometry;
 
 @Autonomous
-public class AutoTwoWobble extends AutonomousOpMode {
+public class Auto_TwoWobble extends AutoOpMode {
 
     @Override
     public void main() {

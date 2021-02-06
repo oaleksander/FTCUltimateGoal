@@ -26,8 +26,9 @@ public class MecanumDrivetrain implements Drivetrain {
 
     /* Physical constants */
     private static final double wheelRadius = 9.8 / 2;
+    private static final double gearRatio = 1;
     private static final Vector2D wheelCenterOffset = new Vector2D(18.05253, 15.20000);
-    private static final double forwardMultiplier = 1 / wheelRadius;
+    private static final double forwardMultiplier = (1 / wheelRadius)/gearRatio;
     private static double sidewaysMultiplier = forwardMultiplier * DrivetrainConfig.strafingMultiplier;
     private static double turnMultiplier = (wheelCenterOffset.x + wheelCenterOffset.y) * DrivetrainConfig.rotationDecrepancy / wheelRadius;
 

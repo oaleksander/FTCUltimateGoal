@@ -78,7 +78,7 @@ public class rpm implements RobotModule {
         feeder.setPosition(ShooterConfig.feederClose);
     }
 
-    public void reset() {
+    public void start() {
         feeder.setPosition(ShooterConfig.feederClose);
         shooterMotor.setVelocity(0);
         setShootingMode(ShooterMode.OFF);

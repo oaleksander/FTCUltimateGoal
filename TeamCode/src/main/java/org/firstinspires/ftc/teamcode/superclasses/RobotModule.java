@@ -11,10 +11,9 @@ public interface RobotModule {
     default void initialize(LinearOpMode opMode) {
         setOpMode(opMode);
         initialize();
-        reset();
     }
 
-    default void reset() {
+    default void start() {
     }
 
     default void update() {

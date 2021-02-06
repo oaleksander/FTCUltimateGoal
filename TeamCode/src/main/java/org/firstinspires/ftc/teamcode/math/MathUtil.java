@@ -30,6 +30,11 @@ public class MathUtil {
         return angleWrap(angle1 + angleWrap(angle2 - angle1) / 2);
     }
 
+    public static double minAbs(double a, double b)
+    {
+        return Math.abs(a)<Math.abs(b)?a:b;
+    }
+
     public static double cosFromSin(double sin, double angle) {
         double cos = Math.sqrt(1 - sin * sin);
         angle = angleWrap(angle);

@@ -27,7 +27,7 @@ public class MovementMacros {
     static byte xSign = 1;
     static byte sideSign = 1;
 
-    public MovementMacros(byte xSign, byte sideSign) {
+    public static void setSettings(byte xSign, byte sideSign) {
         MovementMacros.xSign = xSign;
         MovementMacros.sideSign = sideSign;
     }

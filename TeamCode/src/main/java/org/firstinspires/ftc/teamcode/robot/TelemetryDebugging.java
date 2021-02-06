@@ -2,20 +2,18 @@ package org.firstinspires.ftc.teamcode.robot;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.math.Pose2D;
-import org.firstinspires.ftc.teamcode.math.Vector2D;
-import org.firstinspires.ftc.teamcode.math.Vector3D;
 import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
-import org.opencv.photo.TonemapReinhard;
 
+import static org.firstinspires.ftc.teamcode.robot.WoENrobot.movement;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.odometry;
-import static org.firstinspires.ftc.teamcode.robot.WoENrobot.openCVNode;
+import static org.firstinspires.ftc.teamcode.robot.WoENrobot.runTime;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.shooter;
 
 public class TelemetryDebugging implements RobotModule {
@@ -24,15 +22,23 @@ public class TelemetryDebugging implements RobotModule {
     private final ElapsedTime measurementTime = new ElapsedTime();
     FtcDashboard dashboard = null;
     Telemetry telemetry;
-    TelemetryPacket packet = null;
+    TelemetryPacket dashboardPacket = null;
     long loopCount = 0;
 
     @Config
     static class TelemetryConfig {
-        public static int refreshTimeMs = 100;
+        public static boolean dashboardTelemetry = true;
+        public static int refreshTimeMs = 50;
     }
 
     private LinearOpMode opMode = null;
+
+    public void setOpMode(LinearOpMode opMode) {
+        this.opMode = opMode;
+        dashboard = FtcDashboard.getInstance();
+        telemetry = opMode.telemetry;
+
+    }
 
     private static void rotatePoints(double[] xPoints, double[] yPoints, double angle) {
         for (int i = 0; i < xPoints.length; i++) {
@@ -43,7 +49,8 @@ public class TelemetryDebugging implements RobotModule {
         }
     }
 
-    private void displayDashboardRectangle(Pose2D position) {
+
+    private void createDashboardRectangle(Pose2D position, String color) {
         double by = -position.x / 2.54;
         double bx = position.y / 2.54;
         double l = ROBOT_SIDE_LENGTH / (2.54 * 2);
@@ -57,64 +64,87 @@ public class TelemetryDebugging implements RobotModule {
             byPoints[i] += by;
         }
 
-        packet = new TelemetryPacket();
-        packet.fieldOverlay()
+        dashboardPacket.fieldOverlay()
                 .setStroke("cyan")
                 .setStrokeWidth(2)
                 .strokeLine(bx, by, (bxPoints[0] + bxPoints[3]) / 2, (byPoints[0] + byPoints[3]) / 2);
-        packet.fieldOverlay()
+        dashboardPacket.fieldOverlay()
                 .setStroke("orange")
                 .setStrokeWidth(1)
                 .strokeLine(bx, by, (bxPoints[0] + bxPoints[3]) / 2, (byPoints[0] + byPoints[3]) / 2);
-        packet.fieldOverlay()
-                .setStroke("black")
+        dashboardPacket.fieldOverlay()
+                .setStroke(color)
                 .setStrokeWidth(1)
                 .strokePolygon(bxPoints, byPoints);
-        dashboard.sendTelemetryPacket(packet);
     }
 
+    private boolean updaterIsActive = false;
 
-    public void setOpMode(LinearOpMode opMode) {
-        this.opMode = opMode;
+    private final Runnable updateTelemetry = () -> {
+        updaterIsActive = true;
+        while(opMode.opModeIsActive() && !Thread.currentThread().isInterrupted()) {
+            if (measurementTime.milliseconds() > TelemetryConfig.refreshTimeMs) {
+                double loopFrequency = loopCount/measurementTime.seconds();
+                measurementTime.reset();
+                loopCount = 0;
 
-    }
+
+                telemetry.addData("Status", "Running " + runTime.seconds());
+                telemetry.addData("Loop frequency",   loopFrequency + " Hz");
+                Pose2D robotPosition = odometry.getRobotCoordinates();
+                //   telemetry.addLine("Odometry encoders").addData("odYL", odometry.odometerYL.getCurrentPosition()).addData("odYR", odometry.odometerYR.getCurrentPosition()).addData("odX", odometry.odometerX.getCurrentPosition());
+                //  telemetry.addLine("Robot position ").addData("Y", robotPosition.y).addData("X", robotPosition.x).addData("Head", Math.toDegrees(robotPosition.heading));
+                //   Vector3D velocity = odometry.getRobotVelocity();
+                //     telemetry.addLine("Robot velocity ").addData("Y", velocity.y).addData("X", velocity.x).addData("Head", Math.toDegrees(velocity.z));
+                telemetry.addLine("Shooter ").addData("Mode", shooter.getShootingMode()).addData("Current", shooter.getEncoderFailureMode()?"Encoder Fail":shooter.getCurrentRpm()).addData("Target", shooter.getRpmTarget());
+                //telemetry.addData("conpower", conveyor.conveyorPower);
+                //    telemetry.addLine("headings").addData("Encoder",Math.toDegrees(odometry.getEncoderHeading())).addData("IMU1",Math.toDegrees(odometry.getIMUheading_1())).addData("IMU2",Math.toDegrees(odometry.getIMUheading_2()));
+
+                if(TelemetryConfig.dashboardTelemetry) {
+                    dashboardPacket = new TelemetryPacket();
+                    createDashboardRectangle(robotPosition, "black");
+                    if(movement.pathFollowerIsActive())
+                        createDashboardRectangle(movement.getCurrentTarget(),"green");
+                    dashboardPacket.put("Loop frequency", loopFrequency);
+                    dashboardPacket.put("Flywhel RPM",shooter.getCurrentRpm());
+                    dashboardPacket.put("Flywhel target",shooter.getRpmTarget());
+                    dashboardPacket.put("Status", "Running " + runTime.seconds());
+                    dashboard.sendTelemetryPacket(dashboardPacket);
+                }
+
+
+                //telemetry.addData("OpenCV stack size", openCVNode.getStackSize());
+
+
+                telemetry.update();
+            }
+            else Thread.yield();
+        }
+        updaterIsActive = false;
+    };
+
+    Thread telemetryUpdater = new Thread(updateTelemetry);
 
     @Override
     public void initialize() {
-        dashboard = FtcDashboard.getInstance();
         measurementTime.reset();
         loopCount = 0;
-        telemetry = opMode.telemetry;
         //  telemetry = dashboard.getTelemetry();
         //  telemetry = new MultipleTelemetry(opMode.telemetry,dashboard.getTelemetry());
         telemetry.setMsTransmissionInterval(TelemetryConfig.refreshTimeMs);
         //   dashboard.startCameraStream(openCVNode.getWebcam(),0);
     }
 
+    public void start() {
+        if(telemetryUpdater.getState()!= Thread.State.NEW) {
+            telemetryUpdater.interrupt();
+        }
+        telemetryUpdater = new Thread(updateTelemetry);
+        telemetryUpdater.start();
+    }
+
 
     public void update() {
-        if (measurementTime.milliseconds() > TelemetryConfig.refreshTimeMs) {
-            telemetry.addData("Status", "Running");
-            telemetry.addData("Loop frequency", 1 / (measurementTime.seconds() / loopCount) + " Hz");
-            Pose2D robotPosition = odometry.getRobotCoordinates();
-            //   telemetry.addLine("Odometry encoders").addData("odYL", odometry.odometerYL.getCurrentPosition()).addData("odYR", odometry.odometerYR.getCurrentPosition()).addData("odX", odometry.odometerX.getCurrentPosition());
-            //  telemetry.addLine("Robot position ").addData("Y", robotPosition.y).addData("X", robotPosition.x).addData("Head", Math.toDegrees(robotPosition.heading));
-            //   Vector3D velocity = odometry.getRobotVelocity();
-            //     telemetry.addLine("Robot velocity ").addData("Y", velocity.y).addData("X", velocity.x).addData("Head", Math.toDegrees(velocity.z));
-            telemetry.addLine("Shooter ").addData("Mode", shooter.getShootingMode()).addData("Current", shooter.getCurrentRpm()).addData("Target", shooter.getRpmTarget());
-            //telemetry.addData("conpower", conveyor.conveyorPower);
-            //    telemetry.addLine("headings").addData("Encoder",Math.toDegrees(odometry.getEncoderHeading())).addData("IMU1",Math.toDegrees(odometry.getIMUheading_1())).addData("IMU2",Math.toDegrees(odometry.getIMUheading_2()));
-            //    telemetry.addData("Shooter Velo",shooter.getCurrentRpm());
-
-            displayDashboardRectangle(robotPosition);
-
-            //telemetry.addData("OpenCV stack size", openCVNode.getStackSize());
-
-
-            measurementTime.reset();
-            loopCount = 0;
-            telemetry.update();
-        }
         loopCount++;
     }
 }

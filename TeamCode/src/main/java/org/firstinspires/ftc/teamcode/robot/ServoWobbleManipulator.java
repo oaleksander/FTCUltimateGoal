@@ -19,34 +19,39 @@ public class ServoWobbleManipulator implements WobbleManipulator {
         public static double angleUp = 1;
     }
 
-    private ExpansionHubServo close = null;
-    private final CommandSender closePositionSender = new CommandSender(p -> close.setPosition(p));
-    private ExpansionHubServo angle = null;
-    private final CommandSender anglePositionSender = new CommandSender(p -> angle.setPosition(p));
+    private ExpansionHubServo gripper = null;
+    private final CommandSender closePositionSender = new CommandSender(p -> gripper.setPosition(p));
+    private ExpansionHubServo leverArm = null;
+    private final CommandSender anglePositionSender = new CommandSender(p -> leverArm.setPosition(p));
     private LinearOpMode opMode;
     private boolean isDown = false;
     private Position posAngle = Position.UP;
+    private double leverArmPosition = 0;
+    private double gripperPosition = 0;
 
     public void setOpMode(LinearOpMode OpMode) {
         opMode = OpMode;
     }
 
     public void initialize() {
-        close = (ExpansionHubServo) opMode.hardwareMap.get(Servo.class, "wobbleGrabber");
-        angle = (ExpansionHubServo) opMode.hardwareMap.get(Servo.class, "angle");
-        close.setPosition(WobbleServoPositions.gripperClose);
-        grabWobble(false);
-        angle.setPosition(WobbleServoPositions.angleUp);
+        gripper = (ExpansionHubServo) opMode.hardwareMap.get(Servo.class, "wobbleGrabber");
+        leverArm = (ExpansionHubServo) opMode.hardwareMap.get(Servo.class, "angle");
+        grabWobble(true);
         setAngle(Position.UP);
+        update();
     }
 
     public void grabWobble(boolean dograb) {
-        closePositionSender.send(dograb ? WobbleServoPositions.gripperClose : WobbleServoPositions.gripperOpen);
+        gripperPosition = dograb ? WobbleServoPositions.gripperClose : WobbleServoPositions.gripperOpen;
     }
 
-    public void reset() {
-        close.setPosition(WobbleServoPositions.gripperClose);
-        angle.setPosition(WobbleServoPositions.angleUp);
+    public void start() {
+        update();
+    }
+
+    public void update() {
+        closePositionSender.send(gripperPosition);
+        anglePositionSender.send(leverArmPosition);
     }
 
 
@@ -68,18 +73,14 @@ public class ServoWobbleManipulator implements WobbleManipulator {
         posAngle = position;
         switch (position) {
             case UP:
-                setAngleServoPosition(WobbleServoPositions.angleUp);
+                leverArmPosition = WobbleServoPositions.angleUp;
                 break;
             case DOWN:
-                setAngleServoPosition(WobbleServoPositions.angleDown);
+                leverArmPosition = WobbleServoPositions.angleDown;
                 break;
             case MEDIUM:
-                setAngleServoPosition(WobbleServoPositions.angleMedium);
+                leverArmPosition = WobbleServoPositions.angleMedium;
                 break;
         }
-    }
-
-    private void setAngleServoPosition(double posa) {
-        anglePositionSender.send(posa);
     }
 }

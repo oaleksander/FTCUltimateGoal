@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.hardware.lynx.LynxModule;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -29,7 +30,22 @@ import static java.lang.Math.max;
 import static java.lang.Math.signum;
 
 @TeleOp
+@Disabled
 public class DrivetrainPidConfig extends LinearOpMode {
+
+    @Config
+    @Disabled
+    public static class Constants {
+        public static double achieveableMaxRPMFraction = 0.9;
+        public static double achieveableMinRPMFraction = 0.05;
+        public static double strafingMultiplier = 1 / 0.8;
+        public static double rotationDecrepancy = 1.0;
+        public static double kP = 1.5;
+        public static double kD = 0;
+        public static double kI = 0.15;
+        public static double kF = 15;
+    }
+
     DcMotorEx driveFrontLeft = null;
     DcMotorEx driveFrontRight = null;
     DcMotorEx driveRearLeft = null;
@@ -110,18 +126,6 @@ public class DrivetrainPidConfig extends LinearOpMode {
     private static final double theoreticalMaxSpeed = (maxRPM / 60) * Math.PI * 2;
     private static double maxMotorSpeed = Constants.achieveableMaxRPMFraction * theoreticalMaxSpeed;
     private static double minMotorSpeed = Constants.achieveableMinRPMFraction * theoreticalMaxSpeed;
-
-    @Config
-    public static class Constants {
-        public static double achieveableMaxRPMFraction = 0.9;
-        public static double achieveableMinRPMFraction = 0.05;
-        public static double strafingMultiplier = 1 / 0.8;
-        public static double rotationDecrepancy = 1.0;
-        public static double kP = 1.5;
-        public static double kD = 0;
-        public static double kI = 0.15;
-        public static double kF = 15;
-    }
 
 
     private double powerFrontLeft = 0;
