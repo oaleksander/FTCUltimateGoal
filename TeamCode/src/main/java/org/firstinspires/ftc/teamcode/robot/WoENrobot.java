@@ -74,8 +74,10 @@ public class WoENrobot {
     public static void startRobot() {
         setLedColors(255, 166, 0);
         opMode.waitForStart();
-        regulatorUpdater.start();
+        if(opMode.isStopRequested()) return;
         runTime.reset();
+        Arrays.stream(activeRobotModules).forEach(RobotModule::start);
+        regulatorUpdater.start();
         setLedColors(0, 237, 255);
         opMode.telemetry.addData("Status", "Running");
         opMode.telemetry.update();
@@ -88,7 +90,7 @@ public class WoENrobot {
             opMode.telemetry.update();
         } else {
             opMode = OpMode;
-            Arrays.stream(activeRobotModules).forEach(RobotModule::reset);
+            Arrays.stream(activeRobotModules).forEach(robotModule -> robotModule.setOpMode(opMode));
             if (regulatorUpdater.getState() != Thread.State.NEW) {
                 regulatorUpdater.interrupt();
                 regulatorUpdater = new Thread(updateRegulators);
