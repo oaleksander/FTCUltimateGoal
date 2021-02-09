@@ -21,7 +21,7 @@ public class Conveyor1 implements Conveyor {
     private final ElapsedTime BackOnAftertime = new ElapsedTime();
 
     private LinearOpMode opMode;
-    private DcMotorEx conveyorm = null;
+    public static DcMotorEx conveyorm = null;
     private final CommandSender conveyorPowerSender = new CommandSender(p -> conveyorm.setPower(-p));
     private DistanceSensor sensorDistance;
     private boolean full = false;

@@ -88,7 +88,7 @@ public class WoENrobot {
             opMode.telemetry.update();
         } else {
             opMode = OpMode;
-            Arrays.stream(activeRobotModules).forEach(RobotModule::reset);
+            Arrays.stream(activeRobotModules).forEach(RobotModule::start);
             if (regulatorUpdater.getState() != Thread.State.NEW) {
                 regulatorUpdater.interrupt();
                 regulatorUpdater = new Thread(updateRegulators);
