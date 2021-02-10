@@ -14,6 +14,7 @@ public class AI {
 
     private final double interval = 1000;
     private final double timeDiagnostic = 3000;
+    private final double timeWait = 500;
     private final double maxError = 3;
 
     public void initialize() {
@@ -24,19 +25,15 @@ public class AI {
 
     }
 
-    private void diagnosticConveyor1(){
+    public boolean diagnosticConveyor1(){
         AItime.reset();
         conveyorm.setPower(1);
         do {
-            if (conveyorm.getCurrent(CurrentUnit.AMPS) > 0.5) {
-                //telemetria Conveyor1 OK
-                break;
+            if (conveyorm.getCurrent(CurrentUnit.AMPS) > 0.5 && AItime.milliseconds() > timeWait) {
+                return true;
             }
         }
         while (WoENrobot.opMode.opModeIsActive() && AItime.milliseconds() < timeDiagnostic);
-
-        if (conveyorm.getCurrent(CurrentUnit.AMPS) <= 0.5) {
-            //telemetria Conveyor1 Error
-        }
+        return false;
     }
 }
