@@ -20,7 +20,7 @@ import static java.lang.Math.abs;
 
 public class Conveyor2 implements Conveyor {
     private LinearOpMode opMode;
-    private DcMotorEx conveyor = null;
+    public static DcMotorEx conveyor = null;
     private final motorAccelerationLimiter conveyorPowerSender = new motorAccelerationLimiter(new CommandSender(p -> conveyor.setPower(-p))::send,6);
     private DistanceSensor sensorDistance;
     private final ElapsedTime motorCurrentTimer = new ElapsedTime();
