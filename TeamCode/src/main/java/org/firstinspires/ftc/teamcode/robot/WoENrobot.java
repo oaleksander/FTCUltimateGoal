@@ -34,8 +34,8 @@ public class WoENrobot {
     public static final ElapsedTime runTime = new ElapsedTime();
     protected static RobotModule[] activeRobotModules = {odometry, movement, drivetrain, shooter, wobbleManipulator, conveyor, telemetryDebugging}; //conveyor, odometry, shooter, wobbleManipulator, drivetrain
     static boolean spinCompleted = false;
-    private static ExpansionHubEx expansionHub1 = null;
-    private static ExpansionHubEx expansionHub2 = null;
+    public static ExpansionHubEx expansionHub1 = null;
+    public static ExpansionHubEx expansionHub2 = null;
     private static List<LynxModule> allHubs = null;
     static Runnable updateRegulators = () -> {
         setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
