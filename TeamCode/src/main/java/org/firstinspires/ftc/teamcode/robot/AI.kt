@@ -21,28 +21,32 @@ class AI {
     private val timeDiagnostic = 3000.0
     private val timeWait = 500.0
     private val maxError = 3.0
-    private var motor0: ExpansionHubMotor? = null
-    private var motor1: ExpansionHubMotor? = null
-    private var motor2: ExpansionHubMotor? = null
-    private var motor3: ExpansionHubMotor? = null
+    private var OdometerYL: ExpansionHubMotor? = null
+    private var OdometryYR: ExpansionHubMotor? = null
+    private var Conveyorm: ExpansionHubMotor? = null
+    private var ShooterMotor: ExpansionHubMotor? = null
     private var DriveFrontLeft: ExpansionHubMotor? = null
     private var DriveFrontRight: ExpansionHubMotor? = null
     private var DriveRearLeft: ExpansionHubMotor? = null
     private var DriveRearRight: ExpansionHubMotor? = null
     fun initialize() {
-        motor0 = odometerYL as ExpansionHubMotor
-        motor1 = odometerYR as ExpansionHubMotor
-        motor2 = conveyorm as ExpansionHubMotor
-        motor3 = shooterMotor as ExpansionHubMotor
+        OdometerYL = odometerYL as ExpansionHubMotor
+        OdometryYR = odometerYR as ExpansionHubMotor
+        Conveyorm = conveyorm as ExpansionHubMotor
+        ShooterMotor = shooterMotor as ExpansionHubMotor
         DriveFrontLeft = driveFrontLeft as ExpansionHubMotor
         DriveFrontRight = driveFrontRight as ExpansionHubMotor
         DriveRearLeft = driveRearLeft as ExpansionHubMotor
         DriveRearRight = driveRearRight as ExpansionHubMotor
         AItime.reset()
-        motor2!!.isBridgeOverTemp
     }
 
-    fun update() {}
+    fun update() {
+        if (AItime.milliseconds() > timeDiagnostic) {
+            tempConveyor()
+            AItime.reset()
+        }
+    }
     fun diagnosticConveyor(): Boolean {
         AItime.reset()
         conveyorm.power = 1.0
@@ -55,4 +59,9 @@ class AI {
         conveyorm.power = 0.0
         return false
     }
+
+    fun tempConveyor(): Boolean {
+        return Conveyorm!!.isBridgeOverTemp
+    }
+
 }
