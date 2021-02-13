@@ -1,13 +1,14 @@
 package org.firstinspires.ftc.teamcode.robot
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
+import com.qualcomm.robotcore.hardware.DcMotorEx
 import com.qualcomm.robotcore.util.ElapsedTime
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit
 import org.firstinspires.ftc.teamcode.robot.Conveyor1.conveyorm
-import org.firstinspires.ftc.teamcode.robot.MecanumDrivetrain.driveRearLeft
-import org.firstinspires.ftc.teamcode.robot.MecanumDrivetrain.driveRearRight
-import org.firstinspires.ftc.teamcode.robot.MecanumDrivetrain.driveFrontRight
 import org.firstinspires.ftc.teamcode.robot.MecanumDrivetrain.driveFrontLeft
+import org.firstinspires.ftc.teamcode.robot.MecanumDrivetrain.driveFrontRight
+import org.firstinspires.ftc.teamcode.robot.MecanumDrivetrain.driveRearRight
+import org.firstinspires.ftc.teamcode.robot.MecanumDrivetrain.driveRearLeft
 import org.firstinspires.ftc.teamcode.robot.ThreeWheelOdometry.odometerYL
 import org.firstinspires.ftc.teamcode.robot.ThreeWheelOdometry.odometerYR
 import org.firstinspires.ftc.teamcode.robot.rpm.shooterMotor
@@ -44,25 +45,14 @@ class AI : RobotModule {
         AItime.reset()
     }
 
-    override fun update() {
+   /* override fun update() {
         if (AItime.milliseconds() > timeDiagnostic) {
             tempConveyor()
+            tempShooter()
             AItime.reset()
         }
     }
-    fun diagnosticConveyor(): Boolean {
-        AItime.reset()
-        conveyorm.power = 1.0
-        do {
-            if (conveyorm.getCurrent(CurrentUnit.AMPS) > 0.5 && AItime.milliseconds() > timeWait) {
-                conveyorm.power = 0.0
-                return true
-            }
-        } while (WoENrobot.opMode.opModeIsActive() && AItime.milliseconds() < timeDiagnostic)
-        conveyorm.power = 0.0
-        return false
-    }
-
+*/
     fun tempConveyor(): Boolean {
         return Conveyorm!!.isBridgeOverTemp
     }
@@ -72,16 +62,16 @@ class AI : RobotModule {
     }
 
 
-     fun diagnosticShooter(): Boolean {
+     fun diagnosticMotor(motor: DcMotorEx): Boolean {
         AItime.reset()
-        shooterMotor.power = 1.0
+        motor.power = 1.0
         do {
-            if (shooterMotor.getCurrent(CurrentUnit.AMPS) > 0.5 && AItime.milliseconds() > timeWait) {
-                shooterMotor.power = 0.0
+            if (motor.getCurrent(CurrentUnit.AMPS) > 0.5 && AItime.milliseconds() > timeWait) {
+                motor.power = 0.0
                 return true
             }
-        } while (WoENrobot.opMode.opModeIsActive() && AItime.milliseconds() < timeDiagnostic)
-        shooterMotor.power = 0.0
+        } while (opMode!!.opModeIsActive() && AItime.milliseconds() < timeDiagnostic)
+        motor.power = 0.0
         return false
     }
 
