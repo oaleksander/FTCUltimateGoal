@@ -21,6 +21,7 @@ public class WoENrobot {
     public static Conveyor conveyor = new Conveyor2();
     public static rpm shooter = new rpm();
     public static TelemetryDebugging telemetryDebugging = new TelemetryDebugging();
+    public static AI ai = new AI();
 
     //public static FakeRobot fakeRobot = new FakeRobot();
     //public static Odometry odometry = fakeRobot;
@@ -32,7 +33,7 @@ public class WoENrobot {
     public static LinearOpMode opMode = null;
     public static boolean robotIsInitialized = false;
     public static final ElapsedTime runTime = new ElapsedTime();
-    protected static RobotModule[] activeRobotModules = {odometry, movement, drivetrain, shooter, wobbleManipulator, conveyor, telemetryDebugging}; //conveyor, odometry, shooter, wobbleManipulator, drivetrain
+    protected static RobotModule[] activeRobotModules = {odometry, movement, drivetrain, shooter, wobbleManipulator, conveyor, telemetryDebugging, ai}; //conveyor, odometry, shooter, wobbleManipulator, drivetrain
     static boolean spinCompleted = false;
     public static ExpansionHubEx expansionHub1 = null;
     public static ExpansionHubEx expansionHub2 = null;
