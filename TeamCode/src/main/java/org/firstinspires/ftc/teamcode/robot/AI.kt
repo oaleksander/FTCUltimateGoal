@@ -57,8 +57,9 @@ class AI : RobotModule {
         return Conveyorm!!.isBridgeOverTemp
     }
 
-    fun tempShooter(): Boolean {
-        return ShooterMotor!!.isBridgeOverTemp
+    fun tempMotor(motor: DcMotorEx): Boolean {
+        val motorExp = motor as ExpansionHubMotor
+        return motorExp.isBridgeOverTemp
     }
 
 
