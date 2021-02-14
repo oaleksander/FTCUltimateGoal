@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.robot
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 import com.qualcomm.robotcore.hardware.DcMotorEx
 import com.qualcomm.robotcore.util.ElapsedTime
+import org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit
 import org.firstinspires.ftc.teamcode.robot.Conveyor1.conveyorm
 import org.firstinspires.ftc.teamcode.robot.MecanumDrivetrain.driveFrontLeft
@@ -15,14 +16,15 @@ import org.firstinspires.ftc.teamcode.robot.rpm.shooterMotor
 import org.firstinspires.ftc.teamcode.superclasses.RobotModule
 import org.openftc.revextensions2.ExpansionHubMotor
 
-@Deprecated("")
 class AI : RobotModule {
     private var opMode: LinearOpMode? = null
     private val AItime = ElapsedTime()
+    private val headTime = ElapsedTime()
+    private val maxTimeHead: Double = 60000.0;
     private val interval = 1000.0
-    private val timeDiagnostic = 3000.0
+    private val timeDiagnostic = 1000.0
     private val timeWait = 500.0
-    private var OdometerYL: ExpansionHubMotor? = null
+    private var OdometryYL: ExpansionHubMotor? = null
     private var OdometryYR: ExpansionHubMotor? = null
     private var Conveyorm: ExpansionHubMotor? = null
     private var ShooterMotor: ExpansionHubMotor? = null
@@ -30,11 +32,12 @@ class AI : RobotModule {
     private var DriveFrontRight: ExpansionHubMotor? = null
     private var DriveRearLeft: ExpansionHubMotor? = null
     private var DriveRearRight: ExpansionHubMotor? = null
+    private var owerHead = false;
     override fun setOpMode(OpMode: LinearOpMode) {
         opMode = OpMode
     }
     override fun initialize() {
-        OdometerYL = odometerYL as ExpansionHubMotor
+        OdometryYL = odometerYL as ExpansionHubMotor
         OdometryYR = odometerYR as ExpansionHubMotor
         Conveyorm = conveyorm as ExpansionHubMotor
         ShooterMotor = shooterMotor as ExpansionHubMotor
@@ -45,21 +48,25 @@ class AI : RobotModule {
         AItime.reset()
     }
 
-   /* override fun update() {
+    /*override fun update() {
         if (AItime.milliseconds() > timeDiagnostic) {
-            tempConveyor()
-            tempShooter()
             AItime.reset()
+            if((Conveyorm?.let { tempMotor(it) }!! || ShooterMotor?.let { tempMotor(it) }!! || OdometryYL?.let { tempMotor(it) }!! || OdometryYR?.let { tempMotor(it) }!! ||
+                    DriveFrontLeft?.let { tempMotor(it) }!! || DriveFrontRight?.let { tempMotor(it) }!! || DriveRearLeft?.let { tempMotor(it) }!! || DriveRearRight?.let { tempMotor(it) }!!) && owerHead) {
+                owerHead = true
+                headTime.reset()
+                telemetry.addData("Warning!", "owerhead")
+            }
+            else if(headTime.milliseconds() > maxTimeHead){
+                    //break
+                }
+                else {
+                owerHead = false
+            }
         }
-    }
-*/
-    fun tempConveyor(): Boolean {
-        return Conveyorm!!.isBridgeOverTemp
-    }
-
-    fun tempMotor(motor: DcMotorEx): Boolean {
-        val motorExp = motor as ExpansionHubMotor
-        return motorExp.isBridgeOverTemp
+    }*/
+    private fun tempMotor(motor: ExpansionHubMotor): Boolean {
+        return motor.isBridgeOverTemp
     }
 
 
