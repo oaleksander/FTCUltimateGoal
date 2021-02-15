@@ -11,7 +11,7 @@ import org.openftc.revextensions2.ExpansionHubServo;
 public class ServoWobbleManipulator implements WobbleManipulator {
 
     @Config
-    static class WobbleServoPositions {
+    public static class WobbleServoPositions {
         public static double gripperClose = 0.92;
         public static double gripperOpen = 0.19;
         public static double angleDown = 0.18;
@@ -19,9 +19,9 @@ public class ServoWobbleManipulator implements WobbleManipulator {
         public static double angleUp = 1;
     }
 
-    private ExpansionHubServo gripper = null;
+    public static ExpansionHubServo gripper = null;
     private final CommandSender closePositionSender = new CommandSender(p -> gripper.setPosition(p));
-    private ExpansionHubServo leverArm = null;
+    public static ExpansionHubServo leverArm = null;
     private final CommandSender anglePositionSender = new CommandSender(p -> leverArm.setPosition(p));
     private LinearOpMode opMode;
     private boolean isDown = false;

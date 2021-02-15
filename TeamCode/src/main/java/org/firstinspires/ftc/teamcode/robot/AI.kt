@@ -2,9 +2,12 @@ package org.firstinspires.ftc.teamcode.robot
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 import com.qualcomm.robotcore.hardware.DcMotorEx
+import com.qualcomm.robotcore.hardware.DistanceSensor
+import com.qualcomm.robotcore.hardware.Servo
 import com.qualcomm.robotcore.util.ElapsedTime
 import org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
 import org.firstinspires.ftc.teamcode.robot.Conveyor1.conveyorm
 import org.firstinspires.ftc.teamcode.robot.MecanumDrivetrain.driveFrontLeft
 import org.firstinspires.ftc.teamcode.robot.MecanumDrivetrain.driveFrontRight
@@ -20,7 +23,7 @@ class AI : RobotModule {
     private var opMode: LinearOpMode? = null
     private val AItime = ElapsedTime()
     private val headTime = ElapsedTime()
-    private val maxTimeHead: Double = 60000.0;
+    private val maxTimeHead: Double = 60000.0
     private val interval = 1000.0
     private val timeDiagnostic = 1000.0
     private val timeWait = 500.0
@@ -32,7 +35,7 @@ class AI : RobotModule {
     private var DriveFrontRight: ExpansionHubMotor? = null
     private var DriveRearLeft: ExpansionHubMotor? = null
     private var DriveRearRight: ExpansionHubMotor? = null
-    private var owerHead = false;
+    private var owerHead = false
     override fun setOpMode(OpMode: LinearOpMode) {
         opMode = OpMode
     }
@@ -68,9 +71,18 @@ class AI : RobotModule {
     private fun tempMotor(motor: ExpansionHubMotor): Boolean {
         return motor.isBridgeOverTemp
     }
+    fun diagnositcServo(servo: Servo, startPos :Double, endPos :Double) {
+        AItime.reset()
+        servo.position = startPos
+        while (opMode!!.opModeIsActive() && AItime.milliseconds() < timeDiagnostic/2) {}
+        servo.position = endPos
+        while (opMode!!.opModeIsActive() && AItime.milliseconds() < timeDiagnostic) {}
+    }
+    fun diagnosticRange(sensor: DistanceSensor ) : Boolean {
+        return !sensor.getDistance(DistanceUnit.CM).isNaN()
+    }
 
-
-     fun diagnosticMotor(motor: DcMotorEx): Boolean {
+    fun diagnosticMotor(motor: DcMotorEx): Boolean {
         AItime.reset()
         motor.power = 1.0
         do {

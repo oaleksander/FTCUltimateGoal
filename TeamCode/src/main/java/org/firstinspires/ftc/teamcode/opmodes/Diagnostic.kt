@@ -12,6 +12,13 @@ import org.firstinspires.ftc.teamcode.robot.MecanumDrivetrain.driveFrontLeft
 import org.firstinspires.ftc.teamcode.robot.MecanumDrivetrain.driveFrontRight
 import org.firstinspires.ftc.teamcode.robot.MecanumDrivetrain.driveRearRight
 import org.firstinspires.ftc.teamcode.robot.MecanumDrivetrain.driveRearLeft
+import org.firstinspires.ftc.teamcode.robot.Conveyor1.sensorDistance
+import org.firstinspires.ftc.teamcode.robot.ServoWobbleManipulator.WobbleServoPositions.*
+import org.firstinspires.ftc.teamcode.robot.ServoWobbleManipulator.gripper
+import org.firstinspires.ftc.teamcode.robot.ServoWobbleManipulator.leverArm
+import org.firstinspires.ftc.teamcode.robot.rpm.ShooterConfig.feederClose
+import org.firstinspires.ftc.teamcode.robot.rpm.ShooterConfig.feederOpen
+import org.firstinspires.ftc.teamcode.robot.rpm.feeder
 
 class Diagnostic : LinearOpMode() {
     override fun runOpMode() {
@@ -25,6 +32,11 @@ class Diagnostic : LinearOpMode() {
         telemetry.addData("driveRearRight", ai.diagnosticMotor(driveRearRight))
         telemetry.addData("driveFrontRight", ai.diagnosticMotor(driveFrontRight))
         telemetry.addData("driveFrontLeft", ai.diagnosticMotor(driveFrontLeft))
+        telemetry.addData("RingDetector", ai.diagnosticRange(sensorDistance))
+        telemetry.addData("See Servo", "")
+        ai.diagnositcServo(feeder, feederOpen, feederClose )
+        ai.diagnositcServo(leverArm, angleDown, angleUp)
+        ai.diagnositcServo(gripper, gripperOpen, gripperClose)
         telemetry.update()
     }
 }

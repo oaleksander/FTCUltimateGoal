@@ -36,7 +36,7 @@ public class rpm implements RobotModule {
     private LinearOpMode opMode;
     public static DcMotorEx shooterMotor = null;
     private final CommandSender shooterVelocitySender = new CommandSender(p -> shooterMotor.setVelocity(p));
-    private ExpansionHubServo feeder = null;
+    public static ExpansionHubServo feeder = null;
     private final CommandSender feederPositionSender = new CommandSender(p -> feeder.setPosition(p));
     private ShooterMode shooterMode = ShooterMode.OFF;
     private byte ringsToShoot = 0;
