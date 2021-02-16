@@ -12,39 +12,32 @@ public class Vector2D implements Comparable {
         this.y = y;
     }
 
+    public Vector2D()
+    {
+        this(0,0);
+    }
+
     public Vector2D rotated(double angle) {
         double sina = Math.sin(angle);
         double cosa = MathUtil.cosFromSin(sina, angle);
-        double newX = x * cosa - y * sina;
-        double newY = x * sina + y * cosa;
-        return new Vector2D(newX, newY);
+        return new Vector2D(x * cosa - y * sina, x * sina + y * cosa);
     }
 
     public Vector2D rotatedCW(double angle) {
         double sina = Math.sin(angle);
         double cosa = MathUtil.cosFromSin(sina, angle);
-        double newX = x * cosa + y * sina;
-        double newY = -x * sina + y * cosa;
-        return new Vector2D(newX, newY);
+        return new Vector2D(x * cosa + y * sina, -x * sina + y * cosa);
     }
 
     public Vector2D normalize() {
         double r = radius();
-        if (radius() != 0) {
-            return new Vector2D(x /= radius(), y /= radius());
+        if (r != 0) {
+            return new Vector2D(x / r, y / r);
         }
         return this;
     }
 
-    /*public void normalize() {
-        double r = radius();
-        if (radius() != 0) {
-            x /= radius();
-            y /= radius();
-        }
-    }*/
-
-    public Vector2D add(Vector2D p) {
+    public Vector2D plus(Vector2D p) {
         return new Vector2D(this.x + p.x, this.y + p.y);
     }
 
@@ -64,16 +57,8 @@ public class Vector2D implements Comparable {
         return Math.sqrt(x * x + y * y);
     }
 
-    public Vector2D scale(double d) {
+    public Vector2D times(double d) {
         return new Vector2D(x * d, y * d);
-    }
-
-    public Vector2D multiply(double d) {
-        return new Vector2D(this.x * d, this.y * d);
-    }
-
-    public double distance(Vector2D p) {
-        return minus(p).radius();
     }
 
     @Override

@@ -22,19 +22,15 @@ public class Vector3D extends Vector2D implements Cloneable {
         this(p.x, p.y, z);
     }
 
-    public Vector3D add(Vector3D p2) {
+    public Vector3D plus(Vector3D p2) {
         return new Vector3D(x + p2.x, y + p2.y, z + p2.z);
     }
 
-    public Vector3D substract(Vector3D p2) {
-        return new Vector3D(x - p2.x, y - p2.y, z - p2.z);
-    }
-
-    public Vector3D multiply(Vector3D p2) {
+    public Vector3D times(Vector3D p2) {
         return new Vector3D(x * p2.x, y * p2.y, z * p2.z);
     }
 
-    public Vector3D divideByDouble(double d) {
+    public Vector3D div(double d) {
         return new Vector3D(x / d, y / d, z / d);
     }
 
@@ -42,24 +38,14 @@ public class Vector3D extends Vector2D implements Cloneable {
         return new Vector3D(x - p2.x, y - p2.y, z - p2.z);
     }
 
-    public Vector3D scale(double d) {
+    public Vector3D times(double d) {
         return new Vector3D(x * d, y * d, z * d);
     }
 
-/*    public void normalize() {
-        double r = radius();
-        if (radius() != 0) {
-            x /= radius();
-            y /= radius();
-            z /= radius();
-        }
-    }*/
-
     public Vector3D normalize() {
         double r = radius();
-        if (radius() != 0) {
-            return new Vector3D(x /= radius(), y /= radius(), z /= radius());
-        }
+        if (r != 0)
+            return new Vector3D(x / r, y / r, z / r);
         return this;
     }
 

@@ -18,23 +18,20 @@ public class Pose2D extends Vector2D implements Cloneable {
         this(p.x, p.y, angleWrap(heading));
     }
 
-    public Pose2D add(Pose2D p2) {
+    public Pose2D plus(Pose2D p2) {
         return new Pose2D(x + p2.x, y + p2.y, heading + p2.heading);
     }
 
-    public Pose2D substract(Pose2D p2) {
-        return new Pose2D(x - p2.x, y - p2.y, heading - p2.heading);
-    }
 
-    public Pose2D multiply(Pose2D p2) {
+    public Pose2D times(Pose2D p2) {
         return new Pose2D(x * p2.x, y * p2.y, heading * p2.heading);
     }
 
-    public Pose2D divideByPose(Pose2D p2) {
+    public Pose2D div(Pose2D p2) {
         return new Pose2D(x / p2.x, y / p2.y, heading / p2.heading);
     }
 
-    public Pose2D divideByDouble(double d) {
+    public Pose2D div(double d) {
         return new Pose2D(x / d, y / d, heading / d);
     }
 
@@ -42,7 +39,7 @@ public class Pose2D extends Vector2D implements Cloneable {
         return new Pose2D(x - p2.x, y - p2.y, heading - p2.heading);
     }
 
-    public Pose2D scale(double d) {
+    public Pose2D times(double d) {
         return new Pose2D(x * d, y * d, heading * d);
     }
 
