@@ -34,9 +34,9 @@ class Diagnostic : LinearOpMode() {
         telemetry.addData("driveFrontLeft", ai.diagnosticMotor(driveFrontLeft))
         telemetry.addData("RingDetector", ai.diagnosticRange(sensorDistance))
         telemetry.addData("See Servo", "")
+        telemetry.update()
         ai.diagnositcServo(feeder, feederOpen, feederClose )
         ai.diagnositcServo(leverArm, angleDown, angleUp)
         ai.diagnositcServo(gripper, gripperOpen, gripperClose)
-        telemetry.update()
     }
 }
