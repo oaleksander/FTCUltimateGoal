@@ -15,7 +15,7 @@ public class Auto_NoRingPickup extends AutoOpMode {
 
     @Override
     public void main() {
-        movement.Pos(new Pose2D(odometry.getRobotCoordinates().x + 10 * sideSign, -60, Double.NaN));
+        movement.pos(new Pose2D(odometry.getRobotCoordinates().x + 10 * sideSign, -60, Double.NaN));
         ShootHighGoal(); //TODO Powershots
         // delay(3000);
         MoveWobble();

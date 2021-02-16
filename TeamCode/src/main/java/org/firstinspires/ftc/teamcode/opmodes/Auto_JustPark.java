@@ -13,7 +13,7 @@ public class Auto_JustPark extends AutoOpMode {
     public void main() {
         // MoveWobble();
         //PutRingsToLowGoal();
-        movement.Pos(new Pose2D(getStartPosition().x, 25, 0));
+        movement.pos(new Pose2D(getStartPosition().x, 25, 0));
         //wobbleManipulator.setposlever(360);
     }
 }

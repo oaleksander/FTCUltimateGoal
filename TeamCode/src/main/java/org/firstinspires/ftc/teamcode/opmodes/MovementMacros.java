@@ -47,7 +47,7 @@ public class MovementMacros {
 
     public static void ShootHighGoal() {
         shooter.setShootingMode(rpm.ShooterMode.HIGHGOAL);
-        movement.Pos(getHighGoalShootingPose());
+        movement.pos(getHighGoalShootingPose());
         ElapsedTime shooterAccelerationTimeout = new ElapsedTime();
         while (WoENrobot.getOpMode().opModeIsActive() && ((!shooter.isCorrectRpm(10) && shooterAccelerationTimeout.seconds() < 3)))
             spinOnce();
@@ -94,21 +94,21 @@ public class MovementMacros {
         Pose2D error = movement.getError(new Pose2D(getRingStackPose(), Double.NaN));
         switch (openCVNode.getStackSize()) {
             case FOUR:
-                movement.Pos(new Pose2D(getRingStackPose().minus(new Vector2D(0, 48).rotatedCW(error.acot())), error.acot() + Math.PI), 1, 1, 5, toRadians(5));
+                movement.pos(new Pose2D(getRingStackPose().minus(new Vector2D(0, 48).rotatedCW(error.acot())), error.acot() + Math.PI), 1, 1, 5, toRadians(5));
                 conveyor.setConveyorPower(1);
-                movement.Pos(new Pose2D(getRingStackPose().minus(new Vector2D(0, 20 - 18).rotatedCW(error.acot())), error.acot() + Math.PI), 0.3, 1, 3, toRadians(3));
+                movement.pos(new Pose2D(getRingStackPose().minus(new Vector2D(0, 20 - 18).rotatedCW(error.acot())), error.acot() + Math.PI), 0.3, 1, 3, toRadians(3));
                 delay(1000);
                 conveyor.setConveyorPower(0);
                 ShootHighGoal();
                 conveyor.setConveyorPower(1);
-                movement.Pos(new Pose2D(getRingStackPose().minus(new Vector2D(0, 20 - 39).rotatedCW(error.acot())), error.acot() + Math.PI), 0.6, 1, 3, toRadians(3));
+                movement.pos(new Pose2D(getRingStackPose().minus(new Vector2D(0, 20 - 39).rotatedCW(error.acot())), error.acot() + Math.PI), 0.6, 1, 3, toRadians(3));
                 delay(750);
                 ShootHighGoal();
                 conveyor.setConveyorPower(0);
                 break;
             case ONE:
                 conveyor.setConveyorPower(1);
-                movement.Pos(new Pose2D(getRingStackPose().minus(new Vector2D(0, 20 - 30).rotatedCW(error.acot())), error.acot() + Math.PI), 0.8, 1, 3, toRadians(3));
+                movement.pos(new Pose2D(getRingStackPose().minus(new Vector2D(0, 20 - 30).rotatedCW(error.acot())), error.acot() + Math.PI), 0.8, 1, 3, toRadians(3));
                 delay(1000);
                 ShootHighGoal();
                 conveyor.setConveyorPower(0);
@@ -143,7 +143,7 @@ public class MovementMacros {
         wobbleManipulator.setAngle(WobbleManipulator.Position.MEDIUM);
         Vector2D wobblePose = getPartnerWobblePose();
         Vector2D error = movement.getError(new Pose2D(wobblePose, Double.NaN));
-        movement.Pos(new Pose2D(Double.NaN, Double.NaN, error.acot()), 1, 1, 1, toRadians(75));
+        movement.pos(new Pose2D(Double.NaN, Double.NaN, error.acot()), 1, 1, 1, toRadians(75));
         movement.followPath(new MotionTask(wobblePose.minus(new Vector2D(0, wobblePlacementOffset.radius()).rotatedCW(error.acot())), error.acot() - wobblePlacementOffset.acot()), 1, 1, 1.5, toRadians(1));
         while (movement.pathFollowerIsActive() && getOpMode().opModeIsActive()) {
             if (movement.getError(new Pose2D(wobblePose, Double.NaN)).radius() < 75)
@@ -163,10 +163,10 @@ public class MovementMacros {
 
     public static void Park() {
         if (odometry.getRobotCoordinates().y > yParkLine) {
-            movement.Pos(new Pose2D(89.6372 * xSign + 67.3092 * sideSign, yParkLine + robotYbackLength - parkingTolerance, 0), 1, 1, parkingTolerance, toRadians(5));
+            movement.pos(new Pose2D(89.6372 * xSign + 67.3092 * sideSign, yParkLine + robotYbackLength - parkingTolerance, 0), 1, 1, parkingTolerance, toRadians(5));
         } else {
             wobbleManipulator.setAngle(WobbleManipulator.Position.MEDIUM);
-            movement.Pos(new Pose2D(89.6372 * xSign + 67.3092 * sideSign, yParkLine - robotYfrontLength + parkingTolerance, 0), 1, 1, parkingTolerance, toRadians(5));
+            movement.pos(new Pose2D(89.6372 * xSign + 67.3092 * sideSign, yParkLine - robotYfrontLength + parkingTolerance, 0), 1, 1, parkingTolerance, toRadians(5));
             delay(50);
         }
     }
@@ -225,9 +225,9 @@ public class MovementMacros {
         double angle = 6.5;
         for (short i = 0; i < 3; i++) {
             if (xSign == 1) {
-                movement.Pos(new Pose2D(xSign * pos, -7.5, toRadians(angle)));
+                movement.pos(new Pose2D(xSign * pos, -7.5, toRadians(angle)));
             } else {
-                movement.Pos(new Pose2D(xSign * (pos + 5), -7.5, toRadians(-angle)));
+                movement.pos(new Pose2D(xSign * (pos + 5), -7.5, toRadians(-angle)));
             }
             angle -= 5.4;
             delay(200);
@@ -251,9 +251,9 @@ public class MovementMacros {
         double angle = 5.5;
         for (short i = 0; i < 3; i++) {
             if (xSign == 1) {
-                movement.Pos(new Pose2D(xSign * pos, -5, toRadians(angle)));
+                movement.pos(new Pose2D(xSign * pos, -5, toRadians(angle)));
             } else {
-                movement.Pos(new Pose2D(xSign * pos, -5, toRadians(3)));
+                movement.pos(new Pose2D(xSign * pos, -5, toRadians(3)));
             }
             //angle -= 6.4;
             if (WoENrobot.getOpMode().gamepad1.x) {
@@ -272,7 +272,7 @@ public class MovementMacros {
     public static void ShootPowerShotAngle_experimental() {
         shooter.setShootingMode(rpm.ShooterMode.POWERSHOT);
         for (Pose2D shootingPose : getPowerShotShootingPoses()) {
-            movement.Pos(shootingPose);
+            movement.pos(shootingPose);
             delay(200);
             ElapsedTime shooterAccelerationTimeout = new ElapsedTime();
             shooterAccelerationTimeout.reset();
@@ -289,13 +289,13 @@ public class MovementMacros {
         //shooter.setShootersetings(3850, 500);
         shooter.setShootingMode(rpm.ShooterMode.HIGHGOAL);
         if (sideSign == 1 && xSign == 1)
-            movement.Pos(new Pose2D(xSign * 121, -48.5, toRadians(-8.5)));
+            movement.pos(new Pose2D(xSign * 121, -48.5, toRadians(-8.5)));
         else if (sideSign == -1 && xSign == 1)
-            movement.Pos(new Pose2D(xSign * 53, -30, toRadians(3)));
+            movement.pos(new Pose2D(xSign * 53, -30, toRadians(3)));
         else if (sideSign == -1 && xSign == -1)
-            movement.Pos(new Pose2D(xSign * 147.5, -9.5, toRadians(10.5)));
+            movement.pos(new Pose2D(xSign * 147.5, -9.5, toRadians(10.5)));
         else // if (sideSign == 1 &&  xSign == -1)
-            movement.Pos(new Pose2D(xSign * 61.5, -28, toRadians(-11.5)));
+            movement.pos(new Pose2D(xSign * 61.5, -28, toRadians(-11.5)));
         ElapsedTime shooterAccelerationTimeout = new ElapsedTime();
         while (opMode.opModeIsActive() && !shooter.isCorrectRpm() && shooterAccelerationTimeout.seconds() < 3)
             spinOnce();
@@ -307,7 +307,7 @@ public class MovementMacros {
 
     @Deprecated
     public static void PutRingsToLowGoal() {
-        movement.Pos(new Pose2D((93.75 + 11.25 * xSign) * xSign, 150, toRadians(0)));
+        movement.pos(new Pose2D((93.75 + 11.25 * xSign) * xSign, 150, toRadians(0)));
         wobbleManipulator.setAngle(WobbleManipulator.Position.MEDIUM);
         delay(1000);
         wobbleManipulator.setAngle(WobbleManipulator.Position.UP);

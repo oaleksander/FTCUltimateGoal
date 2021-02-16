@@ -12,11 +12,11 @@ import static org.firstinspires.ftc.teamcode.robot.WoENrobot.*;
 public class Auto_Sandbox extends AutoOpMode {
     @Override
     public void main() {
-        movement.Pos(new Pose2D(50,-100, toRadians(0)));
-        movement.Pos(new Pose2D(50, 100, toRadians(180)));
-        movement.Pos(new Pose2D(50, -100, toRadians(180)));
-        movement.Pos(new Pose2D(50, -100, toRadians(0)));
-        movement.Pos(getStartPosition());
+        movement.pos(new Pose2D(50,-100, toRadians(0)));
+        movement.pos(new Pose2D(50, 100, toRadians(180)));
+        movement.pos(new Pose2D(50, -100, toRadians(180)));
+        movement.pos(new Pose2D(50, -100, toRadians(0)));
+        movement.pos(getStartPosition());
         while (opModeIsActive()) {
             delay(1);
         }
