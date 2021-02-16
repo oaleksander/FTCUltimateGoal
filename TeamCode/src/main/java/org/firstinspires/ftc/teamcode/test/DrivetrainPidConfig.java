@@ -180,11 +180,11 @@ public class DrivetrainPidConfig extends LinearOpMode {
                 module.clearBulkCache();
             // odometry.update();
             Vector3D targetVelocity = new Vector3D(gamepad1.left_stick_x, -gamepad1.left_stick_y, gamepad1.right_stick_x)
-                    .multiply(getMaxVelocity());
+                    .times(getMaxVelocity());
             if (sineResetter.isTriggered(gamepad1.b))
                 sineWaveTimer.reset();
             if (gamepad1.b)
-                targetVelocity = new Vector3D(0, Math.sin(sineWaveTimer.seconds() * Math.PI / 3), 0).multiply(getMaxVelocity());
+                targetVelocity = new Vector3D(0, Math.sin(sineWaveTimer.seconds() * Math.PI / 3), 0).times(getMaxVelocity());
             telemetry.addData("targetX", targetVelocity.x);
             telemetry.addData("targety", targetVelocity.y);
             telemetry.addData("targetz", targetVelocity.z);
