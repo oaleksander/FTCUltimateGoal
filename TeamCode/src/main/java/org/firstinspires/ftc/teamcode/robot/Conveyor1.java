@@ -23,7 +23,7 @@ public class Conveyor1 implements Conveyor {
     private LinearOpMode opMode;
     public static DcMotorEx conveyorm = null;
     private final CommandSender conveyorPowerSender = new CommandSender(p -> conveyorm.setPower(-p));
-    private DistanceSensor sensorDistance;
+    public static DistanceSensor sensorDistance;
     private boolean full = false;
     private boolean backOn = false, stop = false;
     private boolean backMust = false;
