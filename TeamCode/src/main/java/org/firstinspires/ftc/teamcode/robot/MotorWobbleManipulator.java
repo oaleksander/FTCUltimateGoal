@@ -7,15 +7,15 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
 import org.firstinspires.ftc.teamcode.superclasses.WobbleManipulator;
 
 @Deprecated
-public class MotorWobbleManipulator implements WobbleManipulator {
+public class MotorWobbleManipulator extends RobotModule implements WobbleManipulator {
     private final double closeClose = 0.73;
     private final double closeOpen = 0.19;
     private final double minerror = 15, maxspeed = 0.7, kofP = 0.0015, kofd = 0.00001;
     private final ElapsedTime leverTime = new ElapsedTime();
-    private LinearOpMode opMode;
     private DcMotorEx lever = null;
     private Servo close = null;
     private boolean ismed = false, isdown = false;
@@ -24,10 +24,6 @@ public class MotorWobbleManipulator implements WobbleManipulator {
     private double pos = 0;
     private double power = 0, P = 0, D = 0, errorOld = 0, error = 0;
     private double oldpower = 0;
-
-    public void setOpMode(LinearOpMode OpMode) {
-        opMode = OpMode;
-    }
 
     public void initialize() {
 

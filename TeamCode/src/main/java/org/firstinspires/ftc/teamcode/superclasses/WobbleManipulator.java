@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.superclasses;
 
 
-public interface WobbleManipulator extends RobotModule {
+public interface WobbleManipulator{
     enum Position {UP, DOWN, MEDIUM}
 
     void setAngle(Position Positions);

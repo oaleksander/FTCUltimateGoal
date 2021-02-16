@@ -13,7 +13,6 @@ import org.firstinspires.ftc.teamcode.math.Vector3D;
 import org.firstinspires.ftc.teamcode.superclasses.Odometry;
 import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
 import org.openftc.revextensions2.ExpansionHubEx;
-import org.openftc.revextensions2.ExpansionHubMotor;
 import org.openftc.revextensions2.RevBulkData;
 
 import static java.lang.Math.PI;
@@ -22,7 +21,7 @@ import static java.lang.Math.toRadians;
 import static org.firstinspires.ftc.teamcode.math.MathUtil.angleWrap;
 
 @Deprecated
-public class TwoWheelOdometry implements Odometry {
+public class TwoWheelOdometry extends RobotModule implements Odometry {
     private static final double odometryWheelDiameterCm = 4.8;
     private static final double odometryCountsPerCM = (1440) / (odometryWheelDiameterCm * PI);
     private static final double odometryCMPerCounts = (odometryWheelDiameterCm * PI) / 1440;
@@ -35,7 +34,6 @@ public class TwoWheelOdometry implements Odometry {
     private static float IMUoffset = 0;
     private static BNO055IMU imu;
     private static ExpansionHubEx expansionHub;
-    private static LinearOpMode opMode = null;
     public RevBulkData bulkData;
     ElapsedTime looptime = new ElapsedTime();
     double angle_last = 0;
@@ -81,14 +79,10 @@ public class TwoWheelOdometry implements Odometry {
         Vector2D deltaPosition = new Vector2D((double) (bulkData.getMotorCurrentPosition(odometerX) - X_old) - deltaWorldHeading * odometerXcenterOffset,
                 (double) (-bulkData.getMotorCurrentPosition(odometerY) - Y_old) - deltaWorldHeading * odometerYcenterOffset);
 
-        worldPosition = worldPosition.add(new Pose2D(deltaPosition.rotatedCW(worldPosition.heading + deltaWorldHeading / 2), deltaWorldHeading));
+        worldPosition = worldPosition.plus(new Pose2D(deltaPosition.rotatedCW(worldPosition.heading + deltaWorldHeading / 2), deltaWorldHeading));
         Y_old = -bulkData.getMotorCurrentPosition(odometerY);
         X_old = bulkData.getMotorCurrentPosition(odometerX);
 
-    }
-
-    public void setOpMode(LinearOpMode opMode) {
-        TwoWheelOdometry.opMode = opMode;
     }
 
     public void initialize() {
@@ -110,6 +104,7 @@ public class TwoWheelOdometry implements Odometry {
      * @return robot position in (x,y,heading) form
      */
 
+    @Override
     public Pose2D getRobotCoordinates() {
         Vector2D poseTranslation = new Vector2D(worldPosition.x * odometryCMPerCounts, worldPosition.y * odometryCMPerCounts
         );//.add(new Vector2D(0, 1).rotatedCW(worldPosition.heading));

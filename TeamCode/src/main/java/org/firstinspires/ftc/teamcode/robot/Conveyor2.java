@@ -18,8 +18,8 @@ import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
 import static java.lang.Math.abs;
 
 
-public class Conveyor2 implements Conveyor {
-    private LinearOpMode opMode;
+public class Conveyor2 extends RobotModule implements Conveyor {
+
     public static DcMotorEx conveyor = null;
     private final motorAccelerationLimiter conveyorPowerSender = new motorAccelerationLimiter(new CommandSender(p -> conveyor.setPower(-p))::send,6);
     private DistanceSensor sensorDistance;
@@ -38,10 +38,6 @@ public class Conveyor2 implements Conveyor {
 
     private boolean doAutomaticConveyorStopping = true;
     private boolean doReverseOnStop = true;
-
-    public void setOpMode(LinearOpMode opMode) {
-        this.opMode = opMode;
-    }
 
     public void setAutomaticConveyorStopping(boolean doAutomaticConveyorStopping) {
         this.doAutomaticConveyorStopping = doAutomaticConveyorStopping;

@@ -19,8 +19,7 @@ import org.firstinspires.ftc.teamcode.robot.rpm.shooterMotor
 import org.firstinspires.ftc.teamcode.superclasses.RobotModule
 import org.openftc.revextensions2.ExpansionHubMotor
 
-class AI : RobotModule {
-    private var opMode: LinearOpMode? = null
+class AI : RobotModule() {
     private val AItime = ElapsedTime()
     private val headTime = ElapsedTime()
     private val maxTimeHead: Double = 60000.0
@@ -36,10 +35,8 @@ class AI : RobotModule {
     private var DriveRearLeft: ExpansionHubMotor? = null
     private var DriveRearRight: ExpansionHubMotor? = null
     private var owerHead = false
-    override fun setOpMode(OpMode: LinearOpMode) {
-        opMode = OpMode
-    }
     override fun initialize() {
+        /*
         OdometryYL = odometerYL as ExpansionHubMotor
         OdometryYR = odometerYR as ExpansionHubMotor
         Conveyorm = conveyorm as ExpansionHubMotor
@@ -48,7 +45,7 @@ class AI : RobotModule {
         DriveFrontRight = driveFrontRight as ExpansionHubMotor
         DriveRearLeft = driveRearLeft as ExpansionHubMotor
         DriveRearRight = driveRearRight as ExpansionHubMotor
-        AItime.reset()
+        AItime.reset() */
     }
 
     /*override fun update() {

@@ -21,7 +21,7 @@ import static java.lang.Math.abs;
 import static java.lang.Math.max;
 import static java.lang.Math.signum;
 
-public class MecanumDrivetrain implements Drivetrain {
+public class MecanumDrivetrain extends RobotModule implements Drivetrain {
 
 
     /* Physical constants */
@@ -71,11 +71,6 @@ public class MecanumDrivetrain implements Drivetrain {
     private double powerFrontRight = 0;
     private double powerRearLeft = 0;
     private double powerRearRight = 0;
-    private LinearOpMode opMode = null;
-
-    public void setOpMode(LinearOpMode opMode) {
-        this.opMode = opMode;
-    }
 
     public void initialize() {
         assignNames();

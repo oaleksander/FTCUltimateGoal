@@ -16,9 +16,9 @@ import java.util.List;
 
 public class WoENrobot {
 
-    public static WobbleManipulator wobbleManipulator = new ServoWobbleManipulator();
-    public static OpenCVNodeWebcam openCVNode = new OpenCVNodeWebcam();
-    public static Conveyor conveyor = new Conveyor2();
+    public static ServoWobbleManipulator wobbleManipulator = new ServoWobbleManipulator();
+    public static OpenCVNodeWebcam openCVNode = new OpenCVNodePhonecam();
+    public static Conveyor2 conveyor = new Conveyor2();
     public static rpm shooter = new rpm();
     public static TelemetryDebugging telemetryDebugging = new TelemetryDebugging();
     public static AI ai = new AI();

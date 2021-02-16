@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.superclasses;
 
-public interface Conveyor extends RobotModule {
+public interface Conveyor{
+
     void setConveyorPower(double power);
 
     void setForceReverse(boolean forceReverse);

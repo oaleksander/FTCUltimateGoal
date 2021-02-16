@@ -13,6 +13,7 @@ import org.firstinspires.ftc.teamcode.math.Pose2D;
 import org.firstinspires.ftc.teamcode.math.Vector2D;
 import org.firstinspires.ftc.teamcode.math.Vector3D;
 import org.firstinspires.ftc.teamcode.superclasses.Odometry;
+import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
 import org.jetbrains.annotations.NotNull;
 
 import static java.lang.Math.PI;
@@ -23,7 +24,7 @@ import static java.lang.Math.toRadians;
 import static org.firstinspires.ftc.teamcode.math.MathUtil.angleAverage;
 import static org.firstinspires.ftc.teamcode.math.MathUtil.angleWrap;
 
-public class ThreeWheelOdometry implements Odometry {
+public class ThreeWheelOdometry extends RobotModule implements Odometry {
     private double odometryWheelDiameterCm = OdometryConfig.forwardMultiplier*4.8;
     private double odometryCountsPerCM = (1440) / (odometryWheelDiameterCm * PI);
     private double odometryCMPerCounts = (odometryWheelDiameterCm * PI) / 1440;
@@ -37,8 +38,6 @@ public class ThreeWheelOdometry implements Odometry {
     public static DcMotorEx odometerYL = null;
     public static DcMotorEx odometerYR = null;
     public static DcMotorEx odometerX = null;
-    private static LinearOpMode opMode = null;
-    //  public RevBulkData bulkData;
     private float IMUoffset1 = 0;
     private float IMUoffset2 = 0;
     private double encoderHeadingCovariance = 0;
@@ -146,17 +145,13 @@ public class ThreeWheelOdometry implements Odometry {
                     .rotatedCW(deltaPosition.acot());
         }
 
-        worldPosition = worldPosition.add(
+        worldPosition = worldPosition.plus(
                 new Pose2D(deltaPosition.rotatedCW(worldPosition.heading),
                         deltaWorldHeading));
 
         YL_old = odometerYL.getCurrentPosition();
         YR_old = odometerYR.getCurrentPosition();
         X_old = odometerX.getCurrentPosition();
-    }
-
-    public void setOpMode(LinearOpMode opMode) {
-        ThreeWheelOdometry.opMode = opMode;
     }
 
     public void initialize() {
@@ -206,7 +201,7 @@ public class ThreeWheelOdometry implements Odometry {
         X_old = odometerX.getCurrentPosition();
         angleOffset = angleWrap(calculateHeading() + angleOffset - coordinates.heading);
         this.calculatePosition(new Pose2D(new Vector2D(coordinates.x * odometryCountsPerCM, coordinates.y * odometryCountsPerCM)
-                .add(YWheelPairCenterOffset.scale(odometryCountsPerCM).rotatedCW(worldPosition.heading)), coordinates.heading));
+                .plus(YWheelPairCenterOffset.times(odometryCountsPerCM).rotatedCW(worldPosition.heading)), coordinates.heading));
     }
 
     public Vector3D getRobotVelocity() {

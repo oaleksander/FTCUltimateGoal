@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.misc.CommandSender;
 import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
 import org.openftc.revextensions2.ExpansionHubServo;
 
-public class rpm implements RobotModule {
+public class rpm extends RobotModule {
     private final ElapsedTime rpmTime = new ElapsedTime();
     private final ElapsedTime feederTime = new ElapsedTime();
     private final ElapsedTime encoderFailureDetectionTime = new ElapsedTime();
@@ -33,7 +33,6 @@ public class rpm implements RobotModule {
         public static double kF_referenceVoltage = 12.485;
     }
 
-    private LinearOpMode opMode;
     public static DcMotorEx shooterMotor = null;
     private final CommandSender shooterVelocitySender = new CommandSender(p -> shooterMotor.setVelocity(p));
     public static ExpansionHubServo feeder = null;
@@ -46,10 +45,6 @@ public class rpm implements RobotModule {
     private double currentVelocity = 0;
     private double velocityTarget = 2400;
     private boolean encoderFailureMode = false;
-
-    public void setOpMode(LinearOpMode OpMode) {
-        opMode = OpMode;
-    }
 
     public void initialize() {
 

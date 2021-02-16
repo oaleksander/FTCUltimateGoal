@@ -14,13 +14,12 @@ import org.firstinspires.ftc.teamcode.superclasses.Conveyor;
 import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
 
 
-public class Conveyor1 implements Conveyor {
+public class Conveyor1 extends RobotModule implements Conveyor {
     private final ElapsedTime conveyorTime = new ElapsedTime();
     private final ElapsedTime backOnTime = new ElapsedTime();
     private final ElapsedTime pauseTime = new ElapsedTime();
     private final ElapsedTime BackOnAftertime = new ElapsedTime();
 
-    private LinearOpMode opMode;
     public static DcMotorEx conveyorm = null;
     private final CommandSender conveyorPowerSender = new CommandSender(p -> conveyorm.setPower(-p));
     public static DistanceSensor sensorDistance;
@@ -34,10 +33,6 @@ public class Conveyor1 implements Conveyor {
     private double conveyorPower = 0;
     private double distance = 0;
     private double current = 0;
-
-    public void setOpMode(LinearOpMode OpMode) {
-        opMode = OpMode;
-    }
 
 
     public void initialize() {

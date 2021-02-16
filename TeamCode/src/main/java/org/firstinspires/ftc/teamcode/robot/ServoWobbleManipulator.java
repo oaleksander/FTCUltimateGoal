@@ -5,10 +5,11 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.misc.CommandSender;
+import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
 import org.firstinspires.ftc.teamcode.superclasses.WobbleManipulator;
 import org.openftc.revextensions2.ExpansionHubServo;
 
-public class ServoWobbleManipulator implements WobbleManipulator {
+public class ServoWobbleManipulator extends RobotModule implements WobbleManipulator {
 
     @Config
     public static class WobbleServoPositions {
@@ -23,15 +24,10 @@ public class ServoWobbleManipulator implements WobbleManipulator {
     private final CommandSender closePositionSender = new CommandSender(p -> gripper.setPosition(p));
     public static ExpansionHubServo leverArm = null;
     private final CommandSender anglePositionSender = new CommandSender(p -> leverArm.setPosition(p));
-    private LinearOpMode opMode;
     private boolean isDown = false;
     private Position posAngle = Position.UP;
     private double leverArmPosition = 0;
     private double gripperPosition = 0;
-
-    public void setOpMode(LinearOpMode OpMode) {
-        opMode = OpMode;
-    }
 
     public void initialize() {
         gripper = (ExpansionHubServo) opMode.hardwareMap.get(Servo.class, "wobbleGrabber");

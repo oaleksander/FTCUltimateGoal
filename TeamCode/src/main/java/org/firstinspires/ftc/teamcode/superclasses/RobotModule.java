@@ -2,20 +2,23 @@ package org.firstinspires.ftc.teamcode.superclasses;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-public interface RobotModule {
+public abstract class RobotModule {
 
-    void setOpMode(LinearOpMode opMode); //{this.opMode = opMode;}
+    protected LinearOpMode opMode = null;
 
-    void initialize();
+    public void setOpMode(LinearOpMode opMode)
+    {
+        this.opMode = opMode;
+    }
 
-    default void initialize(LinearOpMode opMode) {
+    public void initialize() {}
+
+    public final void initialize(LinearOpMode opMode) {
         setOpMode(opMode);
         initialize();
     }
 
-    default void start() {
-    }
+    public void start() {}
 
-    default void update() {
-    }
+    public void update() {}
 }

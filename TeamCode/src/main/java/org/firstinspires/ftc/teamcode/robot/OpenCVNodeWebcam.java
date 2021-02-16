@@ -17,16 +17,11 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvInternalCamera;
 import org.openftc.easyopencv.OpenCvPipeline;
 
-public class OpenCVNodeWebcam implements RobotModule {
+public class OpenCVNodeWebcam extends RobotModule {
     static final int rows = 640;
     static final int cols = 480;
     OpenCvCamera webcam;
-    LinearOpMode opMode;
     StageSwitchingPipeline pipeline = new StageSwitchingPipeline();
-
-    public void setOpMode(LinearOpMode OpMode) {
-        opMode = OpMode;
-    }
 
     @Override
     public void initialize() {

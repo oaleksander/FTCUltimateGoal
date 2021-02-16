@@ -16,7 +16,7 @@ import static org.firstinspires.ftc.teamcode.robot.WoENrobot.odometry;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.runTime;
 import static org.firstinspires.ftc.teamcode.robot.WoENrobot.shooter;
 
-public class TelemetryDebugging implements RobotModule {
+public class TelemetryDebugging extends RobotModule{
 
     public static double ROBOT_SIDE_LENGTH = 44.4;
     private final ElapsedTime measurementTime = new ElapsedTime();
@@ -31,10 +31,9 @@ public class TelemetryDebugging implements RobotModule {
         public static int refreshTimeMs = 50;
     }
 
-    private LinearOpMode opMode = null;
-
+    @Override
     public void setOpMode(LinearOpMode opMode) {
-        this.opMode = opMode;
+        super.setOpMode(opMode);
         dashboard = FtcDashboard.getInstance();
         telemetry = opMode.telemetry;
 

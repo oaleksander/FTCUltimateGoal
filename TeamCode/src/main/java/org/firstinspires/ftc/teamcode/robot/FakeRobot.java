@@ -15,7 +15,7 @@ import org.firstinspires.ftc.teamcode.misc.motorAccelerationLimiter;
 import static java.lang.Math.abs;
 import static java.lang.Math.signum;
 
-public class FakeRobot implements Drivetrain, Odometry {
+public class FakeRobot extends RobotModule implements Drivetrain, Odometry {
 
     private final Vector3D maxVelocity = new MecanumDrivetrain().getMaxVelocity();
     boolean started = false;
@@ -26,13 +26,7 @@ public class FakeRobot implements Drivetrain, Odometry {
     private final motorAccelerationLimiter yLimiter = new motorAccelerationLimiter(v -> realVelocityFC.y = v, maxVelocity.y / 0.38);
     private final motorAccelerationLimiter xLimiter = new motorAccelerationLimiter(v -> realVelocityFC.x = v, maxVelocity.x / 0.38);
     private Pose2D currentPosition = new Pose2D(0, 0, 0);
-    private LinearOpMode opMode;
     private final ElapsedTime updateTimer = new ElapsedTime();
-
-    @Override
-    public void setOpMode(LinearOpMode opMode) {
-        this.opMode = opMode;
-    }
 
     @Override
     public void initialize() {
