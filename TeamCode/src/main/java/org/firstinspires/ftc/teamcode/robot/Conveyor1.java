@@ -51,11 +51,11 @@ public class Conveyor1 extends RobotModule implements Conveyor {
     }
 
     private void initializecolor() {
-        sensorDistance = opMode.hardwareMap.get(DistanceSensor.class, "ringDetector");
+        sensorDistance = WoENHardware.INSTANCE.getRingDetector();
     }
 
     private void initializedrive() {
-        conveyorm = opMode.hardwareMap.get(DcMotorEx.class, "odometerYL");
+        conveyorm = WoENHardware.INSTANCE.getConveyorMotor();
 
         conveyorm.setDirection(DcMotorSimple.Direction.FORWARD);
 

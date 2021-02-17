@@ -108,10 +108,12 @@ public class WoENrobot {
         opMode.telemetry.update();
 
 
-        allHubs = opMode.hardwareMap.getAll(LynxModule.class);
-        expansionHub1 = opMode.hardwareMap.get(ExpansionHubEx.class, "Control Hub");
-        expansionHub2 = opMode.hardwareMap.get(ExpansionHubEx.class, "Expansion Hub 2");
-        setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
+        WoENHardware.INSTANCE.assignHardware(opMode.hardwareMap);
+        expansionHub1 = WoENHardware.INSTANCE.getControlHub();
+        expansionHub2 = WoENHardware.INSTANCE.getExpansionHub();
+        allHubs = WoENHardware.INSTANCE.getLynxModules();
+
+        setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
 
         Arrays.stream(activeRobotModules).forEach(robotModule -> robotModule.initialize(opMode));
 

@@ -97,10 +97,10 @@ public class MecanumDrivetrain extends RobotModule implements Drivetrain {
     }
 
     private void assignNames() {
-        driveFrontLeft = opMode.hardwareMap.get(DcMotorEx.class, "driveFrontLeft");
-        driveFrontRight = opMode.hardwareMap.get(DcMotorEx.class, "driveFrontRight");
-        driveRearLeft = opMode.hardwareMap.get(DcMotorEx.class, "driveRearLeft");
-        driveRearRight = opMode.hardwareMap.get(DcMotorEx.class, "driveRearRight");
+        driveFrontLeft = WoENHardware.INSTANCE.getDriveFrontLeft();
+        driveFrontRight = WoENHardware.INSTANCE.getDriveFrontRight();
+        driveRearLeft = WoENHardware.INSTANCE.getDriveRearLeft();
+        driveRearRight = WoENHardware.INSTANCE.getDriveRearRight();
     }
 
     private void setMotorDirections() {

@@ -83,14 +83,14 @@ public class ThreeWheelOdometry extends RobotModule implements Odometry {
     }
 
     private void initIMU() {
-        imu1 = opMode.hardwareMap.get(BNO055IMU.class, "imu");
+        imu1 = WoENHardware.INSTANCE.getImu1();
         BNO055IMU.Parameters parameters1 = new BNO055IMU.Parameters();
         parameters1.accelRange = BNO055IMU.AccelRange.G2;
         parameters1.gyroRange = BNO055IMU.GyroRange.DPS500;
         parameters1.mode = BNO055IMU.SensorMode.IMU;
         parameters1.calibrationDataFile = "BNO055IMUCalibration_1.json";
         imu1.initialize(parameters1);
-        imu2 = opMode.hardwareMap.get(BNO055IMU.class, "imu 1");
+        imu2 = WoENHardware.INSTANCE.getImu2();
         BNO055IMU.Parameters parameters2 = new BNO055IMU.Parameters();
         parameters2.accelRange = BNO055IMU.AccelRange.G2;
         parameters2.gyroRange = BNO055IMU.GyroRange.DPS500;

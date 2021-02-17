@@ -27,8 +27,8 @@ public class MotorWobbleManipulator extends RobotModule implements WobbleManipul
 
     public void initialize() {
 
-        lever = opMode.hardwareMap.get(DcMotorEx.class, "lever");
-        close = opMode.hardwareMap.get(Servo.class, "wobbleGrabber");
+        lever = WoENHardware.INSTANCE.getLever();
+        close = WoENHardware.INSTANCE.getGripper();
 
 
         lever.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);

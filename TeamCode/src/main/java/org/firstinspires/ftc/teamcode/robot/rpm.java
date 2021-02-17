@@ -48,7 +48,7 @@ public class rpm extends RobotModule {
 
     public void initialize() {
 
-        shooterMotor = opMode.hardwareMap.get(DcMotorEx.class, "shooterMotor");
+        shooterMotor = WoENHardware.INSTANCE.getShooterMotor();
         MotorConfigurationType motorConfigurationType = shooterMotor.getMotorType().clone();
         motorConfigurationType.setAchieveableMaxRPMFraction(0.896476253);
         motorConfigurationType.setTicksPerRev(24);

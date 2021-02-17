@@ -30,8 +30,8 @@ public class ServoWobbleManipulator extends RobotModule implements WobbleManipul
     private double gripperPosition = 0;
 
     public void initialize() {
-        gripper = (ExpansionHubServo) opMode.hardwareMap.get(Servo.class, "wobbleGrabber");
-        leverArm = (ExpansionHubServo) opMode.hardwareMap.get(Servo.class, "angle");
+        gripper = WoENHardware.INSTANCE.getGripper();
+        leverArm = WoENHardware.INSTANCE.getLeverArm();
         grabWobble(true);
         setAngle(Position.UP);
         update();

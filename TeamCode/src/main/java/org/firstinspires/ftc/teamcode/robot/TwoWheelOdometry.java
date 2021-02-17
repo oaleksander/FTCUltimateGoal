@@ -52,7 +52,7 @@ public class TwoWheelOdometry extends RobotModule implements Odometry {
     }
 
     private void initIMU() {
-        imu = opMode.hardwareMap.get(BNO055IMU.class, "imu");
+        imu = WoENHardware.INSTANCE.getImu2();
         imu.initialize(new BNO055IMU.Parameters());
         IMUoffset = (float) getIMUheading();
     }
@@ -95,7 +95,7 @@ public class TwoWheelOdometry extends RobotModule implements Odometry {
     }
 
     private void assignNames() {
-        expansionHub = opMode.hardwareMap.get(ExpansionHubEx.class, "Expansion Hub 2");
+        expansionHub = WoENHardware.INSTANCE.getExpansionHub();
     }
 
     /**
