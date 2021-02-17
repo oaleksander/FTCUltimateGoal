@@ -26,26 +26,25 @@ class AI : RobotModule() {
     private val interval = 1000.0
     private val timeDiagnostic = 1000.0
     private val timeWait = 500.0
-    private var OdometryYL: ExpansionHubMotor? = null
-    private var OdometryYR: ExpansionHubMotor? = null
-    private var Conveyorm: ExpansionHubMotor? = null
-    private var ShooterMotor: ExpansionHubMotor? = null
-    private var DriveFrontLeft: ExpansionHubMotor? = null
-    private var DriveFrontRight: ExpansionHubMotor? = null
-    private var DriveRearLeft: ExpansionHubMotor? = null
-    private var DriveRearRight: ExpansionHubMotor? = null
+    private lateinit var OdometryYL: ExpansionHubMotor
+    private lateinit var OdometryYR: ExpansionHubMotor
+    private lateinit var Conveyorm: ExpansionHubMotor
+    private lateinit var ShooterMotor: ExpansionHubMotor
+    private lateinit var DriveFrontLeft: ExpansionHubMotor
+    private lateinit var DriveFrontRight: ExpansionHubMotor
+    private lateinit var DriveRearLeft: ExpansionHubMotor
+    private lateinit var DriveRearRight: ExpansionHubMotor
     private var owerHead = false
     override fun initialize() {
-        /*
-        OdometryYL = odometerYL as ExpansionHubMotor
-        OdometryYR = odometerYR as ExpansionHubMotor
-        Conveyorm = conveyorm as ExpansionHubMotor
-        ShooterMotor = shooterMotor as ExpansionHubMotor
-        DriveFrontLeft = driveFrontLeft as ExpansionHubMotor
-        DriveFrontRight = driveFrontRight as ExpansionHubMotor
-        DriveRearLeft = driveRearLeft as ExpansionHubMotor
-        DriveRearRight = driveRearRight as ExpansionHubMotor
-        AItime.reset() */
+        OdometryYL = WoENHardware.odometerYL
+        OdometryYR = WoENHardware.odometerYR
+        Conveyorm = WoENHardware.conveyorMotor
+        ShooterMotor = WoENHardware.shooterMotor
+        DriveFrontLeft = WoENHardware.driveFrontLeft
+        DriveFrontRight = WoENHardware.driveFrontRight
+        DriveRearLeft = WoENHardware.driveRearLeft
+        DriveRearRight = WoENHardware.driveRearRight
+        AItime.reset()
     }
 
     /*override fun update() {
