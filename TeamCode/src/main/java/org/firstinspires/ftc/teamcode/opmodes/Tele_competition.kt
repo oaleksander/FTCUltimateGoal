@@ -1,85 +1,65 @@
-package org.firstinspires.ftc.teamcode.opmodes;
+package org.firstinspires.ftc.teamcode.opmodes
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-
-import org.firstinspires.ftc.teamcode.misc.ButtonSwitch;
-import org.firstinspires.ftc.teamcode.misc.SinglePressButton;
-import org.firstinspires.ftc.teamcode.robot.rpm;
-
-import static org.firstinspires.ftc.teamcode.opmodes.MovementMacros.ShootPOWERSHOTAngle;
-import static org.firstinspires.ftc.teamcode.robot.WoENrobot.conveyor;
-import static org.firstinspires.ftc.teamcode.robot.WoENrobot.initRobot;
-import static org.firstinspires.ftc.teamcode.robot.WoENrobot.movement;
-import static org.firstinspires.ftc.teamcode.robot.WoENrobot.shooter;
-import static org.firstinspires.ftc.teamcode.robot.WoENrobot.spinOnce;
-import static org.firstinspires.ftc.teamcode.robot.WoENrobot.startRobot;
-import static org.firstinspires.ftc.teamcode.robot.WoENrobot.wobbleManipulator;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp
+import org.firstinspires.ftc.teamcode.misc.ButtonSwitch
+import org.firstinspires.ftc.teamcode.misc.SinglePressButton
+import org.firstinspires.ftc.teamcode.robot.WoENrobot
+import org.firstinspires.ftc.teamcode.robot.rpm
 
 @TeleOp(name = "TeleOp COMPETITION", group = "Competition")
-public class Tele_competition extends LinearOpMode {
-    @Override
-    public void runOpMode() {
-        initRobot(this);
-        startRobot();
+class Tele_competition : LinearOpMode() {
+    override fun runOpMode() {
+        WoENrobot.initRobot(this)
+        WoENrobot.startRobot()
         //  conveyor.setBackOnAfter(true);
-        ButtonSwitch buttonAswitch = new ButtonSwitch();
-        ButtonSwitch buttonBackswitch = new ButtonSwitch();
-        ButtonSwitch shooterSpeedSwitch = new ButtonSwitch();
+        val buttonAswitch = ButtonSwitch()
+        val buttonBackswitch = ButtonSwitch()
+        val shooterSpeedSwitch = ButtonSwitch()
         //  ButtonSwitch buttonspeedConveyor = new ButtonSwitch();
-
-        ButtonSwitch shooterOnOffSwitch = new ButtonSwitch();
-        SinglePressButton threeRingPresser = new SinglePressButton();
+        val shooterOnOffSwitch = ButtonSwitch()
+        val threeRingPresser = SinglePressButton()
         //conveyor.feeder.setPosition(0.06);
         //  double powerconveyor = 1;
 
         //shooter.setShootersetings(3800, 500);
         while (opModeIsActive()) {
             if (gamepad2.left_bumper) {
-                MovementMacros.ShootHighGoalAsync();
+                MovementMacros.ShootHighGoalAsync()
                 //   wobbleManipulator2.offAngle();
             }
-            if (!movement.pathFollowerIsActive()) {
-                wobbleManipulator.grabWobble(buttonAswitch.isTriggered(gamepad2.right_bumper));
-                wobbleManipulator.upmediumdown(gamepad2.b, gamepad2.x); // correct
-                conveyor.setConveyorPower(buttonBackswitch.isTriggered(gamepad2.left_trigger > 0.5) ? 1 : 0);
-                shooter.setShootingMode(shooterOnOffSwitch.isTriggered(gamepad2.a) ?
-                        shooterSpeedSwitch.isTriggered(gamepad2.y) ?
-                                rpm.ShooterMode.POWERSHOT
-                                : rpm.ShooterMode.HIGHGOAL
-                        : rpm.ShooterMode.OFF);
-                conveyor.setForceReverse(gamepad2.right_trigger > 0.5);
+            if (!WoENrobot.movement.pathFollowerIsActive()) {
+                WoENrobot.wobbleManipulator.grabWobble(buttonAswitch.isTriggered(gamepad2.right_bumper))
+                WoENrobot.wobbleManipulator.upmediumdown(gamepad2.b, gamepad2.x) // correct
+                WoENrobot.conveyor.setConveyorPower(if (buttonBackswitch.isTriggered(gamepad2.left_trigger > 0.5)) 1.0 else 0.0)
+                WoENrobot.shooter.shootingMode =
+                    if (shooterOnOffSwitch.isTriggered(gamepad2.a)) if (shooterSpeedSwitch.isTriggered(
+                            gamepad2.y
+                        )
+                    ) rpm.ShooterMode.POWERSHOT else rpm.ShooterMode.HIGHGOAL else rpm.ShooterMode.OFF
+                WoENrobot.conveyor.setForceReverse(gamepad2.right_trigger > 0.5)
                 //  conveyor.OFFcolorlock(gamepad2.left_bumper);
                 //   powerconveyor = (buttonspeedConveyor.isTriggered(gamepad2.right_bumper)?-1:1);
                 if (gamepad1.x) {
-                    ShootPOWERSHOTAngle();
+                    MovementMacros.ShootPOWERSHOTAngle()
                 }
-                if (gamepad1.a)
-                    shooter.feedRing();
-                if (threeRingPresser.isTriggered(gamepad1.right_stick_button))
-                    shooter.feedRings();
+                if (gamepad1.a) WoENrobot.shooter.feedRing()
+                if (threeRingPresser.isTriggered(gamepad1.right_stick_button)) WoENrobot.shooter.feedRings()
             }
-            double turn = 0;
-            double y;
-            double x;
-            if (gamepad1.left_bumper) turn -= 0.25;
-            else turn -= gamepad1.left_trigger;
-            if (gamepad1.right_bumper) turn += 0.25;
-            else turn += gamepad1.right_trigger;
+            var turn = 0.0
+            var y: Double
+            var x: Double
+            turn -= if (gamepad1.left_bumper) 0.25 else gamepad1.left_trigger.toDouble()
+            turn += if (gamepad1.right_bumper) 0.25 else gamepad1.right_trigger.toDouble()
             //  turn +=gamepad1.right_stick_x;
-            y = -gamepad1.left_stick_y;
-            x = gamepad1.left_stick_x;
-            if (gamepad1.dpad_up)
-                y += 1;
-            if (gamepad1.dpad_down)
-                y = -1;
-            if (gamepad1.dpad_left)
-                x = -1;
-            if (gamepad1.dpad_right)
-                x += 1;
-
-            movement.humanSetVelocity(x, y, turn);
-            spinOnce();
+            y = -gamepad1.left_stick_y.toDouble()
+            x = gamepad1.left_stick_x.toDouble()
+            if (gamepad1.dpad_up) y += 1.0
+            if (gamepad1.dpad_down) y = -1.0
+            if (gamepad1.dpad_left) x = -1.0
+            if (gamepad1.dpad_right) x += 1.0
+            WoENrobot.movement.humanSetVelocity(x, y, turn)
+            WoENrobot.spinOnce()
         }
     }
 }

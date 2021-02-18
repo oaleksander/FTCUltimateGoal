@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.misc.CommandSender;
 import org.firstinspires.ftc.teamcode.superclasses.Conveyor;
 import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
 
-
+@Deprecated
 public class Conveyor1 extends RobotModule implements Conveyor {
     private final ElapsedTime conveyorTime = new ElapsedTime();
     private final ElapsedTime backOnTime = new ElapsedTime();

@@ -23,7 +23,7 @@ public class Conveyor2 extends MultithreadRobotModule implements Conveyor {
 
     public static DcMotorEx conveyor = null;
     private final motorAccelerationLimiter conveyorPowerSender = new motorAccelerationLimiter(new CommandSender(p -> conveyor.setPower(-p))::send,6);
-    private DistanceSensor sensorDistance;
+    public static DistanceSensor sensorDistance;
     private final ElapsedTime motorCurrentTimer = new ElapsedTime();
     private final ElapsedTime stackDetectionTimer = new ElapsedTime();
 
