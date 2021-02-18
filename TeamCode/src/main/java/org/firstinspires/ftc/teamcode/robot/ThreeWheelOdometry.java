@@ -36,9 +36,9 @@ public class ThreeWheelOdometry extends MultithreadRobotModule implements Odomet
     private static double angleOffset = 0;
     private static BNO055IMU imu1;
     private static BNO055IMU imu2;
-    public static DcMotorEx odometerYL = null;
-    public static DcMotorEx odometerYR = null;
-    public static DcMotorEx odometerX = null;
+    private static DcMotorEx odometerYL = null;
+    private static DcMotorEx odometerYR = null;
+    private static DcMotorEx odometerX = null;
     private float IMUoffset1 = 0;
     private float IMUoffset2 = 0;
     private double encoderHeadingCovariance = 0;

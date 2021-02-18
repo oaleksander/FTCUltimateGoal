@@ -1,21 +1,19 @@
-package org.firstinspires.ftc.teamcode.robot;
+package org.firstinspires.ftc.teamcode.robot
 
-import org.openftc.easyopencv.OpenCvCameraFactory;
-import org.openftc.easyopencv.OpenCvCameraRotation;
-import org.openftc.easyopencv.OpenCvInternalCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory
+import org.openftc.easyopencv.OpenCvCameraRotation
+import org.openftc.easyopencv.OpenCvInternalCamera
 
-@Deprecated
-public class OpenCVNodePhonecam extends OpenCVNodeWebcam {
-    @Override
-    public void initialize() {
+@Deprecated("")
+class OpenCVNodePhonecam : OpenCVNodeWebcam() {
+    override fun initialize() {
         try {
-            int cameraMonitorViewId = opMode.hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", opMode.hardwareMap.appContext.getPackageName());
-            webcam = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
-            webcam.setPipeline(pipeline);
-            webcam.openCameraDeviceAsync(() -> webcam.startStreaming(rows, cols, OpenCvCameraRotation.SIDEWAYS_LEFT));
-        } catch (Exception e) {
-            opMode.telemetry.addData("OpenCVNode Error", e.getMessage());
+            val cameraMonitorViewId = opMode.hardwareMap.appContext.resources.getIdentifier("cameraMonitorViewId","id", opMode.hardwareMap.appContext.packageName)
+            webcam = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId)
+            webcam.setPipeline(pipeline)
+            webcam.openCameraDeviceAsync { webcam.startStreaming(rows, cols, OpenCvCameraRotation.SIDEWAYS_LEFT) }
+        } catch (e: Exception) {
+            opMode.telemetry.addData("OpenCVNode Error", e.message)
         }
     }
 }
-

@@ -178,8 +178,8 @@ class rpm : MultithreadRobotModule() {
     }
 
     companion object {
-        lateinit var shooterMotor: DcMotorEx
-        lateinit var voltageSensor: VoltageSensor
-        lateinit var feeder: ExpansionHubServo
+        private lateinit var shooterMotor: DcMotorEx
+        private lateinit var voltageSensor: VoltageSensor
+        private lateinit var feeder: ExpansionHubServo
     }
 }

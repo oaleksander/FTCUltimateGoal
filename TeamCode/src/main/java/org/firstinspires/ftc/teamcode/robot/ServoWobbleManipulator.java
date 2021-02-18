@@ -21,9 +21,9 @@ public class ServoWobbleManipulator extends MultithreadRobotModule implements Wo
         public static double angleUp = 1;
     }
 
-    public static ExpansionHubServo gripper = null;
+    private static ExpansionHubServo gripper = null;
     private final CommandSender closePositionSender = new CommandSender(p -> gripper.setPosition(p));
-    public static ExpansionHubServo leverArm = null;
+    private static ExpansionHubServo leverArm = null;
     private final CommandSender anglePositionSender = new CommandSender(p -> leverArm.setPosition(p));
     private boolean isDown = false;
     private Position posAngle = Position.UP;

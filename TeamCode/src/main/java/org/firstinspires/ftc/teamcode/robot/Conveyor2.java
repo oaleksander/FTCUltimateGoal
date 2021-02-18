@@ -21,9 +21,9 @@ import static java.lang.Math.abs;
 
 public class Conveyor2 extends MultithreadRobotModule implements Conveyor {
 
-    public static DcMotorEx conveyor = null;
+    private static DcMotorEx conveyor = null;
     private final motorAccelerationLimiter conveyorPowerSender = new motorAccelerationLimiter(new CommandSender(p -> conveyor.setPower(-p))::send,6);
-    public static DistanceSensor sensorDistance;
+    private static DistanceSensor sensorDistance;
     private final ElapsedTime motorCurrentTimer = new ElapsedTime();
     private final ElapsedTime stackDetectionTimer = new ElapsedTime();
 

@@ -57,7 +57,7 @@ public class MecanumDrivetrain extends MultithreadRobotModule implements Drivetr
     private static double minMotorSpeed = DrivetrainConfig.achieveableMinRPMFraction * theoreticalMaxSpeed; //http://b1-srv-kms-1.sch239.net:8239
     private double maxAcceleration = theoreticalMaxSpeed / DrivetrainConfig.secondsToAccelerate;
     /* Drivetrain hardware members. */
-    public static DcMotorEx driveFrontLeft = null;
+    private static DcMotorEx driveFrontLeft = null;
     /* Motor controllers */
     private final motorAccelerationLimiter mFLProfiler = new motorAccelerationLimiter(new CommandSender(v -> driveFrontLeft.setVelocity(v, AngleUnit.RADIANS))::send, maxAcceleration);
     private static DcMotorEx driveFrontRight = null;

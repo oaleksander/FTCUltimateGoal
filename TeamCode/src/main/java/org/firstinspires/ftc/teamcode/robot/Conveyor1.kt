@@ -1,147 +1,137 @@
-package org.firstinspires.ftc.teamcode.robot;
+package org.firstinspires.ftc.teamcode.robot
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.hardware.DcMotor
+import com.qualcomm.robotcore.hardware.DcMotorEx
+import com.qualcomm.robotcore.hardware.DcMotorSimple
+import com.qualcomm.robotcore.hardware.DistanceSensor
+import com.qualcomm.robotcore.util.ElapsedTime
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
+import org.firstinspires.ftc.teamcode.misc.CommandSender
+import org.firstinspires.ftc.teamcode.robot.WoENHardware.conveyorMotor
+import org.firstinspires.ftc.teamcode.robot.WoENHardware.ringDetector
+import org.firstinspires.ftc.teamcode.superclasses.Conveyor
+import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule
+import org.firstinspires.ftc.teamcode.superclasses.RobotModule
 
-import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.teamcode.misc.CommandSender;
-import org.firstinspires.ftc.teamcode.superclasses.Conveyor;
-import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
-
-@Deprecated
-public class Conveyor1 extends RobotModule implements Conveyor {
-    private final ElapsedTime conveyorTime = new ElapsedTime();
-    private final ElapsedTime backOnTime = new ElapsedTime();
-    private final ElapsedTime pauseTime = new ElapsedTime();
-    private final ElapsedTime BackOnAftertime = new ElapsedTime();
-
-    public static DcMotorEx conveyorm = null;
-    private final CommandSender conveyorPowerSender = new CommandSender(p -> conveyorm.setPower(-p));
-    public static DistanceSensor sensorDistance;
-    private boolean full = false;
-    private boolean backOn = false, stop = false;
-    private boolean backMust = false;
-    private boolean backOnAfter = false;
-    private boolean colorLock = false;
-
-    private double timelock = 0;
-    private double conveyorPower = 0;
-    private double distance = 0;
-    private double current = 0;
-
-
-    public void initialize() {
-
-        initializecolor();
-        initializedrive();
+@Deprecated("")
+class Conveyor1 : MultithreadRobotModule(), Conveyor {
+    private val conveyorTime = ElapsedTime()
+    private val backOnTime = ElapsedTime()
+    private val pauseTime = ElapsedTime()
+    private val BackOnAftertime = ElapsedTime()
+    private val conveyorPowerSender = CommandSender { p: Double -> conveyorm.power = -p }
+    private var full = false
+    private var backOn = false
+    private var stop = false
+    private var backMust = false
+    private var backOnAfter = false
+    private var colorLock = false
+    private var timelock = 0.0
+    private var conveyorPower = 0.0
+    private var distance = 0.0
+    private var current = 0.0
+    override fun initialize() {
+        initializecolor()
+        initializedrive()
     }
 
-    public void start() {
-
-        conveyorm.setPower(0);
-        backOn = false;
-        stop = false;
-        conveyorPower = 0;
-
+    override fun start() {
+        conveyorm.power = 0.0
+        backOn = false
+        stop = false
+        conveyorPower = 0.0
     }
 
-    private void initializecolor() {
-        sensorDistance = WoENHardware.INSTANCE.getRingDetector();
+    private fun initializecolor() {
+        sensorDistance = ringDetector
     }
 
-    private void initializedrive() {
-        conveyorm = WoENHardware.INSTANCE.getConveyorMotor();
-
-        conveyorm.setDirection(DcMotorSimple.Direction.FORWARD);
-
-        conveyorm.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+    private fun initializedrive() {
+        conveyorm = conveyorMotor
+        conveyorm.direction = DcMotorSimple.Direction.FORWARD
+        conveyorm.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
     }
 
-
-    private double getdistance() {
+    private fun getdistance(): Double {
         //return 10;
-        return sensorDistance.getDistance(DistanceUnit.CM);
+        return sensorDistance.getDistance(DistanceUnit.CM)
     }
 
-    public void update() {
-
+    override fun updateControlHub() {
         if (pauseTime.milliseconds() >= 100) {
-            pauseTime.reset();
-            if (!colorLock)
-                distance = getdistance();
-            else
-                distance = 10;
-            current = conveyorm.getCurrent(CurrentUnit.AMPS);
+            pauseTime.reset()
+            distance = if (!colorLock) getdistance() else 10.0
         }
+    }
+
+    override fun updateExpansionHub() {
+        current = conveyorm.getCurrent(CurrentUnit.AMPS)
         if (distance < 6) {
             if (conveyorTime.milliseconds() >= 1000) {
-                full = true;
+                full = true
             }
         } else {
-            conveyorTime.reset();
-            full = false;
+            conveyorTime.reset()
+            full = false
         }
         if (!backMust) {
-            if (conveyorPower != 0 && !full) {
+            if (conveyorPower != 0.0 && !full) {
                 if (!stop) {
-                    stop = true;
+                    stop = true
                 }
                 if (current <= 4 && backOnTime.milliseconds() >= 1000) {
                     if (!backOn) {
-                        setConveyorMotorPower(conveyorPower);
-                        backOn = true;
+                        setConveyorMotorPower(conveyorPower)
+                        backOn = true
                     }
-                    timelock = backOnTime.milliseconds();
-                    BackOnAftertime.reset();
+                    timelock = backOnTime.milliseconds()
+                    BackOnAftertime.reset()
                 } else {
-                    if (backOn && (backOnTime.milliseconds() >= (timelock + 500))) {
-                        backOnTime.reset();
-                        setConveyorMotorPower(-conveyorPower);
-                        backOn = false;
+                    if (backOn && backOnTime.milliseconds() >= timelock + 500) {
+                        backOnTime.reset()
+                        setConveyorMotorPower(-conveyorPower)
+                        backOn = false
                     }
                 }
             } else {
                 if (stop) {
-                    if (backOnAfter && BackOnAftertime.milliseconds() < 500)
-                        setConveyorMotorPower(-conveyorPower);
-                    else {
-                        setConveyorMotorPower(0);
-                        stop = false;
-                        backOn = false;
+                    if (backOnAfter && BackOnAftertime.milliseconds() < 500) setConveyorMotorPower(-conveyorPower) else {
+                        setConveyorMotorPower(0.0)
+                        stop = false
+                        backOn = false
                     }
                 }
             }
         } else {
-            setConveyorMotorPower(-1);
-            backOn = false;
-            stop = true;
+            setConveyorMotorPower(-1.0)
+            backOn = false
+            stop = true
         }
     }
 
-    public void setReverseAfterStop(boolean BackOnAfter) {
-        backOnAfter = BackOnAfter;
+    override fun setReverseAfterStop(BackOnAfter: Boolean) {
+        backOnAfter = BackOnAfter
     }
 
-    public void setConveyorPower(double power) {
-        conveyorPower = power;
+    override fun setConveyorPower(power: Double) {
+        conveyorPower = power
     }
 
-    public void setAutomaticConveyorStopping(boolean doAutomaticConveyorStopping) {
-        colorLock = !doAutomaticConveyorStopping;
+    override fun setAutomaticConveyorStopping(doAutomaticConveyorStopping: Boolean) {
+        colorLock = !doAutomaticConveyorStopping
     }
 
-    private void setConveyorMotorPower(double power) {
-        conveyorPowerSender.send(power);
+    private fun setConveyorMotorPower(power: Double) {
+        conveyorPowerSender.send(power)
     }
 
-    public void setForceReverse(boolean Backmust) {
-        backMust = Backmust;
+    override fun setForceReverse(Backmust: Boolean) {
+        backMust = Backmust
     }
 
-
+    companion object {
+        private lateinit var conveyorm: DcMotorEx
+        private lateinit var sensorDistance: DistanceSensor
+    }
 }
