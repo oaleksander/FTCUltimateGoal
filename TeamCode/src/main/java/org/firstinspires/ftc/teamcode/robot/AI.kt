@@ -16,10 +16,11 @@ import org.firstinspires.ftc.teamcode.robot.MecanumDrivetrain.driveRearLeft
 import org.firstinspires.ftc.teamcode.robot.ThreeWheelOdometry.odometerYL
 import org.firstinspires.ftc.teamcode.robot.ThreeWheelOdometry.odometerYR
 import org.firstinspires.ftc.teamcode.robot.rpm.shooterMotor
+import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule
 import org.firstinspires.ftc.teamcode.superclasses.RobotModule
 import org.openftc.revextensions2.ExpansionHubMotor
 
-class AI : RobotModule() {
+class AI : MultithreadRobotModule() {
     private val AItime = ElapsedTime()
     private val headTime = ElapsedTime()
     private val maxTimeHead: Double = 60000.0
@@ -47,7 +48,7 @@ class AI : RobotModule() {
         AItime.reset()
     }
 
-    /*override fun update() {
+    /*override fun update() { //TODO split control hub and expansion hub update
         if (AItime.milliseconds() > timeDiagnostic) {
             AItime.reset()
             if((Conveyorm?.let { tempMotor(it) }!! || ShooterMotor?.let { tempMotor(it) }!! || OdometryYL?.let { tempMotor(it) }!! || OdometryYR?.let { tempMotor(it) }!! ||

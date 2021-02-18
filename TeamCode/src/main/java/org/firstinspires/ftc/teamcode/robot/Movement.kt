@@ -1,10 +1,6 @@
 package org.firstinspires.ftc.teamcode.robot
 
 import com.acmerobotics.dashboard.config.Config
-import org.firstinspires.ftc.teamcode.superclasses.Odometry
-import org.firstinspires.ftc.teamcode.superclasses.Drivetrain
-import org.firstinspires.ftc.teamcode.superclasses.RobotModule
-import org.firstinspires.ftc.teamcode.superclasses.MotionTask
 import org.firstinspires.ftc.teamcode.math.Pose2D
 import org.firstinspires.ftc.teamcode.math.Vector3D
 import com.qualcomm.robotcore.util.ElapsedTime
@@ -12,11 +8,12 @@ import com.qualcomm.robotcore.util.Range
 import kotlin.jvm.JvmOverloads
 import org.firstinspires.ftc.teamcode.math.Vector2D
 import org.firstinspires.ftc.teamcode.math.MathUtil
+import org.firstinspires.ftc.teamcode.superclasses.*
 import java.util.*
 import kotlin.math.abs
 import kotlin.math.sign
 
-class Movement(private val odometry: Odometry, private val drivetrain: Drivetrain) : RobotModule() {
+class Movement(private val odometry: Odometry, private val drivetrain: Drivetrain) : MultithreadRobotModule() {
     @Config
     internal object MovementConfig {
         @JvmField var lookaheadRadius = 45.72
@@ -64,8 +61,7 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
         pathToFollow.add(0, MotionTask(odometry.robotCoordinates))
     }
 
-    override fun update() {
-        if (opMode!!.gamepad1.y) stopPathFollowing()
+    override fun updateOther() {
         bPathFollowingFinished = nTargetPoint >= pathToFollow.size
         if (pathFollowerIsActive() && requestedVelocityPercent.radius() < 0.005) {
             if (pathFollowingTimer.seconds() > 4) nTargetPoint++ else {
@@ -84,6 +80,7 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
         } else if (requestedVelocityPercent.radius() > 0.005) {
             if (pathFollowerIsActive()) stopPathFollowing()
             drivetrain.setRobotVelocity(requestedVelocityPercent*drivetrain.maxVelocity)
+            followPath(odometry.robotCoordinates as MotionTask)
         } else if (pathToFollow.size > 0 && doActiveBraking) moveLinear(pathToFollow[pathToFollow.size - 1]) else drivetrain.setRobotVelocity(0.0, 0.0, 0.0)
     }
 

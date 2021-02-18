@@ -7,11 +7,12 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule;
 import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
 import org.firstinspires.ftc.teamcode.superclasses.WobbleManipulator;
 
 @Deprecated
-public class MotorWobbleManipulator extends RobotModule implements WobbleManipulator {
+public class MotorWobbleManipulator extends MultithreadRobotModule implements WobbleManipulator {
     private final double closeClose = 0.73;
     private final double closeOpen = 0.19;
     private final double minerror = 15, maxspeed = 0.7, kofP = 0.0015, kofd = 0.00001;
@@ -46,7 +47,7 @@ public class MotorWobbleManipulator extends RobotModule implements WobbleManipul
         }
     }
 
-    public void update() {
+    public void updateExpansionHub() {
         error = pos - lever.getCurrentPosition();
         if (Math.abs(error) > minerror) {
             P = error * kofP;

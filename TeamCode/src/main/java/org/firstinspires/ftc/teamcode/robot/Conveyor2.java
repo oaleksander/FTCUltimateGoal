@@ -13,12 +13,13 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.misc.CommandSender;
 import org.firstinspires.ftc.teamcode.misc.motorAccelerationLimiter;
 import org.firstinspires.ftc.teamcode.superclasses.Conveyor;
+import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule;
 import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
 
 import static java.lang.Math.abs;
 
 
-public class Conveyor2 extends RobotModule implements Conveyor {
+public class Conveyor2 extends MultithreadRobotModule implements Conveyor {
 
     public static DcMotorEx conveyor = null;
     private final motorAccelerationLimiter conveyorPowerSender = new motorAccelerationLimiter(new CommandSender(p -> conveyor.setPower(-p))::send,6);
@@ -103,12 +104,15 @@ public class Conveyor2 extends RobotModule implements Conveyor {
         return lastKnownMotorCurrent;
     }
 
-    public void update() {
+    public void updateControlHub(){
+        if (!forceReverse && !(doReverseOnStop && requestedPower == 0) && doAutomaticConveyorStopping)
+            if (getdistance() >= ConveyorConfig.distanceThreshold) {
+                stackDetectionTimer.reset(); //Full collector detection
+            }
+    }
+
+    public void updateExpansionHub() {
         if (!forceReverse) {
-            if (doAutomaticConveyorStopping)
-                if (!(doReverseOnStop && requestedPower == 0) && getdistance() >= ConveyorConfig.distanceThreshold) {
-                    stackDetectionTimer.reset(); //Full collector detection
-                }
             if ((stackDetectionTimer.milliseconds() > ConveyorConfig.stackDetectionTimeout || (doReverseOnStop && requestedPower == 0)) && doAutomaticConveyorStopping) { //reverse+stop in case of ring detection
                 motorCurrentTimer.reset();
                 currentMotorPower = stackDetectionTimer.milliseconds() < ConveyorConfig.stackDetectionTimeout + ConveyorConfig.stackDetectionReverseTime && doReverseOnStop ? -1 : 0;

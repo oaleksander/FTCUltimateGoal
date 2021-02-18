@@ -13,6 +13,7 @@ import org.firstinspires.ftc.teamcode.math.Vector3D;
 import org.firstinspires.ftc.teamcode.misc.CommandSender;
 import org.firstinspires.ftc.teamcode.misc.motorAccelerationLimiter;
 import org.firstinspires.ftc.teamcode.superclasses.Drivetrain;
+import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule;
 import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
 import org.jetbrains.annotations.NotNull;
 
@@ -21,7 +22,7 @@ import static java.lang.Math.abs;
 import static java.lang.Math.max;
 import static java.lang.Math.signum;
 
-public class MecanumDrivetrain extends RobotModule implements Drivetrain {
+public class MecanumDrivetrain extends MultithreadRobotModule implements Drivetrain {
 
 
     /* Physical constants */
@@ -159,7 +160,7 @@ public class MecanumDrivetrain extends RobotModule implements Drivetrain {
         minMotorSpeed = clip(abs(value), 0, theoreticalMaxSpeed);
     }
 
-    public void update() {
+    public void updateControlHub() {
         if (smartMode) {
             mFLProfiler.setVelocity(powerFrontLeft);
             mFRProfiler.setVelocity(powerFrontRight);

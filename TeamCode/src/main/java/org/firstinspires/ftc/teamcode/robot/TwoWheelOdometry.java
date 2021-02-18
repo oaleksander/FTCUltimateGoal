@@ -10,6 +10,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.teamcode.math.Pose2D;
 import org.firstinspires.ftc.teamcode.math.Vector2D;
 import org.firstinspires.ftc.teamcode.math.Vector3D;
+import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule;
 import org.firstinspires.ftc.teamcode.superclasses.Odometry;
 import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
 import org.openftc.revextensions2.ExpansionHubEx;
@@ -21,7 +22,7 @@ import static java.lang.Math.toRadians;
 import static org.firstinspires.ftc.teamcode.math.MathUtil.angleWrap;
 
 @Deprecated
-public class TwoWheelOdometry extends RobotModule implements Odometry {
+public class TwoWheelOdometry extends MultithreadRobotModule implements Odometry {
     private static final double odometryWheelDiameterCm = 4.8;
     private static final double odometryCountsPerCM = (1440) / (odometryWheelDiameterCm * PI);
     private static final double odometryCMPerCounts = (odometryWheelDiameterCm * PI) / 1440;
@@ -57,6 +58,8 @@ public class TwoWheelOdometry extends RobotModule implements Odometry {
         IMUoffset = (float) getIMUheading();
     }
 
+    private double currentIMUHeading = 0;
+
     private double getIMUheading() {
         if (looptime.milliseconds() > 50) {
             looptime.reset();
@@ -64,7 +67,12 @@ public class TwoWheelOdometry extends RobotModule implements Odometry {
         } else return angle_last;
     }
 
-    public void update() {
+    public void updateControlHub()
+    {
+        currentIMUHeading = getIMUheading();
+    }
+
+    public void updateExpansionHub() {
         calculatePosition(worldPosition);
     }
 
@@ -74,7 +82,7 @@ public class TwoWheelOdometry extends RobotModule implements Odometry {
 
         bulkData = expansionHub.getBulkInputData();
 
-        double deltaWorldHeading = angleWrap(getIMUheading() - worldPosition.heading);
+        double deltaWorldHeading = angleWrap(currentIMUHeading - worldPosition.heading);
 
         Vector2D deltaPosition = new Vector2D((double) (bulkData.getMotorCurrentPosition(odometerX) - X_old) - deltaWorldHeading * odometerXcenterOffset,
                 (double) (-bulkData.getMotorCurrentPosition(odometerY) - Y_old) - deltaWorldHeading * odometerYcenterOffset);

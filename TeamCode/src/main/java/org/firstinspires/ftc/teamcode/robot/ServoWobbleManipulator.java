@@ -5,11 +5,12 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.misc.CommandSender;
+import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule;
 import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
 import org.firstinspires.ftc.teamcode.superclasses.WobbleManipulator;
 import org.openftc.revextensions2.ExpansionHubServo;
 
-public class ServoWobbleManipulator extends RobotModule implements WobbleManipulator {
+public class ServoWobbleManipulator extends MultithreadRobotModule implements WobbleManipulator {
 
     @Config
     public static class WobbleServoPositions {
@@ -45,7 +46,7 @@ public class ServoWobbleManipulator extends RobotModule implements WobbleManipul
         update();
     }
 
-    public void update() {
+    public void updateControlHub() {
         closePositionSender.send(gripperPosition);
         anglePositionSender.send(leverArmPosition);
     }

@@ -8,6 +8,7 @@ import org.firstinspires.ftc.teamcode.math.Pose2D;
 import org.firstinspires.ftc.teamcode.math.Vector2D;
 import org.firstinspires.ftc.teamcode.math.Vector3D;
 import org.firstinspires.ftc.teamcode.superclasses.Drivetrain;
+import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule;
 import org.firstinspires.ftc.teamcode.superclasses.Odometry;
 import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
 import org.firstinspires.ftc.teamcode.misc.motorAccelerationLimiter;
@@ -15,7 +16,7 @@ import org.firstinspires.ftc.teamcode.misc.motorAccelerationLimiter;
 import static java.lang.Math.abs;
 import static java.lang.Math.signum;
 
-public class FakeRobot extends RobotModule implements Drivetrain, Odometry {
+public class FakeRobot extends MultithreadRobotModule implements Drivetrain, Odometry {
 
     private final Vector3D maxVelocity = new MecanumDrivetrain().getMaxVelocity();
     boolean started = false;
@@ -46,7 +47,7 @@ public class FakeRobot extends RobotModule implements Drivetrain, Odometry {
     }
 
     @Override
-    public void update() {
+    public void updateOther() {
         if (!started) {
             started = true;
             updateTimer.reset();

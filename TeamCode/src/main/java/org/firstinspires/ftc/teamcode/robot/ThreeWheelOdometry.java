@@ -12,6 +12,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.teamcode.math.Pose2D;
 import org.firstinspires.ftc.teamcode.math.Vector2D;
 import org.firstinspires.ftc.teamcode.math.Vector3D;
+import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule;
 import org.firstinspires.ftc.teamcode.superclasses.Odometry;
 import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
 import org.jetbrains.annotations.NotNull;
@@ -24,7 +25,7 @@ import static java.lang.Math.toRadians;
 import static org.firstinspires.ftc.teamcode.math.MathUtil.angleAverage;
 import static org.firstinspires.ftc.teamcode.math.MathUtil.angleWrap;
 
-public class ThreeWheelOdometry extends RobotModule implements Odometry {
+public class ThreeWheelOdometry extends MultithreadRobotModule implements Odometry {
     private double odometryWheelDiameterCm = OdometryConfig.forwardMultiplier*4.8;
     private double odometryCountsPerCM = (1440) / (odometryWheelDiameterCm * PI);
     private double odometryCMPerCounts = (odometryWheelDiameterCm * PI) / 1440;
@@ -45,7 +46,8 @@ public class ThreeWheelOdometry extends RobotModule implements Odometry {
     private int YR_old = 0;
     private int X_old = 0;
     private final Vector2D YWheelPairCenterOffset = new Vector2D(0, 6.40008);
-    private final ElapsedTime IMUAccessTimer = new ElapsedTime();
+    private final ElapsedTime IMU1AccessTimer = new ElapsedTime();
+    private final ElapsedTime IMU2AccessTimer = new ElapsedTime();
 
     @Config
     static class OdometryConfig {
@@ -65,11 +67,11 @@ public class ThreeWheelOdometry extends RobotModule implements Odometry {
     }
 
     private double calculateHeading() {
-        if (doUseIMU_local && IMUAccessTimer.seconds()>1)
+        if (doUseIMU_local)
         {
-            double angleDivergence = angleWrap(getEncoderHeading() - angleAverage(getIMUheading_1(), getIMUheading_2()));
+            double angleDivergence = angleWrap(getEncoderHeading() - angleAverage(currentIMU1Heading, currentIMU2Heading));
             encoderHeadingCovariance = angleDivergence * (1.0 / 2.0);
-            IMUAccessTimer.reset();
+            IMU1AccessTimer.reset();
         }
         return angleWrap(getEncoderHeading() - angleOffset - encoderHeadingCovariance);
     }
@@ -98,15 +100,17 @@ public class ThreeWheelOdometry extends RobotModule implements Odometry {
         parameters2.calibrationDataFile = "BNO055IMUCalibration_2.json";
         imu2.initialize(parameters2);
         encoderHeadingCovariance = 0;
-        IMUAccessTimer.reset();
+        IMU1AccessTimer.reset();
+        IMU2AccessTimer.reset();
     }
 
+    private double currentIMU1Heading = 0;
     public double getIMUheading_1() {
         if(doUseIMU_local)
         return angleWrap(-imu1.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZXY, AngleUnit.RADIANS).firstAngle - IMUoffset1);
         return -0;
     }
-
+    private double currentIMU2Heading = 0;
     public double getIMUheading_2() {
         if(doUseIMU_local)
         return angleWrap(-imu2.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZXY, AngleUnit.RADIANS).firstAngle - IMUoffset2);
@@ -121,7 +125,20 @@ public class ThreeWheelOdometry extends RobotModule implements Odometry {
         }
     }
 
-    public void update() {
+    public void updateControlHub(){
+        if (doUseIMU_local && IMU1AccessTimer.seconds()>1)
+        {
+            currentIMU1Heading = getIMUheading_1();
+            IMU1AccessTimer.reset();
+        }
+    }
+
+    public void updateExpansionHub() {
+        if (doUseIMU_local && IMU2AccessTimer.seconds()>1)
+        {
+            currentIMU2Heading = getIMUheading_2();
+            IMU2AccessTimer.reset();
+        }
         calculatePosition(worldPosition);
     }
 

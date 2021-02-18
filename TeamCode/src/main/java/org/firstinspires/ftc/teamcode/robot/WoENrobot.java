@@ -4,11 +4,7 @@ import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.superclasses.Conveyor;
-import org.firstinspires.ftc.teamcode.superclasses.Drivetrain;
-import org.firstinspires.ftc.teamcode.superclasses.Odometry;
-import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
-import org.firstinspires.ftc.teamcode.superclasses.WobbleManipulator;
+import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule;
 import org.openftc.revextensions2.ExpansionHubEx;
 
 import java.util.Arrays;
@@ -23,9 +19,8 @@ public class WoENrobot {
     public static TelemetryDebugging telemetryDebugging = new TelemetryDebugging();
     public static AI ai = new AI();
 
-    //public static FakeRobot fakeRobot = new FakeRobot();
-    //public static Odometry odometry = fakeRobot;
-    //public static Drivetrain drivetrain = fakeRobot;
+    //public static FakeRobot odometry = new FakeRobot();
+    //public static FakeRobot drivetrain = odometry;
 
     public static ThreeWheelOdometry odometry = new ThreeWheelOdometry();
     public static MecanumDrivetrain drivetrain = new MecanumDrivetrain();
@@ -33,16 +28,72 @@ public class WoENrobot {
     public static LinearOpMode opMode = null;
     public static boolean robotIsInitialized = false;
     public static final ElapsedTime runTime = new ElapsedTime();
-    protected static RobotModule[] activeRobotModules = {odometry, movement, drivetrain, shooter, wobbleManipulator, conveyor, telemetryDebugging, ai}; //conveyor, odometry, shooter, wobbleManipulator, drivetrain
-    static boolean spinCompleted = false;
-    public static ExpansionHubEx expansionHub1 = null;
-    public static ExpansionHubEx expansionHub2 = null;
+    protected static MultithreadRobotModule[] activeRobotModules = {odometry, movement, drivetrain, wobbleManipulator, conveyor, telemetryDebugging, ai}; //shooter
+    static volatile boolean controlHubSpinCompleted = false;
+    static volatile boolean expansionHubSpinCompleted = false;
+    static volatile boolean spinCompleted = false;
+    public static ExpansionHubEx controlHub = null;
+    public static ExpansionHubEx expansionHub = null;
     private static List<LynxModule> allHubs = null;
+
+    static Runnable updateControlHub = () -> {
+        controlHub.getStandardModule().setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+         while (opMode.opModeIsActive() && !Thread.currentThread().isInterrupted()) {
+             Arrays.stream(activeRobotModules).forEach(MultithreadRobotModule::updateControlHub);
+             controlHubSpinCompleted = true;
+         }
+    };
+    private static Thread controlHubUpdater = new Thread(updateControlHub);
+    static Runnable updateExpansionHub = () -> {
+        expansionHub.getStandardModule().setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        while (opMode.opModeIsActive() && !Thread.currentThread().isInterrupted()) {
+            Arrays.stream(activeRobotModules).forEach(MultithreadRobotModule::updateExpansionHub);
+            expansionHubSpinCompleted = true;
+        }
+    };
+    private static Thread expansionHubUpdater = new Thread(updateExpansionHub);
+    static Runnable updateOther = () -> {
+        while (opMode.opModeIsActive() && !Thread.currentThread().isInterrupted()) {
+            while ((!controlHubSpinCompleted || !expansionHubSpinCompleted) && opMode.opModeIsActive()) {
+                Thread.yield();
+            }
+            Arrays.stream(activeRobotModules).forEach(MultithreadRobotModule::updateOther);
+            controlHubSpinCompleted = false;
+            expansionHubSpinCompleted = false;
+            spinCompleted = true;
+        }
+    };
+    private static Thread otherUpdater = new Thread(updateOther);
+
     static Runnable updateRegulators = () -> {
         setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
-        while (opMode.opModeIsActive() && !Thread.interrupted()) {
-            clearBulkCaches();
-            Arrays.stream(activeRobotModules).forEach(RobotModule::update);
+        while (opMode.opModeIsActive() && !Thread.currentThread().isInterrupted()) {
+            Thread controlHubNode = new Thread(() -> {
+             //   controlHub.getStandardModule().clearBulkCache();
+             //   Arrays.stream(activeRobotModules).forEach(MultithreadRobotModule::updateControlHub);
+            });
+            Thread expansionHubNode = new Thread(() -> {
+           //     expansionHub.getStandardModule().clearBulkCache();
+               // Arrays.stream(activeRobotModules).forEach(MultithreadRobotModule::updateExpansionHub);
+            });
+            // Thread otherCalculationsNode = new Thread(()->{ expansionHub.getStandardModule().clearBulkCache();});
+            controlHubNode.start();
+            try {
+                controlHubNode.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } finally {
+                controlHubNode.interrupt();
+            }
+            expansionHubNode.start();
+            try {
+                expansionHubNode.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } finally {
+                expansionHubNode.interrupt();
+            }
+            Arrays.stream(activeRobotModules).forEach(MultithreadRobotModule::updateOther);
             spinCompleted = true;
         }
     };
@@ -55,6 +106,14 @@ public class WoENrobot {
     public static void FullInitWithCV(LinearOpMode opMode) {
         openCVNode.initialize(opMode);
         forceInitRobot(opMode);
+    }
+
+    private static synchronized void spinHubs() {
+        controlHubSpinCompleted = false;
+        expansionHubSpinCompleted = false;
+            while ((!controlHubSpinCompleted || !expansionHubSpinCompleted) && opMode.opModeIsActive()) {
+                Thread.yield();
+            }
     }
 
     public static void spinOnce() {
@@ -77,8 +136,11 @@ public class WoENrobot {
         opMode.waitForStart();
         if(opMode.isStopRequested()) return;
         runTime.reset();
-        Arrays.stream(activeRobotModules).forEach(RobotModule::start);
-        regulatorUpdater.start();
+        Arrays.stream(activeRobotModules).forEach(MultithreadRobotModule::start);
+        //regulatorUpdater.start();
+        controlHubUpdater.start();
+        expansionHubUpdater.start();
+        otherUpdater.start();
         setLedColors(0, 237, 255);
         opMode.telemetry.addData("Status", "Running");
         opMode.telemetry.update();
@@ -92,10 +154,15 @@ public class WoENrobot {
         } else {
             opMode = OpMode;
             Arrays.stream(activeRobotModules).forEach(robotModule -> robotModule.setOpMode(opMode));
-            if (regulatorUpdater.getState() != Thread.State.NEW) {
-                regulatorUpdater.interrupt();
-                regulatorUpdater = new Thread(updateRegulators);
-            }
+           // regulatorUpdater.interrupt();
+          //  regulatorUpdater = new Thread(updateRegulators);
+
+            controlHubUpdater.interrupt();
+            controlHubUpdater = new Thread(updateControlHub);
+            expansionHubUpdater.interrupt();
+            expansionHubUpdater = new Thread(updateExpansionHub);
+            otherUpdater.interrupt();
+            otherUpdater = new Thread(updateOther);
             opMode.telemetry.addData("Status", "Already initialized, ready");
             opMode.telemetry.update();
         }
@@ -109,8 +176,8 @@ public class WoENrobot {
 
 
         WoENHardware.INSTANCE.assignHardware(opMode.hardwareMap);
-        expansionHub1 = WoENHardware.INSTANCE.getControlHub();
-        expansionHub2 = WoENHardware.INSTANCE.getExpansionHub();
+        controlHub = WoENHardware.INSTANCE.getControlHub();
+        expansionHub = WoENHardware.INSTANCE.getExpansionHub();
         allHubs = WoENHardware.INSTANCE.getLynxModules();
 
         setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
@@ -136,8 +203,8 @@ public class WoENrobot {
     }
 
     public static void setLedColors(int r, int g, int b) {
-        expansionHub1.setLedColor(r, g, b);
-        expansionHub2.setLedColor(r, g, b);
+        controlHub.setLedColor(r, g, b);
+        expansionHub.setLedColor(r, g, b);
     }
 
     public static void setBulkCachingMode(LynxModule.BulkCachingMode mode) {
