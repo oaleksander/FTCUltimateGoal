@@ -16,19 +16,19 @@ class rpm : MultithreadRobotModule() {
     private val encoderFailureDetectionTime = ElapsedTime()
 
     @Config
-    object ShooterConfig {
-        var servoTime = 137.0
-        var servoReturnMultiplier = 2.6
-        var lowRpm = 3470.0
-        var highRpm = 4000.0
-        var timeRpm = 150.0
-        var feederClose = 0.0735
-        var feederOpen = 0.35
-        var kP = 58.0
-        var kI = 0.001 //0.03
-        var kD = 0.05
-        var kF = 14.89
-        var kF_referenceVoltage = 12.485
+    internal object ShooterConfig {
+        @JvmField var servoTime = 137.0
+        @JvmField var servoReturnMultiplier = 2.6
+        @JvmField var lowRpm = 3470.0
+        @JvmField var highRpm = 4000.0
+        @JvmField var timeRpm = 150.0
+        @JvmField var feederClose = 0.0735
+        @JvmField var feederOpen = 0.35
+        @JvmField var kP = 58.0
+        @JvmField var kI = 0.001 //0.03
+        @JvmField var kD = 0.05
+        @JvmField var kF = 14.89
+        @JvmField var kF_referenceVoltage = 12.485
     }
 
     private val shooterVelocitySender = CommandSender { p: Double -> shooterMotor.velocity = p }
