@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -59,13 +60,14 @@ public class MecanumDrivetrain extends MultithreadRobotModule implements Drivetr
     public static DcMotorEx driveFrontLeft = null;
     /* Motor controllers */
     private final motorAccelerationLimiter mFLProfiler = new motorAccelerationLimiter(new CommandSender(v -> driveFrontLeft.setVelocity(v, AngleUnit.RADIANS))::send, maxAcceleration);
-    public static DcMotorEx driveFrontRight = null;
+    private static DcMotorEx driveFrontRight = null;
     private final motorAccelerationLimiter mFRProfiler = new motorAccelerationLimiter(new CommandSender(v -> driveFrontRight.setVelocity(v, AngleUnit.RADIANS))::send, maxAcceleration);
-    public static DcMotorEx driveRearLeft = null;
+    private static DcMotorEx driveRearLeft = null;
     private final motorAccelerationLimiter mRLProfiler = new motorAccelerationLimiter(new CommandSender(v -> driveRearLeft.setVelocity(v, AngleUnit.RADIANS))::send, maxAcceleration);
-    public static DcMotorEx driveRearRight = null;
+    private static DcMotorEx driveRearRight = null;
     private final motorAccelerationLimiter mRRProfiler = new motorAccelerationLimiter(new CommandSender(v -> driveRearRight.setVelocity(v, AngleUnit.RADIANS))::send, maxAcceleration);
 
+    private VoltageSensor voltageSensor = null;
 
     private boolean smartMode = false;
     private double powerFrontLeft = 0;
@@ -75,6 +77,7 @@ public class MecanumDrivetrain extends MultithreadRobotModule implements Drivetr
 
     public void initialize() {
         assignNames();
+        voltageSensor = WoENHardware.INSTANCE.getControlHubVoltageSensor();
         setMotorDirections();
         maxMotorSpeed = DrivetrainConfig.achieveableMaxRPMFraction * theoreticalMaxSpeed;
         minMotorSpeed = DrivetrainConfig.achieveableMinRPMFraction * theoreticalMaxSpeed;
@@ -84,7 +87,7 @@ public class MecanumDrivetrain extends MultithreadRobotModule implements Drivetr
         setMotor0PowerBehaviors(DcMotorEx.ZeroPowerBehavior.BRAKE);
         setMotorConfiguration(DrivetrainConfig.achieveableMaxRPMFraction, tickPerRev, gearing, maxRPM);
         try {
-            setPIDFCoefficients(new PIDFCoefficients(DrivetrainConfig.kP, DrivetrainConfig.kD, DrivetrainConfig.kI, DrivetrainConfig.kF * DrivetrainConfig.kF_referenceVoltage / opMode.hardwareMap.voltageSensor.iterator().next().getVoltage()));
+            setPIDFCoefficients(new PIDFCoefficients(DrivetrainConfig.kP, DrivetrainConfig.kD, DrivetrainConfig.kI, DrivetrainConfig.kF * DrivetrainConfig.kF_referenceVoltage / voltageSensor.getVoltage()));
         } catch (UnsupportedOperationException e) {
             opMode.telemetry.addData("Drivetrain PIDF error ", e.getMessage());
         }

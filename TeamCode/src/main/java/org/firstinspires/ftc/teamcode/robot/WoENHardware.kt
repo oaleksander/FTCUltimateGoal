@@ -1,16 +1,15 @@
 package org.firstinspires.ftc.teamcode.robot
 
-import com.qualcomm.robotcore.hardware.DcMotorEx
 import org.openftc.revextensions2.ExpansionHubMotor
 import org.openftc.revextensions2.ExpansionHubServo
-import com.qualcomm.robotcore.hardware.DistanceSensor
 import org.openftc.revextensions2.ExpansionHubEx
 import com.qualcomm.hardware.bosch.BNO055IMU
-import com.qualcomm.robotcore.hardware.HardwareMap
-import com.qualcomm.robotcore.hardware.Servo
 import org.firstinspires.ftc.robotcore.internal.opmode.OpModeManagerImpl
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil
 import com.qualcomm.hardware.lynx.LynxModule
+import com.qualcomm.hardware.lynx.LynxVoltageSensor
+import com.qualcomm.robotcore.hardware.*
+import java.util.function.DoubleSupplier
 
 object WoENHardware {
 
@@ -19,6 +18,9 @@ object WoENHardware {
     lateinit var lynxModules: List<LynxModule>
     lateinit var controlHub: ExpansionHubEx
     lateinit var expansionHub: ExpansionHubEx
+
+    lateinit var controlHubVoltageSensor: VoltageSensor
+    lateinit var expansionHubVoltageSensor: VoltageSensor
 
     lateinit var driveFrontLeft: ExpansionHubMotor
     lateinit var driveFrontRight: ExpansionHubMotor
@@ -56,6 +58,9 @@ object WoENHardware {
 
         controlHub = hardwareMap.get(ExpansionHubEx::class.java, "Control Hub")
         expansionHub = hardwareMap.get(ExpansionHubEx::class.java, "Expansion Hub 2")
+
+        controlHubVoltageSensor = LynxVoltageSensor(hardwareMap.appContext, controlHub.standardModule)
+        expansionHubVoltageSensor = LynxVoltageSensor(hardwareMap.appContext, expansionHub.standardModule)
 
         driveFrontLeft = hardwareMap.get(DcMotorEx::class.java, "driveFrontLeft") as ExpansionHubMotor
         driveFrontRight = hardwareMap.get(DcMotorEx::class.java, "driveFrontRight") as ExpansionHubMotor

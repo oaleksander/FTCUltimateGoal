@@ -1,10 +1,8 @@
 package org.firstinspires.ftc.teamcode.robot
 
 import com.acmerobotics.dashboard.config.Config
-import com.qualcomm.robotcore.hardware.DcMotor
-import com.qualcomm.robotcore.hardware.DcMotorEx
-import com.qualcomm.robotcore.hardware.DcMotorSimple
-import com.qualcomm.robotcore.hardware.Servo
+import com.qualcomm.hardware.lynx.LynxVoltageSensor
+import com.qualcomm.robotcore.hardware.*
 import com.qualcomm.robotcore.util.ElapsedTime
 import org.firstinspires.ftc.teamcode.misc.CommandSender
 import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule
@@ -45,6 +43,7 @@ class rpm : MultithreadRobotModule() {
         private set
 
     override fun initialize() {
+        voltageSensor = WoENHardware.expansionHubVoltageSensor
         shooterMotor = WoENHardware.shooterMotor
         val motorConfigurationType = shooterMotor.motorType.clone()
         motorConfigurationType.achieveableMaxRPMFraction = 0.896476253
@@ -57,8 +56,7 @@ class rpm : MultithreadRobotModule() {
                 ShooterConfig.kP,
                 ShooterConfig.kI,
                 ShooterConfig.kD,
-                ShooterConfig.kF * ShooterConfig.kF_referenceVoltage / opMode.hardwareMap.voltageSensor.iterator()
-                    .next().voltage
+                ShooterConfig.kF * ShooterConfig.kF_referenceVoltage / voltageSensor.voltage
             )
         } catch (e: UnsupportedOperationException) {
             opMode.telemetry.addData("Shooter PIDF error ", e.message)
@@ -110,14 +108,12 @@ class rpm : MultithreadRobotModule() {
                     0.0,
                     0.0,
                     0.0,
-                    ShooterConfig.kF * ShooterConfig.kF_referenceVoltage / opMode.hardwareMap.voltageSensor.iterator()
-                        .next().voltage
+                    ShooterConfig.kF * ShooterConfig.kF_referenceVoltage / voltageSensor.voltage
                 ) else shooterMotor.setVelocityPIDFCoefficients(
                     ShooterConfig.kP,
                     ShooterConfig.kI,
                     ShooterConfig.kD,
-                    ShooterConfig.kF * ShooterConfig.kF_referenceVoltage / opMode.hardwareMap.voltageSensor.iterator()
-                        .next().voltage
+                    ShooterConfig.kF * ShooterConfig.kF_referenceVoltage / voltageSensor.voltage
                 )
             } catch (ignored: UnsupportedOperationException) {
             }
@@ -169,7 +165,7 @@ class rpm : MultithreadRobotModule() {
     }
 
     fun feedRing() {
-        //  ringsToShoot = 1;
+        //  ringsToShoot = 1
         feederTime.reset()
     }
 
@@ -177,13 +173,13 @@ class rpm : MultithreadRobotModule() {
         ringsToShoot = 3
     }
 
-    //private boolean shooterIsOn = false;
     enum class ShooterMode {
         HIGHGOAL, POWERSHOT, OFF
     }
 
     companion object {
         lateinit var shooterMotor: DcMotorEx
+        lateinit var voltageSensor: VoltageSensor
         lateinit var feeder: ExpansionHubServo
     }
 }
