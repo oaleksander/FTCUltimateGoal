@@ -20,6 +20,8 @@ class Conveyor1 : MultithreadRobotModule(), Conveyor {
     private val backOnTime = ElapsedTime()
     private val pauseTime = ElapsedTime()
     private val BackOnAftertime = ElapsedTime()
+    private lateinit var conveyorm: DcMotorEx
+    private lateinit var sensorDistance: DistanceSensor
     private val conveyorPowerSender = CommandSender { p: Double -> conveyorm.power = -p }
     private var full = false
     private var backOn = false
@@ -128,10 +130,5 @@ class Conveyor1 : MultithreadRobotModule(), Conveyor {
 
     override fun setForceReverse(Backmust: Boolean) {
         backMust = Backmust
-    }
-
-    companion object {
-        private lateinit var conveyorm: DcMotorEx
-        private lateinit var sensorDistance: DistanceSensor
     }
 }

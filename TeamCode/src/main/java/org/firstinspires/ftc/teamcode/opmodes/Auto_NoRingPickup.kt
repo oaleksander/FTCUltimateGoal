@@ -1,25 +1,19 @@
-package org.firstinspires.ftc.teamcode.opmodes;
+package org.firstinspires.ftc.teamcode.opmodes
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-
-import org.firstinspires.ftc.teamcode.math.Pose2D;
-
-import static org.firstinspires.ftc.teamcode.opmodes.MovementMacros.MoveWobble;
-import static org.firstinspires.ftc.teamcode.opmodes.MovementMacros.Park;
-import static org.firstinspires.ftc.teamcode.opmodes.MovementMacros.ShootHighGoal;
-import static org.firstinspires.ftc.teamcode.robot.WoENrobot.movement;
-import static org.firstinspires.ftc.teamcode.robot.WoENrobot.odometry;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous
+import org.firstinspires.ftc.teamcode.math.Pose2D
+import org.firstinspires.ftc.teamcode.opmodes.MovementMacros.MoveWobble
+import org.firstinspires.ftc.teamcode.opmodes.MovementMacros.Park
+import org.firstinspires.ftc.teamcode.robot.WoENrobot
+import org.firstinspires.ftc.teamcode.robot.WoENrobot.movement
 
 @Autonomous
-public class Auto_NoRingPickup extends AutoOpMode {
-
-    @Override
-    public void main() {
-        movement.pos(new Pose2D(odometry.getRobotCoordinates().x + 10 * sideSign, -60, Double.NaN));
-        ShootHighGoal(); //TODO Powershots
+class Auto_NoRingPickup : AutoOpMode() {
+    override fun main() {
+        movement.pos(Pose2D(WoENrobot.odometry.robotCoordinates.x + 10 * sideSign, -60.0, Double.NaN))
+        MovementMacros.ShootHighGoal()
         // delay(3000);
-        MoveWobble();
-        Park();
+        MoveWobble()
+        Park()
     }
 }
-//Shooting();

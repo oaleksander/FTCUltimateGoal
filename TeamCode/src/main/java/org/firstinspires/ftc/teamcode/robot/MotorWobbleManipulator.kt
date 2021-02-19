@@ -19,7 +19,7 @@ class MotorWobbleManipulator : MultithreadRobotModule(), WobbleManipulator {
     private val kofd = 0.00001
     private val leverTime = ElapsedTime()
     private lateinit var lever: DcMotorEx
-    private var close: Servo? = null
+    private lateinit var close: Servo
     private var ismed = false
     private var isdown = false
     private var isGrabbed = true
@@ -44,7 +44,7 @@ class MotorWobbleManipulator : MultithreadRobotModule(), WobbleManipulator {
     override fun grabWobble(dograb: Boolean) {
         if (dograb != isGrabbed) {
             isGrabbed = dograb
-            if (dograb) close!!.position = closeClose else close!!.position = closeOpen
+            if (dograb) close.position = closeClose else close.position = closeOpen
         }
     }
 

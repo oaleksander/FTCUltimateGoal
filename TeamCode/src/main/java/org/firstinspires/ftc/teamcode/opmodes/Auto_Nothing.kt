@@ -1,12 +1,10 @@
-package org.firstinspires.ftc.teamcode.opmodes;
+package org.firstinspires.ftc.teamcode.opmodes
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous
 
 @Autonomous
-public class Auto_Nothing extends AutoOpMode {
-
-    @Override
-    public void main() {
+class Auto_Nothing : AutoOpMode() {
+    override fun main() {
         // MoveWobble();
         //PutRingsToLowGoal();
         // movement.Pos(new Pose2D(getStartPosition().x, 25, 0));

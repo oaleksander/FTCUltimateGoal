@@ -29,10 +29,13 @@ class rpm : MultithreadRobotModule() {
         @JvmField var kF_referenceVoltage = 12.485
     }
 
+    private lateinit var shooterMotor: DcMotorEx
+    private lateinit var voltageSensor: VoltageSensor
+    private lateinit var feeder: ExpansionHubServo
     private val shooterVelocitySender = CommandSender { p: Double -> shooterMotor.velocity = p }
     private val feederPositionSender = CommandSender { p: Double -> feeder.position = p }
     private var shooterMode = ShooterMode.OFF
-    private var ringsToShoot: Byte = 0
+    private var ringsToShoot: Int = 0
     private var timeToAccelerateMs = 1.0
     private var accelerationIncrement = 1.0
     var rpmTarget = 6000.0
@@ -93,7 +96,7 @@ class rpm : MultithreadRobotModule() {
             if (rpmTime.milliseconds() >= timeToAccelerateMs) velocityTarget else rpmTime.milliseconds() * accelerationIncrement * velocityTarget
         shooterVelocitySender.send(currentVelocity)
         if (encoderFailureDetectionTime.seconds() > 1) if (velocityTarget == 0.0 || currentRpm != 0.0) encoderFailureDetectionTime.reset()
-        if (velocityTarget != 0.0 && ringsToShoot.toInt() == 0) updatePIDFCoeffs(
+        if (velocityTarget != 0.0 && ringsToShoot == 0) updatePIDFCoeffs(
             encoderFailureDetectionTime.seconds() > 2
         )
     }
@@ -177,9 +180,4 @@ class rpm : MultithreadRobotModule() {
         HIGHGOAL, POWERSHOT, OFF
     }
 
-    companion object {
-        private lateinit var shooterMotor: DcMotorEx
-        private lateinit var voltageSensor: VoltageSensor
-        private lateinit var feeder: ExpansionHubServo
-    }
 }

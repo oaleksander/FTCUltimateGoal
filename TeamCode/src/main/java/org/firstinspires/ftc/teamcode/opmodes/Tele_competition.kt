@@ -4,14 +4,14 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import org.firstinspires.ftc.teamcode.misc.ButtonSwitch
 import org.firstinspires.ftc.teamcode.misc.SinglePressButton
-import org.firstinspires.ftc.teamcode.robot.WoENrobot
+import org.firstinspires.ftc.teamcode.robot.WoENrobot.*
 import org.firstinspires.ftc.teamcode.robot.rpm
 
 @TeleOp(name = "TeleOp COMPETITION", group = "Competition")
 class Tele_competition : LinearOpMode() {
     override fun runOpMode() {
-        WoENrobot.initRobot(this)
-        WoENrobot.startRobot()
+        initRobot(this)
+        startRobot()
         //  conveyor.setBackOnAfter(true);
         val buttonAswitch = ButtonSwitch()
         val buttonBackswitch = ButtonSwitch()
@@ -28,23 +28,23 @@ class Tele_competition : LinearOpMode() {
                 MovementMacros.ShootHighGoalAsync()
                 //   wobbleManipulator2.offAngle();
             }
-            if (!WoENrobot.movement.pathFollowerIsActive()) {
-                WoENrobot.wobbleManipulator.grabWobble(buttonAswitch.isTriggered(gamepad2.right_bumper))
-                WoENrobot.wobbleManipulator.upmediumdown(gamepad2.b, gamepad2.x) // correct
-                WoENrobot.conveyor.setConveyorPower(if (buttonBackswitch.isTriggered(gamepad2.left_trigger > 0.5)) 1.0 else 0.0)
-                WoENrobot.shooter.shootingMode =
+            if (!movement.pathFollowerIsActive()) {
+                wobbleManipulator.grabWobble(buttonAswitch.isTriggered(gamepad2.right_bumper))
+                wobbleManipulator.upmediumdown(gamepad2.b, gamepad2.x) // correct
+                conveyor.setConveyorPower(if (buttonBackswitch.isTriggered(gamepad2.left_trigger > 0.5)) 1.0 else 0.0)
+                shooter.shootingMode =
                     if (shooterOnOffSwitch.isTriggered(gamepad2.a)) if (shooterSpeedSwitch.isTriggered(
                             gamepad2.y
                         )
                     ) rpm.ShooterMode.POWERSHOT else rpm.ShooterMode.HIGHGOAL else rpm.ShooterMode.OFF
-                WoENrobot.conveyor.setForceReverse(gamepad2.right_trigger > 0.5)
+                conveyor.setForceReverse(gamepad2.right_trigger > 0.5)
                 //  conveyor.OFFcolorlock(gamepad2.left_bumper);
                 //   powerconveyor = (buttonspeedConveyor.isTriggered(gamepad2.right_bumper)?-1:1);
                 if (gamepad1.x) {
                     MovementMacros.ShootPOWERSHOTAngle()
                 }
-                if (gamepad1.a) WoENrobot.shooter.feedRing()
-                if (threeRingPresser.isTriggered(gamepad1.right_stick_button)) WoENrobot.shooter.feedRings()
+                if (gamepad1.a) shooter.feedRing()
+                if (threeRingPresser.isTriggered(gamepad1.right_stick_button)) shooter.feedRings()
             }
             var turn = 0.0
             var y: Double
@@ -58,8 +58,8 @@ class Tele_competition : LinearOpMode() {
             if (gamepad1.dpad_down) y = -1.0
             if (gamepad1.dpad_left) x = -1.0
             if (gamepad1.dpad_right) x += 1.0
-            WoENrobot.movement.humanSetVelocity(x, y, turn)
-            WoENrobot.spinOnce()
+            movement.humanSetVelocity(x, y, turn)
+            spinOnce()
         }
     }
 }

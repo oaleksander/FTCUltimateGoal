@@ -26,7 +26,8 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
         @JvmField var antiWindupFraction_distance = 0.17
         @JvmField var antiWindupFraction_angle = 0.17
     }
-
+    private val minError_distance_default = 1.0
+    private val minError_angle_default = Math.toRadians(0.32)
     private var maxLinearVelocityFraction = 1.0
     private var maxAngularVelocityFraction = 1.0
     private var minError_distance_current = minError_distance_default
@@ -42,6 +43,7 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
     var requestedVelocityPercent = Vector3D(0.0, 0.0, 0.0)
     private var actionOnCompletionExecutor = Thread()
     private val pathFollowingTimer = ElapsedTime()
+
 
     override fun initialize() {
         start()
@@ -102,7 +104,6 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
      * @param linearVelocityFraction  Array of points (motion tasks)
      * @param angularVelocityFraction Array of points (motion tasks)
      */
-    @JvmOverloads
     fun pos(target: Pose2D?, linearVelocityFraction: Double = 1.0, angularVelocityFraction: Double = 1.0) {
         followPath(MotionTask(target), linearVelocityFraction, angularVelocityFraction, minError_distance_default, minError_angle_default)
         while (pathFollowerIsActive() && opMode!!.opModeIsActive()) {
@@ -295,23 +296,18 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
         drivetrain.setRobotVelocity(frontways, sideways, turn);
     }*/
 
-    companion object {
-        private const val minError_distance_default = 1.0
-        private val minError_angle_default = Math.toRadians(0.32)
-
-        /**
-         * Replaces NaNs in Pose2D with odometry coordinates
-         *
-         * @param pose2D Pose to remove NaNs from
-         * @param odometryPose odometry Pose to replace NaNs with
-         * @return Pose without NaNs
-         */
-        fun removeNaN(pose2D: Pose2D, odometryPose: Pose2D): Pose2D {
-            val newPose = pose2D.clone()
-            if (java.lang.Double.isNaN(pose2D.x)) newPose.x = odometryPose.x
-            if (java.lang.Double.isNaN(pose2D.y)) newPose.y = odometryPose.y
-            if (java.lang.Double.isNaN(pose2D.heading)) newPose.heading = odometryPose.heading
-            return newPose
-        }
+    /**
+     * Replaces NaNs in Pose2D with odometry coordinates
+     *
+     * @param pose2D Pose to remove NaNs from
+     * @param odometryPose odometry Pose to replace NaNs with
+     * @return Pose without NaNs
+     */
+    fun removeNaN(pose2D: Pose2D, odometryPose: Pose2D): Pose2D {
+        val newPose = pose2D.clone()
+        if (java.lang.Double.isNaN(pose2D.x)) newPose.x = odometryPose.x
+        if (java.lang.Double.isNaN(pose2D.y)) newPose.y = odometryPose.y
+        if (java.lang.Double.isNaN(pose2D.heading)) newPose.heading = odometryPose.heading
+        return newPose
     }
 }

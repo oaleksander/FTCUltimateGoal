@@ -1,24 +1,20 @@
-package org.firstinspires.ftc.teamcode.opmodes;
+package org.firstinspires.ftc.teamcode.opmodes
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-
-import org.firstinspires.ftc.teamcode.math.Pose2D;
-
-import static java.lang.Math.toRadians;
-import static org.firstinspires.ftc.teamcode.robot.WoENrobot.*;
-
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous
+import org.firstinspires.ftc.teamcode.math.Pose2D
+import org.firstinspires.ftc.teamcode.robot.WoENrobot.delay
+import org.firstinspires.ftc.teamcode.robot.WoENrobot.movement
 
 @Autonomous
-public class Auto_Sandbox extends AutoOpMode {
-    @Override
-    public void main() {
-        movement.pos(new Pose2D(50,-100, toRadians(0)));
-        movement.pos(new Pose2D(50, 100, toRadians(180)));
-        movement.pos(new Pose2D(50, -100, toRadians(180)));
-        movement.pos(new Pose2D(50, -100, toRadians(0)));
-        movement.pos(getStartPosition());
+class Auto_Sandbox : AutoOpMode() {
+    override fun main() {
+        movement.pos(Pose2D(50.0, -100.0, Math.toRadians(0.0)))
+        movement.pos(Pose2D(50.0, 100.0, Math.toRadians(180.0)))
+        movement.pos(Pose2D(50.0, -100.0, Math.toRadians(180.0)))
+        movement.pos(Pose2D(50.0, -100.0, Math.toRadians(0.0)))
+        movement.pos(startPosition)
         while (opModeIsActive()) {
-            delay(1);
+            delay(1.0)
         }
     }
 }
