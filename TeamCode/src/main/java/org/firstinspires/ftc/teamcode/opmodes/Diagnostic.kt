@@ -12,7 +12,10 @@ import org.firstinspires.ftc.teamcode.robot.WoENHardware.driveFrontLeft
 import org.firstinspires.ftc.teamcode.robot.WoENHardware.driveFrontRight
 import org.firstinspires.ftc.teamcode.robot.WoENHardware.driveRearRight
 import org.firstinspires.ftc.teamcode.robot.WoENHardware.driveRearLeft
-import org.firstinspires.ftc.teamcode.robot.ServoWobbleManipulator.WobbleServoPositions.*
+import org.firstinspires.ftc.teamcode.robot.ServoWobbleManipulator.WobbleServoPositions.angleDown
+import org.firstinspires.ftc.teamcode.robot.ServoWobbleManipulator.WobbleServoPositions.angleUp
+import org.firstinspires.ftc.teamcode.robot.ServoWobbleManipulator.WobbleServoPositions.gripperClose
+import org.firstinspires.ftc.teamcode.robot.ServoWobbleManipulator.WobbleServoPositions.gripperOpen
 import org.firstinspires.ftc.teamcode.robot.WoENHardware.gripper
 import org.firstinspires.ftc.teamcode.robot.WoENHardware.leverArm
 import org.firstinspires.ftc.teamcode.robot.WoENHardware.shooterMotor

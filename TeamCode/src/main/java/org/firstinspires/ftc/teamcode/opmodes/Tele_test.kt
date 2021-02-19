@@ -15,34 +15,23 @@ class Tele_test : LinearOpMode() {
     override fun runOpMode() {
         forceInitRobot(this)
         startRobot()
-        val buttonAswitch = ButtonSwitch()
-        //val smartModeSwitch = ButtonSwitch()
-        val buttonStartswitch = ButtonSwitch()
+        val buttonASwitch = ButtonSwitch()
+        val buttonStartSwitch = ButtonSwitch()
         val threeRingPresser = SinglePressButton()
-
-        //odometry.setRobotCoordinates(new Pose2D(0, 0, 0));
-        odometry.setRobotCoordinates(Pose2D(0.0, 0.0, 0.0))
-        //shooter.setShootersetings(4444, 2000);
-        buttonAswitch.isTriggered(true)
-        buttonAswitch.isTriggered(false)
-        // shooter.onshooter(true);
-        // delay(5000);
-        //conveyor.feedrings();
-        //wobbleManipulator2.changepos(WobbleManipulator2.positions.down);
-        // wobbleManipulator2.setAngle(1);
+        odometry.robotCoordinates = Pose2D(0.0, 0.0, 0.0)
+        buttonASwitch.isTriggered(true)
+        buttonASwitch.isTriggered(false)
         while (opModeIsActive()) {
-            // drivetrain.setSmartMode(smartModeSwitch.isTriggered(gamepad1.left_stick_button));
-            wobbleManipulator.grabWobble(buttonAswitch.isTriggered(gamepad1.a))
+            wobbleManipulator.grabWobble(buttonASwitch.isTriggered(gamepad1.a))
             wobbleManipulator.upmediumdown(gamepad1.y, gamepad1.x) // correct
             shooter.shootingMode =
-                if (buttonStartswitch.isTriggered(gamepad1.start)) rpm.ShooterMode.HIGHGOAL else rpm.ShooterMode.OFF
+                if (buttonStartSwitch.isTriggered(gamepad1.start)) rpm.ShooterMode.HIGHGOAL else rpm.ShooterMode.OFF
             if (threeRingPresser.isTriggered(gamepad1.b)) shooter.feedRings()
             var turn = 0.0
             var y: Double
             var x: Double
             turn -= if (gamepad1.left_bumper) 0.25 else gamepad1.left_trigger.toDouble()
             turn += if (gamepad1.right_bumper) 0.25 else gamepad1.right_trigger.toDouble()
-            //  turn +=gamepad1.right_stick_x;
             y = -gamepad1.left_stick_y.toDouble()
             x = gamepad1.left_stick_x.toDouble()
             if (gamepad1.dpad_up) y += 1.0

@@ -1,94 +1,87 @@
-package org.firstinspires.ftc.teamcode.robot;
+package org.firstinspires.ftc.teamcode.robot
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.ElapsedTime
+import org.firstinspires.ftc.teamcode.math.MathUtil
+import org.firstinspires.ftc.teamcode.math.Pose2D
+import org.firstinspires.ftc.teamcode.math.Vector2D
+import org.firstinspires.ftc.teamcode.math.Vector3D
+import org.firstinspires.ftc.teamcode.misc.motorAccelerationLimiter
+import org.firstinspires.ftc.teamcode.superclasses.Drivetrain
+import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule
+import org.firstinspires.ftc.teamcode.superclasses.Odometry
+import kotlin.math.abs
+import kotlin.math.sign
 
-import org.firstinspires.ftc.teamcode.math.MathUtil;
-import org.firstinspires.ftc.teamcode.math.Pose2D;
-import org.firstinspires.ftc.teamcode.math.Vector2D;
-import org.firstinspires.ftc.teamcode.math.Vector3D;
-import org.firstinspires.ftc.teamcode.superclasses.Drivetrain;
-import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule;
-import org.firstinspires.ftc.teamcode.superclasses.Odometry;
-import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
-import org.firstinspires.ftc.teamcode.misc.motorAccelerationLimiter;
-
-import static java.lang.Math.abs;
-import static java.lang.Math.signum;
-
-public class FakeRobot extends MultithreadRobotModule implements Drivetrain, Odometry {
-
-    private final Vector3D maxVelocity = new MecanumDrivetrain().getMaxVelocity();
-    boolean started = false;
-    private Vector3D targetVelocity = new Vector3D(0, 0, 0);
-    private Vector3D targetVelocityFC = new Vector3D(0, 0, 0);
-    private Vector3D realVelocityFC = new Vector3D(0, 0, 0);
-    private final motorAccelerationLimiter zLimiter = new motorAccelerationLimiter(v -> realVelocityFC.z = v, maxVelocity.z / 0.38);
-    private final motorAccelerationLimiter yLimiter = new motorAccelerationLimiter(v -> realVelocityFC.y = v, maxVelocity.y / 0.38);
-    private final motorAccelerationLimiter xLimiter = new motorAccelerationLimiter(v -> realVelocityFC.x = v, maxVelocity.x / 0.38);
-    private Pose2D currentPosition = new Pose2D(0, 0, 0);
-    private final ElapsedTime updateTimer = new ElapsedTime();
-
-    @Override
-    public void initialize() {
-        targetVelocity = new Vector3D(0, 0, 0);
-        realVelocityFC = new Vector3D(0, 0, 0);
-        currentPosition = new Pose2D(0, 0, 0);
-        updateTimer.reset();
+class FakeRobot : MultithreadRobotModule(), Drivetrain, Odometry {
+    private val maxVelocity = MecanumDrivetrain().maxVelocity
+    private var started = false
+    private var targetVelocity = Vector3D(0.0, 0.0, 0.0)
+    private var targetVelocityFC = Vector3D(0.0, 0.0, 0.0)
+    private var realVelocityFC = Vector3D(0.0, 0.0, 0.0)
+    private val zLimiter =
+        motorAccelerationLimiter({ v: Double -> realVelocityFC.z = v }, maxVelocity.z / 0.38)
+    private val yLimiter =
+        motorAccelerationLimiter({ v: Double -> realVelocityFC.y = v }, maxVelocity.y / 0.38)
+    private val xLimiter =
+        motorAccelerationLimiter({ v: Double -> realVelocityFC.x = v }, maxVelocity.x / 0.38)
+    private var currentPosition = Pose2D(0.0, 0.0, 0.0)
+    private val updateTimer = ElapsedTime()
+    override fun initialize() {
+        targetVelocity = Vector3D(0.0, 0.0, 0.0)
+        realVelocityFC = Vector3D(0.0, 0.0, 0.0)
+        currentPosition = Pose2D(0.0, 0.0, 0.0)
+        updateTimer.reset()
     }
 
-    @Override
-    public void start() {
-        targetVelocity = new Vector3D(0, 0, 0);
-        realVelocityFC = new Vector3D(0, 0, 0);
-        currentPosition = new Pose2D(0, 0, 0);
-        updateTimer.reset();
-        started = false;
+    override fun start() {
+        targetVelocity = Vector3D(0.0, 0.0, 0.0)
+        realVelocityFC = Vector3D(0.0, 0.0, 0.0)
+        currentPosition = Pose2D(0.0, 0.0, 0.0)
+        updateTimer.reset()
+        started = false
     }
 
-    @Override
-    public void updateOther() {
+    override fun updateOther() {
         if (!started) {
-            started = true;
-            updateTimer.reset();
+            started = true
+            updateTimer.reset()
         }
         // realVelocityFC.x = targetVelocityFC.x;
-        zLimiter.setVelocity(targetVelocityFC.z);
-        yLimiter.setVelocity(targetVelocityFC.y);
-        xLimiter.setVelocity(targetVelocityFC.x);
-        currentPosition.y += realVelocityFC.y * updateTimer.seconds();
-        currentPosition.x += realVelocityFC.x * updateTimer.seconds();
-        currentPosition.heading = MathUtil.angleWrap(currentPosition.heading + realVelocityFC.z * updateTimer.seconds());
-        updateTimer.reset();
+        zLimiter.setVelocity(targetVelocityFC.z)
+        yLimiter.setVelocity(targetVelocityFC.y)
+        xLimiter.setVelocity(targetVelocityFC.x)
+        currentPosition.y += realVelocityFC.y * updateTimer.seconds()
+        currentPosition.x += realVelocityFC.x * updateTimer.seconds()
+        currentPosition.heading =
+            MathUtil.angleWrap(currentPosition.heading + realVelocityFC.z * updateTimer.seconds())
+        updateTimer.reset()
     }
 
-    @Override
-    public void setRobotVelocity(double frontways, double sideways, double turn) {
-        if (abs(frontways) > maxVelocity.y) frontways = maxVelocity.y * signum(frontways);
-        if (abs(sideways) > maxVelocity.x) sideways = maxVelocity.x * signum(sideways);
-        if (abs(turn) > maxVelocity.z) turn = maxVelocity.z * signum(turn);
-
-        targetVelocity = new Vector3D(sideways, frontways, turn);
-        targetVelocityFC = new Vector3D(new Vector2D(sideways, frontways).rotatedCW(currentPosition.heading), turn);
+    override fun setRobotVelocity(frontways: Double, sideways: Double, turn: Double) {
+        var frontWays = frontways
+        var sideWays = sideways
+        var Turn = turn
+        if (abs(frontways) > maxVelocity.y) frontWays = maxVelocity.y * sign(frontways)
+        if (abs(sideways) > maxVelocity.x) sideWays = maxVelocity.x * sign(sideways)
+        if (abs(turn) > maxVelocity.z) Turn = maxVelocity.z * sign(turn)
+        targetVelocity = Vector3D(sideWays, frontWays, Turn)
+        targetVelocityFC =
+            Vector3D(Vector2D(sideWays, frontWays).rotatedCW(currentPosition.heading), Turn)
     }
 
-    @Override
-    public Vector3D getMaxVelocity() {
-        return maxVelocity;
+    override fun getMaxVelocity(): Vector3D {
+        return maxVelocity
     }
 
-    @Override
-    public Pose2D getRobotCoordinates() {
-        return currentPosition;
+    override fun getRobotCoordinates(): Pose2D {
+        return currentPosition
     }
 
-    @Override
-    public void setRobotCoordinates(Pose2D coordinates) {
-        currentPosition = coordinates.clone();
+    override fun setRobotCoordinates(coordinates: Pose2D) {
+        currentPosition = coordinates.clone()
     }
 
-    @Override
-    public Vector3D getRobotVelocity() {
-        return realVelocityFC;
+    override fun getRobotVelocity(): Vector3D {
+        return realVelocityFC
     }
 }

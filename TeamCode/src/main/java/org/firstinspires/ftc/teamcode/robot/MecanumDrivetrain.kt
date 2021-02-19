@@ -55,38 +55,10 @@ class MecanumDrivetrain : MultithreadRobotModule(), Drivetrain {
     private var maxAcceleration = theoreticalMaxSpeed / DrivetrainConfig.secondsToAccelerate
 
     /* Motor controllers */
-    private val mFLProfiler = motorAccelerationLimiter({ value: Double ->
-        CommandSender { v: Double ->
-            driveFrontLeft.setVelocity(
-                v,
-                AngleUnit.RADIANS
-            )
-        }.send(value)
-    }, maxAcceleration)
-    private val mFRProfiler = motorAccelerationLimiter({ value: Double ->
-        CommandSender { v: Double ->
-            driveFrontRight.setVelocity(
-                v,
-                AngleUnit.RADIANS
-            )
-        }.send(value)
-    }, maxAcceleration)
-    private val mRLProfiler = motorAccelerationLimiter({ value: Double ->
-        CommandSender { v: Double ->
-            driveRearLeft.setVelocity(
-                v,
-                AngleUnit.RADIANS
-            )
-        }.send(value)
-    }, maxAcceleration)
-    private val mRRProfiler = motorAccelerationLimiter({ value: Double ->
-        CommandSender { v: Double ->
-            driveRearRight.setVelocity(
-                v,
-                AngleUnit.RADIANS
-            )
-        }.send(value)
-    }, maxAcceleration)
+    private val mFLProfiler = motorAccelerationLimiter({ value: Double -> CommandSender { v: Double -> driveFrontLeft.setVelocity(v, AngleUnit.RADIANS) }.send(value) }, maxAcceleration)
+    private val mFRProfiler = motorAccelerationLimiter({ value: Double -> CommandSender { v: Double -> driveFrontRight.setVelocity(v, AngleUnit.RADIANS) }.send(value)}, maxAcceleration)
+    private val mRLProfiler = motorAccelerationLimiter({ value: Double -> CommandSender { v: Double -> driveRearLeft.setVelocity(v, AngleUnit.RADIANS) }.send(value) }, maxAcceleration)
+    private val mRRProfiler = motorAccelerationLimiter({ value: Double -> CommandSender { v: Double -> driveRearRight.setVelocity(v, AngleUnit.RADIANS) }.send(value) }, maxAcceleration)
     private lateinit var voltageSensor: VoltageSensor
     private var smartMode = false
     private var powerFrontLeft = 0.0
@@ -101,24 +73,11 @@ class MecanumDrivetrain : MultithreadRobotModule(), Drivetrain {
         minMotorSpeed = DrivetrainConfig.achieveableMinRPMFraction * theoreticalMaxSpeed
         sidewaysMultiplier = forwardMultiplier * DrivetrainConfig.strafingMultiplier
         maxAcceleration = theoreticalMaxSpeed / DrivetrainConfig.secondsToAccelerate
-        turnMultiplier =
-            (wheelCenterOffset.x + wheelCenterOffset.y) * DrivetrainConfig.rotationDecrepancy / wheelRadius
+        turnMultiplier = (wheelCenterOffset.x + wheelCenterOffset.y) * DrivetrainConfig.rotationDecrepancy / wheelRadius
         setMotor0PowerBehaviors(ZeroPowerBehavior.BRAKE)
-        setMotorConfiguration(
-            DrivetrainConfig.achieveableMaxRPMFraction,
-            tickPerRev,
-            gearing,
-            maxRPM
-        )
+        setMotorConfiguration(DrivetrainConfig.achieveableMaxRPMFraction, tickPerRev, gearing, maxRPM)
         try {
-            setPIDFCoefficients(
-                PIDFCoefficients(
-                    DrivetrainConfig.kP,
-                    DrivetrainConfig.kD,
-                    DrivetrainConfig.kI,
-                    DrivetrainConfig.kF * DrivetrainConfig.kF_referenceVoltage / voltageSensor.voltage
-                )
-            )
+            setPIDFCoefficients(PIDFCoefficients(DrivetrainConfig.kP, DrivetrainConfig.kD, DrivetrainConfig.kI, DrivetrainConfig.kF * DrivetrainConfig.kF_referenceVoltage / voltageSensor.voltage))
         } catch (e: UnsupportedOperationException) {
             opMode.telemetry.addData("Drivetrain PIDF error ", e.message)
         }
@@ -253,6 +212,6 @@ class MecanumDrivetrain : MultithreadRobotModule(), Drivetrain {
         driveMotorPowers(frontwaysMotorVelocity + sidewaysMotorVelocity + turnMotorVelocity,
             frontwaysMotorVelocity - sidewaysMotorVelocity - turnMotorVelocity,
             frontwaysMotorVelocity - sidewaysMotorVelocity + turnMotorVelocity,
-            frontwaysMotorVelocity + sidewaysMotorVelocity - turnMotorVelocity);
+            frontwaysMotorVelocity + sidewaysMotorVelocity - turnMotorVelocity)
     }
 }

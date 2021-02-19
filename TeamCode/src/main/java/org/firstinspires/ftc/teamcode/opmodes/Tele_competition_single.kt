@@ -12,18 +12,16 @@ class Tele_competition_single : LinearOpMode() {
     override fun runOpMode() {
         initRobot(this)
         startRobot()
-        val buttonAswitch = ButtonSwitch()
-        val buttonBackswitch = ButtonSwitch()
-        val buttonStartswitch = ButtonSwitch()
+        val buttonASwitch = ButtonSwitch()
+        val buttonBackSwitch = ButtonSwitch()
+        val buttonStartSwitch = ButtonSwitch()
         val threeRingPresser = SinglePressButton()
-
-        //shooter.setShootersetings(3800, 500);
         while (opModeIsActive()) {
-            wobbleManipulator.grabWobble(buttonAswitch.isTriggered(gamepad1.a))
+            wobbleManipulator.grabWobble(buttonASwitch.isTriggered(gamepad1.a))
             wobbleManipulator.upmediumdown(gamepad1.y, gamepad1.x) // correct
             shooter.shootingMode =
-                if (buttonStartswitch.isTriggered(gamepad1.start)) rpm.ShooterMode.HIGHGOAL else rpm.ShooterMode.OFF
-            conveyor.setConveyorPower(if (buttonBackswitch.isTriggered(gamepad1.back)) 1.0 else 0.0)
+                if (buttonStartSwitch.isTriggered(gamepad1.start)) rpm.ShooterMode.HIGHGOAL else rpm.ShooterMode.OFF
+            conveyor.setConveyorPower(if (buttonBackSwitch.isTriggered(gamepad1.back)) 1.0 else 0.0)
             if (gamepad1.b) shooter.feedRing()
             if (threeRingPresser.isTriggered(gamepad1.right_stick_button)) shooter.feedRings()
             var turn = 0.0
@@ -31,7 +29,6 @@ class Tele_competition_single : LinearOpMode() {
             var x: Double
             turn -= if (gamepad1.left_bumper) 0.25 else gamepad1.left_trigger.toDouble()
             turn += if (gamepad1.right_bumper) 0.25 else gamepad1.right_trigger.toDouble()
-            //  turn +=gamepad1.right_stick_x;
             y = -gamepad1.left_stick_y.toDouble()
             x = gamepad1.left_stick_x.toDouble()
             if (gamepad1.dpad_up) y += 1.0
