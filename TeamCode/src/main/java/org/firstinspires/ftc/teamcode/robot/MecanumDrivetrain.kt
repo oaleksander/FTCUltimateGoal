@@ -14,6 +14,7 @@ import org.firstinspires.ftc.teamcode.robot.WoENHardware.controlHubVoltageSensor
 import org.firstinspires.ftc.teamcode.superclasses.Drivetrain
 import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule
 import kotlin.math.abs
+import kotlin.math.sign
 
 class MecanumDrivetrain : MultithreadRobotModule(), Drivetrain {
     /* Motor parameters constatnts. */
@@ -86,7 +87,7 @@ class MecanumDrivetrain : MultithreadRobotModule(), Drivetrain {
             )
         }.send(value)
     }, maxAcceleration)
-    private var voltageSensor: VoltageSensor? = null
+    private lateinit var voltageSensor: VoltageSensor
     private var smartMode = false
     private var powerFrontLeft = 0.0
     private var powerFrontRight = 0.0
@@ -115,7 +116,7 @@ class MecanumDrivetrain : MultithreadRobotModule(), Drivetrain {
                     DrivetrainConfig.kP,
                     DrivetrainConfig.kD,
                     DrivetrainConfig.kI,
-                    DrivetrainConfig.kF * DrivetrainConfig.kF_referenceVoltage / voltageSensor!!.voltage
+                    DrivetrainConfig.kF * DrivetrainConfig.kF_referenceVoltage / voltageSensor.voltage
                 )
             )
         } catch (e: UnsupportedOperationException) {
@@ -215,26 +216,26 @@ class MecanumDrivetrain : MultithreadRobotModule(), Drivetrain {
     }
 
     fun driveMotorPowers(frontLeft: Double, frontRight: Double, rearLeft: Double, rearRight: Double) {
-        var frontLeft = frontLeft
-        var frontRight = frontRight
-        var rearLeft = rearLeft
-        var rearRight = rearRight
-        var maxabs = abs(frontLeft).coerceAtLeast(abs(frontRight)).coerceAtLeast(abs(rearLeft)).coerceAtLeast(abs(rearRight))
+        var frontLeftMotorVelocity = frontLeft
+        var frontRightMotorVelocity = frontRight
+        var rearLeftMotorVelocity = rearLeft
+        var rearRightMotorVelocity = rearRight
+        var maxabs = abs(frontLeftMotorVelocity).coerceAtLeast(abs(frontRightMotorVelocity)).coerceAtLeast(abs(rearLeftMotorVelocity)).coerceAtLeast(abs(rearRightMotorVelocity))
         if (maxabs > maxMotorSpeed) {
             maxabs /= maxMotorSpeed
-            frontLeft /= maxabs
-            frontRight /= maxabs
-            rearLeft /= maxabs
-            rearRight /= maxabs
+            frontLeftMotorVelocity /= maxabs
+            frontRightMotorVelocity /= maxabs
+            rearLeftMotorVelocity /= maxabs
+            rearRightMotorVelocity /= maxabs
         }
-        powerFrontLeft = limitSpeed(frontLeft)
-        powerFrontRight = limitSpeed(frontRight)
-        powerRearLeft = limitSpeed(rearLeft)
-        powerRearRight = limitSpeed(rearRight)
+        powerFrontLeft = limitSpeed(frontLeftMotorVelocity)
+        powerFrontRight = limitSpeed(frontRightMotorVelocity)
+        powerRearLeft = limitSpeed(rearLeftMotorVelocity)
+        powerRearRight = limitSpeed(rearRightMotorVelocity)
     }
 
     private fun limitSpeed(speed: Double): Double {
-        return Range.clip(Math.abs(speed), minMotorSpeed, maxMotorSpeed) * Math.signum(speed)
+        return Range.clip(abs(speed), minMotorSpeed, maxMotorSpeed) * sign(speed)
     }
 
     override fun getMaxVelocity(): Vector3D {
@@ -246,16 +247,12 @@ class MecanumDrivetrain : MultithreadRobotModule(), Drivetrain {
     }
 
     override fun setRobotVelocity(frontways: Double, sideways: Double, turn: Double) {
-        var frontways = frontways
-        var sideways = sideways
-        var turn = turn
-        frontways *= forwardMultiplier
-        sideways *= sidewaysMultiplier
-        turn *= turnMultiplier
-        val FrontLeft = frontways + sideways + turn
-        val FrontRight = frontways - sideways - turn
-        val RearLeft = frontways - sideways + turn
-        val RearRight = frontways + sideways - turn
-        driveMotorPowers(FrontLeft, FrontRight, RearLeft, RearRight)
+        val frontwaysMotorVelocity = frontways * forwardMultiplier
+        val sidewaysMotorVelocity = sideways * sidewaysMultiplier
+        val turnMotorVelocity = turn * turnMultiplier
+        driveMotorPowers(frontwaysMotorVelocity + sidewaysMotorVelocity + turnMotorVelocity,
+            frontwaysMotorVelocity - sidewaysMotorVelocity - turnMotorVelocity,
+            frontwaysMotorVelocity - sidewaysMotorVelocity + turnMotorVelocity,
+            frontwaysMotorVelocity + sidewaysMotorVelocity - turnMotorVelocity);
     }
 }

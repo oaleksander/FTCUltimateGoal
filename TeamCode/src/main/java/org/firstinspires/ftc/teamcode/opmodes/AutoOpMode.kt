@@ -8,7 +8,6 @@ import org.firstinspires.ftc.teamcode.misc.SinglePressButton
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.*
 
 open class AutoOpMode : LinearOpMode() {
-    lateinit var M: MovementMacros
     protected var xSign: Byte = 1
     protected var sideSign: Byte = 1
     var thereAreTwoGamepads = false

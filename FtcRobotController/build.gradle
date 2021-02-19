@@ -17,10 +17,10 @@ android {
     compileSdkVersion 30
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility "1.8"
+        targetCompatibility "1.8"
     }
-    ndkVersion '21.3.6528147'
+    ndkVersion '22.0.7026061'
     buildToolsVersion '30.0.3'
 }
 

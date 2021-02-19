@@ -26,7 +26,7 @@ object MovementMacros {
         get() {
             val error = movement.getError(Pose2D(highGoalPose, Double.NaN))
             val angle = Range.clip(error.acot(), Math.toRadians(-13.0), Math.toRadians(13.0))
-            return Pose2D(highGoalPose.minus(Vector2D(0.0, highGoalShootingDistance).rotatedCW(angle)), angle + highGoalShootingAngle)
+            return Pose2D(highGoalPose-Vector2D(0.0, highGoalShootingDistance).rotatedCW(angle), angle + highGoalShootingAngle)
         }
 
     fun ShootHighGoal() {
@@ -55,15 +55,12 @@ object MovementMacros {
         get() = when (openCVNode.stackSize) {
             StackSize.FOUR -> Vector2D(xSign * 150.3809, 150.2761)
             StackSize.ONE -> Vector2D(xSign * 89.9835, 90.3346)
-            StackSize.ZERO -> Vector2D(xSign * 150.3809, 30.1596)
             else -> Vector2D(xSign * 150.3809, 30.1596)
         }
-    private val partnerWobblePose: Vector2D
-         get() = Pose2D(93.91741046 * xSign - 30.1416 * sideSign, -120.3139, 0.0)
+    private val partnerWobblePose: Vector2D = Vector2D(93.91741046 * xSign - 30.1416 * sideSign, -120.3139)
 
     //    return new Vector2D(90.3747*xSign,-56.9019);
-    private val ringStackPose: Vector2D
-         get() = Vector2D(90.3747 * xSign - 2, -56.9019)
+    private val ringStackPose: Vector2D = Vector2D(90.3747 * xSign - 2, -56.9019)
 
     //    return new Vector2D(90.3747*xSign,-56.9019);
     fun PickupRings(): Boolean {
