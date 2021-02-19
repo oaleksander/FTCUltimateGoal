@@ -162,7 +162,7 @@ class rpm : MultithreadRobotModule() {
                 ShooterMode.OFF -> setShootersetings(0.0, ShooterConfig.timeRpm)
             }
         }
-    @JvmOverloads
+
     fun isCorrectRpm(error: Double = 25.0): Boolean {
         return if (encoderFailureMode) true else Math.abs(currentVelocity - shooterMotor.velocity) < error
     }

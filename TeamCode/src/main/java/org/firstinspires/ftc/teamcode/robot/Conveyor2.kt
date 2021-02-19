@@ -1,137 +1,124 @@
-package org.firstinspires.ftc.teamcode.robot;
+package org.firstinspires.ftc.teamcode.robot
 
-import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.config.Config;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
-import com.qualcomm.robotcore.util.ElapsedTime;
+import com.acmerobotics.dashboard.config.Config
+import com.qualcomm.robotcore.hardware.DcMotor
+import com.qualcomm.robotcore.hardware.DcMotorEx
+import com.qualcomm.robotcore.hardware.DcMotorSimple
+import com.qualcomm.robotcore.hardware.DistanceSensor
+import com.qualcomm.robotcore.util.ElapsedTime
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
+import org.firstinspires.ftc.teamcode.misc.CommandSender
+import org.firstinspires.ftc.teamcode.misc.motorAccelerationLimiter
+import org.firstinspires.ftc.teamcode.robot.WoENHardware.conveyorMotor
+import org.firstinspires.ftc.teamcode.robot.WoENHardware.ringDetector
+import org.firstinspires.ftc.teamcode.superclasses.Conveyor
+import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule
 
-import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.teamcode.misc.CommandSender;
-import org.firstinspires.ftc.teamcode.misc.motorAccelerationLimiter;
-import org.firstinspires.ftc.teamcode.superclasses.Conveyor;
-import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule;
-import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
-
-import static java.lang.Math.abs;
-
-
-public class Conveyor2 extends MultithreadRobotModule implements Conveyor {
-
-    private static DcMotorEx conveyor = null;
-    private final motorAccelerationLimiter conveyorPowerSender = new motorAccelerationLimiter(new CommandSender(p -> conveyor.setPower(-p))::send,6);
-    private static DistanceSensor sensorDistance;
-    private final ElapsedTime motorCurrentTimer = new ElapsedTime();
-    private final ElapsedTime stackDetectionTimer = new ElapsedTime();
+class Conveyor2 : MultithreadRobotModule(), Conveyor {
+    private lateinit var conveyor: DcMotorEx
+    private lateinit var sensorDistance: DistanceSensor
+    private val distanceQueryTimeout = 500.0
+    private val motorCurrentQueryTimeout = 500.0
+    private val conveyorPowerSender = motorAccelerationLimiter({ value: Double -> CommandSender { p: Double -> conveyor.power = -p }.send(value) }, 6.0)
+    private val motorCurrentTimer = ElapsedTime()
+    private val stackDetectionTimer = ElapsedTime()
+    private var lastKnownDistance = 12.0
+    private val distanceQueryTimer = ElapsedTime()
+    private var lastKnownMotorCurrent = 0.0
+    private var forceReverse = false
+    private var currentMotorPower = 0.0
+    private val motorCurrentQueryTimer = ElapsedTime()
+    private var doAutomaticConveyorStopping = true
+    private var doReverseOnStop = true
+    private var requestedPower = 0.0
 
     @Config
-    static class ConveyorConfig {
-        public static double motorLockingCurrentTimeout = 750;
-        public static double motorLockingReverseTime = 750;
-        public static double stackDetectionTimeout = 500;
-        public static double stackDetectionReverseTime = 750;
-        public static double distanceThreshold = -5.6;
-        public static double currentThreshold = 3;
+    internal object ConveyorConfig {
+        @JvmField var motorLockingCurrentTimeout = 750.0
+        @JvmField var motorLockingReverseTime = 750.0
+        @JvmField var stackDetectionTimeout = 500.0
+        @JvmField var stackDetectionReverseTime = 750.0
+        @JvmField var distanceThreshold = -5.6
+        @JvmField var currentThreshold = 3.0
     }
 
-    private boolean doAutomaticConveyorStopping = true;
-    private boolean doReverseOnStop = true;
+    override fun setAutomaticConveyorStopping(doAutomaticConveyorStopping: Boolean) {
+        this.doAutomaticConveyorStopping = doAutomaticConveyorStopping
+    }
 
-    public void setAutomaticConveyorStopping(boolean doAutomaticConveyorStopping) {
-        this.doAutomaticConveyorStopping = doAutomaticConveyorStopping;
+    override fun setReverseAfterStop(doReverseOnStop: Boolean) {
+        this.doReverseOnStop = doReverseOnStop
+    }
+
+    override fun setForceReverse(forceReverse: Boolean) {
+        this.forceReverse = forceReverse
+    }
+
+    override fun setConveyorPower(requestedPower: Double) {
+        if (this.requestedPower != requestedPower) motorCurrentTimer.reset()
+        this.requestedPower = requestedPower
+    }
+
+    override fun initialize() {
+        initializecolor()
+        initializedrive()
+    }
+
+    private fun initializecolor() {
+        sensorDistance = ringDetector
+    }
+
+    private fun initializedrive() {
+        conveyor = conveyorMotor
+        conveyor.direction = DcMotorSimple.Direction.FORWARD //!!! can break odometry
+        conveyor.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
     }
 
 
-    public void setReverseAfterStop(boolean doReverseOnStop) {
-        this.doReverseOnStop = doReverseOnStop;
-    }
-
-
-    public void setForceReverse(boolean forceReverse) {
-        this.forceReverse = forceReverse;
-    }
-
-    private boolean forceReverse = false;
-    private double currentMotorPower = 0;
-
-    public void setConveyorPower(double requestedPower) {
-        if(this.requestedPower!= requestedPower)
-            motorCurrentTimer.reset();
-        this.requestedPower = requestedPower;
-    }
-
-    private double requestedPower = 0;
-
-    public void initialize() {
-        initializecolor();
-        initializedrive();
-    }
-
-    private void initializecolor() {
-        sensorDistance = WoENHardware.INSTANCE.getRingDetector();
-    }
-
-    private void initializedrive() {
-        conveyor = WoENHardware.INSTANCE.getConveyorMotor();
-        conveyor.setDirection(DcMotorSimple.Direction.FORWARD); //!!! can break odometry
-        conveyor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-    }
-
-    private static final double distanceQueryTimeout = 500;
-    private double lastKnownDistance = 12;
-    private final ElapsedTime distanceQueryTimer = new ElapsedTime();
-
-    private double getdistance() {
+    private fun getdistance(): Double {
         if (distanceQueryTimer.milliseconds() > distanceQueryTimeout) {
-            lastKnownDistance = sensorDistance.getDistance(DistanceUnit.CM);
-            distanceQueryTimer.reset();
+            lastKnownDistance = sensorDistance.getDistance(DistanceUnit.CM)
+            distanceQueryTimer.reset()
         }
-        return lastKnownDistance;
+        return lastKnownDistance
     }
 
-    private static final double motorCurrentQueryTimeout = 500;
-    private double lastKnownMotorCurrent = 0;
-    private final ElapsedTime motorCurrentQueryTimer = new ElapsedTime();
-
-    private double getAMPS() {
-        if (motorCurrentQueryTimer.milliseconds() > motorCurrentQueryTimeout) {
-            lastKnownMotorCurrent = abs(conveyor.getCurrent(CurrentUnit.AMPS));
-            motorCurrentQueryTimer.reset();
-        }
-        return lastKnownMotorCurrent;
-    }
-
-    public void updateControlHub(){
-        if (!forceReverse && !(doReverseOnStop && requestedPower == 0) && doAutomaticConveyorStopping)
-            if (getdistance() >= ConveyorConfig.distanceThreshold) {
-                stackDetectionTimer.reset(); //Full collector detection
+    private val aMPS: Double
+        get() {
+            if (motorCurrentQueryTimer.milliseconds() > motorCurrentQueryTimeout) {
+                lastKnownMotorCurrent = Math.abs(conveyor.getCurrent(CurrentUnit.AMPS))
+                motorCurrentQueryTimer.reset()
             }
+            return lastKnownMotorCurrent
+        }
+
+    override fun updateControlHub() {
+        if (!forceReverse && !(doReverseOnStop && requestedPower == 0.0) && doAutomaticConveyorStopping) if (getdistance() >= ConveyorConfig.distanceThreshold) {
+            stackDetectionTimer.reset() //Full collector detection
+        }
     }
 
-    public void updateExpansionHub() {
+    override fun updateExpansionHub() {
         if (!forceReverse) {
-            if ((stackDetectionTimer.milliseconds() > ConveyorConfig.stackDetectionTimeout || (doReverseOnStop && requestedPower == 0)) && doAutomaticConveyorStopping) { //reverse+stop in case of ring detection
-                motorCurrentTimer.reset();
-                currentMotorPower = stackDetectionTimer.milliseconds() < ConveyorConfig.stackDetectionTimeout + ConveyorConfig.stackDetectionReverseTime && doReverseOnStop ? -1 : 0;
+            if ((stackDetectionTimer.milliseconds() > ConveyorConfig.stackDetectionTimeout || doReverseOnStop && requestedPower == 0.0) && doAutomaticConveyorStopping) { //reverse+stop in case of ring detection
+                motorCurrentTimer.reset()
+                currentMotorPower =
+                    if (stackDetectionTimer.milliseconds() < ConveyorConfig.stackDetectionTimeout + ConveyorConfig.stackDetectionReverseTime && doReverseOnStop) -1.0 else 0.0
             } else if (motorCurrentTimer.milliseconds() > ConveyorConfig.motorLockingCurrentTimeout) //reverse after locking
             {
                 if (motorCurrentTimer.milliseconds() < ConveyorConfig.motorLockingReverseTime + ConveyorConfig.motorLockingCurrentTimeout) {
-                    currentMotorPower = -requestedPower;
-                } else
-                    motorCurrentTimer.reset();
+                    currentMotorPower = -requestedPower
+                } else motorCurrentTimer.reset()
             } else {
-                currentMotorPower = +requestedPower;
-                if (getAMPS() < ConveyorConfig.currentThreshold)  //locking detection
-                    motorCurrentTimer.reset();
+                currentMotorPower = +requestedPower
+                if (aMPS < ConveyorConfig.currentThreshold) //locking detection
+                    motorCurrentTimer.reset()
             }
         } else {
-            currentMotorPower = -1;
-            motorCurrentTimer.reset();
+            currentMotorPower = -1.0
+            motorCurrentTimer.reset()
         }
-        conveyorPowerSender.setVelocity(currentMotorPower);
-
+        conveyorPowerSender.setVelocity(currentMotorPower)
     }
 }

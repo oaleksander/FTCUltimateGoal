@@ -104,7 +104,7 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
      * @param linearVelocityFraction  Array of points (motion tasks)
      * @param angularVelocityFraction Array of points (motion tasks)
      */
-    @JvmOverloads
+
     fun pos(target: Pose2D?, linearVelocityFraction: Double = 1.0, angularVelocityFraction: Double = 1.0) {
         followPath(MotionTask(target), linearVelocityFraction, angularVelocityFraction, minError_distance_default, minError_angle_default)
         while (pathFollowerIsActive() && opMode!!.opModeIsActive()) {
@@ -136,7 +136,7 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
      * @param distanceTolerance       Minimum distance error
      * @param angularTolerance        Minimum angular error
      */
-    @JvmOverloads
+
     fun followPath(motionTask: MotionTask?, linearVelocityFraction: Double = 1.0, angularVelocityFraction: Double = 1.0, distanceTolerance: Double = minError_distance_default, angularTolerance: Double = minError_angle_default) {
         followPath(ArrayList(listOf(motionTask)), linearVelocityFraction, angularVelocityFraction, distanceTolerance, angularTolerance)
     }
@@ -149,7 +149,6 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
      * @param distanceTolerance       Minimum distance error
      * @param angularTolerance        Minimum angular error
      */
-    @JvmOverloads
     fun followPath(pathToFollow: ArrayList<MotionTask>, linearVelocityFraction: Double = 1.0, angularVelocityFraction: Double = 1.0, distanceTolerance: Double = minError_distance_default, angularTolerance: Double = minError_angle_default) {
         minError_distance_current = distanceTolerance
         minError_angle_current = angularTolerance
