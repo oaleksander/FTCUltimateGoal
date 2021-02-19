@@ -1,226 +1,261 @@
-package org.firstinspires.ftc.teamcode.robot;
+package org.firstinspires.ftc.teamcode.robot
 
-import com.acmerobotics.dashboard.config.Config;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.PIDFCoefficients;
-import com.qualcomm.robotcore.hardware.VoltageSensor;
-import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
+import com.acmerobotics.dashboard.config.Config
+import com.qualcomm.robotcore.hardware.*
+import com.qualcomm.robotcore.hardware.DcMotor.RunMode
+import com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior
+import com.qualcomm.robotcore.util.Range
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
+import org.firstinspires.ftc.teamcode.math.Vector2D
+import org.firstinspires.ftc.teamcode.math.Vector3D
+import org.firstinspires.ftc.teamcode.misc.CommandSender
+import org.firstinspires.ftc.teamcode.misc.motorAccelerationLimiter
+import org.firstinspires.ftc.teamcode.robot.WoENHardware.controlHubVoltageSensor
+import org.firstinspires.ftc.teamcode.superclasses.Drivetrain
+import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule
+import kotlin.math.abs
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.teamcode.math.Vector2D;
-import org.firstinspires.ftc.teamcode.math.Vector3D;
-import org.firstinspires.ftc.teamcode.misc.CommandSender;
-import org.firstinspires.ftc.teamcode.misc.motorAccelerationLimiter;
-import org.firstinspires.ftc.teamcode.superclasses.Drivetrain;
-import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule;
-import org.firstinspires.ftc.teamcode.superclasses.RobotModule;
-import org.jetbrains.annotations.NotNull;
-
-import static com.qualcomm.robotcore.util.Range.clip;
-import static java.lang.Math.abs;
-import static java.lang.Math.max;
-import static java.lang.Math.signum;
-
-public class MecanumDrivetrain extends MultithreadRobotModule implements Drivetrain {
-
-
-    /* Physical constants */
-    private static final double wheelRadius = 9.8 / 2;
-    private static final double gearRatio = 1;
-    private static final Vector2D wheelCenterOffset = new Vector2D(18.05253, 15.20000);
-    private static final double forwardMultiplier = (1 / wheelRadius)/gearRatio;
-    private static double sidewaysMultiplier = forwardMultiplier * DrivetrainConfig.strafingMultiplier;
-    private static double turnMultiplier = (wheelCenterOffset.x + wheelCenterOffset.y) * DrivetrainConfig.rotationDecrepancy / wheelRadius;
-
+class MecanumDrivetrain : MultithreadRobotModule(), Drivetrain {
     /* Motor parameters constatnts. */
     @Config
-    static class DrivetrainConfig {
-        public static double achieveableMaxRPMFraction = 0.885;
-        public static double achieveableMinRPMFraction = 0.045;
-        public static double strafingMultiplier = 1.35;
-        public static double rotationDecrepancy = 1;
-        public static double secondsToAccelerate = 0.33;
-        public static double kP = 26;
-        public static double kD = 0;
-        public static double kI = 0.1;
-        public static double kF = 15.10;
-        public static double kF_referenceVoltage = 13;
+    internal object DrivetrainConfig {
+        @JvmField var achieveableMaxRPMFraction = 0.885
+        @JvmField var achieveableMinRPMFraction = 0.045
+        @JvmField var strafingMultiplier = 1.35
+        @JvmField var rotationDecrepancy = 1.0
+        @JvmField var secondsToAccelerate = 0.33
+        @JvmField var kP = 26.0
+        @JvmField var kD = 0.0
+        @JvmField var kI = 0.1
+        @JvmField var kF = 15.10
+        @JvmField var kF_referenceVoltage = 13.0
     }
+    /* Physical constants */
+    private val wheelRadius = 9.8 / 2
+    private val gearRatio = 1.0
+    private val wheelCenterOffset = Vector2D(18.05253, 15.20000)
+    private val forwardMultiplier = 1 / wheelRadius / gearRatio
+    private var sidewaysMultiplier = forwardMultiplier * DrivetrainConfig.strafingMultiplier
+    private var turnMultiplier = (wheelCenterOffset.x + wheelCenterOffset.y) * DrivetrainConfig.rotationDecrepancy / wheelRadius
+    private val tickPerRev = 480.0
+    private val gearing = 20.0
+    private val maxRPM = 300.0
+    private val theoreticalMaxSpeed = maxRPM / 60 * Math.PI * 2
+    private var maxMotorSpeed = DrivetrainConfig.achieveableMaxRPMFraction * theoreticalMaxSpeed
+    private var minMotorSpeed =
+        DrivetrainConfig.achieveableMinRPMFraction * theoreticalMaxSpeed //http://b1-srv-kms-1.sch239.net:8239
 
-    private static final double tickPerRev = 480;
-    private static final double gearing = 20;
-    private static final double maxRPM = 300;
-    public static final double theoreticalMaxSpeed = (maxRPM / 60) * Math.PI * 2;
-    private static double maxMotorSpeed = DrivetrainConfig.achieveableMaxRPMFraction * theoreticalMaxSpeed;
-    private static double minMotorSpeed = DrivetrainConfig.achieveableMinRPMFraction * theoreticalMaxSpeed; //http://b1-srv-kms-1.sch239.net:8239
-    private double maxAcceleration = theoreticalMaxSpeed / DrivetrainConfig.secondsToAccelerate;
     /* Drivetrain hardware members. */
-    private static DcMotorEx driveFrontLeft = null;
+    private lateinit var driveFrontLeft: DcMotorEx
+    private lateinit var driveFrontRight: DcMotorEx
+    private lateinit var driveRearLeft: DcMotorEx
+    private lateinit var driveRearRight: DcMotorEx
+
+    private var maxAcceleration = theoreticalMaxSpeed / DrivetrainConfig.secondsToAccelerate
+
     /* Motor controllers */
-    private final motorAccelerationLimiter mFLProfiler = new motorAccelerationLimiter(new CommandSender(v -> driveFrontLeft.setVelocity(v, AngleUnit.RADIANS))::send, maxAcceleration);
-    private static DcMotorEx driveFrontRight = null;
-    private final motorAccelerationLimiter mFRProfiler = new motorAccelerationLimiter(new CommandSender(v -> driveFrontRight.setVelocity(v, AngleUnit.RADIANS))::send, maxAcceleration);
-    private static DcMotorEx driveRearLeft = null;
-    private final motorAccelerationLimiter mRLProfiler = new motorAccelerationLimiter(new CommandSender(v -> driveRearLeft.setVelocity(v, AngleUnit.RADIANS))::send, maxAcceleration);
-    private static DcMotorEx driveRearRight = null;
-    private final motorAccelerationLimiter mRRProfiler = new motorAccelerationLimiter(new CommandSender(v -> driveRearRight.setVelocity(v, AngleUnit.RADIANS))::send, maxAcceleration);
-
-    private VoltageSensor voltageSensor = null;
-
-    private boolean smartMode = false;
-    private double powerFrontLeft = 0;
-    private double powerFrontRight = 0;
-    private double powerRearLeft = 0;
-    private double powerRearRight = 0;
-
-    public void initialize() {
-        assignNames();
-        voltageSensor = WoENHardware.INSTANCE.getControlHubVoltageSensor();
-        setMotorDirections();
-        maxMotorSpeed = DrivetrainConfig.achieveableMaxRPMFraction * theoreticalMaxSpeed;
-        minMotorSpeed = DrivetrainConfig.achieveableMinRPMFraction * theoreticalMaxSpeed;
-        sidewaysMultiplier = forwardMultiplier * DrivetrainConfig.strafingMultiplier;
-        maxAcceleration = theoreticalMaxSpeed / DrivetrainConfig.secondsToAccelerate;
-        turnMultiplier = (wheelCenterOffset.x + wheelCenterOffset.y) * DrivetrainConfig.rotationDecrepancy / wheelRadius;
-        setMotor0PowerBehaviors(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        setMotorConfiguration(DrivetrainConfig.achieveableMaxRPMFraction, tickPerRev, gearing, maxRPM);
+    private val mFLProfiler = motorAccelerationLimiter({ value: Double ->
+        CommandSender { v: Double ->
+            driveFrontLeft.setVelocity(
+                v,
+                AngleUnit.RADIANS
+            )
+        }.send(value)
+    }, maxAcceleration)
+    private val mFRProfiler = motorAccelerationLimiter({ value: Double ->
+        CommandSender { v: Double ->
+            driveFrontRight.setVelocity(
+                v,
+                AngleUnit.RADIANS
+            )
+        }.send(value)
+    }, maxAcceleration)
+    private val mRLProfiler = motorAccelerationLimiter({ value: Double ->
+        CommandSender { v: Double ->
+            driveRearLeft.setVelocity(
+                v,
+                AngleUnit.RADIANS
+            )
+        }.send(value)
+    }, maxAcceleration)
+    private val mRRProfiler = motorAccelerationLimiter({ value: Double ->
+        CommandSender { v: Double ->
+            driveRearRight.setVelocity(
+                v,
+                AngleUnit.RADIANS
+            )
+        }.send(value)
+    }, maxAcceleration)
+    private var voltageSensor: VoltageSensor? = null
+    private var smartMode = false
+    private var powerFrontLeft = 0.0
+    private var powerFrontRight = 0.0
+    private var powerRearLeft = 0.0
+    private var powerRearRight = 0.0
+    override fun initialize() {
+        assignNames()
+        voltageSensor = controlHubVoltageSensor
+        setMotorDirections()
+        maxMotorSpeed = DrivetrainConfig.achieveableMaxRPMFraction * theoreticalMaxSpeed
+        minMotorSpeed = DrivetrainConfig.achieveableMinRPMFraction * theoreticalMaxSpeed
+        sidewaysMultiplier = forwardMultiplier * DrivetrainConfig.strafingMultiplier
+        maxAcceleration = theoreticalMaxSpeed / DrivetrainConfig.secondsToAccelerate
+        turnMultiplier =
+            (wheelCenterOffset.x + wheelCenterOffset.y) * DrivetrainConfig.rotationDecrepancy / wheelRadius
+        setMotor0PowerBehaviors(ZeroPowerBehavior.BRAKE)
+        setMotorConfiguration(
+            DrivetrainConfig.achieveableMaxRPMFraction,
+            tickPerRev,
+            gearing,
+            maxRPM
+        )
         try {
-            setPIDFCoefficients(new PIDFCoefficients(DrivetrainConfig.kP, DrivetrainConfig.kD, DrivetrainConfig.kI, DrivetrainConfig.kF * DrivetrainConfig.kF_referenceVoltage / voltageSensor.getVoltage()));
-        } catch (UnsupportedOperationException e) {
-            opMode.telemetry.addData("Drivetrain PIDF error ", e.getMessage());
+            setPIDFCoefficients(
+                PIDFCoefficients(
+                    DrivetrainConfig.kP,
+                    DrivetrainConfig.kD,
+                    DrivetrainConfig.kI,
+                    DrivetrainConfig.kF * DrivetrainConfig.kF_referenceVoltage / voltageSensor!!.voltage
+                )
+            )
+        } catch (e: UnsupportedOperationException) {
+            opMode.telemetry.addData("Drivetrain PIDF error ", e.message)
         }
-        setSmartMode(true);
-        setRobotVelocity(0, 0, 0);
+        setSmartMode(true)
+        setRobotVelocity(0.0, 0.0, 0.0)
     }
 
-    public void setSmartMode(boolean SmartMode) {
-        smartMode = SmartMode;
-        setMotorMode(SmartMode ? DcMotorEx.RunMode.RUN_USING_ENCODER : DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+    fun setSmartMode(SmartMode: Boolean) {
+        smartMode = SmartMode
+        setMotorMode(if (SmartMode) RunMode.RUN_USING_ENCODER else RunMode.RUN_WITHOUT_ENCODER)
     }
 
-    private void assignNames() {
-        driveFrontLeft = WoENHardware.INSTANCE.getDriveFrontLeft();
-        driveFrontRight = WoENHardware.INSTANCE.getDriveFrontRight();
-        driveRearLeft = WoENHardware.INSTANCE.getDriveRearLeft();
-        driveRearRight = WoENHardware.INSTANCE.getDriveRearRight();
+    private fun assignNames() {
+        driveFrontLeft = WoENHardware.driveFrontLeft
+        driveFrontRight = WoENHardware.driveFrontRight
+        driveRearLeft = WoENHardware.driveRearLeft
+        driveRearRight = WoENHardware.driveRearRight
     }
 
-    private void setMotorDirections() {
-        driveFrontLeft.setDirection(DcMotorEx.Direction.FORWARD);
-        driveFrontRight.setDirection(DcMotorEx.Direction.REVERSE);
-        driveRearLeft.setDirection(DcMotorEx.Direction.FORWARD);
-        driveRearRight.setDirection(DcMotorEx.Direction.REVERSE);
+    private fun setMotorDirections() {
+        driveFrontLeft.direction = DcMotorSimple.Direction.FORWARD
+        driveFrontRight.direction = DcMotorSimple.Direction.REVERSE
+        driveRearLeft.direction = DcMotorSimple.Direction.FORWARD
+        driveRearRight.direction = DcMotorSimple.Direction.REVERSE
     }
 
-    private void setMotor0PowerBehaviors(DcMotorEx.ZeroPowerBehavior zeroPowerBehavior) {
-        driveFrontLeft.setZeroPowerBehavior(zeroPowerBehavior);
-        driveFrontRight.setZeroPowerBehavior(zeroPowerBehavior);
-        driveRearLeft.setZeroPowerBehavior(zeroPowerBehavior);
-        driveRearRight.setZeroPowerBehavior(zeroPowerBehavior);
+    private fun setMotor0PowerBehaviors(zeroPowerBehavior: ZeroPowerBehavior) {
+        driveFrontLeft.zeroPowerBehavior = zeroPowerBehavior
+        driveFrontRight.zeroPowerBehavior = zeroPowerBehavior
+        driveRearLeft.zeroPowerBehavior = zeroPowerBehavior
+        driveRearRight.zeroPowerBehavior = zeroPowerBehavior
     }
 
-    private void setMotorMode(DcMotorEx.RunMode runMode) {
-        driveFrontLeft.setMode(runMode);
-        driveFrontRight.setMode(runMode);
-        driveRearLeft.setMode(runMode);
-        driveRearRight.setMode(runMode);
+    private fun setMotorMode(runMode: RunMode) {
+        driveFrontLeft.mode = runMode
+        driveFrontRight.mode = runMode
+        driveRearLeft.mode = runMode
+        driveRearRight.mode = runMode
     }
 
-    private void setPIDFCoefficients(PIDFCoefficients pidfCoefficients) {
-        driveFrontLeft.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoefficients);
-        driveFrontRight.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoefficients);
-        driveRearLeft.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoefficients);
-        driveRearRight.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoefficients);
+    private fun setPIDFCoefficients(pidfCoefficients: PIDFCoefficients) {
+        driveFrontLeft.setPIDFCoefficients(RunMode.RUN_USING_ENCODER, pidfCoefficients)
+        driveFrontRight.setPIDFCoefficients(RunMode.RUN_USING_ENCODER, pidfCoefficients)
+        driveRearLeft.setPIDFCoefficients(RunMode.RUN_USING_ENCODER, pidfCoefficients)
+        driveRearRight.setPIDFCoefficients(RunMode.RUN_USING_ENCODER, pidfCoefficients)
     }
 
-    private void setMotorConfiguration(double achieveableMaxRPMFraction, double tickPerRev, double gearing, double maxRPM) {
-        setMotorConfiguration(driveFrontLeft, achieveableMaxRPMFraction, tickPerRev, gearing, maxRPM);
-        setMotorConfiguration(driveFrontRight, achieveableMaxRPMFraction, tickPerRev, gearing, maxRPM);
-        setMotorConfiguration(driveRearLeft, achieveableMaxRPMFraction, tickPerRev, gearing, maxRPM);
-        setMotorConfiguration(driveRearRight, achieveableMaxRPMFraction, tickPerRev, gearing, maxRPM);
+    private fun setMotorConfiguration(achieveableMaxRPMFraction: Double, tickPerRev: Double, gearing: Double, maxRPM: Double) {
+        setMotorConfiguration(driveFrontLeft, achieveableMaxRPMFraction, tickPerRev, gearing, maxRPM)
+        setMotorConfiguration(driveFrontRight, achieveableMaxRPMFraction, tickPerRev, gearing, maxRPM)
+        setMotorConfiguration(driveRearLeft, achieveableMaxRPMFraction, tickPerRev, gearing, maxRPM)
+        setMotorConfiguration(driveRearRight, achieveableMaxRPMFraction, tickPerRev, gearing, maxRPM)
     }
 
-    private void setMotorConfiguration(@NotNull DcMotorEx dcMotor, double achieveableMaxRPMFraction, double tickPerRev, double gearing, double maxRPM) {
-        MotorConfigurationType motorConfigurationType = dcMotor.getMotorType().clone();
-        motorConfigurationType.setAchieveableMaxRPMFraction(achieveableMaxRPMFraction);
-        motorConfigurationType.setTicksPerRev(tickPerRev);
-        motorConfigurationType.setGearing(gearing);
-        motorConfigurationType.setMaxRPM(maxRPM);
-        dcMotor.setMotorType(motorConfigurationType);
+    private fun setMotorConfiguration(dcMotor: DcMotorEx, achieveableMaxRPMFraction: Double, tickPerRev: Double, gearing: Double, maxRPM: Double) {
+        val motorConfigurationType = dcMotor.motorType.clone()
+        motorConfigurationType.achieveableMaxRPMFraction = achieveableMaxRPMFraction
+        motorConfigurationType.ticksPerRev = tickPerRev
+        motorConfigurationType.gearing = gearing
+        motorConfigurationType.maxRPM = maxRPM
+        dcMotor.motorType = motorConfigurationType
     }
 
-    private void resetEncoders() {
-        setMotorMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+    private fun resetEncoders() {
+        setMotorMode(RunMode.STOP_AND_RESET_ENCODER)
     }
 
-    public void setMaxDriveSpeed(double value) {
-        maxMotorSpeed = clip(abs(value), 0, theoreticalMaxSpeed);
+    fun setMaxDriveSpeed(value: Double) {
+        maxMotorSpeed = Range.clip(Math.abs(value), 0.0, theoreticalMaxSpeed)
     }
 
-    public void setMinDriveSpeed(double value) {
-        minMotorSpeed = clip(abs(value), 0, theoreticalMaxSpeed);
+    fun setMinDriveSpeed(value: Double) {
+        minMotorSpeed = Range.clip(Math.abs(value), 0.0, theoreticalMaxSpeed)
     }
 
-    public void updateControlHub() {
+    override fun updateControlHub() {
         if (smartMode) {
-            mFLProfiler.setVelocity(powerFrontLeft);
-            mFRProfiler.setVelocity(powerFrontRight);
-            mRLProfiler.setVelocity(powerRearLeft);
-            mRRProfiler.setVelocity(powerRearRight);
-        } else
-            driveMotorPowers_direct(powerFrontLeft / maxMotorSpeed,
-                    powerFrontRight / maxMotorSpeed,
-                    powerRearLeft / maxMotorSpeed,
-                    powerRearRight / maxMotorSpeed);
+            mFLProfiler.setVelocity(powerFrontLeft)
+            mFRProfiler.setVelocity(powerFrontRight)
+            mRLProfiler.setVelocity(powerRearLeft)
+            mRRProfiler.setVelocity(powerRearRight)
+        } else driveMotorPowers_direct(
+            powerFrontLeft / maxMotorSpeed,
+            powerFrontRight / maxMotorSpeed,
+            powerRearLeft / maxMotorSpeed,
+            powerRearRight / maxMotorSpeed
+        )
     }
 
-    public void driveMotorPowers_direct(double frontLeft, double frontRight, double rearLeft, double rearRight) {
-        driveFrontLeft.setPower(frontLeft);
-        driveFrontRight.setPower(frontRight);
-        driveRearLeft.setPower(rearLeft);
-        driveRearRight.setPower(rearRight);
+    fun driveMotorPowers_direct(frontLeft: Double, frontRight: Double, rearLeft: Double, rearRight: Double) {
+        driveFrontLeft.power = frontLeft
+        driveFrontRight.power = frontRight
+        driveRearLeft.power = rearLeft
+        driveRearRight.power = rearRight
     }
 
-    public void driveMotorPowers(double frontLeft, double frontRight, double rearLeft, double rearRight) {
-
-        double maxabs = max(max(abs(frontLeft), abs(frontRight)), max(abs(rearLeft), abs(rearRight)));
+    fun driveMotorPowers(frontLeft: Double, frontRight: Double, rearLeft: Double, rearRight: Double) {
+        var frontLeft = frontLeft
+        var frontRight = frontRight
+        var rearLeft = rearLeft
+        var rearRight = rearRight
+        var maxabs = abs(frontLeft).coerceAtLeast(abs(frontRight)).coerceAtLeast(abs(rearLeft)).coerceAtLeast(abs(rearRight))
         if (maxabs > maxMotorSpeed) {
-            maxabs = maxabs / maxMotorSpeed;
-            frontLeft = (frontLeft / maxabs);
-            frontRight = (frontRight / maxabs);
-            rearLeft = (rearLeft / maxabs);
-            rearRight = (rearRight / maxabs);
+            maxabs /= maxMotorSpeed
+            frontLeft /= maxabs
+            frontRight /= maxabs
+            rearLeft /= maxabs
+            rearRight /= maxabs
         }
-
-        powerFrontLeft = limitSpeed(frontLeft);
-        powerFrontRight = limitSpeed(frontRight);
-        powerRearLeft = limitSpeed(rearLeft);
-        powerRearRight = limitSpeed(rearRight);
+        powerFrontLeft = limitSpeed(frontLeft)
+        powerFrontRight = limitSpeed(frontRight)
+        powerRearLeft = limitSpeed(rearLeft)
+        powerRearRight = limitSpeed(rearRight)
     }
 
-    private double limitSpeed(double speed) {
-        return clip(abs(speed), minMotorSpeed, maxMotorSpeed) * signum(speed);
+    private fun limitSpeed(speed: Double): Double {
+        return Range.clip(Math.abs(speed), minMotorSpeed, maxMotorSpeed) * Math.signum(speed)
     }
 
-    public Vector3D getMaxVelocity() {
-        return new Vector3D(maxMotorSpeed / forwardMultiplier, maxMotorSpeed / forwardMultiplier, maxMotorSpeed / turnMultiplier);
+    override fun getMaxVelocity(): Vector3D {
+        return Vector3D(
+            maxMotorSpeed / forwardMultiplier,
+            maxMotorSpeed / forwardMultiplier,
+            maxMotorSpeed / turnMultiplier
+        )
     }
 
-    public void setRobotVelocity(double frontways, double sideways, double turn) {
-
-        frontways *= forwardMultiplier;
-        sideways *= sidewaysMultiplier;
-        turn *= turnMultiplier;
-
-        double FrontLeft = frontways + sideways + turn;
-        double FrontRight = frontways - sideways - turn;
-        double RearLeft = frontways - sideways + turn;
-        double RearRight = frontways + sideways - turn;
-
-        driveMotorPowers(FrontLeft, FrontRight, RearLeft, RearRight);
+    override fun setRobotVelocity(frontways: Double, sideways: Double, turn: Double) {
+        var frontways = frontways
+        var sideways = sideways
+        var turn = turn
+        frontways *= forwardMultiplier
+        sideways *= sidewaysMultiplier
+        turn *= turnMultiplier
+        val FrontLeft = frontways + sideways + turn
+        val FrontRight = frontways - sideways - turn
+        val RearLeft = frontways - sideways + turn
+        val RearRight = frontways + sideways - turn
+        driveMotorPowers(FrontLeft, FrontRight, RearLeft, RearRight)
     }
-
-
 }
