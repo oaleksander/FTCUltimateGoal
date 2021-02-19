@@ -104,6 +104,7 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
      * @param linearVelocityFraction  Array of points (motion tasks)
      * @param angularVelocityFraction Array of points (motion tasks)
      */
+    @JvmOverloads
     fun pos(target: Pose2D?, linearVelocityFraction: Double = 1.0, angularVelocityFraction: Double = 1.0) {
         followPath(MotionTask(target), linearVelocityFraction, angularVelocityFraction, minError_distance_default, minError_angle_default)
         while (pathFollowerIsActive() && opMode!!.opModeIsActive()) {
