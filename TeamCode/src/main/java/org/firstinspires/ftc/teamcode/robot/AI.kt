@@ -10,6 +10,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
 
 import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule
+import org.openftc.revextensions2.ExpansionHubEx
 import org.openftc.revextensions2.ExpansionHubMotor
 
 class AI : MultithreadRobotModule() {
@@ -70,6 +71,22 @@ class AI : MultithreadRobotModule() {
     }
     fun diagnosticRange(sensor: DistanceSensor ) : Boolean {
         return !sensor.getDistance(DistanceUnit.CM).isNaN()
+    }
+
+    fun getAmpsHub(Hub : ExpansionHubEx) : Double{
+        return Hub.getTotalModuleCurrentDraw(ExpansionHubEx.CurrentDrawUnits.AMPS)
+    }
+    fun getGPIOAmpsHub(Hub : ExpansionHubEx) : Double{
+        return Hub.getGpioBusCurrentDraw(ExpansionHubEx.CurrentDrawUnits.AMPS)
+    }
+    fun getI2CAmpsHub(Hub : ExpansionHubEx) : Double{
+        return Hub.getI2cBusCurrentDraw(ExpansionHubEx.CurrentDrawUnits.AMPS)
+    }
+    fun get5vHub(Hub : ExpansionHubEx) : Double{
+        return Hub.read5vMonitor(ExpansionHubEx.VoltageUnits.VOLTS)
+    }
+    fun get12vHub(Hub : ExpansionHubEx) : Double{
+        return Hub.read12vMonitor(ExpansionHubEx.VoltageUnits.VOLTS)
     }
 
     fun diagnosticMotor(motor: DcMotorEx): Boolean {
