@@ -68,11 +68,11 @@ object WoENHardware {
         odometerYL = hardwareMap.get(DcMotorEx::class.java, "odometerYL") as ExpansionHubMotor
         odometerYR = hardwareMap.get(DcMotorEx::class.java, "odometerYR") as ExpansionHubMotor
         odometerX = hardwareMap.get(DcMotorEx::class.java, "odometerXConveyor") as ExpansionHubMotor
-        conveyorMotor = hardwareMap.get(DcMotorEx::class.java, "odometerYL") as ExpansionHubMotor
+        conveyorMotor = hardwareMap.get(DcMotorEx::class.java, "odometerXConveyor") as ExpansionHubMotor
         shooterMotor = hardwareMap.get(DcMotorEx::class.java, "shooterMotor") as ExpansionHubMotor
         lever = hardwareMap.get(DcMotorEx::class.java, "odometerYR") as ExpansionHubMotor
         ledStrip1 = hardwareMap.get(DcMotorEx::class.java, "odometerYR") as ExpansionHubMotor
-        ledStrip2 = hardwareMap.get(DcMotorEx::class.java, "odometerXConveyor") as ExpansionHubMotor
+        ledStrip2 = hardwareMap.get(DcMotorEx::class.java, "odometerYL") as ExpansionHubMotor
 
         feeder = hardwareMap.get(Servo::class.java, "feeder") as ExpansionHubServo
         gripper = hardwareMap.get(Servo::class.java, "wobbleGrabber") as ExpansionHubServo
