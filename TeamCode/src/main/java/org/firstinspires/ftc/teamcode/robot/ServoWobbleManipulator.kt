@@ -45,6 +45,12 @@ class ServoWobbleManipulator : MultithreadRobotModule(), WobbleManipulator {
         anglePositionSender.send(leverArmPosition)
     }
 
+    override fun updateExpansionHub() {
+    }
+
+    override fun updateOther() {
+    }
+
     override fun upmediumdown(upmedium: Boolean, updown: Boolean) {
         if (upmedium && !updown) {
             setAngle(WobbleManipulator.Position.UP)

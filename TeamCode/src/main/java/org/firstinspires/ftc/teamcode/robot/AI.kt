@@ -5,7 +5,6 @@ import com.qualcomm.robotcore.hardware.DcMotorEx
 import com.qualcomm.robotcore.hardware.DistanceSensor
 import com.qualcomm.robotcore.hardware.Servo
 import com.qualcomm.robotcore.util.ElapsedTime
-import org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
 
@@ -41,33 +40,36 @@ class AI : MultithreadRobotModule() {
         AItimeControlHub.reset()
     }
 
-  /*  override fun updateControlHub() {
-       if (AItimeControlHub.milliseconds() > timeDiagnostic) {
-           AItimeControlHub.reset()
-           if (tempMotor(DriveFrontLeft) || tempMotor(DriveFrontRight) || tempMotor(DriveRearLeft) || tempMotor(DriveRearRight)) {
-               telemetry.addData("Warning!", "owerHeadControlHub")
-           }
-       }
+
+    override fun updateOther() {
     }
 
-    override fun updateExpansionHub() {
-        if (AItimeExpansionHub.milliseconds() > timeDiagnostic){
-            AItimeExpansionHub.reset()
-            if (tempMotor(Conveyorm) || tempMotor(ShooterMotor) || tempMotor(OdometryYL) || tempMotor(OdometryYR)){
-                telemetry.addData("Warning!", "owerHeadExpansionHub")
-            }
-        }
-    }
-*/
+    override fun updateControlHub() {
+       /*  if (AItimeControlHub.milliseconds() > timeDiagnostic) {
+             AItimeControlHub.reset()
+             if (tempMotor(DriveFrontLeft) || tempMotor(DriveFrontRight) || tempMotor(DriveRearLeft) || tempMotor(DriveRearRight)) {
+                 opMode.telemetry.addData("Warning!", "owerHeadControlHub")
+             }
+         }*/
+      }
+
+      override fun updateExpansionHub() {
+          /*if (AItimeExpansionHub.milliseconds() > timeDiagnostic){
+              AItimeExpansionHub.reset()
+              if (tempMotor(Conveyorm) || tempMotor(ShooterMotor) || tempMotor(OdometryYL) || tempMotor(OdometryYR)){
+                  opMode.telemetry.addData("Warning!", "owerHeadExpansionHub")
+              }
+          }*/
+      }
     private fun tempMotor(motor: ExpansionHubMotor): Boolean {
         return motor.isBridgeOverTemp
     }
     fun diagnositcServo(servo: Servo, startPos :Double, endPos :Double) {
         AItime.reset()
         servo.position = startPos
-        while (opMode!!.opModeIsActive() && AItime.milliseconds() < timeDiagnostic/2) {}
+        while (opMode.opModeIsActive() && AItime.milliseconds() < timeDiagnostic/2) { Thread.yield()}
         servo.position = endPos
-        while (opMode!!.opModeIsActive() && AItime.milliseconds() < timeDiagnostic) {}
+       while (opMode.opModeIsActive() && AItime.milliseconds() < timeDiagnostic) {Thread.yield()}
     }
     fun diagnosticRange(sensor: DistanceSensor ) : Boolean {
         return !sensor.getDistance(DistanceUnit.CM).isNaN()

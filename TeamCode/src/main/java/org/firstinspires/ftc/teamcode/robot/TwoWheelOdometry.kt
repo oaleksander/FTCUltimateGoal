@@ -59,6 +59,9 @@ class TwoWheelOdometry : MultithreadRobotModule(), Odometry {
         calculatePosition(worldPosition)
     }
 
+    override fun updateOther() {
+    }
+
     @Synchronized
     fun calculatePosition(initialPose: Pose2D) {
         worldPosition = initialPose

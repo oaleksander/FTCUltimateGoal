@@ -97,13 +97,16 @@ class rpm : MultithreadRobotModule() {
         shooterVelocitySender.send(currentVelocity)
         if (encoderFailureDetectionTime.seconds() > 1) if (velocityTarget == 0.0 || currentRpm != 0.0) encoderFailureDetectionTime.reset()
         if (velocityTarget != 0.0 && ringsToShoot == 0) updatePIDFCoeffs(
-            encoderFailureDetectionTime.seconds() > 2
+            encoderFailureDetectionTime.seconds() > 3
         )
+    }
+
+    override fun updateOther() {
     }
 
     private val PIDFUpdateTimer = ElapsedTime()
     private fun updatePIDFCoeffs(encoderFailureMode: Boolean) {
-        if (encoderFailureMode != this.encoderFailureMode || PIDFUpdateTimer.seconds() > 0.5) {
+        if (encoderFailureMode != this.encoderFailureMode || PIDFUpdateTimer.seconds() > 3.0) {
             this.encoderFailureMode = encoderFailureMode
             PIDFUpdateTimer.reset()
             try {

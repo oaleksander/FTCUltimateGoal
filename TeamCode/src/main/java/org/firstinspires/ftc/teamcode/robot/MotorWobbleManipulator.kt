@@ -41,6 +41,9 @@ class MotorWobbleManipulator : MultithreadRobotModule(), WobbleManipulator {
         grabWobble(true)
     }
 
+    override fun updateControlHub() {
+    }
+
     override fun grabWobble(dograb: Boolean) {
         if (dograb != isGrabbed) {
             isGrabbed = dograb
@@ -68,6 +71,9 @@ class MotorWobbleManipulator : MultithreadRobotModule(), WobbleManipulator {
                 oldpower = power
             }
         }
+    }
+
+    override fun updateOther() {
     }
 
     override fun upmediumdown(upmedium: Boolean, updown: Boolean) {

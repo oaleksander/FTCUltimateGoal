@@ -41,6 +41,12 @@ class FakeRobot : MultithreadRobotModule(), Drivetrain, Odometry {
         started = false
     }
 
+    override fun updateControlHub() {
+    }
+
+    override fun updateExpansionHub() {
+    }
+
     override fun updateOther() {
         if (!started) {
             started = true

@@ -63,6 +63,12 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
         pathToFollow.add(0, MotionTask(odometry.robotCoordinates))
     }
 
+    override fun updateControlHub() {
+    }
+
+    override fun updateExpansionHub() {
+    }
+
     override fun updateOther() {
         bPathFollowingFinished = nTargetPoint >= pathToFollow.size
         if (pathFollowerIsActive() && requestedVelocityPercent.radius() < 0.005) {
@@ -82,7 +88,7 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
         } else if (requestedVelocityPercent.radius() > 0.005) {
             if (pathFollowerIsActive()) stopPathFollowing()
             drivetrain.setRobotVelocity(requestedVelocityPercent*drivetrain.maxVelocity)
-            followPath(odometry.robotCoordinates as MotionTask)
+     //       followPath(odometry.robotCoordinates as MotionTask)
         } else if (pathToFollow.size > 0 && doActiveBraking) moveLinear(pathToFollow[pathToFollow.size - 1]) else drivetrain.setRobotVelocity(0.0, 0.0, 0.0)
     }
 

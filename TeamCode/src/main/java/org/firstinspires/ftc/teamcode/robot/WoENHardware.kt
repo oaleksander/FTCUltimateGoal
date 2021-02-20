@@ -9,7 +9,6 @@ import org.firstinspires.ftc.robotcore.internal.system.AppUtil
 import com.qualcomm.hardware.lynx.LynxModule
 import com.qualcomm.hardware.lynx.LynxVoltageSensor
 import com.qualcomm.robotcore.hardware.*
-import java.util.function.DoubleSupplier
 
 object WoENHardware {
 
@@ -41,7 +40,7 @@ object WoENHardware {
 
     lateinit var ringDetector: DistanceSensor
 
-    lateinit var imu1: BNO055IMU
+    lateinit var controlHubIMU: BNO055IMU
     lateinit var imu2: BNO055IMU
 
 
@@ -81,7 +80,7 @@ object WoENHardware {
 
         ringDetector = hardwareMap.get(DistanceSensor::class.java, "ringDetector")
 
-        imu1 = hardwareMap.get(BNO055IMU::class.java, "imu")
+        controlHubIMU = hardwareMap.get(BNO055IMU::class.java, "imu")
         imu2 = hardwareMap.get(BNO055IMU::class.java, "imu 1")
     }
 }

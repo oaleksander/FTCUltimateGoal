@@ -18,8 +18,8 @@ import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule
 class Conveyor2 : MultithreadRobotModule(), Conveyor {
     private lateinit var conveyor: DcMotorEx
     private lateinit var sensorDistance: DistanceSensor
-    private val distanceQueryTimeout = 500.0
-    private val motorCurrentQueryTimeout = 500.0
+    private val distanceQueryTimeout = 650.0
+    private val motorCurrentQueryTimeout = 650.0
     private val conveyorPowerSender = motorAccelerationLimiter({ value: Double -> CommandSender { p: Double -> conveyor.power = -p }.send(value) }, 6.0)
     private val motorCurrentTimer = ElapsedTime()
     private val stackDetectionTimer = ElapsedTime()
@@ -120,5 +120,8 @@ class Conveyor2 : MultithreadRobotModule(), Conveyor {
             motorCurrentTimer.reset()
         }
         conveyorPowerSender.setVelocity(currentMotorPower)
+    }
+
+    override fun updateOther() {
     }
 }

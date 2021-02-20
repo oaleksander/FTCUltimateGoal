@@ -13,7 +13,7 @@ import java.util.List;
 public class WoENrobot {
 
     public static ServoWobbleManipulator wobbleManipulator = new ServoWobbleManipulator();
-    public static OpenCVNodeWebcam openCVNode = new OpenCVNodePhonecam();
+    public static OpenCVNodeWebcam openCVNode = new OpenCVNodeWebcam();
     public static Conveyor2 conveyor = new Conveyor2();
     public static rpm shooter = new rpm();
     public static TelemetryDebugging telemetryDebugging = new TelemetryDebugging();
@@ -28,7 +28,7 @@ public class WoENrobot {
     public static LinearOpMode opMode = null;
     public static boolean robotIsInitialized = false;
     public static final ElapsedTime runTime = new ElapsedTime();
-    protected static MultithreadRobotModule[] activeRobotModules = {odometry, movement, drivetrain, wobbleManipulator, conveyor, telemetryDebugging, ai}; //shooter
+    protected static MultithreadRobotModule[] activeRobotModules = {odometry, movement, drivetrain, wobbleManipulator, conveyor, shooter, telemetryDebugging, ai}; //
     static volatile boolean controlHubSpinCompleted = false;
     static volatile boolean expansionHubSpinCompleted = false;
     static volatile boolean spinCompleted = false;
@@ -39,6 +39,7 @@ public class WoENrobot {
     static Runnable updateControlHub = () -> {
         controlHub.getStandardModule().setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
          while (opMode.opModeIsActive() && !Thread.currentThread().isInterrupted()) {
+             controlHub.getStandardModule().clearBulkCache();
              Arrays.stream(activeRobotModules).forEach(MultithreadRobotModule::updateControlHub);
              controlHubSpinCompleted = true;
          }
@@ -47,6 +48,7 @@ public class WoENrobot {
     static Runnable updateExpansionHub = () -> {
         expansionHub.getStandardModule().setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
         while (opMode.opModeIsActive() && !Thread.currentThread().isInterrupted()) {
+            expansionHub.getStandardModule().clearBulkCache();
             Arrays.stream(activeRobotModules).forEach(MultithreadRobotModule::updateExpansionHub);
             expansionHubSpinCompleted = true;
         }
@@ -68,32 +70,8 @@ public class WoENrobot {
     static Runnable updateRegulators = () -> {
         setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
         while (opMode.opModeIsActive() && !Thread.currentThread().isInterrupted()) {
-            Thread controlHubNode = new Thread(() -> {
-             //   controlHub.getStandardModule().clearBulkCache();
-             //   Arrays.stream(activeRobotModules).forEach(MultithreadRobotModule::updateControlHub);
-            });
-            Thread expansionHubNode = new Thread(() -> {
-           //     expansionHub.getStandardModule().clearBulkCache();
-               // Arrays.stream(activeRobotModules).forEach(MultithreadRobotModule::updateExpansionHub);
-            });
-            // Thread otherCalculationsNode = new Thread(()->{ expansionHub.getStandardModule().clearBulkCache();});
-            controlHubNode.start();
-            try {
-                controlHubNode.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } finally {
-                controlHubNode.interrupt();
-            }
-            expansionHubNode.start();
-            try {
-                expansionHubNode.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } finally {
-                expansionHubNode.interrupt();
-            }
-            Arrays.stream(activeRobotModules).forEach(MultithreadRobotModule::updateOther);
+            clearBulkCaches();
+            Arrays.stream(activeRobotModules).forEach(MultithreadRobotModule::update);
             spinCompleted = true;
         }
     };
@@ -137,7 +115,7 @@ public class WoENrobot {
         if(opMode.isStopRequested()) return;
         runTime.reset();
         Arrays.stream(activeRobotModules).forEach(MultithreadRobotModule::start);
-        //regulatorUpdater.start();
+       // regulatorUpdater.start();
         controlHubUpdater.start();
         expansionHubUpdater.start();
         otherUpdater.start();
@@ -157,12 +135,6 @@ public class WoENrobot {
            // regulatorUpdater.interrupt();
           //  regulatorUpdater = new Thread(updateRegulators);
 
-            controlHubUpdater.interrupt();
-            controlHubUpdater = new Thread(updateControlHub);
-            expansionHubUpdater.interrupt();
-            expansionHubUpdater = new Thread(updateExpansionHub);
-            otherUpdater.interrupt();
-            otherUpdater = new Thread(updateOther);
             opMode.telemetry.addData("Status", "Already initialized, ready");
             opMode.telemetry.update();
         }
@@ -188,6 +160,13 @@ public class WoENrobot {
             regulatorUpdater.interrupt();
             regulatorUpdater = new Thread(updateRegulators);
         }
+
+        controlHubUpdater.interrupt();
+        controlHubUpdater = new Thread(updateControlHub);
+        expansionHubUpdater.interrupt();
+        expansionHubUpdater = new Thread(updateExpansionHub);
+        otherUpdater.interrupt();
+        otherUpdater = new Thread(updateOther);
         //stopAllMotors();
 
         robotIsInitialized = true;

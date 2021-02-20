@@ -5,15 +5,14 @@ public abstract class MultithreadRobotModule extends RobotModule{
     @Deprecated
     @Override
     public final void update() {
-        updateControlHub();
-        updateExpansionHub();
-        updateOther();
+       // updateControlHub();
+       // updateExpansionHub();
+       // updateOther();
     }
 
-    public synchronized void updateControlHub(){}
+    public abstract void updateControlHub();
 
-    public synchronized void updateExpansionHub(){}
+    public abstract void updateExpansionHub();
 
-    public void updateOther(){
-    }
+    public abstract void updateOther();
 }

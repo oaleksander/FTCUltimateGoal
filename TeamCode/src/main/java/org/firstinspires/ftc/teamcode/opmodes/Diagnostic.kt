@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmodes
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import org.firstinspires.ftc.teamcode.robot.WoENHardware.conveyorMotor
 import org.firstinspires.ftc.teamcode.robot.WoENHardware.ringDetector
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.startRobot
@@ -23,6 +24,7 @@ import org.firstinspires.ftc.teamcode.robot.rpm.ShooterConfig.feederClose
 import org.firstinspires.ftc.teamcode.robot.rpm.ShooterConfig.feederOpen
 import org.firstinspires.ftc.teamcode.robot.WoENHardware.feeder
 
+@TeleOp
 class Diagnostic : LinearOpMode() {
     override fun runOpMode() {
         forceInitRobot(this)

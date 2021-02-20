@@ -167,6 +167,12 @@ class MecanumDrivetrain : MultithreadRobotModule(), Drivetrain {
         )
     }
 
+    override fun updateExpansionHub() {
+    }
+
+    override fun updateOther() {
+    }
+
     fun driveMotorPowers_direct(frontLeft: Double, frontRight: Double, rearLeft: Double, rearRight: Double) {
         driveFrontLeft.power = frontLeft
         driveFrontRight.power = frontRight

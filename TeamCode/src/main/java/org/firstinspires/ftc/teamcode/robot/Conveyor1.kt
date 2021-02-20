@@ -112,6 +112,9 @@ class Conveyor1 : MultithreadRobotModule(), Conveyor {
         }
     }
 
+    override fun updateOther() {
+    }
+
     override fun setReverseAfterStop(BackOnAfter: Boolean) {
         backOnAfter = BackOnAfter
     }
