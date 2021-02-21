@@ -129,11 +129,7 @@ object WoENrobot {
             opMode.telemetry.update()
         } else {
             opMode = OpMode
-            Arrays.stream(activeRobotModules).forEach { robotModule: MultithreadRobotModule ->
-                robotModule.setOpMode(
-                    opMode
-                )
-            }
+            Arrays.stream(activeRobotModules).forEach { robotModule: MultithreadRobotModule -> robotModule.setOpMode(opMode) }
             // regulatorUpdater.interrupt();
             //  regulatorUpdater = new Thread(updateRegulators);
             opMode.telemetry.addData("Status", "Already initialized, ready")
@@ -150,11 +146,7 @@ object WoENrobot {
         expansionHub = WoENHardware.expansionHub
         allHubs = lynxModules
         setBulkCachingMode(BulkCachingMode.MANUAL)
-        Arrays.stream(activeRobotModules).forEach { robotModule: MultithreadRobotModule ->
-            robotModule.initialize(
-                opMode
-            )
-        }
+        Arrays.stream(activeRobotModules).forEach { robotModule: MultithreadRobotModule -> robotModule.initialize(opMode) }
         if (regulatorUpdater.state != Thread.State.NEW) {
             regulatorUpdater.interrupt()
             regulatorUpdater = Thread(updateRegulators)

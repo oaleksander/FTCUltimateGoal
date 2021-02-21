@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.util.ElapsedTime
 import org.firstinspires.ftc.teamcode.misc.CommandSender
 import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule
 import org.openftc.revextensions2.ExpansionHubServo
+import kotlin.math.abs
 
 class rpm : MultithreadRobotModule() {
     private val rpmTime = ElapsedTime()
@@ -42,6 +43,7 @@ class rpm : MultithreadRobotModule() {
         private set
     private var currentVelocity = 0.0
     private var velocityTarget = 2400.0
+    var rpmNow = currentRpm
     var encoderFailureMode = false
         private set
 
@@ -99,6 +101,7 @@ class rpm : MultithreadRobotModule() {
         if (velocityTarget != 0.0 && ringsToShoot == 0) updatePIDFCoeffs(
             encoderFailureDetectionTime.seconds() > 3
         )
+        rpmNow = currentRpm
     }
 
     override fun updateOther() {
@@ -146,7 +149,7 @@ class rpm : MultithreadRobotModule() {
     }*/
   //  val isCorrectRpm: Boolean
        // get() = isCorrectRpm(25.0)
-    val currentRpm: Double
+    private val currentRpm: Double
         get() = shooterMotor.velocity * 2.5
     var shootingMode: ShooterMode
         get() = shooterMode
@@ -167,7 +170,7 @@ class rpm : MultithreadRobotModule() {
         }
 
     fun isCorrectRpm(error: Double = 25.0): Boolean {
-        return if (encoderFailureMode) true else Math.abs(currentVelocity - shooterMotor.velocity) < error
+        return if (encoderFailureMode) true else abs(currentVelocity - shooterMotor.velocity) < error
     }
 
     fun feedRing() {
