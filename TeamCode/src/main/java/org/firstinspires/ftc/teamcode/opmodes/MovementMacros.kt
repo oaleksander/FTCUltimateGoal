@@ -87,7 +87,6 @@ object MovementMacros {
                 conveyor.setConveyorPower(0.0)
             }
             StackSize.ZERO -> return false
-            else -> return false
         }
         return true
     }
