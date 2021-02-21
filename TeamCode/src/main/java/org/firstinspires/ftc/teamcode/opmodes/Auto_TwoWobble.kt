@@ -7,7 +7,10 @@ import org.firstinspires.ftc.teamcode.opmodes.MovementMacros.Park
 import org.firstinspires.ftc.teamcode.opmodes.MovementMacros.PickSecondWobble
 import org.firstinspires.ftc.teamcode.opmodes.MovementMacros.PickupRings
 import org.firstinspires.ftc.teamcode.opmodes.MovementMacros.Shooting
-import org.firstinspires.ftc.teamcode.robot.WoENrobot.*
+import org.firstinspires.ftc.teamcode.robot.WoENrobot.conveyor
+import org.firstinspires.ftc.teamcode.robot.WoENrobot.movement
+import org.firstinspires.ftc.teamcode.robot.WoENrobot.odometry
+import org.firstinspires.ftc.teamcode.robot.WoENrobot.runTime
 
 @Autonomous
 class Auto_TwoWobble : AutoOpMode() {

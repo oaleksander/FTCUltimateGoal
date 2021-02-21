@@ -4,7 +4,13 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import org.firstinspires.ftc.teamcode.misc.ButtonSwitch
 import org.firstinspires.ftc.teamcode.misc.SinglePressButton
-import org.firstinspires.ftc.teamcode.robot.WoENrobot.*
+import org.firstinspires.ftc.teamcode.robot.WoENrobot.conveyor
+import org.firstinspires.ftc.teamcode.robot.WoENrobot.initRobot
+import org.firstinspires.ftc.teamcode.robot.WoENrobot.movement
+import org.firstinspires.ftc.teamcode.robot.WoENrobot.shooter
+import org.firstinspires.ftc.teamcode.robot.WoENrobot.spinOnce
+import org.firstinspires.ftc.teamcode.robot.WoENrobot.startRobot
+import org.firstinspires.ftc.teamcode.robot.WoENrobot.wobbleManipulator
 import org.firstinspires.ftc.teamcode.robot.rpm
 
 @TeleOp(name = "TeleOp COMPETITION single", group = "Competition")

@@ -4,7 +4,9 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous
 import org.firstinspires.ftc.teamcode.math.Pose2D
 import org.firstinspires.ftc.teamcode.opmodes.MovementMacros.Park
 import org.firstinspires.ftc.teamcode.opmodes.MovementMacros.ShootHighGoal
-import org.firstinspires.ftc.teamcode.robot.WoENrobot.*
+import org.firstinspires.ftc.teamcode.robot.WoENrobot.movement
+import org.firstinspires.ftc.teamcode.robot.WoENrobot.odometry
+import org.firstinspires.ftc.teamcode.robot.WoENrobot.wobbleManipulator
 import org.firstinspires.ftc.teamcode.superclasses.WobbleManipulator
 
 @Autonomous

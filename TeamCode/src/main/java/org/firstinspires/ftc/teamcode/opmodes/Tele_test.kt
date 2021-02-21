@@ -5,8 +5,13 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import org.firstinspires.ftc.teamcode.math.Pose2D
 import org.firstinspires.ftc.teamcode.misc.ButtonSwitch
 import org.firstinspires.ftc.teamcode.misc.SinglePressButton
-import org.firstinspires.ftc.teamcode.robot.WoENrobot
-import org.firstinspires.ftc.teamcode.robot.WoENrobot.*
+import org.firstinspires.ftc.teamcode.robot.WoENrobot.forceInitRobot
+import org.firstinspires.ftc.teamcode.robot.WoENrobot.movement
+import org.firstinspires.ftc.teamcode.robot.WoENrobot.odometry
+import org.firstinspires.ftc.teamcode.robot.WoENrobot.shooter
+import org.firstinspires.ftc.teamcode.robot.WoENrobot.spinOnce
+import org.firstinspires.ftc.teamcode.robot.WoENrobot.startRobot
+import org.firstinspires.ftc.teamcode.robot.WoENrobot.wobbleManipulator
 import org.firstinspires.ftc.teamcode.robot.rpm
 
 @TeleOp(name = "Teleop TEST/PRACTICE", group = "Debugging")

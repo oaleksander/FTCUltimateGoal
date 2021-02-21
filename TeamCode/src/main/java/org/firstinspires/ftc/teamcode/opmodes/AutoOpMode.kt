@@ -5,7 +5,13 @@ import com.qualcomm.robotcore.util.Range
 import org.firstinspires.ftc.teamcode.math.Pose2D
 import org.firstinspires.ftc.teamcode.misc.HSVRGB
 import org.firstinspires.ftc.teamcode.misc.SinglePressButton
-import org.firstinspires.ftc.teamcode.robot.WoENrobot.*
+import org.firstinspires.ftc.teamcode.robot.WoENrobot.FullInitWithCV
+import org.firstinspires.ftc.teamcode.robot.WoENrobot.movement
+import org.firstinspires.ftc.teamcode.robot.WoENrobot.odometry
+import org.firstinspires.ftc.teamcode.robot.WoENrobot.openCVNode
+import org.firstinspires.ftc.teamcode.robot.WoENrobot.runTime
+import org.firstinspires.ftc.teamcode.robot.WoENrobot.setLedColors
+import org.firstinspires.ftc.teamcode.robot.WoENrobot.startRobot
 
 open class AutoOpMode : LinearOpMode() {
     protected var xSign: Byte = 1

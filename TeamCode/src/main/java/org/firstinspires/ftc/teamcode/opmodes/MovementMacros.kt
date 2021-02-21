@@ -5,7 +5,15 @@ import com.qualcomm.robotcore.util.Range
 import org.firstinspires.ftc.teamcode.math.Pose2D
 import org.firstinspires.ftc.teamcode.math.Vector2D
 import org.firstinspires.ftc.teamcode.robot.OpenCVNodeWebcam.StackSize
-import org.firstinspires.ftc.teamcode.robot.WoENrobot.*
+import org.firstinspires.ftc.teamcode.robot.WoENrobot.conveyor
+import org.firstinspires.ftc.teamcode.robot.WoENrobot.delay
+import org.firstinspires.ftc.teamcode.robot.WoENrobot.movement
+import org.firstinspires.ftc.teamcode.robot.WoENrobot.odometry
+import org.firstinspires.ftc.teamcode.robot.WoENrobot.opMode
+import org.firstinspires.ftc.teamcode.robot.WoENrobot.openCVNode
+import org.firstinspires.ftc.teamcode.robot.WoENrobot.shooter
+import org.firstinspires.ftc.teamcode.robot.WoENrobot.spinOnce
+import org.firstinspires.ftc.teamcode.robot.WoENrobot.wobbleManipulator
 import org.firstinspires.ftc.teamcode.robot.rpm
 import org.firstinspires.ftc.teamcode.superclasses.MotionTask
 import org.firstinspires.ftc.teamcode.superclasses.WobbleManipulator
@@ -33,7 +41,7 @@ object MovementMacros {
         shooter.shootingMode = rpm.ShooterMode.HIGHGOAL
         movement.pos(highGoalShootingPose)
         val shooterAccelerationTimeout = ElapsedTime()
-        while (getOpMode().opModeIsActive() && !shooter.isCorrectRpm(10.0) && shooterAccelerationTimeout.seconds() < 3)
+        while (opMode.opModeIsActive() && !shooter.isCorrectRpm(10.0) && shooterAccelerationTimeout.seconds() < 3)
             spinOnce()
         shooter.feedRings()
         delay(1050.0)
@@ -98,7 +106,7 @@ object MovementMacros {
         val wobblePose = wobblePose
         val error: Vector2D = movement.getError(Pose2D(wobblePose, Double.NaN))
         movement.followPath(MotionTask(wobblePose.minus(Vector2D(0.0, wobblePlacementOffset.radius()).rotatedCW(error.acot())), error.acot() - wobblePlacementOffset.acot()), 1.0, 1.0, 2.0, Math.toRadians(2.0))
-        while (movement.pathFollowerIsActive() && getOpMode().opModeIsActive()) {
+        while (movement.pathFollowerIsActive() && opMode.opModeIsActive()) {
             if (movement.getError(Pose2D(wobblePose, Double.NaN)).radius() < 75)
                 wobbleManipulator.setAngle(WobbleManipulator.Position.DOWN)
             spinOnce()
@@ -115,7 +123,7 @@ object MovementMacros {
         val error: Vector2D = movement.getError(Pose2D(wobblePose, Double.NaN))
         movement.pos(Pose2D(Double.NaN, Double.NaN, error.acot()), 1.0, 1.0, 1.0, Math.toRadians(75.0))
         movement.followPath(MotionTask(wobblePose.minus(Vector2D(0.0, wobblePlacementOffset.radius()).rotatedCW(error.acot())), error.acot() - wobblePlacementOffset.acot()), 1.0, 1.0, 1.5, Math.toRadians(1.0))
-        while (movement.pathFollowerIsActive() && getOpMode().opModeIsActive()) {
+        while (movement.pathFollowerIsActive() && opMode.opModeIsActive()) {
             if (movement.getError(Pose2D(wobblePose, Double.NaN)).radius() < 75 )
                 wobbleManipulator.setAngle(WobbleManipulator.Position.DOWN)
             spinOnce()
@@ -187,7 +195,7 @@ object MovementMacros {
             }
             angle -= 5.4
             delay(200.0)
-            if (getOpMode().gamepad1.x) {
+            if (opMode.gamepad1.x) {
                 break
             }
             //pos -= 18;
@@ -211,7 +219,7 @@ object MovementMacros {
                 movement.pos(Pose2D(xSign * pos, -5.0, Math.toRadians(3.0)))
             }
             //angle -= 6.4;
-            if (getOpMode().gamepad1.x) {
+            if (opMode.gamepad1.x) {
                 break
             }
             pos -= 18.0

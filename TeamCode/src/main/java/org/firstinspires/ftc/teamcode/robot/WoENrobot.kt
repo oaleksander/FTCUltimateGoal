@@ -1,204 +1,195 @@
-package org.firstinspires.ftc.teamcode.robot;
+package org.firstinspires.ftc.teamcode.robot
 
-import com.qualcomm.hardware.lynx.LynxModule;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.hardware.lynx.LynxModule
+import com.qualcomm.hardware.lynx.LynxModule.BulkCachingMode
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
+import com.qualcomm.robotcore.util.ElapsedTime
+import org.firstinspires.ftc.teamcode.robot.WoENHardware.assignHardware
+import org.firstinspires.ftc.teamcode.robot.WoENHardware.lynxModules
+import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule
+import org.openftc.revextensions2.ExpansionHubEx
+import java.util.*
 
-import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule;
-import org.openftc.revextensions2.ExpansionHubEx;
-
-import java.util.Arrays;
-import java.util.List;
-
-public class WoENrobot {
-
-    public static ServoWobbleManipulator wobbleManipulator = new ServoWobbleManipulator();
-    public static OpenCVNodeWebcam openCVNode = new OpenCVNodeWebcam();
-    public static Conveyor2 conveyor = new Conveyor2();
-    public static rpm shooter = new rpm();
-    public static TelemetryDebugging telemetryDebugging = new TelemetryDebugging();
-    public static AI ai = new AI();
+object WoENrobot {
+    var wobbleManipulator = ServoWobbleManipulator()
+    var openCVNode = OpenCVNodeWebcam()
+    var conveyor = Conveyor2()
+    var shooter = rpm()
+    var telemetryDebugging = TelemetryDebugging()
+    var ai = AI()
 
     //public static FakeRobot odometry = new FakeRobot();
     //public static FakeRobot drivetrain = odometry;
+    var odometry = ThreeWheelOdometry()
+    var drivetrain = MecanumDrivetrain()
+    var movement = Movement(odometry, drivetrain)
+    lateinit var opMode: LinearOpMode
+    var robotIsInitialized = false
+    val runTime = ElapsedTime()
+    private val activeRobotModules = arrayOf(odometry, movement, drivetrain, wobbleManipulator, conveyor, shooter, telemetryDebugging, ai) //
 
-    public static ThreeWheelOdometry odometry = new ThreeWheelOdometry();
-    public static MecanumDrivetrain drivetrain = new MecanumDrivetrain();
-    public static Movement movement = new Movement(odometry, drivetrain);
-    public static LinearOpMode opMode = null;
-    public static boolean robotIsInitialized = false;
-    public static final ElapsedTime runTime = new ElapsedTime();
-    protected static MultithreadRobotModule[] activeRobotModules = {odometry, movement, drivetrain, wobbleManipulator, conveyor, shooter, telemetryDebugging, ai}; //
-    static volatile boolean controlHubSpinCompleted = false;
-    static volatile boolean expansionHubSpinCompleted = false;
-    static volatile boolean spinCompleted = false;
-    public static ExpansionHubEx controlHub = null;
-    public static ExpansionHubEx expansionHub = null;
-    private static List<LynxModule> allHubs = null;
+    @Volatile
+    var controlHubSpinCompleted = false
 
-    static Runnable updateControlHub = () -> {
-        controlHub.getStandardModule().setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
-         while (opMode.opModeIsActive() && !Thread.currentThread().isInterrupted()) {
-             controlHub.getStandardModule().clearBulkCache();
-             Arrays.stream(activeRobotModules).forEach(MultithreadRobotModule::updateControlHub);
-             controlHubSpinCompleted = true;
-         }
-    };
-    private static Thread controlHubUpdater = new Thread(updateControlHub);
-    static Runnable updateExpansionHub = () -> {
-        expansionHub.getStandardModule().setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
-        while (opMode.opModeIsActive() && !Thread.currentThread().isInterrupted()) {
-            expansionHub.getStandardModule().clearBulkCache();
-            Arrays.stream(activeRobotModules).forEach(MultithreadRobotModule::updateExpansionHub);
-            expansionHubSpinCompleted = true;
+    @Volatile
+    var expansionHubSpinCompleted = false
+
+    @Volatile
+    var spinCompleted = false
+    lateinit var controlHub: ExpansionHubEx
+    lateinit var expansionHub: ExpansionHubEx
+    private lateinit var allHubs: List<LynxModule>
+    var updateControlHub = Runnable {
+        controlHub.standardModule.bulkCachingMode = BulkCachingMode.MANUAL
+        while (opMode.opModeIsActive() && !Thread.currentThread().isInterrupted) {
+            controlHub.standardModule.clearBulkCache()
+            Arrays.stream(activeRobotModules).forEach { obj: MultithreadRobotModule -> obj.updateControlHub() }
+            controlHubSpinCompleted = true
         }
-    };
-    private static Thread expansionHubUpdater = new Thread(updateExpansionHub);
-    static Runnable updateOther = () -> {
-        while (opMode.opModeIsActive() && !Thread.currentThread().isInterrupted()) {
+    }
+    private var controlHubUpdater = Thread(updateControlHub)
+    var updateExpansionHub = Runnable {
+        expansionHub.standardModule.bulkCachingMode = BulkCachingMode.MANUAL
+        while (opMode.opModeIsActive() && !Thread.currentThread().isInterrupted) {
+            expansionHub.standardModule.clearBulkCache()
+            Arrays.stream(activeRobotModules).forEach { obj: MultithreadRobotModule -> obj.updateExpansionHub() }
+            expansionHubSpinCompleted = true
+        }
+    }
+    private var expansionHubUpdater = Thread(updateExpansionHub)
+    var updateOther = Runnable {
+        while (opMode.opModeIsActive() && !Thread.currentThread().isInterrupted) {
             while ((!controlHubSpinCompleted || !expansionHubSpinCompleted) && opMode.opModeIsActive()) {
-                Thread.yield();
+                Thread.yield()
             }
-            Arrays.stream(activeRobotModules).forEach(MultithreadRobotModule::updateOther);
-            controlHubSpinCompleted = false;
-            expansionHubSpinCompleted = false;
-            spinCompleted = true;
+            Arrays.stream(activeRobotModules).forEach { obj: MultithreadRobotModule -> obj.updateOther() }
+            controlHubSpinCompleted = false
+            expansionHubSpinCompleted = false
+            spinCompleted = true
         }
-    };
-    private static Thread otherUpdater = new Thread(updateOther);
-
-    static Runnable updateRegulators = () -> {
-        setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
-        while (opMode.opModeIsActive() && !Thread.currentThread().isInterrupted()) {
-            clearBulkCaches();
-            Arrays.stream(activeRobotModules).forEach(MultithreadRobotModule::update);
-            spinCompleted = true;
+    }
+    private var otherUpdater = Thread(updateOther)
+    var updateRegulators = Runnable {
+        setBulkCachingMode(BulkCachingMode.MANUAL)
+        while (opMode.opModeIsActive() && !Thread.currentThread().isInterrupted) {
+            clearBulkCaches()
+            Arrays.stream(activeRobotModules).forEach { obj: MultithreadRobotModule -> obj.update() }
+            spinCompleted = true
         }
-    };
-    private static Thread regulatorUpdater = new Thread(updateRegulators);
-
-    public static LinearOpMode getOpMode() {
-        return opMode;
+    }
+    private var regulatorUpdater = Thread(updateRegulators)
+    fun FullInitWithCV(OpMode: LinearOpMode) {
+        openCVNode.initialize(OpMode)
+        forceInitRobot(OpMode)
     }
 
-    public static void FullInitWithCV(LinearOpMode opMode) {
-        openCVNode.initialize(opMode);
-        forceInitRobot(opMode);
+    @Synchronized
+    private fun spinHubs() {
+        controlHubSpinCompleted = false
+        expansionHubSpinCompleted = false
+        while ((!controlHubSpinCompleted || !expansionHubSpinCompleted) && opMode.opModeIsActive()) {
+            Thread.yield()
+        }
     }
 
-    private static synchronized void spinHubs() {
-        controlHubSpinCompleted = false;
-        expansionHubSpinCompleted = false;
-            while ((!controlHubSpinCompleted || !expansionHubSpinCompleted) && opMode.opModeIsActive()) {
-                Thread.yield();
-            }
-    }
-
-    public static void spinOnce() {
-        spinCompleted = false;
+    fun spinOnce() {
+        spinCompleted = false
         while (!spinCompleted && opMode.opModeIsActive()) {
-            Thread.yield();
+            Thread.yield()
         }
     }
 
-    public static void delay(double delay_ms) {
-        ElapsedTime timer = new ElapsedTime();
-        timer.reset();
+    fun delay(delay_ms: Double) {
+        val timer = ElapsedTime()
+        timer.reset()
         while (timer.milliseconds() < delay_ms && opMode.opModeIsActive()) {
-            Thread.yield();
+            Thread.yield()
         }
     }
 
-    public static void startRobot() {
-        setLedColors(255, 166, 0);
-        opMode.waitForStart();
-        if(opMode.isStopRequested()) return;
-        runTime.reset();
-        Arrays.stream(activeRobotModules).forEach(MultithreadRobotModule::start);
-       // regulatorUpdater.start();
-        controlHubUpdater.start();
-        expansionHubUpdater.start();
-        otherUpdater.start();
-        setLedColors(0, 237, 255);
-        opMode.telemetry.addData("Status", "Running");
-        opMode.telemetry.update();
+    fun startRobot() {
+        setLedColors(255, 166, 0)
+        opMode.waitForStart()
+        if (opMode.isStopRequested) return
+        runTime.reset()
+        Arrays.stream(activeRobotModules).forEach { obj: MultithreadRobotModule -> obj.start() }
+        // regulatorUpdater.start();
+        controlHubUpdater.start()
+        expansionHubUpdater.start()
+        otherUpdater.start()
+        setLedColors(0, 237, 255)
+        opMode.telemetry.addData("Status", "Running")
+        opMode.telemetry.update()
     }
 
-    public static void initRobot(LinearOpMode OpMode) {
+    fun initRobot(OpMode: LinearOpMode) {
         if (!robotIsInitialized) {
-            forceInitRobot(OpMode);
-            opMode.telemetry.addData("Status", "Initialization successful");
-            opMode.telemetry.update();
+            forceInitRobot(OpMode)
+            opMode.telemetry.addData("Status", "Initialization successful")
+            opMode.telemetry.update()
         } else {
-            opMode = OpMode;
-            Arrays.stream(activeRobotModules).forEach(robotModule -> robotModule.setOpMode(opMode));
-           // regulatorUpdater.interrupt();
-          //  regulatorUpdater = new Thread(updateRegulators);
-
-            opMode.telemetry.addData("Status", "Already initialized, ready");
-            opMode.telemetry.update();
+            opMode = OpMode
+            Arrays.stream(activeRobotModules).forEach { robotModule: MultithreadRobotModule ->
+                robotModule.setOpMode(
+                    opMode
+                )
+            }
+            // regulatorUpdater.interrupt();
+            //  regulatorUpdater = new Thread(updateRegulators);
+            opMode.telemetry.addData("Status", "Already initialized, ready")
+            opMode.telemetry.update()
         }
     }
 
-    public static void forceInitRobot(LinearOpMode OpMode) {
-        opMode = OpMode;
-
-        opMode.telemetry.addData("Status", "Initializing...");
-        opMode.telemetry.update();
-
-
-        WoENHardware.INSTANCE.assignHardware(opMode.hardwareMap);
-        controlHub = WoENHardware.INSTANCE.getControlHub();
-        expansionHub = WoENHardware.INSTANCE.getExpansionHub();
-        allHubs = WoENHardware.INSTANCE.getLynxModules();
-
-        setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
-
-        Arrays.stream(activeRobotModules).forEach(robotModule -> robotModule.initialize(opMode));
-
-        if (regulatorUpdater.getState() != Thread.State.NEW) {
-            regulatorUpdater.interrupt();
-            regulatorUpdater = new Thread(updateRegulators);
+    fun forceInitRobot(OpMode: LinearOpMode) {
+        opMode = OpMode
+        opMode.telemetry.addData("Status", "Initializing...")
+        opMode.telemetry.update()
+        assignHardware(opMode.hardwareMap)
+        controlHub = WoENHardware.controlHub
+        expansionHub = WoENHardware.expansionHub
+        allHubs = lynxModules
+        setBulkCachingMode(BulkCachingMode.MANUAL)
+        Arrays.stream(activeRobotModules).forEach { robotModule: MultithreadRobotModule ->
+            robotModule.initialize(
+                opMode
+            )
         }
-
-        controlHubUpdater.interrupt();
-        controlHubUpdater = new Thread(updateControlHub);
-        expansionHubUpdater.interrupt();
-        expansionHubUpdater = new Thread(updateExpansionHub);
-        otherUpdater.interrupt();
-        otherUpdater = new Thread(updateOther);
+        if (regulatorUpdater.state != Thread.State.NEW) {
+            regulatorUpdater.interrupt()
+            regulatorUpdater = Thread(updateRegulators)
+        }
+        controlHubUpdater.interrupt()
+        controlHubUpdater = Thread(updateControlHub)
+        expansionHubUpdater.interrupt()
+        expansionHubUpdater = Thread(updateExpansionHub)
+        otherUpdater.interrupt()
+        otherUpdater = Thread(updateOther)
         //stopAllMotors();
-
-        robotIsInitialized = true;
-
-        opMode.telemetry.addData("Status", "Force initialized");
-        opMode.telemetry.update();
-
+        robotIsInitialized = true
+        opMode.telemetry.addData("Status", "Force initialized")
+        opMode.telemetry.update()
     }
 
-    public static void simpleInit(LinearOpMode OpMode) {
-        initRobot(opMode);
-        startRobot();
+    fun simpleInit(OpMode: LinearOpMode) {
+        initRobot(OpMode)
+        startRobot()
     }
 
-    public static void setLedColors(int r, int g, int b) {
-        controlHub.setLedColor(r, g, b);
-        expansionHub.setLedColor(r, g, b);
+    fun setLedColors(r: Int, g: Int, b: Int) {
+        controlHub.setLedColor(r, g, b)
+        expansionHub.setLedColor(r, g, b)
     }
 
-    public static void setBulkCachingMode(LynxModule.BulkCachingMode mode) {
-        for (LynxModule module : allHubs)
-            module.setBulkCachingMode(mode);
+    fun setBulkCachingMode(mode: BulkCachingMode?) {
+        for (module in allHubs) module.bulkCachingMode = mode
     }
 
-    public static void clearBulkCaches() {
-        for (LynxModule module : allHubs)
-            module.clearBulkCache();
+    fun clearBulkCaches() {
+        for (module in allHubs) module.clearBulkCache()
     }
 
-    public static void FullInit(LinearOpMode OpMode) {
-        forceInitRobot(opMode);
+    fun FullInit(OpMode: LinearOpMode) {
+        forceInitRobot(OpMode)
     }
 }
-
-

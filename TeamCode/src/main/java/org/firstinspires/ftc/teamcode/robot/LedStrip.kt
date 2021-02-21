@@ -9,6 +9,7 @@ class LedStrip: MultithreadRobotModule() {
     private lateinit var ledStrip1 : DcMotorEx
     private lateinit var ledStrip2 : DcMotorEx
     private val ledTime = ElapsedTime()
+    private val time = ElapsedTime()
 
     override fun initialize() {
         ledStrip1 = WoENHardware.ledStrip1
@@ -26,7 +27,7 @@ class LedStrip: MultithreadRobotModule() {
     override fun updateOther() {
 
     }
-    private fun smoothlyLedOn(led : DcMotorEx, time : Double = 1000.0) {
-        ledTime.reset()
+    private fun smoothlyLedOn(led : DcMotorEx) {
+
     }
 }
