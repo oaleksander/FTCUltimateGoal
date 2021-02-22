@@ -5,6 +5,11 @@ import com.qualcomm.robotcore.util.ElapsedTime
 import org.firstinspires.ftc.teamcode.misc.CommandSender
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.shooter
 import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule
+import java.lang.Math.pow
+import kotlin.math.PI
+import kotlin.math.pow
+import kotlin.math.sin
+
 @Deprecated("")
 class LedStrip: MultithreadRobotModule() {
     private lateinit var ledStrip1 : DcMotorEx
@@ -31,7 +36,7 @@ class LedStrip: MultithreadRobotModule() {
 
     }
 
-    private fun smoothlyLedOn(led : CommandSender, time :Double = 1500.0) {
+    private fun smoothlyLedOn(led: CommandSender, time: Double = 1500.0) {
         val x = if (time != 0.0) 1/time else 1.0
         when {
             ledTime.milliseconds() > time * 3 -> {
@@ -52,6 +57,10 @@ class LedStrip: MultithreadRobotModule() {
             }
         }
     }
+    private fun smoothyLed(led: CommandSender, time: Double = 1500.0, maxPower: Double = 1.0) {
+        val x = if (time != 0.0) PI/time else 1.0
+        led.send(sin(PI * x).pow(2))
+    }
     private fun infromLed() {
         when {
             shooter.rpmNow == 0.0 -> {
@@ -68,7 +77,7 @@ class LedStrip: MultithreadRobotModule() {
             }
         }
     }
-    private fun onLed(led :CommandSender, power : Double = 1.0) {
+    private fun onLed(led: CommandSender, power : Double = 1.0) {
         led.send(power)
     }
 
@@ -79,3 +88,4 @@ class LedStrip: MultithreadRobotModule() {
         SMOOTHLY, ON, OFF, INFORM
     }
 }
+
