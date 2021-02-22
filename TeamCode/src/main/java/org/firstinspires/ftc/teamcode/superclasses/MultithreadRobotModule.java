@@ -10,9 +10,9 @@ public abstract class MultithreadRobotModule extends RobotModule{
        // updateOther();
     }
 
-    public abstract void updateControlHub();
+    public void updateControlHub() {}
 
-    public abstract void updateExpansionHub();
+    public void updateExpansionHub() {}
 
-    public abstract void updateOther();
+    public void updateOther() {}
 }
