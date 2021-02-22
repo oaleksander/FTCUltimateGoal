@@ -21,7 +21,7 @@ android {
         targetCompatibility "1.8"
     }
     ndkVersion '22.0.7026061'
-    buildToolsVersion '31.0.0 rc1'
+    buildToolsVersion '30.0.3'
 }
 
 repositories {
