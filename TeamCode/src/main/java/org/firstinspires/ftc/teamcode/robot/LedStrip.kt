@@ -59,7 +59,7 @@ class LedStrip: MultithreadRobotModule() {
     }
     private fun smoothyLed(led: CommandSender, time: Double = 1500.0, maxPower: Double = 1.0) {
         val x = if (time != 0.0) PI/time else 1.0
-        led.send(sin(ledTime.milliseconds() * x).pow(2))
+        led.send(sin(ledTime.milliseconds() * x).pow(2) * maxPower)
     }
     private fun infromLed() {
         when {
