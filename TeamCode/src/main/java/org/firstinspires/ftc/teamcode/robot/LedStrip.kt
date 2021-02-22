@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.robot
 
-import androidx.renderscript.ScriptIntrinsicBLAS
 import com.qualcomm.robotcore.hardware.DcMotorEx
 import com.qualcomm.robotcore.util.ElapsedTime
 import org.firstinspires.ftc.teamcode.misc.CommandSender
@@ -32,24 +31,24 @@ class LedStrip: MultithreadRobotModule() {
 
     }
 
-    private fun smoothlyLedOn(led : DcMotorEx, time :Double = 1500.0) {
+    private fun smoothlyLedOn(led : CommandSender, time :Double = 1500.0) {
         val x = if (time != 0.0) 1/time else 1.0
         when {
             ledTime.milliseconds() > time * 3 -> {
                 ledTime.reset()
-                //led.power = 0.0
+                led.send(0.0)
             }
             ledTime.milliseconds() < time -> {
-                //led.power = ledTime.milliseconds() * x
+                led.send(ledTime.milliseconds() * x)
             }
             ledTime.milliseconds() < time * 1.5 -> {
-                //led.power = 1.0
+                led.send(1.0)
             }
             ledTime.milliseconds() < time * 2.5 -> {
-                //led.power = 1.0 - (ledTime.milliseconds() - time * 1.5) * x
+                led.send(1.0 - (ledTime.milliseconds() - time * 1.5) * x)
             }
             else -> {
-                //led.power = 0.0
+                led.send(0.0)
             }
         }
     }
@@ -68,6 +67,13 @@ class LedStrip: MultithreadRobotModule() {
                 setPowerLed2.send(1.0)
             }
         }
+    }
+    private fun onLed(led :CommandSender, power : Double = 1.0) {
+        led.send(power)
+    }
+
+    private fun offLed(led: CommandSender) {
+        led.send(0.0)
     }
     enum class ledMode {
         SMOOTHLY, ON, OFF, INFORM
