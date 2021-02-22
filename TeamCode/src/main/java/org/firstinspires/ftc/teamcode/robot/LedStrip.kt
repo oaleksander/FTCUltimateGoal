@@ -4,6 +4,7 @@ import androidx.renderscript.ScriptIntrinsicBLAS
 import com.qualcomm.robotcore.hardware.DcMotorEx
 import com.qualcomm.robotcore.util.ElapsedTime
 import org.firstinspires.ftc.teamcode.misc.CommandSender
+import org.firstinspires.ftc.teamcode.robot.WoENrobot.shooter
 import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule
 @Deprecated("")
 class LedStrip: MultithreadRobotModule() {
@@ -30,6 +31,7 @@ class LedStrip: MultithreadRobotModule() {
     override fun updateOther() {
 
     }
+
     private fun smoothlyLedOn(led : DcMotorEx, time :Double = 1500.0) {
         val x = if (time != 0.0) 1/time else 1.0
         when {
@@ -50,5 +52,24 @@ class LedStrip: MultithreadRobotModule() {
                 //led.power = 0.0
             }
         }
+    }
+    private fun infromLed() {
+        when {
+            shooter.rpmNow == 0.0 -> {
+                setPowerLed1.send(0.0)
+                setPowerLed2.send(0.0)
+            }
+            shooter.isCorrectRpm() -> {
+               setPowerLed1.send(1.0)
+               setPowerLed2.send(0.0)
+            }
+            else -> {
+                setPowerLed1.send(0.0)
+                setPowerLed2.send(1.0)
+            }
+        }
+    }
+    enum class ledMode {
+        SMOOTHLY, ON, OFF, INFORM
     }
 }

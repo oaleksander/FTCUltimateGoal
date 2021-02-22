@@ -170,7 +170,7 @@ class rpm : MultithreadRobotModule() {
         }
 
     fun isCorrectRpm(error: Double = 25.0): Boolean {
-        return if (encoderFailureMode) true else abs(currentVelocity - shooterMotor.velocity) < error
+        return if (encoderFailureMode) true else abs(currentVelocity - shooterMotor.velocity) < error // abs(currentVelocity - rpmNow / 2.5) < error
     }
 
     fun feedRing() {
