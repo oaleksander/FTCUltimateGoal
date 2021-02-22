@@ -33,9 +33,9 @@ class MecanumDrivetrain : MultithreadRobotModule(), Drivetrain {
     }
     /* Physical constants */
     private val wheelRadius = 9.8 / 2
-    private val gearRatio = 1.0
+    private val gearRatio = 17.0/13.0
     private val wheelCenterOffset = Vector2D(18.05253, 15.20000)
-    private val forwardMultiplier = 1 / wheelRadius / gearRatio
+    private val forwardMultiplier = (1 / wheelRadius) / gearRatio
     private var sidewaysMultiplier = forwardMultiplier * DrivetrainConfig.strafingMultiplier
     private var turnMultiplier = (wheelCenterOffset.x + wheelCenterOffset.y) * DrivetrainConfig.rotationDecrepancy / wheelRadius
     private val tickPerRev = 480.0
