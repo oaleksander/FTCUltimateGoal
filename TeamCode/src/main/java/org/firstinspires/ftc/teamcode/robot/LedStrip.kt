@@ -5,7 +5,6 @@ import com.qualcomm.robotcore.util.ElapsedTime
 import org.firstinspires.ftc.teamcode.misc.CommandSender
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.shooter
 import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule
-import java.lang.Math.pow
 import kotlin.math.PI
 import kotlin.math.pow
 import kotlin.math.sin
@@ -63,7 +62,7 @@ class LedStrip: MultithreadRobotModule() {
     }
     private fun infromLed() {
         when {
-            shooter.rpmNow == 0.0 -> {
+            shooter.currentRpm == 0.0 -> {
                 setPowerLed1.send(0.0)
                 setPowerLed2.send(0.0)
             }

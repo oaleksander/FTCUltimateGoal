@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.robot
 
 import com.acmerobotics.dashboard.config.Config
-import com.qualcomm.hardware.lynx.LynxVoltageSensor
 import com.qualcomm.robotcore.hardware.*
 import com.qualcomm.robotcore.util.ElapsedTime
 import org.firstinspires.ftc.teamcode.misc.CommandSender
@@ -41,9 +40,8 @@ class rpm : MultithreadRobotModule() {
     private var accelerationIncrement = 1.0
     var rpmTarget = 6000.0
         private set
-    private var currentVelocity = 0.0
-    private var velocityTarget = 2400.0
-    var rpmNow = currentRpm
+    private var motorVelocityTarget = 0.0
+    var currentRpm = 0.0
     var encoderFailureMode = false
         private set
 
@@ -91,17 +89,15 @@ class rpm : MultithreadRobotModule() {
             feedRing()
             ringsToShoot--
         }
-        setFeederPosition(feederTime.milliseconds() < ShooterConfig.servoTime && velocityTarget != 0.0)
+        setFeederPosition(feederTime.milliseconds() < ShooterConfig.servoTime && motorVelocityTarget != 0.0)
     }
     override fun updateExpansionHub() {
-        currentVelocity =
-            if (rpmTime.milliseconds() >= timeToAccelerateMs) velocityTarget else rpmTime.milliseconds() * accelerationIncrement * velocityTarget
-        shooterVelocitySender.send(currentVelocity)
-        if (encoderFailureDetectionTime.seconds() > 1) if (velocityTarget == 0.0 || currentRpm != 0.0) encoderFailureDetectionTime.reset()
-        if (velocityTarget != 0.0 && ringsToShoot == 0) updatePIDFCoeffs(
+        shooterVelocitySender.send(if (rpmTime.milliseconds() >= timeToAccelerateMs) motorVelocityTarget else rpmTime.milliseconds() * accelerationIncrement * motorVelocityTarget)
+        if (encoderFailureDetectionTime.seconds() > 1) if (motorVelocityTarget == 0.0 || getMotorRpm() != 0.0) encoderFailureDetectionTime.reset()
+        if (motorVelocityTarget != 0.0 && ringsToShoot == 0) updatePIDFCoeffs(
             encoderFailureDetectionTime.seconds() > 3
         )
-        rpmNow = currentRpm
+        currentRpm = getMotorRpm()
     }
 
     override fun updateOther() {
@@ -138,19 +134,12 @@ class rpm : MultithreadRobotModule() {
             rpmTarget = Rpm
             if (time != 0.0) timeToAccelerateMs = Math.abs(time)
             accelerationIncrement = rpmTarget / timeToAccelerateMs / 6000
-            velocityTarget = rpmTarget * 0.4
+            motorVelocityTarget = rpmTarget * 0.4
         }
     }
 
-    /*  public void onshooter(boolean On) {
-        if (On)
-            rpmTime.reset();
-        shooterIsOn = On;
-    }*/
-  //  val isCorrectRpm: Boolean
-       // get() = isCorrectRpm(25.0)
-    private val currentRpm: Double
-        get() = shooterMotor.velocity * 2.5
+    private fun getMotorRpm(): Double = shooterMotor.velocity * 2.5
+
     var shootingMode: ShooterMode
         get() = shooterMode
         set(mode) {
@@ -169,8 +158,8 @@ class rpm : MultithreadRobotModule() {
             }
         }
 
-    fun isCorrectRpm(error: Double = 25.0): Boolean {
-        return if (encoderFailureMode) true else abs(currentVelocity - shooterMotor.velocity) < error // abs(currentVelocity - rpmNow / 2.5) < error
+    fun isCorrectRpm(error: Double = 30.0): Boolean {
+        return if (encoderFailureMode) true else abs(rpmTarget - currentRpm) < error // abs(currentVelocity - rpmNow / 2.5) < error
     }
 
     fun feedRing() {
