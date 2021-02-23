@@ -1,9 +1,12 @@
 package org.firstinspires.ftc.teamcode.robot
 
+import com.acmerobotics.dashboard.config.Config
 import org.firstinspires.ftc.teamcode.superclasses.RobotModule
 import org.openftc.easyopencv.OpenCvCamera
 import org.openftc.easyopencv.OpenCvCameraFactory
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
+import org.firstinspires.ftc.teamcode.robot.OpenCVNodeWebcam.OpenCVConfig.HSVLowerBound
+import org.firstinspires.ftc.teamcode.robot.OpenCVNodeWebcam.OpenCVConfig.HSVUpperBound
 import org.openftc.easyopencv.OpenCvCamera.AsyncCameraOpenListener
 import org.openftc.easyopencv.OpenCvCameraRotation
 import org.opencv.core.*
@@ -13,8 +16,14 @@ import org.opencv.imgproc.Imgproc
 import java.lang.Exception
 
 open class OpenCVNodeWebcam : RobotModule() {
+    
+    @Config
+    internal object OpenCVConfig {
+        @JvmField var HSVLowerBound = Scalar(12.0, 160.0, 80.0)
+        @JvmField var HSVUpperBound = Scalar(18.0, 255.0, 255.0)
+    }
+
     lateinit var webcam: OpenCvCamera
-    var pipeline = StageSwitchingPipeline()
     override fun initialize() {
         try {
             webcam = OpenCvCameraFactory.getInstance().createWebcam(
@@ -40,13 +49,11 @@ open class OpenCVNodeWebcam : RobotModule() {
         }
     }
 
-    val stackSize: StackSize
-        get() = pipeline.stackSize
 
     fun stopCam() {
         val finalStackSize = stackSize
         try {
-            webcam.closeCameraDeviceAsync { pipeline.stackSize = finalStackSize }
+            webcam.closeCameraDeviceAsync { stackSize = finalStackSize }
         } catch (ignored: Exception) {
         }
     }
@@ -57,26 +64,23 @@ open class OpenCVNodeWebcam : RobotModule() {
         return stackSize
     }
 
-    val mean: Double
-        get() = pipeline.mean
-    val aspectRatio: Double
-        get() = pipeline.aspectRatio
+    @Volatile var stackSize = StackSize.ZERO
+    @Volatile var mean = 0.0
+    @Volatile var aspectRatio = 0.0
 
     enum class StackSize {
         ZERO, ONE, FOUR
     }
 
-    class StageSwitchingPipeline : OpenCvPipeline() {
+    val pipeline = object: OpenCvPipeline() {
         private val stages = Stage.values()
-        var all = Mat()
-        var HSVMat = Mat()
-        var thresholdMat = Mat()
-        var crop = Rect(0, 200, rows, cols - 220)
-
-        @Volatile
-        var stackSize = StackSize.ZERO
-        var mean = 0.0
-        var aspectRatio = 0.0
+        private var all = Mat()
+        private var HSVMat = Mat()
+        private var HSVMatMean = Scalar(.0)
+        private var thresholdMat = Mat()
+        private val structuringElement = Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, Size(35.0, 10.0))
+        private val crop = Rect(0, 200, rows, cols - 220)
+        private val BlurSize = Size(9.0, 9.0)
         private var stageToRenderToViewport = Stage.DETECTION
         override fun onViewportTapped() {
             val currentStageNum = stageToRenderToViewport.ordinal
@@ -89,28 +93,12 @@ open class OpenCVNodeWebcam : RobotModule() {
 
         override fun processFrame(input: Mat): Mat {
             all = input.submat(crop)
-            Imgproc.GaussianBlur(all, all, Size(9.0, 9.0), 0.0)
+            Imgproc.GaussianBlur(all, all, BlurSize, 0.0)
             Imgproc.cvtColor(all, HSVMat, Imgproc.COLOR_RGB2HSV)
-            Core.inRange(
-                HSVMat,
-                Scalar(
-                    12.0,
-                    (160 + Core.mean(HSVMat).`val`[1]) / 2,
-                    (80 + Core.mean(HSVMat).`val`[2]) / 2
-                ),
-                Scalar(18.0, 255.0, 255.0),
-                thresholdMat
-            )
-            Imgproc.erode(
-                thresholdMat,
-                thresholdMat,
-                Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, Size(35.0, 10.0))
-            )
-            Imgproc.dilate(
-                thresholdMat,
-                thresholdMat,
-                Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, Size(35.0, 100.0))
-            )
+            HSVMatMean = Core.mean(HSVMat)
+            Core.inRange(HSVMat, Scalar(HSVLowerBound.`val`[0], (HSVLowerBound.`val`[1] + HSVMatMean.`val`[1]) / 2.0, (HSVLowerBound.`val`[2] + HSVMatMean.`val`[2]) / 2.0), HSVUpperBound, thresholdMat)
+            Imgproc.erode(thresholdMat, thresholdMat, structuringElement)
+            Imgproc.dilate(thresholdMat, thresholdMat, structuringElement)
             val rect = Imgproc.boundingRect(thresholdMat)
             Imgproc.rectangle(input, crop, Scalar(0.0, 255.0, 0.0), 2)
             Imgproc.rectangle(all, rect, Scalar(0.0, 0.0, 255.0), 2)
@@ -135,12 +123,11 @@ open class OpenCVNodeWebcam : RobotModule() {
             }
         }
 
-        internal enum class Stage {
-            DETECTION,  //includes outlines
-            THRESHOLD,  //b&w
-            RAW_IMAGE
-            //displays raw view
-        }
+    }
+    enum class Stage {
+        DETECTION,  //includes outlines
+        THRESHOLD,  //b&w
+        RAW_IMAGE //displays raw view
     }
 
     companion object {
