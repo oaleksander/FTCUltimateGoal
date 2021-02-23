@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.util.ElapsedTime
 import org.firstinspires.ftc.teamcode.robot.WoENHardware.gripper
 import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule
 import org.firstinspires.ftc.teamcode.superclasses.WobbleManipulator
+import kotlin.math.abs
 
 @Deprecated("")
 class MotorWobbleManipulator : MultithreadRobotModule(), WobbleManipulator {
@@ -53,7 +54,7 @@ class MotorWobbleManipulator : MultithreadRobotModule(), WobbleManipulator {
 
     override fun updateExpansionHub() {
         error = pos - lever.currentPosition
-        if (Math.abs(error) > minerror) {
+        if (abs(error) > minerror) {
             P = error * kofP
             D = (error - errorOld) * kofd
             power = P + D

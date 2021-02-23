@@ -63,16 +63,16 @@ class FakeRobot : MultithreadRobotModule(), Drivetrain, Odometry {
         updateTimer.reset()
     }
 
-    override fun setRobotVelocity(frontways: Double, sideways: Double, turn: Double) {
-        var frontWays = frontways
-        var sideWays = sideways
-        var Turn = turn
-        if (abs(frontways) > maxVelocity.y) frontWays = maxVelocity.y * sign(frontways)
-        if (abs(sideways) > maxVelocity.x) sideWays = maxVelocity.x * sign(sideways)
-        if (abs(turn) > maxVelocity.z) Turn = maxVelocity.z * sign(turn)
-        targetVelocity = Vector3D(sideWays, frontWays, Turn)
+    override fun setRobotVelocity(frontwaysVelocity: Double, sidewaysVelocity: Double, turnVelocity: Double) {
+        var frontways = frontwaysVelocity
+        var sideways = sidewaysVelocity
+        var turn = turnVelocity
+        if (abs(frontways) > maxVelocity.y) frontways = maxVelocity.y * sign(frontways)
+        if (abs(sideways) > maxVelocity.x) sideways = maxVelocity.x * sign(sideways)
+        if (abs(turn) > maxVelocity.z) turn = maxVelocity.z * sign(turn)
+        targetVelocity = Vector3D(sideways, frontways, turn)
         targetVelocityFC =
-            Vector3D(Vector2D(sideWays, frontWays).rotatedCW(currentPosition.heading), Turn)
+            Vector3D(Vector2D(sideways, frontways).rotatedCW(currentPosition.heading), turn)
     }
 
     override fun getMaxVelocity(): Vector3D {

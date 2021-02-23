@@ -146,11 +146,11 @@ class MecanumDrivetrain : MultithreadRobotModule(), Drivetrain {
     }
 
     fun setMaxDriveSpeed(value: Double) {
-        maxMotorSpeed = Range.clip(Math.abs(value), 0.0, theoreticalMaxSpeed)
+        maxMotorSpeed = Range.clip(abs(value), 0.0, theoreticalMaxSpeed)
     }
 
     fun setMinDriveSpeed(value: Double) {
-        minMotorSpeed = Range.clip(Math.abs(value), 0.0, theoreticalMaxSpeed)
+        minMotorSpeed = Range.clip(abs(value), 0.0, theoreticalMaxSpeed)
     }
 
     override fun updateControlHub() {
@@ -173,14 +173,14 @@ class MecanumDrivetrain : MultithreadRobotModule(), Drivetrain {
     override fun updateOther() {
     }
 
-    fun driveMotorPowers_direct(frontLeft: Double, frontRight: Double, rearLeft: Double, rearRight: Double) {
+    private fun driveMotorPowers_direct(frontLeft: Double, frontRight: Double, rearLeft: Double, rearRight: Double) {
         driveFrontLeft.power = frontLeft
         driveFrontRight.power = frontRight
         driveRearLeft.power = rearLeft
         driveRearRight.power = rearRight
     }
 
-    fun driveMotorPowers(frontLeft: Double, frontRight: Double, rearLeft: Double, rearRight: Double) {
+    private fun driveMotorPowers(frontLeft: Double, frontRight: Double, rearLeft: Double, rearRight: Double) {
         var frontLeftMotorVelocity = frontLeft
         var frontRightMotorVelocity = frontRight
         var rearLeftMotorVelocity = rearLeft

@@ -127,7 +127,7 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
      * @param distanceTolerance       Minimum distance error
      * @param angularTolerance        Minimum angular error
      */
-    fun pos(target: Pose2D?, linearVelocityFraction: Double, angularVelocityFraction: Double, distanceTolerance: Double, angularTolerance: Double) {
+    fun pos(target: Pose2D?, linearVelocityFraction: Double = 1.0, angularVelocityFraction: Double = 1.0, distanceTolerance: Double = minError_angle_default, angularTolerance: Double = minError_angle_default) {
         followPath(MotionTask(target), linearVelocityFraction, angularVelocityFraction, distanceTolerance, angularTolerance)
         while (pathFollowerIsActive() && opMode!!.opModeIsActive()) {
             Thread.yield()
@@ -195,7 +195,6 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
         MovementConfig.antiWindupFraction_angle = minAngleVelocityFraction
     }
 
-
     private val moveControllerTimer = ElapsedTime()
 
     /**
@@ -214,9 +213,10 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
                 (error.y + previousError.y) * 0.5,
                 MathUtil.angleAverage(error.heading, previousError.heading)
             )*moveControllerTimer.seconds()
-            integralError = Vector3D(Range.clip(Math.abs(integralError.x), 0.0, MovementConfig.antiWindupFraction_distance * drivetrain.maxVelocity.x) * Math.signum(integralError.x),
-                    Range.clip(Math.abs(integralError.y), 0.0, MovementConfig.antiWindupFraction_distance * drivetrain.maxVelocity.y) * Math.signum(integralError.y),
-                    Range.clip(Math.abs(integralError.z), 0.0, MovementConfig.antiWindupFraction_angle * drivetrain.maxVelocity.z) * Math.signum(integralError.z))
+            integralError = Vector3D(Range.clip(abs(integralError.x), 0.0, MovementConfig.antiWindupFraction_distance * drivetrain.maxVelocity.x) * sign(integralError.x),
+                    Range.clip(abs(integralError.y), 0.0, MovementConfig.antiWindupFraction_distance * drivetrain.maxVelocity.y) * sign(integralError.y),
+                    Range.clip(abs(integralError.z), 0.0, MovementConfig.antiWindupFraction_angle * drivetrain.maxVelocity.z) * sign(integralError.z)
+            )
             diffError = odometry.robotVelocity*-1.0
         } else integralError = Vector3D()
         moveControllerTimer.reset()
@@ -287,7 +287,7 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
      *
      * @param velocityCommand Robot velocities in cm/s
      */
-    fun holonomicMoveFC(velocityCommand: Vector3D) {
+    private fun holonomicMoveFC(velocityCommand: Vector3D) {
         var linearVelocity = Vector2D(velocityCommand.x, velocityCommand.y).rotatedCW(-odometry.robotCoordinates.heading)
         linearVelocity = linearVelocity.normalize()*Range.clip(linearVelocity.radius(), 0.0, drivetrain.maxVelocity.y * maxLinearVelocityFraction)
         val angularVelocity = Range.clip(abs(velocityCommand.z), 0.0, drivetrain.maxVelocity.z * maxAngularVelocityFraction)*sign(velocityCommand.z)

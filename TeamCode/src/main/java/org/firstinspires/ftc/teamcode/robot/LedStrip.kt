@@ -28,7 +28,6 @@ class LedStrip: MultithreadRobotModule() {
     }
 
     override fun updateExpansionHub() {
-
     }
 
     override fun updateOther() {
