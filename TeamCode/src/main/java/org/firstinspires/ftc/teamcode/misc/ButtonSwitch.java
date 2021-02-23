@@ -1,12 +1,21 @@
 package org.firstinspires.ftc.teamcode.misc;
 
-public class ButtonSwitch {
-    private boolean lastButtonstate = false;
-    private boolean trigger = false;
+import java.util.function.BooleanSupplier;
 
-    public boolean isTriggered(boolean buttonState) {
-        trigger = ((buttonState != lastButtonstate) && buttonState) != trigger;
-        lastButtonstate = buttonState;
+public class ButtonSwitch {
+
+    private boolean lastButtonState = false;
+    private boolean trigger = false;
+    private final BooleanSupplier booleanSupplier;
+
+    public ButtonSwitch(BooleanSupplier booleanSupplier) {
+        this.booleanSupplier = booleanSupplier;
+    }
+
+    public boolean get() {
+        boolean currentButtonState = booleanSupplier.getAsBoolean();
+        trigger = ((currentButtonState != lastButtonState) && currentButtonState) != trigger;
+        lastButtonState = currentButtonState;
         return trigger;
     }
 }

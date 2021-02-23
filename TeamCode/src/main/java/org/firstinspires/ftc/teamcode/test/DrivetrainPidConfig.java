@@ -169,7 +169,7 @@ public class DrivetrainPidConfig extends LinearOpMode {
         for (LynxModule module : allHubs)
             module.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
         setPIDFCoefficients(new PIDFCoefficients(Constants.kP, Constants.kD, Constants.kI, Constants.kF));
-        SinglePressButton sineResetter = new SinglePressButton();
+        SinglePressButton sineResetter = new SinglePressButton(()->gamepad1.b);
         ElapsedTime sineWaveTimer = new ElapsedTime();
         telemetry.setMsTransmissionInterval(40);
         for (LynxModule module : allHubs)
@@ -181,7 +181,7 @@ public class DrivetrainPidConfig extends LinearOpMode {
             // odometry.update();
             Vector3D targetVelocity = new Vector3D(gamepad1.left_stick_x, -gamepad1.left_stick_y, gamepad1.right_stick_x)
                     .times(getMaxVelocity());
-            if (sineResetter.isTriggered(gamepad1.b))
+            if (sineResetter.get())
                 sineWaveTimer.reset();
             if (gamepad1.b)
                 targetVelocity = new Vector3D(0, Math.sin(sineWaveTimer.seconds() * Math.PI / 3), 0).times(getMaxVelocity());
