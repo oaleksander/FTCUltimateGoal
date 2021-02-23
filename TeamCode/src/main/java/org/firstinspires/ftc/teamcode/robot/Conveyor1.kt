@@ -119,7 +119,11 @@ class Conveyor1 : MultithreadRobotModule(), Conveyor {
         backOnAfter = BackOnAfter
     }
 
-    override fun setConveyorPower(power: Double) {
+    override fun enableConveyor(isEnabled: Boolean) {
+        setConveyorPower(if(isEnabled) 1.0 else 0.0)
+    }
+
+    private fun setConveyorPower(power: Double) {
         conveyorPower = power
     }
 

@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.superclasses;
 
 public interface Conveyor{
 
-    void setConveyorPower(double power);
+    void enableConveyor(boolean isEnabled);
 
     void setForceReverse(boolean forceReverse);
 

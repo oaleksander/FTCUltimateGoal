@@ -14,6 +14,7 @@ import org.firstinspires.ftc.teamcode.robot.WoENHardware.conveyorMotor
 import org.firstinspires.ftc.teamcode.robot.WoENHardware.ringDetector
 import org.firstinspires.ftc.teamcode.superclasses.Conveyor
 import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule
+import kotlin.math.abs
 
 class Conveyor2 : MultithreadRobotModule(), Conveyor {
     private lateinit var conveyor: DcMotorEx
@@ -35,6 +36,7 @@ class Conveyor2 : MultithreadRobotModule(), Conveyor {
 
     @Config
     internal object ConveyorConfig {
+        @JvmField var conveyorPower = 1.0
         @JvmField var motorLockingCurrentTimeout = 750.0
         @JvmField var motorLockingReverseTime = 750.0
         @JvmField var stackDetectionTimeout = 500.0
@@ -55,7 +57,11 @@ class Conveyor2 : MultithreadRobotModule(), Conveyor {
         this.forceReverse = forceReverse
     }
 
-    override fun setConveyorPower(requestedPower: Double) {
+    override fun enableConveyor(isEnabled: Boolean) {
+        setConveyorPower(if(isEnabled) ConveyorConfig.conveyorPower else 0.0)
+    }
+
+    private fun setConveyorPower(requestedPower: Double) {
         if (this.requestedPower != requestedPower) motorCurrentTimer.reset()
         this.requestedPower = requestedPower
     }
@@ -87,7 +93,7 @@ class Conveyor2 : MultithreadRobotModule(), Conveyor {
     private val aMPS: Double
         get() {
             if (motorCurrentQueryTimer.milliseconds() > motorCurrentQueryTimeout) {
-                lastKnownMotorCurrent = Math.abs(conveyor.getCurrent(CurrentUnit.AMPS))
+                lastKnownMotorCurrent = abs(conveyor.getCurrent(CurrentUnit.AMPS))
                 motorCurrentQueryTimer.reset()
             }
             return lastKnownMotorCurrent
