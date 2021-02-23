@@ -13,6 +13,7 @@ import org.firstinspires.ftc.teamcode.math.MathUtil
 import org.firstinspires.ftc.teamcode.math.Pose2D
 import org.firstinspires.ftc.teamcode.math.Vector2D
 import org.firstinspires.ftc.teamcode.math.Vector3D
+import org.firstinspires.ftc.teamcode.misc.Encoder
 import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule
 import org.firstinspires.ftc.teamcode.superclasses.Odometry
 import kotlin.math.cos
@@ -24,9 +25,9 @@ class ThreeWheelOdometry : MultithreadRobotModule(), Odometry {
     private var angleOffset = 0.0
     private lateinit var imu1: BNO055IMU
     private lateinit var imu2: BNO055IMU
-    private lateinit var odometerYL: DcMotorEx
-    private lateinit var odometerYR: DcMotorEx
-    private lateinit var odometerX: DcMotorEx
+    private lateinit var odometerYL: Encoder
+    private lateinit var odometerYR: Encoder
+    private lateinit var odometerX: Encoder
     private var odometryWheelDiameterCm = OdometryConfig.forwardMultiplier * 4.8
     private var odometryCountsPerCM = 1440 / (odometryWheelDiameterCm * Math.PI)
     private var odometryCMPerCounts = odometryWheelDiameterCm * Math.PI / 1440
@@ -151,9 +152,9 @@ class ThreeWheelOdometry : MultithreadRobotModule(), Odometry {
             imu2AccessTimer.reset()
         }
 
-        currentYLVelocity = odometerYL.velocity
-        currentYLVelocity = odometerYR.velocity
-        currentYLVelocity = odometerX.velocity
+        currentYLVelocity = odometerYL.correctedVelocity
+        currentYLVelocity = odometerYR.correctedVelocity
+        currentYLVelocity = odometerX.correctedVelocity
         calculatePosition(worldPosition)
     }
 
@@ -197,18 +198,21 @@ class ThreeWheelOdometry : MultithreadRobotModule(), Odometry {
         odometryCMPerCounts = odometryWheelDiameterCm * Math.PI / 1440
         odometerXcenterOffset =
             -21.7562349 * odometryCountsPerCM * cos(Math.toRadians(51.293002))
-        odometerYL = WoENHardware.odometerYL
-        odometerYR = WoENHardware.odometerYR
-        odometerX = WoENHardware.odometerX
-        odometerYL.direction = DcMotorSimple.Direction.FORWARD
-        odometerYR.direction = DcMotorSimple.Direction.REVERSE
-        odometerX.direction = DcMotorSimple.Direction.REVERSE
-        odometerYL.mode = DcMotor.RunMode.STOP_AND_RESET_ENCODER
-        odometerYR.mode = DcMotor.RunMode.STOP_AND_RESET_ENCODER
-        odometerX.mode = DcMotor.RunMode.STOP_AND_RESET_ENCODER
-        odometerYL.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
-        odometerYR.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
-        odometerX.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
+        WoENHardware.odometerYL.let{
+            odometerYL = Encoder(it, Encoder.Direction.FORWARD)
+            it.mode = DcMotor.RunMode.STOP_AND_RESET_ENCODER
+            it.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
+        }
+        WoENHardware.odometerYR.let{
+            odometerYR = Encoder(it, Encoder.Direction.REVERSE)
+            it.mode = DcMotor.RunMode.STOP_AND_RESET_ENCODER
+            it.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
+        }
+        WoENHardware.odometerX.let{
+            odometerX = Encoder(it, Encoder.Direction.REVERSE)
+            it.mode = DcMotor.RunMode.STOP_AND_RESET_ENCODER
+            it.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
+        }
         ylOld = odometerYL.currentPosition
         yrOld = odometerYR.currentPosition
         xOld = odometerX.currentPosition

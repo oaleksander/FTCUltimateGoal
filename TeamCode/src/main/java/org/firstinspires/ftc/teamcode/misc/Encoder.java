@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.misc;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
@@ -42,11 +43,12 @@ public class Encoder {
     private double velocityEstimate;
     private double lastUpdateTime;
 
-    public Encoder(DcMotorEx motor) {
+    public Encoder(DcMotorEx motor, Direction direction) {
         this.motor = motor;
+        this.direction = direction;
+
         this.clock = new ElapsedTime();
 
-        this.direction = Direction.FORWARD;
 
         this.lastPosition = 0;
         this.velocityEstimate = 0.0;
@@ -67,7 +69,7 @@ public class Encoder {
     }
 
     public int getCurrentPosition() {
-        int multiplier = direction.getMultiplier();
+        int multiplier = direction.getMultiplier() * (motor.getDirection() == DcMotorSimple.Direction.FORWARD?1:-1);
         int currentPosition = motor.getCurrentPosition() * multiplier;
         if (currentPosition != lastPosition) {
             double currentTime = clock.seconds();
@@ -80,7 +82,7 @@ public class Encoder {
     }
 
     public double getRawVelocity() {
-        int multiplier = direction.getMultiplier();
+        int multiplier = direction.getMultiplier() * (motor.getDirection() == DcMotorSimple.Direction.FORWARD?1:-1);
         return motor.getVelocity() * multiplier;
     }
 
