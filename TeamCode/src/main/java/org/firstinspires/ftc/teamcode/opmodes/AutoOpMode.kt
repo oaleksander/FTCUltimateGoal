@@ -14,10 +14,10 @@ import org.firstinspires.ftc.teamcode.robot.WoENrobot.setLedColors
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.startRobot
 
 open class AutoOpMode : LinearOpMode() {
-    protected var xSign: Byte = 1
-    protected var sideSign: Byte = 1
-    var thereAreTwoGamepads = false
-    var delayAtStart = 0.0
+    private var xSign: Int = 1
+    private var sideSign: Int = 1
+    private var thereAreTwoGamepads = false
+    private var delayAtStart = 0.0
     open fun main() {}
     val startPosition: Pose2D
         get() = Pose2D(93.91741046 * xSign + 30.1416 * sideSign, -156.12089687, 0.0)
@@ -29,9 +29,9 @@ open class AutoOpMode : LinearOpMode() {
         super.waitForStart()
     }
 
-    var delayAtStartIncrement = SinglePressButton()
-    var delayAtStartDecrement = SinglePressButton()
-    fun start_loop() {
+    private var delayAtStartIncrementPresser = SinglePressButton{gamepad1.dpad_up}
+    private var delayAtStartDecrementPresser = SinglePressButton{gamepad1.dpad_down}
+    private fun start_loop() {
         val color = HSVRGB.convert((runTime.seconds() * 50).toFloat() % 360, 100f, 50f)
         setLedColors(color.x.toInt(), color.y.toInt(), color.z.toInt())
         val indicator =
@@ -40,14 +40,9 @@ open class AutoOpMode : LinearOpMode() {
         xSign = if (gamepad1.b) 1 else if (gamepad1.x) -1 else xSign
         sideSign =
             if (gamepad1.dpad_right || gamepad1.left_stick_x > 0.5) 1 else if (gamepad1.dpad_left || gamepad1.left_stick_x < -0.5) -1 else sideSign
-        delayAtStart = Range.clip(
-            delayAtStart + (if (delayAtStartIncrement.isTriggered(gamepad1.dpad_up)) 500 else 0) - if (delayAtStartDecrement.isTriggered(
-                    gamepad1.dpad_down
-                )
-            ) 500 else 0, 0.0, 30000.0
-        )
-        telemetry.addData("Alliance", if (xSign.toInt() == 1) "RED" else "BLUE")
-        telemetry.addData("Tape Side", if (sideSign.toInt() == 1) "RIGHT" else "LEFT")
+        delayAtStart = Range.clip(delayAtStart + (if (delayAtStartIncrementPresser.get()) 500 else 0) - if (delayAtStartDecrementPresser.get()) 500 else 0, 0.0, 30000.0)
+        telemetry.addData("Alliance", if (xSign == 1) "RED" else "BLUE")
+        telemetry.addData("Tape Side", if (sideSign == 1) "RIGHT" else "LEFT")
         telemetry.addData("Starting delay [ms]", delayAtStart)
         telemetry.addLine("")
         thereAreTwoGamepads = gamepad2.start || gamepad2.b || thereAreTwoGamepads
