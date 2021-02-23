@@ -26,9 +26,9 @@ class Shooter : MultithreadRobotModule() {
         @JvmField
         var timeRpm = 150.0
         @JvmField
-        var feederClose = 0.0735
+        var feederClose = 0.15
         @JvmField
-        var feederOpen = 0.35
+        var feederOpen = 0.42
         @JvmField
         var kP = 58.0
         @JvmField

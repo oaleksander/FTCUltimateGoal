@@ -49,36 +49,43 @@ object WoENrobot {
     lateinit var expansionHub: ExpansionHubEx
     private lateinit var allHubs: List<LynxModule>
     var updateControlHub = Runnable {
-        controlHub.standardModule.bulkCachingMode = BulkCachingMode.MANUAL
-        while (opMode.opModeIsActive() && !Thread.currentThread().isInterrupted) {
-            controlHub.standardModule.clearBulkCache()
-            Arrays.stream(activeRobotModules)
-                .forEach { obj: MultithreadRobotModule -> obj.updateControlHub() }
-            controlHubSpinCompleted = true
-        }
+        try {
+            controlHub.standardModule.bulkCachingMode = BulkCachingMode.MANUAL
+            while (opMode.opModeIsActive() && !Thread.currentThread().isInterrupted) {
+                controlHub.standardModule.clearBulkCache()
+                Arrays.stream(activeRobotModules)
+                    .forEach { obj: MultithreadRobotModule -> obj.updateControlHub() }
+                controlHubSpinCompleted = true
+            }
+
+        }catch (e: InterruptedException) {}
     }
     private var controlHubUpdater = Thread(updateControlHub)
     var updateExpansionHub = Runnable {
-        expansionHub.standardModule.bulkCachingMode = BulkCachingMode.MANUAL
-        while (opMode.opModeIsActive() && !Thread.currentThread().isInterrupted) {
-            expansionHub.standardModule.clearBulkCache()
-            Arrays.stream(activeRobotModules)
-                .forEach { obj: MultithreadRobotModule -> obj.updateExpansionHub() }
-            expansionHubSpinCompleted = true
-        }
+        try {
+            expansionHub.standardModule.bulkCachingMode = BulkCachingMode.MANUAL
+            while (opMode.opModeIsActive() && !Thread.currentThread().isInterrupted) {
+                expansionHub.standardModule.clearBulkCache()
+                Arrays.stream(activeRobotModules)
+                    .forEach { obj: MultithreadRobotModule -> obj.updateExpansionHub() }
+                expansionHubSpinCompleted = true
+            }
+        }catch (e: InterruptedException) {}
     }
     private var expansionHubUpdater = Thread(updateExpansionHub)
     var updateOther = Runnable {
-        while (opMode.opModeIsActive() && !Thread.currentThread().isInterrupted) {
-            while ((!controlHubSpinCompleted || !expansionHubSpinCompleted) && opMode.opModeIsActive()) {
-                Thread.yield()
+        try {
+            while (opMode.opModeIsActive() && !Thread.currentThread().isInterrupted) {
+                while ((!controlHubSpinCompleted || !expansionHubSpinCompleted) && opMode.opModeIsActive()) {
+                    Thread.yield()
+                }
+                Arrays.stream(activeRobotModules)
+                    .forEach { obj: MultithreadRobotModule -> obj.updateOther() }
+                controlHubSpinCompleted = false
+                expansionHubSpinCompleted = false
+                spinCompleted = true
             }
-            Arrays.stream(activeRobotModules)
-                .forEach { obj: MultithreadRobotModule -> obj.updateOther() }
-            controlHubSpinCompleted = false
-            expansionHubSpinCompleted = false
-            spinCompleted = true
-        }
+        }catch (e: InterruptedException) {}
     }
     private var otherUpdater = Thread(updateOther)
     var updateRegulators = Runnable {

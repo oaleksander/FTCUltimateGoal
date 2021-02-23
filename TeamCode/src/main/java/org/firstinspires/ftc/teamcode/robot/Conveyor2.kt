@@ -43,17 +43,17 @@ class Conveyor2 : MultithreadRobotModule(), Conveyor {
         @JvmField
         var conveyorPower = 1.0
         @JvmField
-        var motorLockingCurrentTimeout = 750.0
+        var motorLockingCurrentTimeout = 400.0
         @JvmField
         var motorLockingReverseTime = 750.0
         @JvmField
-        var stackDetectionTimeout = 500.0
+        var stackDetectionTimeout = 1000.0
         @JvmField
         var stackDetectionReverseTime = 750.0
         @JvmField
-        var distanceThreshold = -5.6
+        var distanceThreshold = 5.46
         @JvmField
-        var currentThreshold = 3.0
+        var currentThreshold = 2.5
     }
 
     override fun setAutomaticConveyorStopping(doAutomaticConveyorStopping: Boolean) {
@@ -111,7 +111,8 @@ class Conveyor2 : MultithreadRobotModule(), Conveyor {
         }
 
     override fun updateControlHub() {
-        if (!forceReverse && !(doReverseOnStop && requestedPower == 0.0) && doAutomaticConveyorStopping) if (getdistance() >= ConveyorConfig.distanceThreshold) {
+        if (!forceReverse && !(doReverseOnStop && requestedPower == 0.0) && doAutomaticConveyorStopping)
+            if (getdistance() >= ConveyorConfig.distanceThreshold) {
             stackDetectionTimer.reset() //Full collector detection
         }
     }
