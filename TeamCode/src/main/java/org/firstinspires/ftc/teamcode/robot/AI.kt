@@ -26,6 +26,7 @@ class AI : MultithreadRobotModule() {
     private lateinit var DriveFrontRight: ExpansionHubMotor
     private lateinit var DriveRearLeft: ExpansionHubMotor
     private lateinit var DriveRearRight: ExpansionHubMotor
+
     override fun initialize() {
         OdometryYL = WoENHardware.odometerYL
         OdometryYR = WoENHardware.odometerYR
@@ -99,7 +100,7 @@ class AI : MultithreadRobotModule() {
                 motor.power = 0.0
                 return true
             }
-        } while (opMode!!.opModeIsActive() && AItime.milliseconds() < timeDiagnostic)
+        } while (opMode.opModeIsActive() && AItime.milliseconds() < timeDiagnostic)
         motor.power = 0.0
         return false
     }
