@@ -6,19 +6,21 @@ public abstract class RobotModule {
 
     protected LinearOpMode opMode = null;
 
-    public void setOpMode(LinearOpMode opMode)
-    {
+    public void setOpMode(LinearOpMode opMode) {
         this.opMode = opMode;
     }
 
-    public void initialize() {}
+    public void initialize() {
+    }
 
     public final void initialize(LinearOpMode opMode) {
         setOpMode(opMode);
         initialize();
     }
 
-    public void start() {}
+    public void start() {
+    }
 
-    public void update() {}
+    public void updateAll() {
+    }
 }

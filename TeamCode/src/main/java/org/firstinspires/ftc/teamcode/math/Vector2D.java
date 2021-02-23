@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.math;
 
 import java.util.Locale;
 
-public class Vector2D implements Comparable {
+public class Vector2D{
 
     public double x;
     public double y;
@@ -12,9 +12,8 @@ public class Vector2D implements Comparable {
         this.y = y;
     }
 
-    public Vector2D()
-    {
-        this(0,0);
+    public Vector2D() {
+        this(0, 0);
     }
 
     public Vector2D rotated(double angle) {
@@ -78,14 +77,6 @@ public class Vector2D implements Comparable {
     @Override
     public String toString() {
         return String.format(Locale.getDefault(), "(%.1f, %.1f)", x, y);
-    }
-
-    @Override
-    public int compareTo(Object o) {
-        if (this == o) return 0;
-        if (o == null || getClass() != o.getClass()) return -1;
-        Vector2D p = (Vector2D) o;
-        return Integer.compare(this.hashCode(), o.hashCode());
     }
 
 }

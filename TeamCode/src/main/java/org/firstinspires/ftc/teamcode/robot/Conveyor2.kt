@@ -21,7 +21,11 @@ class Conveyor2 : MultithreadRobotModule(), Conveyor {
     private lateinit var sensorDistance: DistanceSensor
     private val distanceQueryTimeout = 650.0
     private val motorCurrentQueryTimeout = 650.0
-    private val conveyorPowerSender = motorAccelerationLimiter({ value: Double -> CommandSender { p: Double -> conveyor.power = -p }.send(value) }, 6.0)
+    private val conveyorPowerSender = motorAccelerationLimiter({ value: Double ->
+        CommandSender { p: Double ->
+            conveyor.power = -p
+        }.send(value)
+    }, 6.0)
     private val motorCurrentTimer = ElapsedTime()
     private val stackDetectionTimer = ElapsedTime()
     private var lastKnownDistance = 12.0
@@ -36,13 +40,20 @@ class Conveyor2 : MultithreadRobotModule(), Conveyor {
 
     @Config
     internal object ConveyorConfig {
-        @JvmField var conveyorPower = 1.0
-        @JvmField var motorLockingCurrentTimeout = 750.0
-        @JvmField var motorLockingReverseTime = 750.0
-        @JvmField var stackDetectionTimeout = 500.0
-        @JvmField var stackDetectionReverseTime = 750.0
-        @JvmField var distanceThreshold = -5.6
-        @JvmField var currentThreshold = 3.0
+        @JvmField
+        var conveyorPower = 1.0
+        @JvmField
+        var motorLockingCurrentTimeout = 750.0
+        @JvmField
+        var motorLockingReverseTime = 750.0
+        @JvmField
+        var stackDetectionTimeout = 500.0
+        @JvmField
+        var stackDetectionReverseTime = 750.0
+        @JvmField
+        var distanceThreshold = -5.6
+        @JvmField
+        var currentThreshold = 3.0
     }
 
     override fun setAutomaticConveyorStopping(doAutomaticConveyorStopping: Boolean) {
@@ -58,7 +69,7 @@ class Conveyor2 : MultithreadRobotModule(), Conveyor {
     }
 
     override fun enableConveyor(isEnabled: Boolean) {
-        setConveyorPower(if(isEnabled) ConveyorConfig.conveyorPower else 0.0)
+        setConveyorPower(if (isEnabled) ConveyorConfig.conveyorPower else 0.0)
     }
 
     private fun setConveyorPower(requestedPower: Double) {

@@ -144,7 +144,7 @@ public class DrivetrainPidConfig extends LinearOpMode {
     List<LynxModule> allHubs;
 
     @Override
-    public void runOpMode() throws InterruptedException {
+    public void runOpMode(){
         waitForStart();
         odometry.initialize(this);
         dashboard = FtcDashboard.getInstance();
@@ -169,12 +169,12 @@ public class DrivetrainPidConfig extends LinearOpMode {
         for (LynxModule module : allHubs)
             module.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
         setPIDFCoefficients(new PIDFCoefficients(Constants.kP, Constants.kD, Constants.kI, Constants.kF));
-        SinglePressButton sineResetter = new SinglePressButton(()->gamepad1.b);
+        SinglePressButton sineResetter = new SinglePressButton(() -> gamepad1.b);
         ElapsedTime sineWaveTimer = new ElapsedTime();
         telemetry.setMsTransmissionInterval(40);
         for (LynxModule module : allHubs)
             module.clearBulkCache();
-        odometry.update();
+        odometry.updateAll();
         while (opModeIsActive()) {
             for (LynxModule module : allHubs)
                 module.clearBulkCache();

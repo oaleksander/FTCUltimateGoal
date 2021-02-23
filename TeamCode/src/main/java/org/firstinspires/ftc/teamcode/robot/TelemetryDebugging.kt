@@ -23,15 +23,19 @@ class TelemetryDebugging : MultithreadRobotModule() {
 
     @Volatile
     var loopCount = AtomicInteger(0)
+
     @Volatile
     var controlHubLoopCount = AtomicInteger(0)
+
     @Volatile
     var expansionHubLooploopCount = AtomicInteger(0)
 
     @Config
     internal object TelemetryConfig {
-        @JvmField var dashboardTelemetry = true
-        @JvmField var refreshTimeMs = 50
+        @JvmField
+        var dashboardTelemetry = true
+        @JvmField
+        var refreshTimeMs = 50
     }
 
     override fun setOpMode(opMode: LinearOpMode) {
@@ -72,15 +76,17 @@ class TelemetryDebugging : MultithreadRobotModule() {
         while (opMode.opModeIsActive() && !Thread.currentThread().isInterrupted) {
             if (measurementTime.milliseconds() > TelemetryConfig.refreshTimeMs) {
                 val loopFrequency = loopCount.getAndSet(0) / measurementTime.seconds()
-                val controlHubLoopFrequency = controlHubLoopCount.getAndSet(0) / measurementTime.seconds()
-                val expansionHubloopFrequency = expansionHubLooploopCount.getAndSet(0) / measurementTime.seconds()
+                val controlHubLoopFrequency =
+                    controlHubLoopCount.getAndSet(0) / measurementTime.seconds()
+                val expansionHubloopFrequency =
+                    expansionHubLooploopCount.getAndSet(0) / measurementTime.seconds()
                 measurementTime.reset()
                 telemetry.addData("Status", "Running " + runTime.seconds())
                 telemetry.addData("Total Loop frequency", "$loopFrequency Hz")
                 telemetry.addData("CH Loop frequency", "$controlHubLoopFrequency Hz")
                 telemetry.addData("EH Loop frequency", "$expansionHubloopFrequency Hz")
                 val robotPosition = odometry.robotCoordinates
-               // telemetry.addLine("Odometry encoders").addData("odYL", WoENHardware.odometerYL.getCurrentPosition()).addData("odYR", WoENHardware.odometerYR.getCurrentPosition()).addData("odX", WoENHardware.odometerX.getCurrentPosition());
+                // telemetry.addLine("Odometry encoders").addData("odYL", WoENHardware.odometerYL.getCurrentPosition()).addData("odYR", WoENHardware.odometerYR.getCurrentPosition()).addData("odX", WoENHardware.odometerX.getCurrentPosition());
                 //telemetry.addLine("Robot position ").addData("Y", robotPosition.y).addData("X", robotPosition.x).addData("Head", Math.toDegrees(robotPosition.heading));
                 //   Vector3D velocity = odometry.getRobotVelocity();
                 //     telemetry.addLine("Robot velocity ").addData("Y", velocity.y).addData("X", velocity.x).addData("Head", Math.toDegrees(velocity.z));
@@ -97,8 +103,8 @@ class TelemetryDebugging : MultithreadRobotModule() {
                     dashboardPacket.put("Loop frequency", loopFrequency)
                     dashboardPacket.put("CH Loop frequency", controlHubLoopFrequency)
                     dashboardPacket.put("EH Loop frequency", expansionHubloopFrequency)
-                       // dashboardPacket.put("Flywhel RPM",shooter.currentRpm);
-                      //  dashboardPacket.put("Flywhel target",shooter.rpmTarget);
+                    // dashboardPacket.put("Flywhel RPM",shooter.currentRpm);
+                    //  dashboardPacket.put("Flywhel target",shooter.rpmTarget);
                     dashboardPacket.put("Status", "Running " + runTime.seconds())
                     dashboard.sendTelemetryPacket(dashboardPacket)
                 }

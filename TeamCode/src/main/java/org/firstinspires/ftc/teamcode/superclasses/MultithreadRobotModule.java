@@ -1,18 +1,20 @@
 package org.firstinspires.ftc.teamcode.superclasses;
 
-public abstract class MultithreadRobotModule extends RobotModule{
+public abstract class MultithreadRobotModule extends RobotModule {
 
-    @Deprecated
     @Override
-    public final void update() {
-       updateControlHub();
-       updateExpansionHub();
-       updateOther();
+    public final void updateAll() {
+        updateControlHub();
+        updateExpansionHub();
+        updateOther();
     }
 
-    public void updateControlHub() {}
+    public void updateControlHub() {
+    }
 
-    public void updateExpansionHub() {}
+    public void updateExpansionHub() {
+    }
 
-    public void updateOther() {}
+    public void updateOther() {
+    }
 }

@@ -18,13 +18,13 @@ class TeleOp_Dual : LinearOpMode() {
         initRobot(this)
         startRobot()
         /* Wobble */
-        val threeRingPresser = SinglePressButton{gamepad1.right_stick_button}
-        val grabWobbleSwitch = ButtonSwitch{gamepad2.right_bumper}
+        val threeRingPresser = SinglePressButton { gamepad1.right_stick_button }
+        val grabWobbleSwitch = ButtonSwitch { gamepad2.right_bumper }
         /* Conveyor */
-        val conveyorOnOffSwitch = ButtonSwitch{gamepad2.left_trigger > 0.5}
+        val conveyorOnOffSwitch = ButtonSwitch { gamepad2.left_trigger > 0.5 }
         /* Shooter */
-        val shooterSpeedSwitch = ButtonSwitch{gamepad2.y}
-        val shooterOnOffSwitch = ButtonSwitch{gamepad2.a}
+        val shooterSpeedSwitch = ButtonSwitch { gamepad2.y }
+        val shooterOnOffSwitch = ButtonSwitch { gamepad2.a }
         while (opModeIsActive()) {
             /* Wobble */
             wobbleManipulator.grabWobble(grabWobbleSwitch.get())
@@ -34,16 +34,17 @@ class TeleOp_Dual : LinearOpMode() {
             /* Shooter */
             shooter.shootingMode = if (shooterOnOffSwitch.get())
                 if (shooterSpeedSwitch.get()) rpm.ShooterMode.POWERSHOT
-                    else rpm.ShooterMode.HIGHGOAL
-                else rpm.ShooterMode.OFF
+                else rpm.ShooterMode.HIGHGOAL
+            else rpm.ShooterMode.OFF
             conveyor.setForceReverse(gamepad2.right_trigger > 0.5)
             if (gamepad1.a) shooter.feedRing()
             else if (threeRingPresser.get()) shooter.feedRings()
             /* Drivetrain */
             movement.humanSetVelocity(
-                gamepad1.left_stick_x.toDouble() + if (gamepad1.dpad_left) -1.0 else 0.0 +  if (gamepad1.dpad_right) 1.0 else 0.0,
-                -gamepad1.left_stick_y.toDouble() + if(gamepad1.dpad_up) 1.0 else 0.0 + if (gamepad1.dpad_down) -1.0 else 0.0,
-                if (gamepad1.right_bumper) 0.25 else gamepad1.right_trigger.toDouble() - if (gamepad1.left_bumper) 0.25 else gamepad1.left_trigger.toDouble())
+                gamepad1.left_stick_x.toDouble() + if (gamepad1.dpad_left) -1.0 else 0.0 + if (gamepad1.dpad_right) 1.0 else 0.0,
+                -gamepad1.left_stick_y.toDouble() + if (gamepad1.dpad_up) 1.0 else 0.0 + if (gamepad1.dpad_down) -1.0 else 0.0,
+                if (gamepad1.right_bumper) 0.25 else gamepad1.right_trigger.toDouble() - if (gamepad1.left_bumper) 0.25 else gamepad1.left_trigger.toDouble()
+            )
         }
     }
 

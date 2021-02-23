@@ -15,18 +15,30 @@ class rpm : MultithreadRobotModule() {
 
     @Config
     internal object ShooterConfig {
-        @JvmField var servoTime = 137.0
-        @JvmField var servoReturnMultiplier = 2.6
-        @JvmField var lowRpm = 3470.0
-        @JvmField var highRpm = 4000.0
-        @JvmField var timeRpm = 150.0
-        @JvmField var feederClose = 0.0735
-        @JvmField var feederOpen = 0.35
-        @JvmField var kP = 58.0
-        @JvmField var kI = 0.001 //0.03
-        @JvmField var kD = 0.05
-        @JvmField var kF = 14.89
-        @JvmField var kF_referenceVoltage = 12.485
+        @JvmField
+        var servoTime = 137.0
+        @JvmField
+        var servoReturnMultiplier = 2.6
+        @JvmField
+        var lowRpm = 3470.0
+        @JvmField
+        var highRpm = 4000.0
+        @JvmField
+        var timeRpm = 150.0
+        @JvmField
+        var feederClose = 0.0735
+        @JvmField
+        var feederOpen = 0.35
+        @JvmField
+        var kP = 58.0
+        @JvmField
+        var kI = 0.001 //0.03
+        @JvmField
+        var kD = 0.05
+        @JvmField
+        var kF = 14.89
+        @JvmField
+        var kF_referenceVoltage = 12.485
     }
 
     private lateinit var shooterMotor: DcMotorEx
@@ -91,6 +103,7 @@ class rpm : MultithreadRobotModule() {
         }
         setFeederPosition(feederTime.milliseconds() < ShooterConfig.servoTime && motorVelocityTarget != 0.0)
     }
+
     override fun updateExpansionHub() {
         shooterVelocitySender.send(if (rpmTime.milliseconds() >= timeToAccelerateMs) motorVelocityTarget else rpmTime.milliseconds() * accelerationIncrement * motorVelocityTarget)
         if (encoderFailureDetectionTime.seconds() > 1) if (motorVelocityTarget == 0.0 || getMotorRpm() != 0.0) encoderFailureDetectionTime.reset()

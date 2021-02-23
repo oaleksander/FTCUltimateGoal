@@ -63,7 +63,11 @@ class FakeRobot : MultithreadRobotModule(), Drivetrain, Odometry {
         updateTimer.reset()
     }
 
-    override fun setRobotVelocity(frontwaysVelocity: Double, sidewaysVelocity: Double, turnVelocity: Double) {
+    override fun setRobotVelocity(
+        frontwaysVelocity: Double,
+        sidewaysVelocity: Double,
+        turnVelocity: Double
+    ) {
         var frontways = frontwaysVelocity
         var sideways = sidewaysVelocity
         var turn = turnVelocity

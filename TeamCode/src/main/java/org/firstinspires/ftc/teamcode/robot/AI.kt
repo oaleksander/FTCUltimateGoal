@@ -1,13 +1,11 @@
 package org.firstinspires.ftc.teamcode.robot
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 import com.qualcomm.robotcore.hardware.DcMotorEx
 import com.qualcomm.robotcore.hardware.DistanceSensor
 import com.qualcomm.robotcore.hardware.Servo
 import com.qualcomm.robotcore.util.ElapsedTime
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
-
 import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule
 import org.openftc.revextensions2.ExpansionHubEx
 import org.openftc.revextensions2.ExpansionHubMotor
@@ -46,49 +44,60 @@ class AI : MultithreadRobotModule() {
     }
 
     override fun updateControlHub() {
-       /*  if (AItimeControlHub.milliseconds() > timeDiagnostic) {
-             AItimeControlHub.reset()
-             if (tempMotor(DriveFrontLeft) || tempMotor(DriveFrontRight) || tempMotor(DriveRearLeft) || tempMotor(DriveRearRight)) {
-                 opMode.telemetry.addData("Warning!", "owerHeadControlHub")
-             }
-         }*/
-      }
-
-      override fun updateExpansionHub() {
-          /*if (AItimeExpansionHub.milliseconds() > timeDiagnostic){
-              AItimeExpansionHub.reset()
-              if (tempMotor(Conveyorm) || tempMotor(ShooterMotor) || tempMotor(OdometryYL) || tempMotor(OdometryYR)){
-                  opMode.telemetry.addData("Warning!", "owerHeadExpansionHub")
+        /*  if (AItimeControlHub.milliseconds() > timeDiagnostic) {
+              AItimeControlHub.reset()
+              if (tempMotor(DriveFrontLeft) || tempMotor(DriveFrontRight) || tempMotor(DriveRearLeft) || tempMotor(DriveRearRight)) {
+                  opMode.telemetry.addData("Warning!", "owerHeadControlHub")
               }
           }*/
-      }
+    }
+
+    override fun updateExpansionHub() {
+        /*if (AItimeExpansionHub.milliseconds() > timeDiagnostic){
+            AItimeExpansionHub.reset()
+            if (tempMotor(Conveyorm) || tempMotor(ShooterMotor) || tempMotor(OdometryYL) || tempMotor(OdometryYR)){
+                opMode.telemetry.addData("Warning!", "owerHeadExpansionHub")
+            }
+        }*/
+    }
+
     private fun tempMotor(motor: ExpansionHubMotor): Boolean {
         return motor.isBridgeOverTemp
     }
-    fun diagnositcServo(servo: Servo, startPos :Double, endPos :Double) {
+
+    fun diagnositcServo(servo: Servo, startPos: Double, endPos: Double) {
         AItime.reset()
         servo.position = startPos
-        while (opMode.opModeIsActive() && AItime.milliseconds() < timeDiagnostic/2) { Thread.yield()}
+        while (opMode.opModeIsActive() && AItime.milliseconds() < timeDiagnostic / 2) {
+            Thread.yield()
+        }
         servo.position = endPos
-       while (opMode.opModeIsActive() && AItime.milliseconds() < timeDiagnostic) {Thread.yield()}
+        while (opMode.opModeIsActive() && AItime.milliseconds() < timeDiagnostic) {
+            Thread.yield()
+        }
     }
-    fun diagnosticRange(sensor: DistanceSensor ) : Boolean {
+
+    fun diagnosticRange(sensor: DistanceSensor): Boolean {
         return !sensor.getDistance(DistanceUnit.CM).isNaN()
     }
 
-    fun getAmpsHub(Hub : ExpansionHubEx) : Double{
+    fun getAmpsHub(Hub: ExpansionHubEx): Double {
         return Hub.getTotalModuleCurrentDraw(ExpansionHubEx.CurrentDrawUnits.AMPS)
     }
-    fun getGPIOAmpsHub(Hub : ExpansionHubEx) : Double{
+
+    fun getGPIOAmpsHub(Hub: ExpansionHubEx): Double {
         return Hub.getGpioBusCurrentDraw(ExpansionHubEx.CurrentDrawUnits.AMPS)
     }
-    fun getI2CAmpsHub(Hub : ExpansionHubEx) : Double{
+
+    fun getI2CAmpsHub(Hub: ExpansionHubEx): Double {
         return Hub.getI2cBusCurrentDraw(ExpansionHubEx.CurrentDrawUnits.AMPS)
     }
-    fun get5vHub(Hub : ExpansionHubEx) : Double{
+
+    fun get5vHub(Hub: ExpansionHubEx): Double {
         return Hub.read5vMonitor(ExpansionHubEx.VoltageUnits.VOLTS)
     }
-    fun get12vHub(Hub : ExpansionHubEx) : Double{
+
+    fun get12vHub(Hub: ExpansionHubEx): Double {
         return Hub.read12vMonitor(ExpansionHubEx.VoltageUnits.VOLTS)
     }
 

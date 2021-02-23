@@ -2,27 +2,27 @@ package org.firstinspires.ftc.teamcode.opmodes
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
-import org.firstinspires.ftc.teamcode.robot.WoENHardware.conveyorMotor
-import org.firstinspires.ftc.teamcode.robot.WoENHardware.ringDetector
-import org.firstinspires.ftc.teamcode.robot.WoENrobot.startRobot
-import org.firstinspires.ftc.teamcode.robot.WoENrobot.forceInitRobot
-import org.firstinspires.ftc.teamcode.robot.WoENrobot.ai
-import org.firstinspires.ftc.teamcode.robot.WoENHardware.odometerYL
-import org.firstinspires.ftc.teamcode.robot.WoENHardware.odometerYR
-import org.firstinspires.ftc.teamcode.robot.WoENHardware.driveFrontLeft
-import org.firstinspires.ftc.teamcode.robot.WoENHardware.driveFrontRight
-import org.firstinspires.ftc.teamcode.robot.WoENHardware.driveRearRight
-import org.firstinspires.ftc.teamcode.robot.WoENHardware.driveRearLeft
 import org.firstinspires.ftc.teamcode.robot.ServoWobbleManipulator.WobbleServoPositions.angleDown
 import org.firstinspires.ftc.teamcode.robot.ServoWobbleManipulator.WobbleServoPositions.angleUp
 import org.firstinspires.ftc.teamcode.robot.ServoWobbleManipulator.WobbleServoPositions.gripperClose
 import org.firstinspires.ftc.teamcode.robot.ServoWobbleManipulator.WobbleServoPositions.gripperOpen
+import org.firstinspires.ftc.teamcode.robot.WoENHardware.conveyorMotor
+import org.firstinspires.ftc.teamcode.robot.WoENHardware.driveFrontLeft
+import org.firstinspires.ftc.teamcode.robot.WoENHardware.driveFrontRight
+import org.firstinspires.ftc.teamcode.robot.WoENHardware.driveRearLeft
+import org.firstinspires.ftc.teamcode.robot.WoENHardware.driveRearRight
+import org.firstinspires.ftc.teamcode.robot.WoENHardware.feeder
 import org.firstinspires.ftc.teamcode.robot.WoENHardware.gripper
 import org.firstinspires.ftc.teamcode.robot.WoENHardware.leverArm
+import org.firstinspires.ftc.teamcode.robot.WoENHardware.odometerYL
+import org.firstinspires.ftc.teamcode.robot.WoENHardware.odometerYR
+import org.firstinspires.ftc.teamcode.robot.WoENHardware.ringDetector
 import org.firstinspires.ftc.teamcode.robot.WoENHardware.shooterMotor
+import org.firstinspires.ftc.teamcode.robot.WoENrobot.ai
+import org.firstinspires.ftc.teamcode.robot.WoENrobot.forceInitRobot
+import org.firstinspires.ftc.teamcode.robot.WoENrobot.startRobot
 import org.firstinspires.ftc.teamcode.robot.rpm.ShooterConfig.feederClose
 import org.firstinspires.ftc.teamcode.robot.rpm.ShooterConfig.feederOpen
-import org.firstinspires.ftc.teamcode.robot.WoENHardware.feeder
 
 @TeleOp
 class Diagnostic : LinearOpMode() {
@@ -40,7 +40,7 @@ class Diagnostic : LinearOpMode() {
         telemetry.addData("RingDetector", ai.diagnosticRange(ringDetector))
         telemetry.addData("See Servo", "")
         telemetry.update()
-        ai.diagnositcServo(feeder, feederOpen, feederClose )
+        ai.diagnositcServo(feeder, feederOpen, feederClose)
         ai.diagnositcServo(leverArm, angleDown, angleUp)
         ai.diagnositcServo(gripper, gripperOpen, gripperClose)
     }

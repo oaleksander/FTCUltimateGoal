@@ -9,13 +9,19 @@ import org.openftc.revextensions2.ExpansionHubServo
 class ServoWobbleManipulator : MultithreadRobotModule(), WobbleManipulator {
     private lateinit var gripper: ExpansionHubServo
     private lateinit var leverArm: ExpansionHubServo
+
     @Config
     object WobbleServoPositions {
-        @JvmField var gripperClose = 0.92
-        @JvmField var gripperOpen = 0.19
-        @JvmField var angleDown = 0.18
-        @JvmField var angleMedium = 0.6
-        @JvmField var angleUp = 1.0
+        @JvmField
+        var gripperClose = 0.92
+        @JvmField
+        var gripperOpen = 0.19
+        @JvmField
+        var angleDown = 0.18
+        @JvmField
+        var angleMedium = 0.6
+        @JvmField
+        var angleUp = 1.0
     }
 
     private val closePositionSender = CommandSender { p: Double -> gripper.position = p }

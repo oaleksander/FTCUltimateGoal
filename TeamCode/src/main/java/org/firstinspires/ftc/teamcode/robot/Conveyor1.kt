@@ -12,7 +12,6 @@ import org.firstinspires.ftc.teamcode.robot.WoENHardware.conveyorMotor
 import org.firstinspires.ftc.teamcode.robot.WoENHardware.ringDetector
 import org.firstinspires.ftc.teamcode.superclasses.Conveyor
 import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule
-import org.firstinspires.ftc.teamcode.superclasses.RobotModule
 
 @Deprecated("")
 class Conveyor1 : MultithreadRobotModule(), Conveyor {
@@ -120,7 +119,7 @@ class Conveyor1 : MultithreadRobotModule(), Conveyor {
     }
 
     override fun enableConveyor(isEnabled: Boolean) {
-        setConveyorPower(if(isEnabled) 1.0 else 0.0)
+        setConveyorPower(if (isEnabled) 1.0 else 0.0)
     }
 
     private fun setConveyorPower(power: Double) {

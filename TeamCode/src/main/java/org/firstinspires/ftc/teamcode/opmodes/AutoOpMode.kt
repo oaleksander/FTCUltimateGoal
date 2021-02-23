@@ -29,8 +29,8 @@ open class AutoOpMode : LinearOpMode() {
         super.waitForStart()
     }
 
-    private var delayAtStartIncrementPresser = SinglePressButton{gamepad1.dpad_up}
-    private var delayAtStartDecrementPresser = SinglePressButton{gamepad1.dpad_down}
+    private var delayAtStartIncrementPresser = SinglePressButton { gamepad1.dpad_up }
+    private var delayAtStartDecrementPresser = SinglePressButton { gamepad1.dpad_down }
     private fun start_loop() {
         val color = HSVRGB.convert((runTime.seconds() * 50).toFloat() % 360, 100f, 50f)
         setLedColors(color.x.toInt(), color.y.toInt(), color.z.toInt())
@@ -40,7 +40,11 @@ open class AutoOpMode : LinearOpMode() {
         xSign = if (gamepad1.b) 1 else if (gamepad1.x) -1 else xSign
         sideSign =
             if (gamepad1.dpad_right || gamepad1.left_stick_x > 0.5) 1 else if (gamepad1.dpad_left || gamepad1.left_stick_x < -0.5) -1 else sideSign
-        delayAtStart = Range.clip(delayAtStart + (if (delayAtStartIncrementPresser.get()) 500 else 0) - if (delayAtStartDecrementPresser.get()) 500 else 0, 0.0, 30000.0)
+        delayAtStart = Range.clip(
+            delayAtStart + (if (delayAtStartIncrementPresser.get()) 500 else 0) - if (delayAtStartDecrementPresser.get()) 500 else 0,
+            0.0,
+            30000.0
+        )
         telemetry.addData("Alliance", if (xSign == 1) "RED" else "BLUE")
         telemetry.addData("Tape Side", if (sideSign == 1) "RIGHT" else "LEFT")
         telemetry.addData("Starting delay [ms]", delayAtStart)

@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.superclasses;
 
-public interface Conveyor{
+public interface Conveyor {
 
     void enableConveyor(boolean isEnabled);
 
