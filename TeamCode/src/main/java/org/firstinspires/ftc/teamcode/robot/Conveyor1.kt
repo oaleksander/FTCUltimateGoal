@@ -18,7 +18,7 @@ class Conveyor1 : MultithreadRobotModule(), Conveyor {
     private val conveyorTime = ElapsedTime()
     private val backOnTime = ElapsedTime()
     private val pauseTime = ElapsedTime()
-    private val BackOnAftertime = ElapsedTime()
+    private val backOnAftertime = ElapsedTime()
     private lateinit var conveyorm: DcMotorEx
     private lateinit var sensorDistance: DistanceSensor
     private val conveyorPowerSender = CommandSender { p: Double -> conveyorm.power = -p }
@@ -87,7 +87,7 @@ class Conveyor1 : MultithreadRobotModule(), Conveyor {
                         backOn = true
                     }
                     timelock = backOnTime.milliseconds()
-                    BackOnAftertime.reset()
+                    backOnAftertime.reset()
                 } else {
                     if (backOn && backOnTime.milliseconds() >= timelock + 500) {
                         backOnTime.reset()
@@ -97,7 +97,7 @@ class Conveyor1 : MultithreadRobotModule(), Conveyor {
                 }
             } else {
                 if (stop) {
-                    if (backOnAfter && BackOnAftertime.milliseconds() < 500) setConveyorMotorPower(-conveyorPower) else {
+                    if (backOnAfter && backOnAftertime.milliseconds() < 500) setConveyorMotorPower(-conveyorPower) else {
                         setConveyorMotorPower(0.0)
                         stop = false
                         backOn = false

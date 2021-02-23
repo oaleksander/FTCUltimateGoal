@@ -8,7 +8,7 @@ import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule
 import org.openftc.revextensions2.ExpansionHubServo
 import kotlin.math.abs
 
-class rpm : MultithreadRobotModule() {
+class Shooter : MultithreadRobotModule() {
     private val rpmTime = ElapsedTime()
     private val feederTime = ElapsedTime()
     private val encoderFailureDetectionTime = ElapsedTime()
@@ -116,11 +116,11 @@ class rpm : MultithreadRobotModule() {
     override fun updateOther() {
     }
 
-    private val PIDFUpdateTimer = ElapsedTime()
+    private val pidfUpdateTimer = ElapsedTime()
     private fun updatePIDFCoeffs(encoderFailureMode: Boolean) {
-        if (encoderFailureMode != this.encoderFailureMode || PIDFUpdateTimer.seconds() > 3.0) {
+        if (encoderFailureMode != this.encoderFailureMode || pidfUpdateTimer.seconds() > 3.0) {
             this.encoderFailureMode = encoderFailureMode
-            PIDFUpdateTimer.reset()
+            pidfUpdateTimer.reset()
             try {
                 if (this.encoderFailureMode) shooterMotor.setVelocityPIDFCoefficients(
                     0.0,
@@ -145,7 +145,7 @@ class rpm : MultithreadRobotModule() {
     private fun setShootersetings(Rpm: Double, time: Double) {
         if (Rpm != rpmTarget || time != timeToAccelerateMs) {
             rpmTarget = Rpm
-            if (time != 0.0) timeToAccelerateMs = Math.abs(time)
+            if (time != 0.0) timeToAccelerateMs = abs(time)
             accelerationIncrement = rpmTarget / timeToAccelerateMs / 6000
             motorVelocityTarget = rpmTarget * 0.4
         }

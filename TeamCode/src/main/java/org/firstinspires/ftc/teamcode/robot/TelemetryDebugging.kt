@@ -19,7 +19,7 @@ class TelemetryDebugging : MultithreadRobotModule() {
     private val measurementTime = ElapsedTime()
     lateinit var dashboard: FtcDashboard
     lateinit var telemetry: Telemetry
-    lateinit var dashboardPacket: TelemetryPacket
+    private lateinit var dashboardPacket: TelemetryPacket
 
     @Volatile
     var loopCount = AtomicInteger(0)
@@ -47,7 +47,7 @@ class TelemetryDebugging : MultithreadRobotModule() {
     private fun createDashboardRectangle(position: Pose2D, color: String) {
         val by = -position.x / 2.54
         val bx = position.y / 2.54
-        val l = ROBOT_SIDE_LENGTH / (2.54 * 2)
+        val l = robotSideLength / (2.54 * 2)
         val l2 = l * 435.55 / 444
         val bxPoints = doubleArrayOf(l, -l, -l, l)
         val byPoints = doubleArrayOf(l2, l2, -l2, -l2)
@@ -116,7 +116,7 @@ class TelemetryDebugging : MultithreadRobotModule() {
         }
         updaterIsActive = false
     }
-    var telemetryUpdater = Thread(updateTelemetry)
+    private var telemetryUpdater = Thread(updateTelemetry)
     override fun initialize() {
         measurementTime.reset()
         loopCount.getAndSet(0)
@@ -146,7 +146,7 @@ class TelemetryDebugging : MultithreadRobotModule() {
         loopCount.getAndIncrement()
     }
 
-    var ROBOT_SIDE_LENGTH = 44.4
+    private var robotSideLength = 44.4
     private fun rotatePoints(xPoints: DoubleArray, yPoints: DoubleArray, angle: Double) {
         for (i in xPoints.indices) {
             val x = xPoints[i]

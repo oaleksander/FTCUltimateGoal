@@ -8,9 +8,9 @@ import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector
 
 @Deprecated("")
 class TFdetector(opMode: LinearOpMode?) : Runnable {
-    var recognitionResult = 0
+    private var recognitionResult = 0
     var opMode: LinearOpMode? = null
-    var uptime = ElapsedTime()
+    private var uptime = ElapsedTime()
     private lateinit var vuforia: VuforiaLocalizer
     private lateinit var tfod: TFObjectDetector
     private var doStop = false

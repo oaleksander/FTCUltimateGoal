@@ -14,7 +14,7 @@ object WoENrobot {
     var wobbleManipulator = ServoWobbleManipulator()
     var openCVNode = OpenCVNodeWebcam()
     var conveyor = Conveyor2()
-    var shooter = rpm()
+    var shooter = Shooter()
     var telemetryDebugging = TelemetryDebugging()
     var ai = AI()
 
@@ -91,7 +91,7 @@ object WoENrobot {
         }
     }
     private var regulatorUpdater = Thread(updateRegulators)
-    fun FullInitWithCV(OpMode: LinearOpMode) {
+    fun fullInitWithCV(OpMode: LinearOpMode) {
         openCVNode.initialize(OpMode)
         forceInitRobot(OpMode)
     }
@@ -188,15 +188,15 @@ object WoENrobot {
         expansionHub.setLedColor(r, g, b)
     }
 
-    fun setBulkCachingMode(mode: BulkCachingMode?) {
+    private fun setBulkCachingMode(mode: BulkCachingMode?) {
         for (module in allHubs) module.bulkCachingMode = mode
     }
 
-    fun clearBulkCaches() {
+    private fun clearBulkCaches() {
         for (module in allHubs) module.clearBulkCache()
     }
 
-    fun FullInit(OpMode: LinearOpMode) {
+    fun fullInit(OpMode: LinearOpMode) {
         forceInitRobot(OpMode)
     }
 }

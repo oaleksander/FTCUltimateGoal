@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.superclasses;
 
+@SuppressWarnings("EmptyMethod")
 public abstract class MultithreadRobotModule extends RobotModule {
 
     @Override

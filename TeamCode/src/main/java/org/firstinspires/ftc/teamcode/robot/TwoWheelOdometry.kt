@@ -15,6 +15,7 @@ import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule
 import org.firstinspires.ftc.teamcode.superclasses.Odometry
 import org.openftc.revextensions2.ExpansionHubEx
 import org.openftc.revextensions2.RevBulkData
+import kotlin.math.cos
 
 @Deprecated("")
 class TwoWheelOdometry : MultithreadRobotModule(), Odometry {
@@ -22,30 +23,30 @@ class TwoWheelOdometry : MultithreadRobotModule(), Odometry {
     private val odometryCountsPerCM = 1440 / (odometryWheelDiameterCm * Math.PI)
     private val odometryCMPerCounts = odometryWheelDiameterCm * Math.PI / 1440
     private val odometerYcenterOffset =
-        38.3633669516 * odometryCountsPerCM * Math.cos(Math.toRadians(19.490773014)) / 2
+        38.3633669516 * odometryCountsPerCM * cos(Math.toRadians(19.490773014)) / 2
     private val odometerXcenterOffset =
-        36.8862986805 * odometryCountsPerCM * Math.cos(Math.toRadians(67.021303041)) / 2
+        36.8862986805 * odometryCountsPerCM * cos(Math.toRadians(67.021303041)) / 2
     private val yWheelPairRadiusCm = 18.425 //18.1275;
     private val radiansPerEncoderDifference = odometryCMPerCounts / (yWheelPairRadiusCm * 2)
     private val odometerY = 1
     private val odometerX = 2
-    var worldPosition = Pose2D()
-    private var IMUoffset = 0f
+    private var worldPosition = Pose2D()
+    private var imuOffset = 0f
     private lateinit var imu: BNO055IMU
     private lateinit var expansionHub: ExpansionHubEx
-    lateinit var bulkData: RevBulkData
-    var looptime = ElapsedTime()
-    var angle_last = 0.0
-    private var Y_old = 0
-    private var X_old = 0
+    private lateinit var bulkData: RevBulkData
+    private var looptime = ElapsedTime()
+    private var lastAngle = 0.0
+    private var yOld = 0
+    private var xOld = 0
     private fun calculateHeading(L: Int, R: Int): Double {
-        return MathUtil.angleWrap((L - R).toDouble() * radiansPerEncoderDifference - IMUoffset)
+        return MathUtil.angleWrap((L - R).toDouble() * radiansPerEncoderDifference - imuOffset)
     }
 
     private fun initIMU() {
         imu = imu2
         imu.initialize(BNO055IMU.Parameters())
-        IMUoffset = iMUheading.toFloat()
+        imuOffset = iMUheading.toFloat()
     }
 
     private var currentIMUHeading = 0.0
@@ -56,9 +57,9 @@ class TwoWheelOdometry : MultithreadRobotModule(), Odometry {
                 AxesReference.INTRINSIC,
                 AxesOrder.ZXY,
                 AngleUnit.RADIANS
-            ).firstAngle - IMUoffset).toDouble()
-        ).also { angle_last = it }
-    } else angle_last
+            ).firstAngle - imuOffset).toDouble()
+        ).also { lastAngle = it }
+    } else lastAngle
 
     override fun updateControlHub() {
         currentIMUHeading = iMUheading
@@ -77,8 +78,8 @@ class TwoWheelOdometry : MultithreadRobotModule(), Odometry {
         bulkData = expansionHub.bulkInputData
         val deltaWorldHeading = MathUtil.angleWrap(currentIMUHeading - worldPosition.heading)
         val deltaPosition = Vector2D(
-            (bulkData.getMotorCurrentPosition(odometerX) - X_old).toDouble() - deltaWorldHeading * odometerXcenterOffset,
-            (-bulkData.getMotorCurrentPosition(odometerY) - Y_old).toDouble() - deltaWorldHeading * odometerYcenterOffset
+            (bulkData.getMotorCurrentPosition(odometerX) - xOld).toDouble() - deltaWorldHeading * odometerXcenterOffset,
+            (-bulkData.getMotorCurrentPosition(odometerY) - yOld).toDouble() - deltaWorldHeading * odometerYcenterOffset
         )
         worldPosition = worldPosition.plus(
             Pose2D(
@@ -86,8 +87,8 @@ class TwoWheelOdometry : MultithreadRobotModule(), Odometry {
                 deltaWorldHeading
             )
         )
-        Y_old = -bulkData.getMotorCurrentPosition(odometerY)
-        X_old = bulkData.getMotorCurrentPosition(odometerX)
+        yOld = -bulkData.getMotorCurrentPosition(odometerY)
+        xOld = bulkData.getMotorCurrentPosition(odometerX)
     }
 
     override fun initialize() {
@@ -95,8 +96,8 @@ class TwoWheelOdometry : MultithreadRobotModule(), Odometry {
         initIMU()
         delay(500.0)
         bulkData = expansionHub.bulkInputData
-        Y_old = -bulkData.getMotorCurrentPosition(odometerY)
-        X_old = bulkData.getMotorCurrentPosition(odometerX)
+        yOld = -bulkData.getMotorCurrentPosition(odometerY)
+        xOld = bulkData.getMotorCurrentPosition(odometerX)
     }
 
     private fun assignNames() {
@@ -117,11 +118,11 @@ class TwoWheelOdometry : MultithreadRobotModule(), Odometry {
     }
 
     override fun setRobotCoordinates(coordinates: Pose2D) {
-        IMUoffset = MathUtil.angleWrap(
+        imuOffset = MathUtil.angleWrap(
             calculateHeading(
                 bulkData.getMotorCurrentPosition(odometerY),
                 -bulkData.getMotorCurrentPosition(odometerY)
-            ) + IMUoffset - coordinates.heading
+            ) + imuOffset - coordinates.heading
         ).toFloat()
         calculatePosition(
             Pose2D(

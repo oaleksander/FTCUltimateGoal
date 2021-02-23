@@ -244,7 +244,7 @@ class MecanumDrivetrain : MultithreadRobotModule(), Drivetrain {
             mFRProfiler.setVelocity(powerFrontRight)
             mRLProfiler.setVelocity(powerRearLeft)
             mRRProfiler.setVelocity(powerRearRight)
-        } else driveMotorPowers_direct(
+        } else driveMotorPowersDirect(
             powerFrontLeft / maxMotorSpeed,
             powerFrontRight / maxMotorSpeed,
             powerRearLeft / maxMotorSpeed,
@@ -258,7 +258,7 @@ class MecanumDrivetrain : MultithreadRobotModule(), Drivetrain {
     override fun updateOther() {
     }
 
-    private fun driveMotorPowers_direct(
+    private fun driveMotorPowersDirect(
         frontLeft: Double,
         frontRight: Double,
         rearLeft: Double,

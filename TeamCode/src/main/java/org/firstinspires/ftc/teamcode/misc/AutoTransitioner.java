@@ -16,6 +16,7 @@ import org.firstinspires.ftc.robotcore.internal.opmode.OpModeManagerImpl;
  * Where 'Robot Teleop' is replaced with the NAME of your teleop program. See full documentation
  * on kno3.net/resources for more info.
  */
+@SuppressWarnings("BusyWait")
 public class AutoTransitioner extends Thread {
     private static final AutoTransitioner INSTANCE = new AutoTransitioner(); //Create singleton instance
 
@@ -40,7 +41,7 @@ public class AutoTransitioner extends Thread {
     @Override
     public void run() {
         try {
-            while (true) { //Loop
+            while (!Thread.currentThread().isInterrupted()) { //Loop
                 synchronized (this) { //Synchronized to prevent weird conditions
                     //If there is a transition set up and the active op mode is no longer the one
                     //the transition was set up with, proceed with the transition
@@ -50,7 +51,7 @@ public class AutoTransitioner extends Thread {
                         reset(); //Reset the AutoTransitioner
                     }
                 }
-                Thread.sleep(50); //Sleep 50 milliseconds to minimize performance impact to the rest of your program
+                Thread.sleep(100); //Sleep 50 milliseconds to minimize performance impact to the rest of your program
             }
         } catch (InterruptedException ex) {
             Log.e("RCActivity", "AutoTransitioner shutdown, thread interrupted");

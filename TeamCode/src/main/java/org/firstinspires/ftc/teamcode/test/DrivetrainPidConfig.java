@@ -139,7 +139,7 @@ public class DrivetrainPidConfig extends LinearOpMode {
     private final motorAccelerationLimiter mRLProfiler = new motorAccelerationLimiter(new CommandSender(v -> driveRearLeft.setVelocity(v, AngleUnit.RADIANS))::send, maxAcceleration);
     private final motorAccelerationLimiter mRRProfiler = new motorAccelerationLimiter(new CommandSender(v -> driveRearRight.setVelocity(v, AngleUnit.RADIANS))::send, maxAcceleration);
 
-    static ThreeWheelOdometry odometry = new ThreeWheelOdometry();
+    static final ThreeWheelOdometry odometry = new ThreeWheelOdometry();
     FtcDashboard dashboard;
     List<LynxModule> allHubs;
 

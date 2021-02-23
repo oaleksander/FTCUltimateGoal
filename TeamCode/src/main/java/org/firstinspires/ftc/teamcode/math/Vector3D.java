@@ -89,7 +89,7 @@ public class Vector3D extends Vector2D implements Cloneable {
     }
 
     @Override
-    public Vector3D clone() {
-        return new Vector3D(x, y, z);
+    public Vector3D clone() throws CloneNotSupportedException {
+        return new Vector3D(super.clone(), z);
     }
 }

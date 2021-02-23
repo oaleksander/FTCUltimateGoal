@@ -8,7 +8,7 @@ import org.firstinspires.ftc.teamcode.robot.WoENrobot
 
 @TeleOp
 @Disabled
-class callopencv : LinearOpMode() {
+class Callopencv : LinearOpMode() {
     override fun runOpMode() {
         // WoENrobot.forceInitRobot(this);
         WoENrobot.openCVNode.initialize(this)

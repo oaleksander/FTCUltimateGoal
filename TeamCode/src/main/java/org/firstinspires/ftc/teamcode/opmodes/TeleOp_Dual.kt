@@ -10,9 +10,9 @@ import org.firstinspires.ftc.teamcode.robot.WoENrobot.movement
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.shooter
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.startRobot
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.wobbleManipulator
-import org.firstinspires.ftc.teamcode.robot.rpm
+import org.firstinspires.ftc.teamcode.robot.Shooter
 
-@TeleOp()
+@TeleOp
 class TeleOp_Dual : LinearOpMode() {
     override fun runOpMode() {
         initRobot(this)
@@ -33,9 +33,9 @@ class TeleOp_Dual : LinearOpMode() {
             conveyor.enableConveyor(conveyorOnOffSwitch.get())
             /* Shooter */
             shooter.shootingMode = if (shooterOnOffSwitch.get())
-                if (shooterSpeedSwitch.get()) rpm.ShooterMode.POWERSHOT
-                else rpm.ShooterMode.HIGHGOAL
-            else rpm.ShooterMode.OFF
+                if (shooterSpeedSwitch.get()) Shooter.ShooterMode.POWERSHOT
+                else Shooter.ShooterMode.HIGHGOAL
+            else Shooter.ShooterMode.OFF
             conveyor.setForceReverse(gamepad2.right_trigger > 0.5)
             if (gamepad1.a) shooter.feedRing()
             else if (threeRingPresser.get()) shooter.feedRings()

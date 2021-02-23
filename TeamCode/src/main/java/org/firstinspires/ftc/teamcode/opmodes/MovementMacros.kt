@@ -28,7 +28,7 @@ import org.firstinspires.ftc.teamcode.robot.WoENrobot.openCVNode
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.shooter
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.spinOnce
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.wobbleManipulator
-import org.firstinspires.ftc.teamcode.robot.rpm
+import org.firstinspires.ftc.teamcode.robot.Shooter
 import org.firstinspires.ftc.teamcode.superclasses.MotionTask
 import org.firstinspires.ftc.teamcode.superclasses.WobbleManipulator
 import java.lang.Math.toRadians
@@ -184,14 +184,14 @@ object MovementMacros {
         }
 
     fun shootHighGoal() {
-        shooter.shootingMode = rpm.ShooterMode.HIGHGOAL
+        shooter.shootingMode = Shooter.ShooterMode.HIGHGOAL
         movement.pos(highGoalShootingPose)
         val shooterAccelerationTimeout = ElapsedTime()
         while (opMode.opModeIsActive() && !shooter.isCorrectRpm(10.0) && shooterAccelerationTimeout.seconds() < 3)
             spinOnce()
         shooter.feedRings()
         delay(1050.0)
-        shooter.shootingMode = rpm.ShooterMode.OFF
+        shooter.shootingMode = Shooter.ShooterMode.OFF
     }
 
     /*
@@ -252,7 +252,7 @@ object MovementMacros {
     }
 
     fun shootPowerShotDynamic() {
-        shooter.shootingMode = rpm.ShooterMode.POWERSHOT
+        shooter.shootingMode = Shooter.ShooterMode.POWERSHOT
         for (powerShot in PowerShot.values()) {
             movement.pos(powerShotShootingPose(powerShot))
             delay(200.0)
@@ -262,12 +262,12 @@ object MovementMacros {
             shooter.feedRing()
             delay(200.0)
         }
-        shooter.shootingMode = rpm.ShooterMode.OFF
+        shooter.shootingMode = Shooter.ShooterMode.OFF
     }
 
 
     fun shootPOWERSHOTAngle() {  //rename
-        shooter.shootingMode = rpm.ShooterMode.POWERSHOT
+        shooter.shootingMode = Shooter.ShooterMode.POWERSHOT
         val pos = 31.0
         var angle = 6.5
         for (i in 0..2) {
@@ -288,11 +288,11 @@ object MovementMacros {
             shooter.feedRing()
             delay(200.0)
         }
-        shooter.shootingMode = rpm.ShooterMode.OFF
+        shooter.shootingMode = Shooter.ShooterMode.OFF
     }
 
     fun shootPowerShotPos() {  //rename
-        shooter.shootingMode = rpm.ShooterMode.POWERSHOT
+        shooter.shootingMode = Shooter.ShooterMode.POWERSHOT
         var pos = 50.0
         val angle = 5.5
         for (i in 0..2) {
@@ -312,7 +312,7 @@ object MovementMacros {
             shooter.feedRing()
             delay(200.0)
         }
-        shooter.shootingMode = rpm.ShooterMode.OFF
+        shooter.shootingMode = Shooter.ShooterMode.OFF
     }
 
     /*

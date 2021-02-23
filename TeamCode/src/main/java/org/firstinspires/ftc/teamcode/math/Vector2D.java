@@ -79,4 +79,12 @@ public class Vector2D{
         return String.format(Locale.getDefault(), "(%.1f, %.1f)", x, y);
     }
 
+    @Override
+    public Vector2D clone() throws CloneNotSupportedException {
+        Vector2D clone = (Vector2D) super.clone();
+        clone.x = x;
+        clone.y = y;
+        return clone;
+    }
+
 }

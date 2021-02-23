@@ -6,7 +6,7 @@ import java.util.function.DoubleConsumer;
 
 public class CommandSender {
     private final ElapsedTime lastCommandTimer = new ElapsedTime();
-    DoubleConsumer doubleConsumer;
+    private final DoubleConsumer doubleConsumer;
     private double timeout = 3000;
     private double lastValue = Double.NaN;
 

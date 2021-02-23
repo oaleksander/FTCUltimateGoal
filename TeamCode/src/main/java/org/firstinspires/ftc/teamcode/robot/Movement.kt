@@ -39,12 +39,12 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
         var antiWindupFraction_angle = 0.17
     }
 
-    private val minError_distance_default = 1.0
-    private val minError_angle_default = Math.toRadians(0.32)
+    private val minErrorDistanceDefault = 1.0
+    private val minErrorAngleDefault = Math.toRadians(0.32)
     private var maxLinearVelocityFraction = 1.0
     private var maxAngularVelocityFraction = 1.0
-    private var minError_distance_current = minError_distance_default
-    private var minError_angle_current = minError_angle_default
+    private var minErrorDistanceCurrent = minErrorDistanceDefault
+    private var minErrorAngleCurrent = minErrorAngleDefault
     var nTargetPoint = 1
     var pathToFollow = ArrayList<MotionTask>()
     var bPathFollowerEnabled = false
@@ -145,8 +145,8 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
             MotionTask(target),
             linearVelocityFraction,
             angularVelocityFraction,
-            minError_distance_default,
-            minError_angle_default
+            minErrorDistanceDefault,
+            minErrorAngleDefault
         )
         while (pathFollowerIsActive() && opMode!!.opModeIsActive()) {
             Thread.yield()
@@ -166,8 +166,8 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
         target: Pose2D?,
         linearVelocityFraction: Double = 1.0,
         angularVelocityFraction: Double = 1.0,
-        distanceTolerance: Double = minError_angle_default,
-        angularTolerance: Double = minError_angle_default
+        distanceTolerance: Double = minErrorAngleDefault,
+        angularTolerance: Double = minErrorAngleDefault
     ) {
         followPath(
             MotionTask(target),
@@ -195,8 +195,8 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
         motionTask: MotionTask?,
         linearVelocityFraction: Double = 1.0,
         angularVelocityFraction: Double = 1.0,
-        distanceTolerance: Double = minError_distance_default,
-        angularTolerance: Double = minError_angle_default
+        distanceTolerance: Double = minErrorDistanceDefault,
+        angularTolerance: Double = minErrorAngleDefault
     ) {
         followPath(
             ArrayList(listOf(motionTask)),
@@ -220,11 +220,11 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
         pathToFollow: ArrayList<MotionTask>,
         linearVelocityFraction: Double = 1.0,
         angularVelocityFraction: Double = 1.0,
-        distanceTolerance: Double = minError_distance_default,
-        angularTolerance: Double = minError_angle_default
+        distanceTolerance: Double = minErrorDistanceDefault,
+        angularTolerance: Double = minErrorAngleDefault
     ) {
-        minError_distance_current = distanceTolerance
-        minError_angle_current = angularTolerance
+        minErrorDistanceCurrent = distanceTolerance
+        minErrorAngleCurrent = angularTolerance
         setMaxLinearVelocityFraction(linearVelocityFraction)
         setMaxAngleVelocityFraction(angularVelocityFraction)
         bPathFollowerEnabled = false
@@ -313,7 +313,7 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
             )
         else
             holonomicMoveFC(control)
-        return abs(error.heading) < minError_angle_current && error.radius() < minError_distance_current
+        return abs(error.heading) < minErrorAngleCurrent && error.radius() < minErrorDistanceCurrent
         //drivetrain.setRobotVelocity(0, 0, 0);
     }
 

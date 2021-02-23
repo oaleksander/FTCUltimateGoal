@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.superclasses;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+@SuppressWarnings("EmptyMethod")
 public abstract class RobotModule {
 
     protected LinearOpMode opMode = null;

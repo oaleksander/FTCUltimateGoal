@@ -1,9 +1,11 @@
 package org.firstinspires.ftc.teamcode.math;
 
+import java.util.Locale;
+
 import static org.firstinspires.ftc.teamcode.math.MathUtil.angleWrap;
 
-public class Pose2D extends Vector2D implements Cloneable {
-    public double heading = 0;
+public class Pose2D extends Vector2D{
+    public double heading;
 
     public Pose2D(double x, double y, double heading) {
         super(x, y);
@@ -74,11 +76,11 @@ public class Pose2D extends Vector2D implements Cloneable {
 
     @Override
     public String toString() {
-        return String.format("{x: %.3f, y: %.3f, θ: %.3f}", x, y, heading);
+        return String.format(Locale.getDefault(), "{x: %.3f, y: %.3f, θ: %.3f}", x, y, heading);
     }
 
     @Override
-    public Pose2D clone() {
-        return new Pose2D(x, y, heading);
+    public Pose2D clone() throws CloneNotSupportedException {
+        return new Pose2D(super.clone(), heading);
     }
 }

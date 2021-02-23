@@ -27,8 +27,8 @@ class MotorWobbleManipulator : MultithreadRobotModule(), WobbleManipulator {
     private var posangle: Byte = 0
     private var pos = 0.0
     private var power = 0.0
-    private var P = 0.0
-    private var D = 0.0
+    private var p = 0.0
+    private var d = 0.0
     private var errorOld = 0.0
     private var error = 0.0
     private var oldpower = 0.0
@@ -55,9 +55,9 @@ class MotorWobbleManipulator : MultithreadRobotModule(), WobbleManipulator {
     override fun updateExpansionHub() {
         error = pos - lever.currentPosition
         if (abs(error) > minerror) {
-            P = error * kofP
-            D = (error - errorOld) * kofd
-            power = P + D
+            p = error * kofP
+            d = (error - errorOld) * kofd
+            power = p + d
             if (power > maxspeed) power = maxspeed
             if (power < -maxspeed) power = -maxspeed
             if (oldpower != power) {

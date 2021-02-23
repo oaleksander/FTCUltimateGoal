@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.util.Range
 import org.firstinspires.ftc.teamcode.math.Pose2D
 import org.firstinspires.ftc.teamcode.misc.HSVRGB
 import org.firstinspires.ftc.teamcode.misc.SinglePressButton
-import org.firstinspires.ftc.teamcode.robot.WoENrobot.FullInitWithCV
+import org.firstinspires.ftc.teamcode.robot.WoENrobot.fullInitWithCV
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.movement
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.odometry
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.openCVNode
@@ -24,14 +24,14 @@ open class AutoOpMode : LinearOpMode() {
 
     override fun waitForStart() {
         while (!isStarted) {
-            start_loop()
+            startLoop()
         }
         super.waitForStart()
     }
 
     private var delayAtStartIncrementPresser = SinglePressButton { gamepad1.dpad_up }
     private var delayAtStartDecrementPresser = SinglePressButton { gamepad1.dpad_down }
-    private fun start_loop() {
+    private fun startLoop() {
         val color = HSVRGB.convert((runTime.seconds() * 50).toFloat() % 360, 100f, 50f)
         setLedColors(color.x.toInt(), color.y.toInt(), color.z.toInt())
         val indicator =
@@ -56,7 +56,7 @@ open class AutoOpMode : LinearOpMode() {
     }
 
     override fun runOpMode() {
-        FullInitWithCV(this)
+        fullInitWithCV(this)
         startRobot()
         movement.setActiveBraking(true)
         if (isStopRequested) return

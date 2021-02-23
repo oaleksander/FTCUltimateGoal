@@ -87,7 +87,7 @@ class LedStrip : MultithreadRobotModule() {
         led.send(0.0)
     }
 
-    enum class ledMode {
+    enum class LedMode {
         SMOOTHLY, ON, OFF, INFORM
     }
 }
