@@ -21,11 +21,11 @@ class Conveyor2 : MultithreadRobotModule(), Conveyor {
     private lateinit var sensorDistance: DistanceSensor
     private val distanceQueryTimeout = 650.0
     private val motorCurrentQueryTimeout = 650.0
-    private val conveyorPowerSender = motorAccelerationLimiter({ value: Double ->
-        CommandSender { p: Double ->
-            conveyor.power = -p
-        }.send(value)
-    }, 6.0)
+
+    private val conveyorPowerSender = CommandSender { p: Double -> conveyor.power = -p }
+
+    private val conveyorAccelerationLimiter = motorAccelerationLimiter({ value: Double -> conveyorPowerSender.send(value) }, 6.0)
+
     private val motorCurrentTimer = ElapsedTime()
     private val stackDetectionTimer = ElapsedTime()
     private var lastKnownDistance = 12.0
@@ -45,13 +45,13 @@ class Conveyor2 : MultithreadRobotModule(), Conveyor {
         @JvmField
         var motorLockingCurrentTimeout = 400.0
         @JvmField
-        var motorLockingReverseTime = 750.0
+        var motorLockingReverseTime = 500.0
         @JvmField
         var stackDetectionTimeout = 1000.0
         @JvmField
-        var stackDetectionReverseTime = 750.0
+        var stackDetectionReverseTime = 600.0
         @JvmField
-        var distanceThreshold = 5.46
+        var distanceThreshold = -5.46
         @JvmField
         var currentThreshold = 2.5
     }
@@ -137,7 +137,7 @@ class Conveyor2 : MultithreadRobotModule(), Conveyor {
             currentMotorPower = -1.0
             motorCurrentTimer.reset()
         }
-        conveyorPowerSender.setVelocity(currentMotorPower)
+        conveyorAccelerationLimiter.setVelocity(currentMotorPower)
     }
 
     override fun updateOther() {

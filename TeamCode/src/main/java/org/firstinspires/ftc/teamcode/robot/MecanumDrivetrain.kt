@@ -70,38 +70,18 @@ class MecanumDrivetrain : MultithreadRobotModule(), Drivetrain {
     private var maxAcceleration = theoreticalMaxSpeed / DrivetrainConfig.secondsToAccelerate
 
     /* Motor controllers */
-    private val mFLProfiler = motorAccelerationLimiter({ value: Double ->
-        CommandSender { v: Double ->
-            driveFrontLeft.setVelocity(
-                v,
-                AngleUnit.RADIANS
-            )
-        }.send(value)
-    }, maxAcceleration)
-    private val mFRProfiler = motorAccelerationLimiter({ value: Double ->
-        CommandSender { v: Double ->
-            driveFrontRight.setVelocity(
-                v,
-                AngleUnit.RADIANS
-            )
-        }.send(value)
-    }, maxAcceleration)
-    private val mRLProfiler = motorAccelerationLimiter({ value: Double ->
-        CommandSender { v: Double ->
-            driveRearLeft.setVelocity(
-                v,
-                AngleUnit.RADIANS
-            )
-        }.send(value)
-    }, maxAcceleration)
-    private val mRRProfiler = motorAccelerationLimiter({ value: Double ->
-        CommandSender { v: Double ->
-            driveRearRight.setVelocity(
-                v,
-                AngleUnit.RADIANS
-            )
-        }.send(value)
-    }, maxAcceleration)
+    private val mFLSender = CommandSender { v: Double -> driveFrontLeft.setVelocity(v, AngleUnit.RADIANS) }
+    private val mFLProfiler = motorAccelerationLimiter({ value: Double -> mFLSender.send(value) }, maxAcceleration)
+
+    private val mFRSender = CommandSender { v: Double -> driveFrontRight.setVelocity(v, AngleUnit.RADIANS) }
+    private val mFRProfiler = motorAccelerationLimiter({ value: Double -> mFRSender.send(value) }, maxAcceleration)
+
+    private val mRLSender = CommandSender { v: Double -> driveRearLeft.setVelocity(v, AngleUnit.RADIANS) }
+    private val mRLProfiler = motorAccelerationLimiter({ value: Double -> mRLSender.send(value) }, maxAcceleration)
+
+    private val mRRSender = CommandSender { v: Double -> driveRearRight.setVelocity(v, AngleUnit.RADIANS) }
+    private val mRRProfiler = motorAccelerationLimiter({ value: Double -> mRRSender.send(value) }, maxAcceleration)
+
     private lateinit var voltageSensor: VoltageSensor
     private var smartMode = false
     private var powerFrontLeft = 0.0
