@@ -114,8 +114,8 @@ class Conveyor1 : MultithreadRobotModule(), Conveyor {
     override fun updateOther() {
     }
 
-    override fun setReverseAfterStop(BackOnAfter: Boolean) {
-        backOnAfter = BackOnAfter
+    override fun setReverseAfterStop(doReverseOnStop: Boolean) {
+        backOnAfter = doReverseOnStop
     }
 
     override fun enableConveyor(isEnabled: Boolean) {
@@ -134,7 +134,7 @@ class Conveyor1 : MultithreadRobotModule(), Conveyor {
         conveyorPowerSender.send(power)
     }
 
-    override fun setForceReverse(Backmust: Boolean) {
-        backMust = Backmust
+    override fun setForceReverse(forceReverse: Boolean) {
+        backMust = forceReverse
     }
 }
