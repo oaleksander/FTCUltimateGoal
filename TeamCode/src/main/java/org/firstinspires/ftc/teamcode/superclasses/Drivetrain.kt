@@ -1,13 +1,12 @@
-package org.firstinspires.ftc.teamcode.superclasses;
+package org.firstinspires.ftc.teamcode.superclasses
 
-import org.firstinspires.ftc.teamcode.math.Vector3D;
+import org.firstinspires.ftc.teamcode.math.Vector3D
 
-public interface Drivetrain {
-    void setRobotVelocity(double frontways, double sideways, double turn);
-
-    default void setRobotVelocity(Vector3D move) {
-        setRobotVelocity(move.y, move.x, move.z);
+interface Drivetrain {
+    fun setRobotVelocity(frontways: Double, sideways: Double, turn: Double)
+    fun setRobotVelocity(move: Vector3D) {
+        setRobotVelocity(move.y, move.x, move.z)
     }
 
-    Vector3D getMaxVelocity();
+    val maxVelocity: Vector3D
 }
