@@ -70,9 +70,9 @@ class ServoWobbleManipulator : MultithreadRobotModule(), WobbleManipulator {
         } else isDown = false
     }
 
-    override fun setAngle(position: WobbleManipulator.Position) {
-        posAngle = position
-        leverArmPosition = when (position) {
+    override fun setAngle(Positions: WobbleManipulator.Position) {
+        posAngle = Positions
+        leverArmPosition = when (Positions) {
             WobbleManipulator.Position.UP -> WobbleServoPositions.angleUp
             WobbleManipulator.Position.DOWN -> WobbleServoPositions.angleDown
             WobbleManipulator.Position.MEDIUM -> WobbleServoPositions.angleMedium
