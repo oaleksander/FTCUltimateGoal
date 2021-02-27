@@ -43,15 +43,15 @@ class Conveyor2 : MultithreadRobotModule(), Conveyor {
         @JvmField
         var conveyorPower = 1.0
         @JvmField
-        var motorLockingCurrentTimeout = 400.0
+        var motorLockingCurrentTimeout = 800.0
         @JvmField
-        var motorLockingReverseTime = 500.0
+        var motorLockingReverseTime = 600.0
         @JvmField
         var stackDetectionTimeout = 1000.0
         @JvmField
         var stackDetectionReverseTime = 600.0
         @JvmField
-        var distanceThreshold = -5.46
+        var distanceThreshold = 5.46
         @JvmField
         var currentThreshold = 2.5
     }
@@ -94,12 +94,12 @@ class Conveyor2 : MultithreadRobotModule(), Conveyor {
 
 
     private fun getdistance(): Double {
-        return 100.0/*
+       // return 100.0/*
         if (distanceQueryTimer.milliseconds() > distanceQueryTimeout) {
             lastKnownDistance = sensorDistance.getDistance(DistanceUnit.CM)
             distanceQueryTimer.reset()
         }
-        return lastKnownDistance*/
+        return lastKnownDistance
     }
 
     private val aMPS: Double

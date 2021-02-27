@@ -19,9 +19,9 @@ open class OpenCVNodeWebcam : RobotModule() {
     @Disabled
     internal object OpenCVConfig {
         @JvmField
-        var HSVLowerBound = Scalar(12.0, 160.0, 80.0)
+        var HSVLowerBound = Scalar(10.0, 160.0, 80.0)
         @JvmField
-        var HSVUpperBound = Scalar(18.0, 255.0, 255.0)
+        var HSVUpperBound = Scalar(22.0, 255.0, 255.0)
     }
 
     lateinit var webcam: OpenCvCamera
