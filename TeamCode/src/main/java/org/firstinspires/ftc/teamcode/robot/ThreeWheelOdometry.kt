@@ -35,7 +35,7 @@ class ThreeWheelOdometry : MultithreadRobotModule(), Odometry {
     private var odometerXcenterOffset =
         -18.15937 * odometryCountsPerCM * cos(Math.toRadians(84.9452))
     private var radiansPerEncoderDifference =
-        OdometryConfig.headingMultiplier * (odometryCMPerCounts / (yWheelPairRadiusCm * 2))
+        OdometryConfig.headingMultiplier * (odometryCMPerCounts / (yWheelPairRadiusCm * 2.0))
     private var imuOffset1 = 0f
     private var imuOffset2 = 0f
     private var encoderHeadingCovariance = 0.0
