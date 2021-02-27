@@ -50,15 +50,15 @@ object MovementMacros {
         @JvmField
         var PartnerWobblePoseYOffset = 0.0
         @JvmField
-        var HighGoalShootingDistance = 234.0
+        var HighGoalShootingDistance = 231.0
         @JvmField
-        var HighGoalShootingAngle = -5.3
+        var HighGoalShootingAngle = -12.3
         @JvmField
-        var PowerShotShootingDistance = 196.4089
+        var PowerShotShootingDistance = 200.4089
         @JvmField
         var PowerShotShootingAngle = -4.7
         @JvmField
-        var RingStackApproachOffset = 48.0
+        var RingStackApproachOffset = 58.0
         @JvmField
         var RingStackFirstRingOffset = 2.0
         @JvmField
@@ -342,7 +342,7 @@ object MovementMacros {
                             RingStackFirstRingOffset
                         ).rotatedCW(heading), heading + Math.PI
                     ),
-                    linearVelocityFraction = .3,
+                    linearVelocityFraction = .2,
                     distanceTolerance = 5.0,
                     angularTolerance = toRadians(5.0)
                 )
@@ -357,7 +357,7 @@ object MovementMacros {
                             RingStackFourthRingOffset
                         ).rotatedCW(heading), heading + Math.PI
                     ),
-                    linearVelocityFraction = .6,
+                    linearVelocityFraction = .4,
                     distanceTolerance = 3.0,
                     angularTolerance = toRadians(3.0)
                 )
