@@ -75,7 +75,7 @@ object MovementMacros {
 
     fun avoidRingStack() {
         movement.pos(
-            Pose2D(odometry.robotCoordinates.x + 15 * sideSign, -50.0, Double.NaN),
+            Pose2D(odometry.robotCoordinates.x + 15 * sideSign, -60.0, Double.NaN),
             distanceTolerance = 10.0,
             angularTolerance = .5
         )
@@ -161,8 +161,8 @@ object MovementMacros {
 
     fun shooting() {
         when {
-            sideSign * xSign == 1 -> shootPowerShotDynamic()
-            else -> shootPowerShotPos()
+            sideSign * xSign == 1 -> shootHighGoal()
+            else -> shootPowerShotDynamic()
         }
     }
 

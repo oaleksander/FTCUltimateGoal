@@ -11,18 +11,18 @@ import org.openftc.revextensions2.ExpansionHubEx
 import java.util.*
 
 object WoENrobot {
-    var wobbleManipulator = ServoWobbleManipulator()
-    var openCVNode = OpenCVNodeWebcam()
-    var conveyor = Conveyor2()
-    var shooter = Shooter()
-    var telemetryDebugging = TelemetryDebugging()
-    var ai = AI()
+    val wobbleManipulator = ServoWobbleManipulator()
+    val openCVNode = OpenCVNodeWebcam()
+    val conveyor = Conveyor2()
+    val shooter = Shooter()
+    val telemetryDebugging = TelemetryDebugging()
+    val ai = AI()
 
-    //public static FakeRobot odometry = new FakeRobot();
-    //public static FakeRobot drivetrain = odometry;
-    var odometry = ThreeWheelOdometry()
-    var drivetrain = MecanumDrivetrain()
-    var movement = Movement(odometry, drivetrain)
+    //val odometry = FakeRobot();
+    //val drivetrain = odometry;
+    val odometry = ThreeWheelOdometry()
+    val drivetrain = MecanumDrivetrain()
+    val movement = Movement(odometry, drivetrain)
     lateinit var opMode: LinearOpMode
     var robotIsInitialized = false
     val runTime = ElapsedTime()
@@ -133,10 +133,10 @@ object WoENrobot {
         if (opMode.isStopRequested) return
         runTime.reset()
         Arrays.stream(activeRobotModules).forEach { obj: MultithreadRobotModule -> obj.start() }
-        // regulatorUpdater.start();
-        controlHubUpdater.start()
-        expansionHubUpdater.start()
-        otherUpdater.start()
+        regulatorUpdater.start();
+        //controlHubUpdater.start()
+        //expansionHubUpdater.start()
+        //otherUpdater.start()
         setLedColors(0, 237, 255)
         opMode.telemetry.addData("Status", "Running")
         opMode.telemetry.update()
@@ -151,8 +151,16 @@ object WoENrobot {
             opMode = OpMode
             Arrays.stream(activeRobotModules)
                 .forEach { robotModule: MultithreadRobotModule -> robotModule.setOpMode(opMode) }
-            // regulatorUpdater.interrupt();
-            //  regulatorUpdater = new Thread(updateRegulators);
+            if (regulatorUpdater.state != Thread.State.NEW) {
+                regulatorUpdater.interrupt()
+                regulatorUpdater = Thread(updateRegulators)
+            }
+            controlHubUpdater.interrupt()
+            controlHubUpdater = Thread(updateControlHub)
+            expansionHubUpdater.interrupt()
+            expansionHubUpdater = Thread(updateExpansionHub)
+            otherUpdater.interrupt()
+            otherUpdater = Thread(updateOther)
             opMode.telemetry.addData("Status", "Already initialized, ready")
             opMode.telemetry.update()
         }
@@ -169,10 +177,8 @@ object WoENrobot {
         setBulkCachingMode(BulkCachingMode.MANUAL)
         Arrays.stream(activeRobotModules)
             .forEach { robotModule: MultithreadRobotModule -> robotModule.initialize(opMode) }
-        if (regulatorUpdater.state != Thread.State.NEW) {
-            regulatorUpdater.interrupt()
-            regulatorUpdater = Thread(updateRegulators)
-        }
+        regulatorUpdater.interrupt()
+        regulatorUpdater = Thread(updateRegulators)
         controlHubUpdater.interrupt()
         controlHubUpdater = Thread(updateControlHub)
         expansionHubUpdater.interrupt()

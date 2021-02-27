@@ -27,12 +27,12 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
         var kD_distance = 0.15
         @JvmField
         var kI_distance = 0.6
-        @JvmField
-        var kP_angle = 3.6
-        @JvmField
-        var kD_angle = 0.15
-        @JvmField
-        var kI_angle = 0.6
+        //@JvmField TODO separate coeffs on angle and distance
+        //var kP_angle = 3.6
+        //@JvmField
+        //var kD_angle = 0.15
+        //@JvmField
+        //var kI_angle = 0.6
         @JvmField
         var antiWindupFraction_distance = 0.17
         @JvmField

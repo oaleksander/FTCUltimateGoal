@@ -13,7 +13,7 @@ import kotlin.math.abs
 import kotlin.math.sign
 
 class FakeRobot : MultithreadRobotModule(), Drivetrain, Odometry {
-    private val maxVelocity = MecanumDrivetrain().maxVelocity
+   // private val maxVelocity = MecanumDrivetrain().maxVelocity
     private var started = false
     private var targetVelocity = Vector3D(0.0, 0.0, 0.0)
     private var targetVelocityFC = Vector3D(0.0, 0.0, 0.0)
@@ -36,7 +36,6 @@ class FakeRobot : MultithreadRobotModule(), Drivetrain, Odometry {
     override fun start() {
         targetVelocity = Vector3D(0.0, 0.0, 0.0)
         realVelocityFC = Vector3D(0.0, 0.0, 0.0)
-        currentPosition = Pose2D(0.0, 0.0, 0.0)
         updateTimer.reset()
         started = false
     }
@@ -63,25 +62,20 @@ class FakeRobot : MultithreadRobotModule(), Drivetrain, Odometry {
         updateTimer.reset()
     }
 
-    override fun setRobotVelocity(
-        frontwaysVelocity: Double,
-        sidewaysVelocity: Double,
-        turnVelocity: Double
-    ) {
-        var frontways = frontwaysVelocity
-        var sideways = sidewaysVelocity
-        var turn = turnVelocity
-        if (abs(frontways) > maxVelocity.y) frontways = maxVelocity.y * sign(frontways)
-        if (abs(sideways) > maxVelocity.x) sideways = maxVelocity.x * sign(sideways)
-        if (abs(turn) > maxVelocity.z) turn = maxVelocity.z * sign(turn)
-        targetVelocity = Vector3D(sideways, frontways, turn)
+    override fun setRobotVelocity(frontways: Double, sideways: Double, turn: Double) {
+        var frontWays = frontways
+        var sideWays = sideways
+        var Turn = turn
+        if (abs(frontWays) > maxVelocity.y) frontWays = maxVelocity.y * sign(frontWays)
+        if (abs(sideWays) > maxVelocity.x) sideWays = maxVelocity.x * sign(sideWays)
+        if (abs(Turn) > maxVelocity.z) Turn = maxVelocity.z * sign(Turn)
+        targetVelocity = Vector3D(sideWays, frontWays, Turn)
         targetVelocityFC =
-            Vector3D(Vector2D(sideways, frontways).rotatedCW(currentPosition.heading), turn)
+            Vector3D(Vector2D(sideWays, frontWays).rotatedCW(currentPosition.heading), Turn)
     }
 
-    override fun getMaxVelocity(): Vector3D {
-        return maxVelocity
-    }
+    override val maxVelocity: Vector3D
+            get() = MecanumDrivetrain().maxVelocity
 
     override fun getRobotCoordinates(): Pose2D {
         return currentPosition

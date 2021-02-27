@@ -279,13 +279,13 @@ class MecanumDrivetrain : MultithreadRobotModule(), Drivetrain {
         return Range.clip(abs(speed), minMotorSpeed, maxMotorSpeed) * sign(speed)
     }
 
-    override fun getMaxVelocity(): Vector3D {
-        return Vector3D(
+    override val maxVelocity: Vector3D
+        get() = Vector3D(
             maxMotorSpeed / forwardMultiplier,
             maxMotorSpeed / forwardMultiplier,
             maxMotorSpeed / turnMultiplier
         )
-    }
+
 
     override fun setRobotVelocity(frontways: Double, sideways: Double, turn: Double) {
         val frontwaysMotorVelocity = frontways * forwardMultiplier

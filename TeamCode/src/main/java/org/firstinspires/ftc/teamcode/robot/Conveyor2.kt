@@ -94,11 +94,12 @@ class Conveyor2 : MultithreadRobotModule(), Conveyor {
 
 
     private fun getdistance(): Double {
+        return 100.0/*
         if (distanceQueryTimer.milliseconds() > distanceQueryTimeout) {
             lastKnownDistance = sensorDistance.getDistance(DistanceUnit.CM)
             distanceQueryTimer.reset()
         }
-        return lastKnownDistance
+        return lastKnownDistance*/
     }
 
     private val aMPS: Double

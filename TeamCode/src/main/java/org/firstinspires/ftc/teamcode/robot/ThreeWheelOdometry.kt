@@ -20,7 +20,7 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 class ThreeWheelOdometry : MultithreadRobotModule(), Odometry {
-    private val yWheelPairRadiusCm = 18.2425
+    private val yWheelPairRadiusCm = 18.000
     private var worldPosition = Pose2D()
     private var angleOffset = 0.0
     private lateinit var imu1: BNO055IMU
@@ -28,20 +28,21 @@ class ThreeWheelOdometry : MultithreadRobotModule(), Odometry {
     private lateinit var odometerYL: Encoder
     private lateinit var odometerYR: Encoder
     private lateinit var odometerX: Encoder
+    private val endoderCPR = 8192.0
     private var odometryWheelDiameterCm = OdometryConfig.forwardMultiplier * 4.8
-    private var odometryCountsPerCM = 1440 / (odometryWheelDiameterCm * Math.PI)
-    private var odometryCMPerCounts = odometryWheelDiameterCm * Math.PI / 1440
+    private var odometryCountsPerCM = endoderCPR / (odometryWheelDiameterCm * Math.PI)
+    private var odometryCMPerCounts = odometryWheelDiameterCm * Math.PI / endoderCPR
     private var odometerXcenterOffset =
-        -21.7562349 * odometryCountsPerCM * cos(Math.toRadians(51.293002))
+        -18.15937 * odometryCountsPerCM * cos(Math.toRadians(84.9452))
     private var radiansPerEncoderDifference =
-        OdometryConfig.headingMultiplier * (odometryCMPerCounts / (yWheelPairRadiusCm * 2))
+        OdometryConfig.headingMultiplier * (odometryCMPerCounts / (yWheelPairRadiusCm * 2.0))
     private var imuOffset1 = 0f
     private var imuOffset2 = 0f
     private var encoderHeadingCovariance = 0.0
     private var ylOld = 0
     private var yrOld = 0
     private var xOld = 0
-    private val yWheelPairCenterOffset = Vector2D(0.0, 6.40008)
+    private val yWheelPairCenterOffset = Vector2D(0.0, 6.35375)
     private val imu1AccessTimer = ElapsedTime()
     private val imu2AccessTimer = ElapsedTime()
 
@@ -51,7 +52,7 @@ class ThreeWheelOdometry : MultithreadRobotModule(), Odometry {
         var forwardMultiplier = 1.00
 
         @JvmField
-        var headingMultiplier = 1.003851129713462
+        var headingMultiplier = 1.0000
 
         @JvmField
         var doUseIMU = false
@@ -59,15 +60,6 @@ class ThreeWheelOdometry : MultithreadRobotModule(), Odometry {
 
     private var doUseIMULocal = OdometryConfig.doUseIMU
     private fun calculateHeading(): Double {
-        if (doUseIMULocal && false) {
-            val angleDivergence = MathUtil.angleWrap(
-                encoderHeading - MathUtil.angleAverage(
-                    currentIMU1Heading,
-                    currentIMU2Heading
-                )
-            )
-            encoderHeadingCovariance = angleDivergence * (1.0 / 2.0)
-        }
         return MathUtil.angleWrap(encoderHeading - angleOffset - encoderHeadingCovariance)
     }
 
@@ -141,16 +133,14 @@ class ThreeWheelOdometry : MultithreadRobotModule(), Odometry {
     override fun updateControlHub() {
         if (doUseIMULocal && imu1AccessTimer.seconds() > 1) {
             updateCHIMUHeading()
+            val angleDivergence = MathUtil.angleWrap(encoderHeading - currentIMU1Heading) //TODO
+            encoderHeadingCovariance = angleDivergence * (1.0 / 2.0)
             imu1AccessTimer.reset()
         }
     }
 
 
     override fun updateExpansionHub() {
-        if (doUseIMULocal && imu2AccessTimer.seconds() > 1) {
-            updateEHIMUHeading()
-            imu2AccessTimer.reset()
-        }
 
         currentYLVelocity = odometerYL.correctedVelocity
         currentYLVelocity = odometerYR.correctedVelocity
@@ -194,12 +184,12 @@ class ThreeWheelOdometry : MultithreadRobotModule(), Odometry {
         radiansPerEncoderDifference =
             OdometryConfig.headingMultiplier * (odometryCMPerCounts / (yWheelPairRadiusCm * 2))
         odometryWheelDiameterCm = OdometryConfig.forwardMultiplier * 4.8
-        odometryCountsPerCM = 1440 / (odometryWheelDiameterCm * Math.PI)
-        odometryCMPerCounts = odometryWheelDiameterCm * Math.PI / 1440
+        odometryCountsPerCM = endoderCPR / (odometryWheelDiameterCm * Math.PI)
+        odometryCMPerCounts = odometryWheelDiameterCm * Math.PI / endoderCPR
         odometerXcenterOffset =
             -21.7562349 * odometryCountsPerCM * cos(Math.toRadians(51.293002))
         WoENHardware.odometerYL.let{
-            odometerYL = Encoder(it, Encoder.Direction.FORWARD)
+            odometerYL = Encoder(it, Encoder.Direction.REVERSE)
             it.mode = DcMotor.RunMode.STOP_AND_RESET_ENCODER
             it.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
         }
