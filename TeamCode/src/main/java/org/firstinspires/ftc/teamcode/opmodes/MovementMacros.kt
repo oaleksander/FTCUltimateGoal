@@ -54,7 +54,7 @@ object MovementMacros {
         @JvmField
         var HighGoalShootingAngle = -5.3
         @JvmField
-        var PowerShotShootingDistance = 200.4089
+        var PowerShotShootingDistance = 196.4089
         @JvmField
         var PowerShotShootingAngle = -4.7
         @JvmField
@@ -320,7 +320,7 @@ object MovementMacros {
     */
 
     private val ringStackPose: Vector2D
-        get() = Vector2D(90.3747 * xSign, -56.9019)
+        get() = Vector2D(90.3747 * xSign + 5.0, -56.9019)
 
     fun pickupRings(): Boolean {
         val heading = movement.getError(Pose2D(ringStackPose, Double.NaN)).acot()
@@ -328,19 +328,19 @@ object MovementMacros {
             StackSize.FOUR -> {
                 movement.pos(
                     Pose2D(
-                        (ringStackPose - Vector2D(
+                        ringStackPose - Vector2D(
                             0.0,
                             RingStackApproachOffset
-                        )).rotatedCW(heading), heading + Math.PI
+                        ).rotatedCW(heading), heading + Math.PI
                     ), distanceTolerance = 5.0, angularTolerance = toRadians(5.0)
                 )
                 conveyor.enableConveyor(true)
                 movement.pos(
                     Pose2D(
-                        (ringStackPose - Vector2D(
+                        ringStackPose - Vector2D(
                             0.0,
                             RingStackFirstRingOffset
-                        )).rotatedCW(heading), heading + Math.PI
+                        ).rotatedCW(heading), heading + Math.PI
                     ),
                     linearVelocityFraction = .3,
                     distanceTolerance = 5.0,
@@ -352,10 +352,10 @@ object MovementMacros {
                 //conveyor.enableConveyor(true)
                 movement.pos(
                     Pose2D(
-                        (ringStackPose - Vector2D(
+                        ringStackPose - Vector2D(
                             0.0,
                             RingStackFourthRingOffset
-                        )).rotatedCW(heading), heading + Math.PI
+                        ).rotatedCW(heading), heading + Math.PI
                     ),
                     linearVelocityFraction = .6,
                     distanceTolerance = 3.0,
@@ -369,10 +369,10 @@ object MovementMacros {
                 conveyor.enableConveyor(true)
                 movement.pos(
                     Pose2D(
-                        (ringStackPose - Vector2D(
+                        ringStackPose - Vector2D(
                             0.0,
                             RingStackFirstRingOffset
-                        )).rotatedCW(heading), heading + Math.PI
+                        ).rotatedCW(heading), heading + Math.PI
                     ),
                     linearVelocityFraction = .8,
                     distanceTolerance = 3.0,
