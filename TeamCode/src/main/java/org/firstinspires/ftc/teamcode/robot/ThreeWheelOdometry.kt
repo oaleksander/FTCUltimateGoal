@@ -184,8 +184,8 @@ class ThreeWheelOdometry : MultithreadRobotModule(), Odometry {
         radiansPerEncoderDifference =
             OdometryConfig.headingMultiplier * (odometryCMPerCounts / (yWheelPairRadiusCm * 2))
         odometryWheelDiameterCm = OdometryConfig.forwardMultiplier * 4.8
-        odometryCountsPerCM = 1440 / (odometryWheelDiameterCm * Math.PI)
-        odometryCMPerCounts = odometryWheelDiameterCm * Math.PI / 1440
+        odometryCountsPerCM = 8192 / (odometryWheelDiameterCm * Math.PI)
+        odometryCMPerCounts = odometryWheelDiameterCm * Math.PI / 8192
         odometerXcenterOffset =
             -21.7562349 * odometryCountsPerCM * cos(Math.toRadians(51.293002))
         WoENHardware.odometerYL.let{
