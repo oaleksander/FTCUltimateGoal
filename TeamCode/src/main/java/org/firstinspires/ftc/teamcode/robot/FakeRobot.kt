@@ -36,7 +36,6 @@ class FakeRobot : MultithreadRobotModule(), Drivetrain, Odometry {
     override fun start() {
         targetVelocity = Vector3D(0.0, 0.0, 0.0)
         realVelocityFC = Vector3D(0.0, 0.0, 0.0)
-        currentPosition = Pose2D(0.0, 0.0, 0.0)
         updateTimer.reset()
         started = false
     }
