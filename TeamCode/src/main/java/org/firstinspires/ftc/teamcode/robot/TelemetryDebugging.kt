@@ -127,9 +127,7 @@ class TelemetryDebugging : MultithreadRobotModule() {
     }
 
     override fun start() {
-        if (telemetryUpdater.state != Thread.State.NEW) {
-            telemetryUpdater.interrupt()
-        }
+        telemetryUpdater.interrupt()
         telemetryUpdater = Thread(updateTelemetry)
         telemetryUpdater.start()
     }
