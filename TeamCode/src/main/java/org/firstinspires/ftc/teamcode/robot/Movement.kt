@@ -117,7 +117,8 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
     }
 
     val currentTarget: Pose2D
-        get() = removeNaN(pathToFollow[nTargetPoint], odometry.robotCoordinates)
+        get() = Pose2D() //removeNaN(pathToFollow[nTargetPoint], odometry.robotCoordinates)
+
 
     /**
      * Checks whether path follower was disabled or have finished its job

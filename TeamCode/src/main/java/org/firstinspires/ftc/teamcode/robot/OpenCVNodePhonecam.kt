@@ -2,20 +2,21 @@ package org.firstinspires.ftc.teamcode.robot
 
 import org.openftc.easyopencv.OpenCvCameraFactory
 import org.openftc.easyopencv.OpenCvCameraRotation
+import org.openftc.easyopencv.OpenCvInternalCamera
 import org.openftc.easyopencv.OpenCvInternalCamera2
 
 @Deprecated("")
 class OpenCVNodePhonecam : OpenCVNodeWebcam() {
     override fun initialize() {
         try {
-            webcam = OpenCvCameraFactory.getInstance().createInternalCamera2(
-                OpenCvInternalCamera2.CameraDirection.BACK,
+            webcam = OpenCvCameraFactory.getInstance().createInternalCamera(
+                OpenCvInternalCamera.CameraDirection.BACK,
                 opMode.hardwareMap.appContext.resources.getIdentifier(
                     "cameraMonitorViewId",
                     "id",
                     opMode.hardwareMap.appContext.packageName
                 )
-            ) as OpenCvInternalCamera2
+            ) as OpenCvInternalCamera
             webcam.setPipeline(pipeline)
             webcam.openCameraDeviceAsync {
                 webcam.startStreaming(
