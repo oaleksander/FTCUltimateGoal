@@ -54,7 +54,7 @@ object MovementMacros {
         @JvmField
         var HighGoalShootingAngle = -5.3
         @JvmField
-        var PowerShotShootingDistance = 200.4089
+        var PowerShotShootingDistance = 196.4089
         @JvmField
         var PowerShotShootingAngle = -4.7
         @JvmField
@@ -319,15 +319,16 @@ object MovementMacros {
     // Ring stack
     */
 
-    val ringStackPose: Vector2D
-        get() = Vector2D(90.3747 * xSign - 5, -56.9019)
+    private val ringStackPose: Vector2D
+        get() = Vector2D(90.3747 * xSign + 5.0, -56.9019)
 
     fun pickupRings(): Boolean {
         val heading = movement.getError(Pose2D(ringStackPose, Double.NaN)).acot()
         when (openCVNode.stackSize) {
             StackSize.FOUR -> {
                 movement.pos(
-                    Pose2D(ringStackPose - Vector2D(
+                    Pose2D(
+                        ringStackPose - Vector2D(
                             0.0,
                             RingStackApproachOffset
                         ).rotatedCW(heading), heading + Math.PI
@@ -335,7 +336,8 @@ object MovementMacros {
                 )
                 conveyor.enableConveyor(true)
                 movement.pos(
-                    Pose2D(ringStackPose - Vector2D(
+                    Pose2D(
+                        ringStackPose - Vector2D(
                             0.0,
                             RingStackFirstRingOffset
                         ).rotatedCW(heading), heading + Math.PI
@@ -349,7 +351,8 @@ object MovementMacros {
                 shootHighGoal()
                 //conveyor.enableConveyor(true)
                 movement.pos(
-                    Pose2D(ringStackPose - Vector2D(
+                    Pose2D(
+                        ringStackPose - Vector2D(
                             0.0,
                             RingStackFourthRingOffset
                         ).rotatedCW(heading), heading + Math.PI
@@ -365,7 +368,8 @@ object MovementMacros {
             StackSize.ONE -> {
                 conveyor.enableConveyor(true)
                 movement.pos(
-                    Pose2D(ringStackPose - Vector2D(
+                    Pose2D(
+                        ringStackPose - Vector2D(
                             0.0,
                             RingStackFirstRingOffset
                         ).rotatedCW(heading), heading + Math.PI
