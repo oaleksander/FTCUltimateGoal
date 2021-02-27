@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.robot
 
 import com.acmerobotics.dashboard.config.Config
+import com.qualcomm.robotcore.eventloop.opmode.Disabled
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.firstinspires.ftc.teamcode.robot.OpenCVNodeWebcam.OpenCVConfig.HSVLowerBound
 import org.firstinspires.ftc.teamcode.robot.OpenCVNodeWebcam.OpenCVConfig.HSVUpperBound
@@ -15,6 +16,7 @@ import org.openftc.easyopencv.OpenCvPipeline
 open class OpenCVNodeWebcam : RobotModule() {
 
     @Config
+    @Disabled
     internal object OpenCVConfig {
         @JvmField
         var HSVLowerBound = Scalar(12.0, 160.0, 80.0)
