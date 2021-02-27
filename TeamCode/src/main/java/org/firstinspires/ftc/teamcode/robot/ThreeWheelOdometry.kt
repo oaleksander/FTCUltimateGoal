@@ -28,7 +28,7 @@ class ThreeWheelOdometry : MultithreadRobotModule(), Odometry {
     private lateinit var odometerYL: Encoder
     private lateinit var odometerYR: Encoder
     private lateinit var odometerX: Encoder
-    private val endoderCPR = 8192;
+    private val endoderCPR = 8192.0
     private var odometryWheelDiameterCm = OdometryConfig.forwardMultiplier * 4.8
     private var odometryCountsPerCM = endoderCPR / (odometryWheelDiameterCm * Math.PI)
     private var odometryCMPerCounts = odometryWheelDiameterCm * Math.PI / endoderCPR
