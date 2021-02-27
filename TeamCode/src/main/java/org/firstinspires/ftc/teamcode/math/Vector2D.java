@@ -80,11 +80,8 @@ public class Vector2D{
     }
 
     @Override
-    public Vector2D clone() throws CloneNotSupportedException {
-        Vector2D clone = (Vector2D) super.clone();
-        clone.x = x;
-        clone.y = y;
-        return clone;
+    public Vector2D clone(){
+        return new Vector2D(this.x,this.y);
     }
 
 }

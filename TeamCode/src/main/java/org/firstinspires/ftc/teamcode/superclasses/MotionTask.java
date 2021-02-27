@@ -45,5 +45,10 @@ public class MotionTask extends Pose2D {
         super(x, y, Double.NaN);
     }
 
+    @Override
+    public MotionTask clone() {
+        return new MotionTask(this.x,this.y,this.heading,this.actionOnConpletion);
+    }
+
 
 }

@@ -80,7 +80,7 @@ public class Pose2D extends Vector2D{
     }
 
     @Override
-    public Pose2D clone() throws CloneNotSupportedException {
-        return new Pose2D(super.clone(), heading);
+    public Pose2D clone(){
+        return new Pose2D(this.x,this.y,this.heading);
     }
 }
