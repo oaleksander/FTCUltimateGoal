@@ -35,6 +35,7 @@ class ServoWobbleManipulator : MultithreadRobotModule(), WobbleManipulator {
         leverArm = WoENHardware.leverArm
         grabWobble(true)
         setAngle(WobbleManipulator.Position.UP)
+        updateControlHub()
     }
 
     override fun grabWobble(dograb: Boolean) {
