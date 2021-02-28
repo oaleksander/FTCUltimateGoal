@@ -21,9 +21,9 @@ open class OpenCVNodeWebcam : RobotModule() {
 
     @Config
     internal object OpenCVConfig {
-        @JvmField var lowH = 10.0
-        @JvmField var lowS = 160.0
-        @JvmField var lowV = 80.0
+        @JvmField var lowH = 9.0
+        @JvmField var lowS = 130.0
+        @JvmField var lowV = 60.0
         @JvmField var highH = 22.0
         @JvmField var highS = 255.0
         @JvmField var highV = 255.0

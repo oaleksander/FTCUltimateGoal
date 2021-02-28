@@ -50,9 +50,9 @@ object MovementMacros {
         @JvmField
         var PartnerWobblePoseYOffset = 0.0
         @JvmField
-        var HighGoalShootingDistance = 231.0
+        var HighGoalShootingDistance = 215.0
         @JvmField
-        var HighGoalShootingAngle = -12.3
+        var HighGoalShootingAngle = -4.3
         @JvmField
         var PowerShotShootingDistance = 200.4089
         @JvmField
@@ -120,6 +120,7 @@ object MovementMacros {
             spinOnce()
         }
         wobbleManipulator.setAngle(WobbleManipulator.Position.DOWN)
+        delay(500.0)
         wobbleManipulator.grabWobble(false)
         delay(300.0)
     }
@@ -320,7 +321,7 @@ object MovementMacros {
     */
 
     private val ringStackPose: Vector2D
-        get() = Vector2D(90.3747 * xSign + 5.0, -56.9019)
+        get() = Vector2D(90.3747 * xSign -7.0, -56.9019)
 
     fun pickupRings(): Boolean {
         val heading = movement.getError(Pose2D(ringStackPose, Double.NaN)).acot()
@@ -378,7 +379,7 @@ object MovementMacros {
                     distanceTolerance = 3.0,
                     angularTolerance = toRadians(3.0)
                 )
-                delay(500.0)
+                delay(4500.0)
                 shootHighGoal()
                 conveyor.enableConveyor(false)
             }

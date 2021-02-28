@@ -22,7 +22,7 @@ class Shooter : MultithreadRobotModule() {
         @JvmField
         var lowRpm = 3470.0
         @JvmField
-        var highRpm = 4200.0
+        var highRpm = 4000.0
         @JvmField
         var timeRpm = 150.0
         @JvmField
