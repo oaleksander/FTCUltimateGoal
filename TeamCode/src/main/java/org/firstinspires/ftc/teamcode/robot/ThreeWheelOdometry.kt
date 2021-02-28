@@ -182,7 +182,7 @@ class ThreeWheelOdometry : MultithreadRobotModule(), Odometry {
         doUseIMULocal = OdometryConfig.doUseIMU
         if (doUseIMULocal) initIMU()
         radiansPerEncoderDifference =
-            OdometryConfig.headingMultiplier * (odometryCMPerCounts / (yWheelPairRadiusCm * 2))
+            OdometryConfig.headingMultiplier * (odometryCMPerCounts / (yWheelPairRadiusCm * 2.0))
         odometryWheelDiameterCm = OdometryConfig.forwardMultiplier * 4.8
         odometryCountsPerCM = endoderCPR / (odometryWheelDiameterCm * Math.PI)
         odometryCMPerCounts = odometryWheelDiameterCm * Math.PI / endoderCPR
