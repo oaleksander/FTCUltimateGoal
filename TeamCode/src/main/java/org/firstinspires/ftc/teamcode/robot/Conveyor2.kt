@@ -19,8 +19,8 @@ import kotlin.math.abs
 class Conveyor2 : MultithreadRobotModule(), Conveyor {
     private lateinit var conveyor: DcMotorEx
     private lateinit var sensorDistance: DistanceSensor
-    private val distanceQueryTimeout = 650.0
-    private val motorCurrentQueryTimeout = 650.0
+    private val distanceQueryTimeout = 300.0
+    private val motorCurrentQueryTimeout = 100.0
 
     private val conveyorPowerSender = CommandSender { p: Double -> conveyor.power = -p }
 
@@ -94,7 +94,6 @@ class Conveyor2 : MultithreadRobotModule(), Conveyor {
 
 
     private fun getdistance(): Double {
-       // return 100.0/*
         if (distanceQueryTimer.milliseconds() > distanceQueryTimeout) {
             lastKnownDistance = sensorDistance.getDistance(DistanceUnit.CM)
             distanceQueryTimer.reset()
