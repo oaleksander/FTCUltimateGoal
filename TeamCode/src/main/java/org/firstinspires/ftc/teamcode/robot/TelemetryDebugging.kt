@@ -9,8 +9,11 @@ import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.math.Pose2D
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.movement
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.odometry
+import org.firstinspires.ftc.teamcode.robot.WoENrobot.openCVNode
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.runTime
+import org.firstinspires.ftc.teamcode.robot.WoENrobot.shooter
 import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule
+import java.lang.Exception
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.math.cos
 import kotlin.math.sin
@@ -72,49 +75,64 @@ class TelemetryDebugging : MultithreadRobotModule() {
 
     private var updaterIsActive = false
     private val updateTelemetry = Runnable {
-        updaterIsActive = true
-        while (opMode.opModeIsActive() && !Thread.currentThread().isInterrupted) {
-            if (measurementTime.milliseconds() > TelemetryConfig.refreshTimeMs) {
-                val loopFrequency = loopCount.getAndSet(0) / measurementTime.seconds()
-                val controlHubLoopFrequency =
-                    controlHubLoopCount.getAndSet(0) / measurementTime.seconds()
-                val expansionHubloopFrequency =
-                    expansionHubLooploopCount.getAndSet(0) / measurementTime.seconds()
-                measurementTime.reset()
-                telemetry.addData("Status", "Running " + runTime.seconds())
-                telemetry.addData("Total Loop frequency", "$loopFrequency Hz")
-                telemetry.addData("CH Loop frequency", "$controlHubLoopFrequency Hz")
-                telemetry.addData("EH Loop frequency", "$expansionHubloopFrequency Hz")
-                val robotPosition = odometry.robotCoordinates
-                // telemetry.addLine("Odometry encoders").addData("odYL", WoENHardware.odometerYL.getCurrentPosition()).addData("odYR", WoENHardware.odometerYR.getCurrentPosition()).addData("odX", WoENHardware.odometerX.getCurrentPosition());
-                //telemetry.addLine("Robot position ").addData("Y", robotPosition.y).addData("X", robotPosition.x).addData("Head", Math.toDegrees(robotPosition.heading));
-                //   Vector3D velocity = odometry.getRobotVelocity();
-                //     telemetry.addLine("Robot velocity ").addData("Y", velocity.y).addData("X", velocity.x).addData("Head", Math.toDegrees(velocity.z));
-                //////  //    telemetry.addLine("Shooter ").addData("Mode", shooter.getShootingMode()).addData("Current", shooter.getEncoderFailureMode()?"Encoder Fail":shooter.getCurrentRpm()).addData("Target", shooter.getRpmTarget());
-                //telemetry.addData("conpower", conveyor.conveyorPower);
-                //    telemetry.addLine("headings").addData("Encoder",Math.toDegrees(odometry.getEncoderHeading())).addData("IMU1",Math.toDegrees(odometry.getIMUheading_1())).addData("IMU2",Math.toDegrees(odometry.getIMUheading_2()));
-                if (TelemetryConfig.dashboardTelemetry) {
-                    dashboardPacket = TelemetryPacket()
-                    createDashboardRectangle(robotPosition, "black")
-                    if (movement.pathFollowerIsActive()) createDashboardRectangle(
-                        movement.currentTarget,
-                        "green"
+        try {
+            updaterIsActive = true
+            while (opMode.opModeIsActive() && !Thread.currentThread().isInterrupted) {
+                if (measurementTime.milliseconds() > TelemetryConfig.refreshTimeMs) {
+                    val loopFrequency = loopCount.getAndSet(0) / measurementTime.seconds()
+                    val controlHubLoopFrequency =
+                        controlHubLoopCount.getAndSet(0) / measurementTime.seconds()
+                    val expansionHubloopFrequency =
+                        expansionHubLooploopCount.getAndSet(0) / measurementTime.seconds()
+                    measurementTime.reset()
+                    telemetry.addData(
+                        "Status",
+                        "Running " + String.format(
+                            "%.1f s @ %.1f Hz",
+                            runTime.seconds(),
+                            loopFrequency
+                        )
                     )
-                    dashboardPacket.put("Loop frequency", loopFrequency)
-                    dashboardPacket.put("CH Loop frequency", controlHubLoopFrequency)
-                    dashboardPacket.put("EH Loop frequency", expansionHubloopFrequency)
-                    // dashboardPacket.put("Flywhel RPM",shooter.currentRpm);
-                    //  dashboardPacket.put("Flywhel target",shooter.rpmTarget);
-                    dashboardPacket.put("Status", "Running " + runTime.seconds())
-                    dashboard.sendTelemetryPacket(dashboardPacket)
-                }
+                    //  telemetry.addData("CH Loop frequency", "$controlHubLoopFrequency Hz")
+                    //  telemetry.addData("EH Loop frequency", "$expansionHubloopFrequency Hz")
+                    val robotPosition = odometry.robotCoordinates
+                    // telemetry.addLine("Odometry encoders").addData("odYL", WoENHardware.odometerYL.getCurrentPosition()).addData("odYR", WoENHardware.odometerYR.getCurrentPosition()).addData("odX", WoENHardware.odometerX.getCurrentPosition());
+                    //telemetry.addLine("Robot position ").addData("Y", robotPosition.y).addData("X", robotPosition.x).addData("Head", Math.toDegrees(robotPosition.heading));
+                    //   Vector3D velocity = odometry.getRobotVelocity();
+                    //     telemetry.addLine("Robot velocity ").addData("Y", velocity.y).addData("X", velocity.x).addData("Head", Math.toDegrees(velocity.z));
+                    telemetry.addLine("Shooter ").addData("Mode", shooter.shootingMode).addData(
+                        "Current",
+                        if (shooter.encoderFailureMode) "Encoder Fail" else shooter.currentRpm
+                    ).addData("Target", shooter.rpmTarget)
+                    //telemetry.addData("conpower", conveyor.conveyorPower);
+                    //    telemetry.addLine("headings").addData("Encoder",Math.toDegrees(odometry.getEncoderHeading())).addData("IMU1",Math.toDegrees(odometry.getIMUheading_1())).addData("IMU2",Math.toDegrees(odometry.getIMUheading_2()));
+                    if (TelemetryConfig.dashboardTelemetry) {
+                        dashboardPacket = TelemetryPacket()
+                        createDashboardRectangle(robotPosition, "black")
+                        if (movement.pathFollowerIsActive()) createDashboardRectangle(
+                            movement.currentTarget,
+                            "green"
+                        )
+                        dashboardPacket.put("Loop frequency", loopFrequency)
+                        // dashboardPacket.put("CH Loop frequency", controlHubLoopFrequency)
+                        // dashboardPacket.put("EH Loop frequency", expansionHubloopFrequency)
+                        // dashboardPacket.put("Flywhel RPM",shooter.currentRpm);
+                        //  dashboardPacket.put("Flywhel target",shooter.rpmTarget);
+                        dashboardPacket.put("Status", "Running " + runTime.seconds())
+                        dashboard.sendTelemetryPacket(dashboardPacket)
+                    }
 
 
-                //telemetry.addData("OpenCV stack size", openCVNode.getStackSize());
-                telemetry.update()
-            } else Thread.yield()
+                    //telemetry.addData("OpenCV stack size", openCVNode.getStackSize());
+                    telemetry.update()
+                } else Thread.yield()
+            }
+            updaterIsActive = false
+        } catch (e: Exception) {
+            telemetry.clear()
+            telemetry.addData("Telemetry Error", e.message)
+            telemetry.update()
         }
-        updaterIsActive = false
     }
     private var telemetryUpdater = Thread(updateTelemetry)
     override fun initialize() {
@@ -123,7 +141,7 @@ class TelemetryDebugging : MultithreadRobotModule() {
         //  telemetry = dashboard.getTelemetry();
         //  telemetry = new MultipleTelemetry(opMode.telemetry,dashboard.getTelemetry());
         telemetry.msTransmissionInterval = TelemetryConfig.refreshTimeMs
-        //   dashboard.startCameraStream(openCVNode.getWebcam(),0);
+        //dashboard.startCameraStream(openCVNode.webcam,5.0);
     }
 
     override fun start() {
@@ -133,11 +151,11 @@ class TelemetryDebugging : MultithreadRobotModule() {
     }
 
     override fun updateControlHub() {
-        controlHubLoopCount.getAndIncrement()
+      //  controlHubLoopCount.getAndIncrement()
     }
 
     override fun updateExpansionHub() {
-        expansionHubLooploopCount.getAndIncrement()
+       // expansionHubLooploopCount.getAndIncrement()
     }
 
     override fun updateOther() {

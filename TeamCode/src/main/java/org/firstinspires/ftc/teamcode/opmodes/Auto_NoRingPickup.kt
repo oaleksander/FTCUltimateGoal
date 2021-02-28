@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous
 import org.firstinspires.ftc.teamcode.opmodes.MovementMacros.avoidRingStack
 import org.firstinspires.ftc.teamcode.opmodes.MovementMacros.moveWobble
 import org.firstinspires.ftc.teamcode.opmodes.MovementMacros.park
+import org.firstinspires.ftc.teamcode.opmodes.MovementMacros.shootHighGoal
 import org.firstinspires.ftc.teamcode.opmodes.MovementMacros.shooting
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.delay
 
@@ -13,7 +14,7 @@ import org.firstinspires.ftc.teamcode.robot.WoENrobot.delay
 class Auto_NoRingPickup : AutoOpMode() {
     override fun main() {
         avoidRingStack()
-        shooting()
+        shootHighGoal()
         delay(0.0)
         moveWobble()
         park()

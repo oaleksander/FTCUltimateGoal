@@ -1,10 +1,14 @@
 package org.firstinspires.ftc.teamcode.robot
 
 import com.acmerobotics.dashboard.config.Config
-import com.qualcomm.robotcore.eventloop.opmode.Disabled
+import com.qualcomm.robotcore.util.ElapsedTime
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
-import org.firstinspires.ftc.teamcode.robot.OpenCVNodeWebcam.OpenCVConfig.HSVLowerBound
-import org.firstinspires.ftc.teamcode.robot.OpenCVNodeWebcam.OpenCVConfig.HSVUpperBound
+import org.firstinspires.ftc.teamcode.robot.OpenCVNodeWebcam.OpenCVConfig.highH
+import org.firstinspires.ftc.teamcode.robot.OpenCVNodeWebcam.OpenCVConfig.highS
+import org.firstinspires.ftc.teamcode.robot.OpenCVNodeWebcam.OpenCVConfig.highV
+import org.firstinspires.ftc.teamcode.robot.OpenCVNodeWebcam.OpenCVConfig.lowH
+import org.firstinspires.ftc.teamcode.robot.OpenCVNodeWebcam.OpenCVConfig.lowS
+import org.firstinspires.ftc.teamcode.robot.OpenCVNodeWebcam.OpenCVConfig.lowV
 import org.firstinspires.ftc.teamcode.superclasses.RobotModule
 import org.opencv.core.*
 import org.opencv.imgproc.Imgproc
@@ -16,12 +20,13 @@ import org.openftc.easyopencv.OpenCvPipeline
 open class OpenCVNodeWebcam : RobotModule() {
 
     @Config
-    @Disabled
     internal object OpenCVConfig {
-        @JvmField
-        var HSVLowerBound = Scalar(10.0, 160.0, 80.0)
-        @JvmField
-        var HSVUpperBound = Scalar(22.0, 255.0, 255.0)
+        @JvmField var lowH = 10.0
+        @JvmField var lowS = 160.0
+        @JvmField var lowV = 80.0
+        @JvmField var highH = 22.0
+        @JvmField var highS = 255.0
+        @JvmField var highV = 255.0
     }
 
     lateinit var webcam: OpenCvCamera
@@ -87,6 +92,7 @@ open class OpenCVNodeWebcam : RobotModule() {
         private val crop = Rect(0, 200, rows, cols - 220)
         private val BlurSize = Size(9.0, 9.0)
         private var stageToRenderToViewport = Stage.DETECTION
+        private val autoTapper = ElapsedTime()
         override fun onViewportTapped() {
             val currentStageNum = stageToRenderToViewport.ordinal
             var nextStageNum = currentStageNum + 1
@@ -97,6 +103,8 @@ open class OpenCVNodeWebcam : RobotModule() {
         }
 
         override fun processFrame(input: Mat): Mat {
+            val hsvLowerBound = Scalar(lowH, lowS, lowV)
+            val hsvUpperBound = Scalar(highH, highS, highV)
             all = input.submat(crop)
             Imgproc.GaussianBlur(all, all, BlurSize, 0.0)
             Imgproc.cvtColor(all, HSVMat, Imgproc.COLOR_RGB2HSV)
@@ -104,11 +112,11 @@ open class OpenCVNodeWebcam : RobotModule() {
             Core.inRange(
                 HSVMat,
                 Scalar(
-                    HSVLowerBound.`val`[0],
-                    (HSVLowerBound.`val`[1] + HSVMatMean.`val`[1]) / 2.0,
-                    (HSVLowerBound.`val`[2] + HSVMatMean.`val`[2]) / 2.0
+                    hsvLowerBound.`val`[0],
+                    (hsvLowerBound.`val`[1] + HSVMatMean.`val`[1]) / 2.0,
+                    (hsvLowerBound.`val`[2] + HSVMatMean.`val`[2]) / 2.0
                 ),
-                HSVUpperBound,
+                hsvUpperBound,
                 thresholdMat
             )
             Imgproc.erode(thresholdMat, thresholdMat, structuringElement)
@@ -124,12 +132,16 @@ open class OpenCVNodeWebcam : RobotModule() {
                 stackSize = StackSize.ZERO
                 aspectRatio = 0.0
             }
+            if(autoTapper.seconds()>3) {
+                onViewportTapped()
+                autoTapper.reset()
+            }
             return when (stageToRenderToViewport) {
                 Stage.DETECTION -> {
                     all
                 }
                 Stage.RAW_IMAGE -> {
-                    input
+                    input.submat(crop)
                 }
                 Stage.THRESHOLD -> {
                     thresholdMat

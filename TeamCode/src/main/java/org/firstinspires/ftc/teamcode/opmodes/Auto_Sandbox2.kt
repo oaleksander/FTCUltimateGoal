@@ -10,7 +10,6 @@ import org.firstinspires.ftc.teamcode.robot.WoENrobot.movement
 @Autonomous(name = "Pos test")
 class Auto_Sandbox2 : AutoOpMode() {
     override fun main() {
-        movement.pos(Pose2D(MovementMacros.ringStackPose,Double.NaN))
         shootPOWERSHOTAngle()
     }
 }

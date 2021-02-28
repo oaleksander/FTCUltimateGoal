@@ -117,7 +117,13 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
     }
 
     val currentTarget: Pose2D
-        get() = Pose2D() //removeNaN(pathToFollow[nTargetPoint], odometry.robotCoordinates)
+        get() {
+            return try {
+                removeNaN(pathToFollow[nTargetPoint], odometry.robotCoordinates)
+            } catch (e: ArrayIndexOutOfBoundsException) {
+                Pose2D()
+            }
+        }
 
 
     /**
