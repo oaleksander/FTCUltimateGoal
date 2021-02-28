@@ -13,16 +13,16 @@ import java.util.*
 
 object WoENrobot {
     val wobbleManipulator = ServoWobbleManipulator()
-    val openCVNode = OpenCVNodePhonecam()
+    val openCVNode = OpenCVNodeWebcam()
     val conveyor = Conveyor2()
     val shooter = Shooter()
     val telemetryDebugging = TelemetryDebugging()
     val ai = AI()
 
-    val odometry = FakeRobot();
-    val drivetrain = odometry;
-    //val odometry = ThreeWheelOdometry()
-    //val drivetrain = MecanumDrivetrain()
+    //val odometry = FakeRobot();
+    //val drivetrain = odometry;
+    val odometry = ThreeWheelOdometry()
+    val drivetrain = MecanumDrivetrain()
     val movement = Movement(odometry, drivetrain)
     lateinit var opMode: LinearOpMode
     var robotIsInitialized = false
