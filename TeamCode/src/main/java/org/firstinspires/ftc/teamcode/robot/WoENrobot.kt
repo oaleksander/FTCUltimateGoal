@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 import com.qualcomm.robotcore.util.ElapsedTime
 import org.firstinspires.ftc.teamcode.robot.WoENHardware.assignHardware
 import org.firstinspires.ftc.teamcode.robot.WoENHardware.lynxModules
+import org.firstinspires.ftc.teamcode.robot.simulation.OpenCVNodePhonecam
 import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule
 import org.openftc.revextensions2.ExpansionHubEx
 import java.lang.Exception
@@ -14,19 +15,15 @@ import java.util.*
 object WoENrobot {
     val wobbleManipulator = ServoWobbleManipulator()
     val openCVNode = OpenCVNodeWebcam()
-    val conveyor = Conveyor2()
+    val conveyor = Conveyor()
     val shooter = Shooter()
     val telemetryDebugging = TelemetryDebugging()
     val ai = AI()
-
     //val odometry = FakeRobot();
     //val drivetrain = odometry;
     val odometry = ThreeWheelOdometry()
     val drivetrain = MecanumDrivetrain()
     val movement = Movement(odometry, drivetrain)
-    lateinit var opMode: LinearOpMode
-    var robotIsInitialized = false
-    val runTime = ElapsedTime()
     private val activeRobotModules = arrayOf(
         odometry,
         movement,
@@ -38,6 +35,10 @@ object WoENrobot {
         ai
     ) //
 
+
+    lateinit var opMode: LinearOpMode
+    var robotIsInitialized = false
+    val runTime = ElapsedTime()
     @Volatile
     var controlHubSpinCompleted = false
 

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.robot
+package org.firstinspires.ftc.teamcode.robot.legacy
 
 import com.qualcomm.hardware.bosch.BNO055IMU
 import com.qualcomm.robotcore.util.ElapsedTime
@@ -9,6 +9,7 @@ import org.firstinspires.ftc.teamcode.math.MathUtil
 import org.firstinspires.ftc.teamcode.math.Pose2D
 import org.firstinspires.ftc.teamcode.math.Vector2D
 import org.firstinspires.ftc.teamcode.math.Vector3D
+import org.firstinspires.ftc.teamcode.robot.WoENHardware
 import org.firstinspires.ftc.teamcode.robot.WoENHardware.imu2
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.delay
 import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule
