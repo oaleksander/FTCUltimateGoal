@@ -14,8 +14,8 @@ import org.firstinspires.ftc.teamcode.robot.WoENrobot.conveyor
 @Autonomous
 class Auto_Default : AutoOpMode() {
     override fun main() {
-        conveyor.setAutomaticConveyorStopping(true)
-        conveyor.setReverseAfterStop(true)
+        conveyor.enableFullStackStopping = true
+        conveyor.reverseBeforeStop = true
         avoidRingStack()
         shootHighGoal()
         moveWobble()

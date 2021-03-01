@@ -31,13 +31,13 @@ class TeleOp_Single : LinearOpMode() {
             wobbleManipulator.grabWobble(grabWobbleSwitch.get())
             wobbleManipulator.upmediumdown(gamepad1.y, gamepad1.x) // correct
             /* Conveyor */
-            conveyor.enableConveyor(conveyorOnOffSwitch.get())
+            conveyor.enableConveyor = conveyorOnOffSwitch.get()
             /* Shooter */
             shooter.shootingMode = if (shooterOnOffSwitch.get())
                 if (shooterSpeedSwitch.get()) Shooter.ShooterMode.POWERSHOT
                 else Shooter.ShooterMode.HIGHGOAL
             else Shooter.ShooterMode.OFF
-            conveyor.setForceReverse(gamepad1.dpad_right)
+            conveyor.forceReverse = gamepad1.dpad_right
             if (gamepad1.a) shooter.feedRing()
             if (threeRingPresser.get()) shooter.feedRings()
             /* Drivetrain */

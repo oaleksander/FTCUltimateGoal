@@ -10,32 +10,35 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
 import org.firstinspires.ftc.teamcode.misc.CommandSender
 import org.firstinspires.ftc.teamcode.misc.motorAccelerationLimiter
+import org.firstinspires.ftc.teamcode.robot.Conveyor.ConveyorConfig.conveyorPower
 import org.firstinspires.ftc.teamcode.robot.WoENHardware.conveyorMotor
 import org.firstinspires.ftc.teamcode.robot.WoENHardware.ringDetector
 import org.firstinspires.ftc.teamcode.superclasses.Conveyor
 import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule
 import kotlin.math.abs
 
-class Conveyor2 : MultithreadRobotModule(), Conveyor {
+class Conveyor : MultithreadRobotModule(),
+    Conveyor {
     private lateinit var conveyor: DcMotorEx
     private lateinit var sensorDistance: DistanceSensor
     private val distanceQueryTimeout = 300.0
     private val motorCurrentQueryTimeout = 100.0
 
-    private val conveyorPowerSender = CommandSender { p: Double -> conveyor.power = -p }
+    private val conveyorPowerSender = CommandSender {conveyor.power = it}
 
-    private val conveyorAccelerationLimiter = motorAccelerationLimiter({ value: Double -> conveyorPowerSender.send(value) }, 6.0)
+    private val conveyorAccelerationLimiter = motorAccelerationLimiter({conveyorPowerSender.send(it)}, 6.0)
 
     private val motorCurrentTimer = ElapsedTime()
     private val stackDetectionTimer = ElapsedTime()
     private var lastKnownDistance = 12.0
     private val distanceQueryTimer = ElapsedTime()
     private var lastKnownMotorCurrent = 0.0
-    private var forceReverse = false
+    override var forceReverse = false
     private var currentMotorPower = 0.0
+    override var enableConveyor = false
     private val motorCurrentQueryTimer = ElapsedTime()
-    private var doAutomaticConveyorStopping = true
-    private var doReverseOnStop = true
+    override var enableFullStackStopping = true
+    override var reverseBeforeStop = true
     private var requestedPower = 0.0
 
     @Config
@@ -56,27 +59,6 @@ class Conveyor2 : MultithreadRobotModule(), Conveyor {
         var currentThreshold = 2.5
     }
 
-    override fun setAutomaticConveyorStopping(doAutomaticConveyorStopping: Boolean) {
-        this.doAutomaticConveyorStopping = doAutomaticConveyorStopping
-    }
-
-    override fun setReverseAfterStop(doReverseOnStop: Boolean) {
-        this.doReverseOnStop = doReverseOnStop
-    }
-
-    override fun setForceReverse(forceReverse: Boolean) {
-        this.forceReverse = forceReverse
-    }
-
-    override fun enableConveyor(isEnabled: Boolean) {
-        setConveyorPower(if (isEnabled) ConveyorConfig.conveyorPower else 0.0)
-    }
-
-    private fun setConveyorPower(requestedPower: Double) {
-        if (this.requestedPower != requestedPower) motorCurrentTimer.reset()
-        this.requestedPower = requestedPower
-    }
-
     override fun initialize() {
         initializecolor()
         initializedrive()
@@ -88,7 +70,7 @@ class Conveyor2 : MultithreadRobotModule(), Conveyor {
 
     private fun initializedrive() {
         conveyor = conveyorMotor
-        conveyor.direction = DcMotorSimple.Direction.FORWARD //!!! can break odometry
+        conveyor.direction = DcMotorSimple.Direction.REVERSE //Should be intaking rings at +1.0
         conveyor.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
     }
 
@@ -111,25 +93,30 @@ class Conveyor2 : MultithreadRobotModule(), Conveyor {
         }
 
     override fun updateControlHub() {
-        if (!forceReverse && !(doReverseOnStop && requestedPower == 0.0) && doAutomaticConveyorStopping)
+        if (!forceReverse && !(reverseBeforeStop && requestedPower == 0.0) && enableFullStackStopping)
             if (getdistance() >= ConveyorConfig.distanceThreshold) {
             stackDetectionTimer.reset() //Full collector detection
         }
     }
 
+    val collectorIsFull : Boolean
+        get() = stackDetectionTimer.milliseconds() > ConveyorConfig.stackDetectionTimeout && !forceReverse && enableFullStackStopping && requestedPower != 0.0
+    val motorIsLocked: Boolean
+        get() = motorCurrentTimer.milliseconds() > ConveyorConfig.motorLockingCurrentTimeout && !forceReverse && stackDetectionTimer.milliseconds() < ConveyorConfig.stackDetectionTimeout && requestedPower != 0.0
+
     override fun updateExpansionHub() {
         if (!forceReverse) {
-            if ((stackDetectionTimer.milliseconds() > ConveyorConfig.stackDetectionTimeout || doReverseOnStop && requestedPower == 0.0) && doAutomaticConveyorStopping) { //reverse+stop in case of ring detection
+            if ((stackDetectionTimer.milliseconds() > ConveyorConfig.stackDetectionTimeout || reverseBeforeStop && requestedPower == 0.0) && enableFullStackStopping) { //reverse+stop in case of ring detection
                 motorCurrentTimer.reset()
                 currentMotorPower =
-                    if (stackDetectionTimer.milliseconds() < ConveyorConfig.stackDetectionTimeout + ConveyorConfig.stackDetectionReverseTime && doReverseOnStop) -1.0 else 0.0
+                    if (stackDetectionTimer.milliseconds() < ConveyorConfig.stackDetectionTimeout + ConveyorConfig.stackDetectionReverseTime && reverseBeforeStop) -1.0 else 0.0
             } else if (motorCurrentTimer.milliseconds() > ConveyorConfig.motorLockingCurrentTimeout) //reverse after locking
             {
                 if (motorCurrentTimer.milliseconds() < ConveyorConfig.motorLockingReverseTime + ConveyorConfig.motorLockingCurrentTimeout) {
-                    currentMotorPower = -requestedPower
+                    currentMotorPower = - if(enableConveyor) conveyorPower else 0.0
                 } else motorCurrentTimer.reset()
             } else {
-                currentMotorPower = +requestedPower
+                currentMotorPower = + if(enableConveyor) conveyorPower else 0.0
                 if (aMPS < ConveyorConfig.currentThreshold) //locking detection
                     motorCurrentTimer.reset()
             }

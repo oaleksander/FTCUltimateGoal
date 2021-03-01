@@ -32,7 +32,7 @@ class TeleOp_test : LinearOpMode() {
             wobbleManipulator.grabWobble(grabWobbleSwitch.get())
             wobbleManipulator.upmediumdown(gamepad1.y, gamepad1.x) // correct
             /* Conveyor */
-            WoENrobot.conveyor.enableConveyor(conveyorOnOffSwitch.get())
+            WoENrobot.conveyor.enableConveyor = conveyorOnOffSwitch.get()
             /* Shooter */
             shooter.shootingMode =
                 if (shooterOnOffSwitch.get()) Shooter.ShooterMode.HIGHGOAL else Shooter.ShooterMode.OFF

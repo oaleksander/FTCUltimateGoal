@@ -335,7 +335,7 @@ object MovementMacros {
                         ).rotatedCW(heading), heading + Math.PI
                     ), distanceTolerance = 5.0, angularTolerance = toRadians(5.0)
                 )
-                conveyor.enableConveyor(true)
+                conveyor.enableConveyor = true
                 movement.pos(
                     Pose2D(
                         ringStackPose - Vector2D(
@@ -364,10 +364,10 @@ object MovementMacros {
                 )
                 delay(750.0)
                 shootHighGoal()
-                conveyor.enableConveyor(false)
+                conveyor.enableConveyor = false
             }
             StackSize.ONE -> {
-                conveyor.enableConveyor(true)
+                conveyor.enableConveyor = true
                 movement.pos(
                     Pose2D(
                         ringStackPose - Vector2D(
@@ -381,7 +381,7 @@ object MovementMacros {
                 )
                 delay(4500.0)
                 shootHighGoal()
-                conveyor.enableConveyor(false)
+                conveyor.enableConveyor = false
             }
             StackSize.ZERO -> return false
         }

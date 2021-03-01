@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.robot
+package org.firstinspires.ftc.teamcode.robot.legacy
 
 import com.qualcomm.robotcore.hardware.DcMotor
 import com.qualcomm.robotcore.hardware.DcMotorEx
@@ -14,20 +14,27 @@ import org.firstinspires.ftc.teamcode.superclasses.Conveyor
 import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule
 
 @Deprecated("")
-class Conveyor1 : MultithreadRobotModule(), Conveyor {
+class Conveyor() : MultithreadRobotModule(),
+    Conveyor {
     private val conveyorTime = ElapsedTime()
     private val backOnTime = ElapsedTime()
     private val pauseTime = ElapsedTime()
     private val backOnAftertime = ElapsedTime()
     private lateinit var conveyorm: DcMotorEx
+    override var enableConveyor = false
+    set(value) {
+        field = value
+        conveyorPower = if (value) 1.0 else 0.0
+    }
+
     private lateinit var sensorDistance: DistanceSensor
     private val conveyorPowerSender = CommandSender { p: Double -> conveyorm.power = -p }
     private var full = false
     private var backOn = false
     private var stop = false
-    private var backMust = false
-    private var backOnAfter = false
-    private var colorLock = false
+    override var forceReverse = true
+    override var enableFullStackStopping = true
+    override var reverseBeforeStop = true
     private var timelock = 0.0
     private var conveyorPower = 0.0
     private var distance = 0.0
@@ -62,7 +69,7 @@ class Conveyor1 : MultithreadRobotModule(), Conveyor {
     override fun updateControlHub() {
         if (pauseTime.milliseconds() >= 100) {
             pauseTime.reset()
-            distance = if (!colorLock) getdistance() else 10.0
+            distance = if (!this.enableFullStackStopping) getdistance() else 10.0
         }
     }
 
@@ -76,7 +83,7 @@ class Conveyor1 : MultithreadRobotModule(), Conveyor {
             conveyorTime.reset()
             full = false
         }
-        if (!backMust) {
+        if (!this.forceReverse) {
             if (conveyorPower != 0.0 && !full) {
                 if (!stop) {
                     stop = true
@@ -97,7 +104,7 @@ class Conveyor1 : MultithreadRobotModule(), Conveyor {
                 }
             } else {
                 if (stop) {
-                    if (backOnAfter && backOnAftertime.milliseconds() < 500) setConveyorMotorPower(-conveyorPower) else {
+                    if (this.reverseBeforeStop && backOnAftertime.milliseconds() < 500) setConveyorMotorPower(-conveyorPower) else {
                         setConveyorMotorPower(0.0)
                         stop = false
                         backOn = false
@@ -114,27 +121,9 @@ class Conveyor1 : MultithreadRobotModule(), Conveyor {
     override fun updateOther() {
     }
 
-    override fun setReverseAfterStop(doReverseOnStop: Boolean) {
-        backOnAfter = doReverseOnStop
-    }
-
-    override fun enableConveyor(isEnabled: Boolean) {
-        setConveyorPower(if (isEnabled) 1.0 else 0.0)
-    }
-
-    private fun setConveyorPower(power: Double) {
-        conveyorPower = power
-    }
-
-    override fun setAutomaticConveyorStopping(doAutomaticConveyorStopping: Boolean) {
-        colorLock = !doAutomaticConveyorStopping
-    }
 
     private fun setConveyorMotorPower(power: Double) {
         conveyorPowerSender.send(power)
     }
 
-    override fun setForceReverse(forceReverse: Boolean) {
-        backMust = forceReverse
-    }
 }

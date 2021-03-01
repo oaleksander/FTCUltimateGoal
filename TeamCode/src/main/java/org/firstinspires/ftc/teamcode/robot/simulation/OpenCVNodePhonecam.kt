@@ -1,11 +1,10 @@
-package org.firstinspires.ftc.teamcode.robot
+package org.firstinspires.ftc.teamcode.robot.simulation
 
+import org.firstinspires.ftc.teamcode.robot.OpenCVNodeWebcam
 import org.openftc.easyopencv.OpenCvCameraFactory
 import org.openftc.easyopencv.OpenCvCameraRotation
 import org.openftc.easyopencv.OpenCvInternalCamera
-import org.openftc.easyopencv.OpenCvInternalCamera2
 
-@Deprecated("")
 class OpenCVNodePhonecam : OpenCVNodeWebcam() {
     override fun initialize() {
         try {
