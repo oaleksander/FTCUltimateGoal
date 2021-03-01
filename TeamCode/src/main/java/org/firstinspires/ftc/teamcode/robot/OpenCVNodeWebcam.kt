@@ -21,10 +21,10 @@ open class OpenCVNodeWebcam : RobotModule() {
 
     @Config
     internal object OpenCVConfig {
-        @JvmField var lowH = 9.0
-        @JvmField var lowS = 130.0
-        @JvmField var lowV = 60.0
-        @JvmField var highH = 22.0
+        @JvmField var lowH = 2.0
+        @JvmField var lowS = 128.0
+        @JvmField var lowV = 128.0
+        @JvmField var highH = 13.0
         @JvmField var highS = 255.0
         @JvmField var highV = 255.0
     }
@@ -84,12 +84,18 @@ open class OpenCVNodeWebcam : RobotModule() {
     val pipeline = object : OpenCvPipeline() {
         private val stages = Stage.values()
         private var all = Mat()
+        var ringStackBoundingRect = Rect()
+        var hsvLowerBound = Scalar(lowH, lowS, lowV)
+        var hsvUpperBound = Scalar(highH, highS, highV)
+        private var wbReferenceScalar = Scalar(128.0,128.0,128.0)
+        private var wbReferenceLum = .0
         private var HSVMat = Mat()
-        private var HSVMatMean = Scalar(.0)
+        private var HSVMatMean = Scalar(.0,.0,.0)
         private var thresholdMat = Mat()
         private val structuringElement =
             Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, Size(35.0, 10.0))
-        private val crop = Rect(0, 200, rows, cols - 220)
+        private val crop = Rect(0, cols-(cols*2)/3, rows, (cols*2)/3)
+        private var wbReferenceRect = Rect(rows/2-(rows/2)/2,cols-cols/4,rows/2,cols/4) //cols/3
         private val BlurSize = Size(9.0, 9.0)
         private var stageToRenderToViewport = Stage.DETECTION
         private val autoTapper = ElapsedTime()
@@ -103,49 +109,67 @@ open class OpenCVNodeWebcam : RobotModule() {
         }
 
         override fun processFrame(input: Mat): Mat {
-            val hsvLowerBound = Scalar(lowH, lowS, lowV)
-            val hsvUpperBound = Scalar(highH, highS, highV)
-            all = input.submat(crop)
-            Imgproc.GaussianBlur(all, all, BlurSize, 0.0)
-            Imgproc.cvtColor(all, HSVMat, Imgproc.COLOR_RGB2HSV)
-            HSVMatMean = Core.mean(HSVMat)
-            Core.inRange(
-                HSVMat,
-                Scalar(
-                    hsvLowerBound.`val`[0],
-                    (hsvLowerBound.`val`[1] + HSVMatMean.`val`[1]) / 2.0,
-                    (hsvLowerBound.`val`[2] + HSVMatMean.`val`[2]) / 2.0
-                ),
-                hsvUpperBound,
-                thresholdMat
-            )
-            Imgproc.erode(thresholdMat, thresholdMat, structuringElement)
-            Imgproc.dilate(thresholdMat, thresholdMat, structuringElement)
-            val rect = Imgproc.boundingRect(thresholdMat)
-            Imgproc.rectangle(input, crop, Scalar(0.0, 255.0, 0.0), 2)
-            Imgproc.rectangle(all, rect, Scalar(0.0, 0.0, 255.0), 2)
-            mean = Core.mean(thresholdMat).`val`[0]
-            if (mean > 0.1) {
-                aspectRatio = rect.width.toDouble() / rect.height.toDouble()
-                stackSize = if (aspectRatio > 2.2) StackSize.ONE else StackSize.FOUR
-            } else {
-                stackSize = StackSize.ZERO
-                aspectRatio = 0.0
-            }
-            if(autoTapper.seconds()>3) {
-                onViewportTapped()
-                autoTapper.reset()
-            }
-            return when (stageToRenderToViewport) {
-                Stage.DETECTION -> {
-                    all
+            try {
+                wbReferenceScalar = Core.mean(input.submat(wbReferenceRect))
+                wbReferenceLum =
+                    (wbReferenceScalar.`val`[0] + wbReferenceScalar.`val`[1] + wbReferenceScalar.`val`[2]) / 3.0
+                all = input.submat(crop)
+                if (wbReferenceLum != 0.0) {
+                    wbReferenceScalar = Scalar(
+                        wbReferenceLum / wbReferenceScalar.`val`[0],
+                        wbReferenceLum / wbReferenceScalar.`val`[1],
+                        wbReferenceLum / wbReferenceScalar.`val`[2]
+                    )
+                    Core.multiply(all, wbReferenceScalar, all)
                 }
-                Stage.RAW_IMAGE -> {
-                    input.submat(crop)
-                }
-                Stage.THRESHOLD -> {
+                Imgproc.GaussianBlur(all, all, BlurSize, 0.0)
+                Imgproc.cvtColor(all, HSVMat, Imgproc.COLOR_RGB2HSV)
+                hsvLowerBound = Scalar(lowH, lowS, lowV)
+                hsvUpperBound = Scalar(highH, highS, highV)
+                HSVMatMean = Core.mean(HSVMat)
+                Core.inRange(
+                    HSVMat,
+                    Scalar(
+                        hsvLowerBound.`val`[0],
+                        (hsvLowerBound.`val`[1] + HSVMatMean.`val`[1]) / 2.0,
+                        (hsvLowerBound.`val`[2] + HSVMatMean.`val`[2]) / 2.0
+                    ),
+                    hsvUpperBound,
                     thresholdMat
+                )
+                Imgproc.erode(thresholdMat, thresholdMat, structuringElement)
+                Imgproc.dilate(thresholdMat, thresholdMat, structuringElement)
+                ringStackBoundingRect = Imgproc.boundingRect(thresholdMat)
+                Imgproc.rectangle(input, crop, Scalar(0.0, 255.0, 0.0), 2)
+                Imgproc.rectangle(input, wbReferenceRect, Scalar(128.0, 128.0, 128.0), 2)
+                Imgproc.rectangle(all, ringStackBoundingRect, Scalar(0.0, 0.0, 255.0), 2)
+                mean = Core.mean(thresholdMat).`val`[0]
+                if (mean > 0.1) {
+                    aspectRatio =
+                        ringStackBoundingRect.width.toDouble() / ringStackBoundingRect.height.toDouble()
+                    stackSize = if (aspectRatio > 2.2) StackSize.ONE else StackSize.FOUR
+                } else {
+                    stackSize = StackSize.ZERO
+                    aspectRatio = 0.0
                 }
+                if (autoTapper.seconds() > 3) {
+                    onViewportTapped()
+                    autoTapper.reset()
+                }
+                return when (stageToRenderToViewport) {
+                    Stage.DETECTION -> {
+                        all
+                    }
+                    Stage.RAW_IMAGE -> {
+                        input.submat(crop)
+                    }
+                    Stage.THRESHOLD -> {
+                        thresholdMat
+                    }
+                }
+            } catch (e: Exception) {
+                stackSize = StackSize.ZERO
+                return Mat()
             }
         }
 
