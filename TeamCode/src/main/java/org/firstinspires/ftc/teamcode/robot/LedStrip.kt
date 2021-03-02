@@ -87,21 +87,21 @@ class LedStrip : MultithreadRobotModule() {
     }
 
     enum class LedMode {
-        SMOOTHLY, ON, OFF, INFORM
+        SMOOTHLY, ON, OFF, INFORMSHOOTER
     }
 
-    fun ledMode(LedMode: LedMode, ledPower1: Double = 1.0, ledPower2: Double = 1.0, ledTime1: Double = 1500.0, ledTime2: Double = 1500.0) {
-        when (LedMode) {
-            LedStrip.LedMode.ON -> {
+    fun setLedMode(mode: LedMode, ledPower1: Double = 1.0, ledPower2: Double = 1.0, ledTime1: Double = 1500.0, ledTime2: Double = 1500.0) {
+        when (mode) {
+            LedMode.ON -> {
                 onLed(setPowerLed1, ledPower1)
                 onLed(setPowerLed2, ledPower2)
             }
-            LedStrip.LedMode.INFORM -> infromLed()
-            LedStrip.LedMode.SMOOTHLY -> {
+            LedMode.INFORMSHOOTER -> infromLed()
+            LedMode.SMOOTHLY -> {
                 smoothyLed(setPowerLed1, ledTime1, ledPower1)
                 smoothyLed(setPowerLed2, ledTime2, ledPower2)
             }
-            LedStrip.LedMode.OFF -> {
+            LedMode.OFF -> {
                 offLed(setPowerLed1)
                 offLed(setPowerLed2)
             }
