@@ -9,7 +9,6 @@ import kotlin.math.PI
 import kotlin.math.pow
 import kotlin.math.sin
 
-@Deprecated("")
 class LedStrip : MultithreadRobotModule() {
     private lateinit var ledStrip1: DcMotorEx
     private lateinit var ledStrip2: DcMotorEx
@@ -89,6 +88,24 @@ class LedStrip : MultithreadRobotModule() {
 
     enum class LedMode {
         SMOOTHLY, ON, OFF, INFORM
+    }
+
+    fun ledMode(LedMode: LedMode, ledPower1: Double = 1.0, ledPower2: Double = 1.0, ledTime1: Double = 1500.0, ledTime2: Double = 1500.0) {
+        when (LedMode) {
+            LedStrip.LedMode.ON -> {
+                onLed(setPowerLed1, ledPower1)
+                onLed(setPowerLed2, ledPower2)
+            }
+            LedStrip.LedMode.INFORM -> infromLed()
+            LedStrip.LedMode.SMOOTHLY -> {
+                smoothyLed(setPowerLed1, ledTime1, ledPower1)
+                smoothyLed(setPowerLed2, ledTime2, ledPower2)
+            }
+            LedStrip.LedMode.OFF -> {
+                offLed(setPowerLed1)
+                offLed(setPowerLed2)
+            }
+        }
     }
 }
 
