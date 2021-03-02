@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.robot
 
+import com.qualcomm.robotcore.hardware.DcMotor
 import com.qualcomm.robotcore.hardware.DcMotorEx
+import com.qualcomm.robotcore.hardware.DcMotorSimple
 import com.qualcomm.robotcore.util.ElapsedTime
 import org.firstinspires.ftc.teamcode.misc.CommandSender
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.shooter
@@ -20,6 +22,12 @@ class LedStrip : MultithreadRobotModule() {
     override fun initialize() {
         ledStrip1 = WoENHardware.ledStrip1
         ledStrip2 = WoENHardware.ledStrip2
+        ledStrip1.direction = DcMotorSimple.Direction.FORWARD
+        ledStrip1.mode = DcMotor.RunMode.STOP_AND_RESET_ENCODER
+        ledStrip1.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
+        ledStrip2.direction = DcMotorSimple.Direction.FORWARD
+        ledStrip2.mode = DcMotor.RunMode.STOP_AND_RESET_ENCODER
+        ledStrip2.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
         ledTime.reset()
     }
 
