@@ -36,6 +36,7 @@ class LedStrip : MultithreadRobotModule() {
     }
 
     override fun updateExpansionHub() {
+        setLedMode(LedMode.INFORMSHOOTER)
     }
 
     override fun updateOther() {
