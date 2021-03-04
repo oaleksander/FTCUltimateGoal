@@ -7,9 +7,11 @@ import org.firstinspires.ftc.teamcode.misc.CommandSender
 import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig.kD
 import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig.kI
 import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig.kP
+import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig.maxI
 import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule
 import org.openftc.revextensions2.ExpansionHubServo
 import kotlin.math.abs
+import kotlin.math.sign
 
 class Shooter2: MultithreadRobotModule() {
     private val rpmTime = ElapsedTime()
@@ -38,6 +40,8 @@ class Shooter2: MultithreadRobotModule() {
         var kI = 0.001 //0.03
         @JvmField
         var kD = 0.05
+        @JvmField
+        var maxI = 6000
       //  @JvmField
       //  var kF = 14.89
       //  @JvmField
@@ -102,13 +106,18 @@ class Shooter2: MultithreadRobotModule() {
     private var D = 0.0
     private var I = 0.0
     private var power = 0.0
+    private var timeOld = WoENrobot.runTime.seconds()
+    private var timeDelta = 0.0
     override fun updateExpansionHub() {
+        timeDelta = WoENrobot.runTime.seconds() - timeOld
+        timeOld = WoENrobot.runTime.seconds()
         currentRpm = getMotorRpm()
         if (rpmTarget != 0.0) {
             rpmError = rpmTarget - currentRpm
             P = rpmError * kP
-            D = (rpmError - rpmErrorOld) * kD
-            I += kI * rpmError
+            D = (rpmError - rpmErrorOld) * kD / timeDelta
+            I = (I + kI * rpmError) * timeDelta
+            if (abs(I) > maxI) I = sign(I) * maxI
             power = (P + I + D) / 6000
             rpmErrorOld = rpmError
         }
