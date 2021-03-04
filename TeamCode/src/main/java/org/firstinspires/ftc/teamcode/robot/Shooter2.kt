@@ -4,9 +4,12 @@ import com.acmerobotics.dashboard.config.Config
 import com.qualcomm.robotcore.hardware.*
 import com.qualcomm.robotcore.util.ElapsedTime
 import org.firstinspires.ftc.teamcode.misc.CommandSender
+import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig.kA
 import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig.kD
 import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig.kI
 import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig.kP
+import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig.kS
+import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig.kV
 import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig.maxI
 import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig.maxRPM
 import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule
@@ -41,6 +44,12 @@ class Shooter2: MultithreadRobotModule() {
         var kI = 0.001 //0.03
         @JvmField
         var kD = 0.05
+        @JvmField
+        var kV = 0.0
+        @JvmField
+        var kA = 0.0
+        @JvmField
+        var kS = 0.0
         @JvmField
         var maxI = 6000
         @JvmField
@@ -108,6 +117,9 @@ class Shooter2: MultithreadRobotModule() {
     private var P = 0.0
     private var D = 0.0
     private var I = 0.0
+    private var V = 0.0
+    private var A = 0.0
+    private var S = 0.0
     private var power = 0.0
     private var timeOld = WoENrobot.runTime.seconds()
     private var timeDelta = 0.0
@@ -121,7 +133,10 @@ class Shooter2: MultithreadRobotModule() {
             D = (rpmError - rpmErrorOld) * kD / timeDelta
             I += (kI * rpmError) * timeDelta
             if (abs(I) > maxI) I = sign(I) * maxI
-            power = (P + I + D) / maxRPM
+            V = kV * 0
+            A = kA * 0
+            S = kS * 0
+            power = (P + I + D + V + A + S) / maxRPM
             rpmErrorOld = rpmError
         }
         else {
