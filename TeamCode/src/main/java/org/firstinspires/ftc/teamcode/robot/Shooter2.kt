@@ -26,8 +26,8 @@ class Shooter2: MultithreadRobotModule() {
         var lowRpm = 3470.0
         @JvmField
         var highRpm = 4000.0
-        @JvmField
-        var timeRpm = 150.0
+      //  @JvmField
+      //  var timeRpm = 150.0
         @JvmField
         var feederClose = 0.165
         @JvmField
@@ -96,12 +96,12 @@ class Shooter2: MultithreadRobotModule() {
         }
         setFeederPosition(feederTime.milliseconds() < ShooterConfig.servoTime && motorVelocityTarget != 0.0)
     }
-    var rpmError = 0.0
-    var rpmErrorOld = 0.0
-    var P = 0.0
-    var D = 0.0
-    var I = 0.0
-    var power = 0.0
+    private var rpmError = 0.0
+    private var rpmErrorOld = 0.0
+    private var P = 0.0
+    private var D = 0.0
+    private var I = 0.0
+    private var power = 0.0
     override fun updateExpansionHub() {
         currentRpm = getMotorRpm()
         if (rpmTarget != 0.0) {
@@ -128,12 +128,9 @@ class Shooter2: MultithreadRobotModule() {
         feederPositionSender.send(if (push) ShooterConfig.feederOpen else ShooterConfig.feederClose)
     }
 
-    private fun setShootersetings(Rpm: Double, time: Double) {
-        if (Rpm != rpmTarget || time != timeToAccelerateMs) {
+    private fun setShootersetings(Rpm: Double) {
+        if (Rpm != rpmTarget) {
             rpmTarget = Rpm
-            if (time != 0.0) timeToAccelerateMs = abs(time)
-            accelerationIncrement = rpmTarget / timeToAccelerateMs / 6000
-            motorVelocityTarget = rpmTarget * 0.4
         }
     }
 
@@ -146,14 +143,12 @@ class Shooter2: MultithreadRobotModule() {
             shooterMode = mode
             when (mode) {
                 ShooterMode.HIGHGOAL -> setShootersetings(
-                    ShooterConfig.highRpm,
-                    ShooterConfig.timeRpm
+                    ShooterConfig.highRpm
                 )
                 ShooterMode.POWERSHOT -> setShootersetings(
-                    ShooterConfig.lowRpm,
-                    ShooterConfig.timeRpm
+                    ShooterConfig.lowRpm
                 )
-                ShooterMode.OFF -> setShootersetings(0.0, ShooterConfig.timeRpm)
+                ShooterMode.OFF -> setShootersetings(0.0)
             }
         }
 
