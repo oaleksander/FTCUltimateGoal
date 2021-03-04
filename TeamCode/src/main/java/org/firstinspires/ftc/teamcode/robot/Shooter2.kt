@@ -8,6 +8,7 @@ import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig.kD
 import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig.kI
 import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig.kP
 import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig.maxI
+import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig.maxRPM
 import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule
 import org.openftc.revextensions2.ExpansionHubServo
 import kotlin.math.abs
@@ -42,6 +43,8 @@ class Shooter2: MultithreadRobotModule() {
         var kD = 0.05
         @JvmField
         var maxI = 6000
+        @JvmField
+        var maxRPM = 5400
       //  @JvmField
       //  var kF = 14.89
       //  @JvmField
@@ -118,7 +121,7 @@ class Shooter2: MultithreadRobotModule() {
             D = (rpmError - rpmErrorOld) * kD / timeDelta
             I += (kI * rpmError) * timeDelta
             if (abs(I) > maxI) I = sign(I) * maxI
-            power = (P + I + D) / 6000
+            power = (P + I + D) / maxRPM
             rpmErrorOld = rpmError
         }
         else {
