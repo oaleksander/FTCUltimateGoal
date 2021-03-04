@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.util.ElapsedTime
 import org.firstinspires.ftc.teamcode.misc.CommandSender
 import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig.kA
 import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig.kD
+import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig.kV_referenceVoltage
 import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig.kI
 import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig.kP
 import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig.kS
@@ -45,19 +46,19 @@ class Shooter2: MultithreadRobotModule() {
         @JvmField
         var kD = 0.05
         @JvmField
-        var kV = 0.0
+        var kV = 0.5
         @JvmField
-        var kA = 0.0
+        var kA = 0.1
         @JvmField
-        var kS = 0.0
+        var kS = 0.6
         @JvmField
         var maxI = 6000
         @JvmField
         var maxRPM = 5400
       //  @JvmField
       //  var kF = 14.89
-      //  @JvmField
-      //  var kF_referenceVoltage = 12.485
+        @JvmField
+        var kV_referenceVoltage = 12.485
     }
 
     private lateinit var shooterMotor: DcMotorEx
@@ -123,19 +124,21 @@ class Shooter2: MultithreadRobotModule() {
     private var power = 0.0
     private var timeOld = WoENrobot.runTime.seconds()
     private var timeDelta = 0.0
+    private var voltageDelta = 0.0
     override fun updateExpansionHub() {
         timeDelta = WoENrobot.runTime.seconds() - timeOld
         timeOld = WoENrobot.runTime.seconds()
         currentRpm = getMotorRpm()
+        voltageDelta = kV_referenceVoltage / voltageSensor.voltage
         if (rpmTarget != 0.0) {
             rpmError = rpmTarget - currentRpm
             P = rpmError * kP
             D = (rpmError - rpmErrorOld) * kD / timeDelta
             I += (kI * rpmError) * timeDelta
             if (abs(I) > maxI) I = sign(I) * maxI
-            V = kV * 0
-            A = kA * 0
-            S = kS * 0
+            V = kV * rpmTarget * voltageDelta
+            A = kA * rpmTarget / timeDelta * voltageDelta
+            S = kS * sign(rpmTarget) * voltageDelta
             power = (P + I + D + V + A + S) / maxRPM
             rpmErrorOld = rpmError
         }
