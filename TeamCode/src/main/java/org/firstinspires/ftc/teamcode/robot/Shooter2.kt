@@ -116,7 +116,7 @@ class Shooter2: MultithreadRobotModule() {
             rpmError = rpmTarget - currentRpm
             P = rpmError * kP
             D = (rpmError - rpmErrorOld) * kD / timeDelta
-            I = (I + kI * rpmError) * timeDelta
+            I += (kI * rpmError) * timeDelta
             if (abs(I) > maxI) I = sign(I) * maxI
             power = (P + I + D) / 6000
             rpmErrorOld = rpmError
