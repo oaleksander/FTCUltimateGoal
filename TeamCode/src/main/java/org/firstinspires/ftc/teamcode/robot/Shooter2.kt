@@ -125,6 +125,7 @@ class Shooter2: MultithreadRobotModule() {
     private var timeOld = WoENrobot.runTime.seconds()
     private var timeDelta = 0.0
     private var voltageDelta = 0.0
+    private var rpmTargetOld = 0.0
     override fun updateExpansionHub() {
         timeDelta = WoENrobot.runTime.seconds() - timeOld
         timeOld = WoENrobot.runTime.seconds()
@@ -137,16 +138,18 @@ class Shooter2: MultithreadRobotModule() {
             I += (kI * rpmError) * timeDelta
             if (abs(I) > maxI) I = sign(I) * maxI
             V = kV * rpmTarget * voltageDelta
-            A = kA * rpmTarget / timeDelta * voltageDelta
+            A = kA * (rpmTarget - rpmTargetOld) / timeDelta * voltageDelta
             S = kS * sign(rpmTarget) * voltageDelta
             power = (P + I + D + V + A + S) / maxRPM
             rpmErrorOld = rpmError
+            rpmTargetOld = rpmTarget
         }
         else {
             rpmError = 0.0
             power = 0.0
             rpmErrorOld = 0.0
             I = 0.0
+            rpmTargetOld = 0.0
         }
         shooterPowerSender.send(power)
     }
