@@ -24,8 +24,8 @@ class ServoWobbleManipulator : MultithreadRobotModule(), WobbleManipulator {
         var angleUp = 1.0
     }
 
-    private val closePositionSender = CommandSender { p: Double -> gripper.position = p }
-    private val anglePositionSender = CommandSender { p: Double -> leverArm.position = p }
+    private val closePositionSender = CommandSender {gripper.position = it}
+    private val anglePositionSender = CommandSender {leverArm.position = it}
     private var isDown = false
     private var posAngle = WobbleManipulator.Position.UP
     private var leverArmPosition = 0.0
@@ -35,12 +35,12 @@ class ServoWobbleManipulator : MultithreadRobotModule(), WobbleManipulator {
         leverArm = WoENHardware.leverArm
         grabWobble(true)
         setAngle(WobbleManipulator.Position.UP)
-        updateControlHub()
+        closePositionSender.send(gripperPosition)
+        anglePositionSender.send(leverArmPosition)
     }
 
     override fun grabWobble(dograb: Boolean) {
-        gripperPosition =
-            if (dograb) WobbleServoPositions.gripperClose else WobbleServoPositions.gripperOpen
+        gripperPosition = if (dograb) WobbleServoPositions.gripperClose else WobbleServoPositions.gripperOpen
     }
 
     override fun start() {
