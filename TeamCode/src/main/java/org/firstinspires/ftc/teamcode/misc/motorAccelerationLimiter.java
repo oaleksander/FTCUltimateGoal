@@ -21,12 +21,11 @@ public class motorAccelerationLimiter {
     }
 
     public void setVelocity(double requestedVelocity) {
-        if (requestedVelocity == 0) {
-            currentVelocity = 0;
-        } else {
-            currentVelocity += min(abs(requestedVelocity - currentVelocity), abs(looptime.seconds() * maxAcceleration)) * signum(requestedVelocity - currentVelocity);
-        }
+        currentVelocity += min(abs(requestedVelocity - currentVelocity), abs(looptime.seconds() * maxAcceleration)) * signum(requestedVelocity - currentVelocity);
+        if (requestedVelocity == 0)
+            motorToControl.accept(0);
+        else
+            motorToControl.accept(currentVelocity);
         looptime.reset();
-        motorToControl.accept(currentVelocity);
     }
 }
