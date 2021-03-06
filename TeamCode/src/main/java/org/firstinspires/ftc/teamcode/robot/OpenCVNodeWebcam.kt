@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.robot
 
 import com.acmerobotics.dashboard.config.Config
 import com.qualcomm.robotcore.util.ElapsedTime
+import com.qualcomm.robotcore.util.RollingAverage
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.firstinspires.ftc.teamcode.robot.OpenCVNodeWebcam.OpenCVConfig.highH
 import org.firstinspires.ftc.teamcode.robot.OpenCVNodeWebcam.OpenCVConfig.highS
@@ -82,6 +83,10 @@ open class OpenCVNodeWebcam : RobotModule() {
     }
 
     val pipeline = object : OpenCvPipeline() {
+        private val averageResult = RollingAverage(10)
+        private val ZERO_RINGS = 0
+        private val ONE_RING = 1
+        private val FOUR_RINGS = 2
         private val stages = Stage.values()
         private var all = Mat()
         var ringStackBoundingRect = Rect()
@@ -93,10 +98,10 @@ open class OpenCVNodeWebcam : RobotModule() {
         private var HSVMatMean = Scalar(.0,.0,.0)
         private var thresholdMat = Mat()
         private val structuringElement =
-            Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, Size(35.0, 10.0))
+            Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, Size(cols/14.0, cols/48.0))
         private val crop = Rect(0, cols-(cols*2)/3, rows, (cols*2)/3)
         private var wbReferenceRect = Rect(rows/2-(rows/2)/2,cols-cols/4,rows/2,cols/4) //cols/3
-        private val BlurSize = Size(9.0, 9.0)
+        private val BlurSize = Size(cols/50.0, cols/50.0)
         private var stageToRenderToViewport = Stage.DETECTION
         private val autoTapper = ElapsedTime()
         override fun onViewportTapped() {
@@ -147,11 +152,17 @@ open class OpenCVNodeWebcam : RobotModule() {
                 if (mean > 0.1) {
                     aspectRatio =
                         ringStackBoundingRect.width.toDouble() / ringStackBoundingRect.height.toDouble()
-                    stackSize = if (aspectRatio > 2.2) StackSize.ONE else StackSize.FOUR
+                    if (aspectRatio > 2.2) averageResult.addNumber(ONE_RING) else averageResult.addNumber(FOUR_RINGS)
                 } else {
-                    stackSize = StackSize.ZERO
+                    averageResult.addNumber(ZERO_RINGS)
                     aspectRatio = 0.0
                 }
+                stackSize = when(averageResult.average){
+                    ONE_RING->StackSize.ONE
+                    FOUR_RINGS->StackSize.FOUR
+                    else -> StackSize.ZERO
+                }
+
                 if (autoTapper.seconds() > 3) {
                     onViewportTapped()
                     autoTapper.reset()
