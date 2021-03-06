@@ -39,7 +39,6 @@ class Conveyor : MultithreadRobotModule(),
     private val motorCurrentQueryTimer = ElapsedTime()
     override var enableFullStackStopping = true
     override var reverseBeforeStop = true
-    private var requestedPower = 0.0
 
     @Config
     internal object ConveyorConfig {
@@ -93,29 +92,35 @@ class Conveyor : MultithreadRobotModule(),
         }
 
     override fun updateControlHub() {
-        if (!forceReverse && !(reverseBeforeStop && requestedPower == 0.0) && enableFullStackStopping)
+        if (!forceReverse && !(reverseBeforeStop && !enableConveyor) && enableFullStackStopping)
             if (getdistance() >= ConveyorConfig.distanceThreshold) {
             stackDetectionTimer.reset() //Full collector detection
         }
     }
 
     val collectorIsFull : Boolean
-        get() = stackDetectionTimer.milliseconds() > ConveyorConfig.stackDetectionTimeout && !forceReverse && enableFullStackStopping && requestedPower != 0.0
+        get() = stackDetectionTimer.milliseconds() > ConveyorConfig.stackDetectionTimeout && !forceReverse && enableFullStackStopping && enableConveyor
     val motorIsLocked: Boolean
-        get() = motorCurrentTimer.milliseconds() > ConveyorConfig.motorLockingCurrentTimeout && !forceReverse && stackDetectionTimer.milliseconds() < ConveyorConfig.stackDetectionTimeout && requestedPower != 0.0
+        get() = motorCurrentTimer.milliseconds() > ConveyorConfig.motorLockingCurrentTimeout && !forceReverse && stackDetectionTimer.milliseconds() < ConveyorConfig.stackDetectionTimeout && enableConveyor
 
     override fun updateExpansionHub() {
-        if (!forceReverse) {
-            if ((stackDetectionTimer.milliseconds() > ConveyorConfig.stackDetectionTimeout || reverseBeforeStop && requestedPower == 0.0) && enableFullStackStopping) { //reverse+stop in case of ring detection
+        if (!forceReverse)
+        {
+            if ((stackDetectionTimer.milliseconds() > ConveyorConfig.stackDetectionTimeout || reverseBeforeStop && !enableConveyor) && enableFullStackStopping)
+            { //reverse+stop in case of ring detection
                 motorCurrentTimer.reset()
-                currentMotorPower =
-                    if (stackDetectionTimer.milliseconds() < ConveyorConfig.stackDetectionTimeout + ConveyorConfig.stackDetectionReverseTime && reverseBeforeStop) -1.0 else 0.0
-            } else if (motorCurrentTimer.milliseconds() > ConveyorConfig.motorLockingCurrentTimeout) //reverse after locking
+                currentMotorPower = if (stackDetectionTimer.milliseconds() < ConveyorConfig.stackDetectionTimeout + ConveyorConfig.stackDetectionReverseTime && reverseBeforeStop) -1.0 else 0.0
+            }
+            else if (motorCurrentTimer.milliseconds() > ConveyorConfig.motorLockingCurrentTimeout) //reverse after locking
             {
-                if (motorCurrentTimer.milliseconds() < ConveyorConfig.motorLockingReverseTime + ConveyorConfig.motorLockingCurrentTimeout) {
+                if (motorCurrentTimer.milliseconds() < ConveyorConfig.motorLockingReverseTime + ConveyorConfig.motorLockingCurrentTimeout)
+                {
                     currentMotorPower = - if(enableConveyor) conveyorPower else 0.0
-                } else motorCurrentTimer.reset()
-            } else {
+                }
+                else motorCurrentTimer.reset()
+            }
+            else
+            {
                 currentMotorPower = + if(enableConveyor) conveyorPower else 0.0
                 if (aMPS < ConveyorConfig.currentThreshold) //locking detection
                     motorCurrentTimer.reset()
