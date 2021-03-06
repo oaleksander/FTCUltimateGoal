@@ -52,7 +52,7 @@ class ThreeWheelOdometry : MultithreadRobotModule(), Odometry {
         var forwardMultiplier = 1.00
 
         @JvmField
-        var headingMultiplier = 1.0178671389975555
+        var headingMultiplier = 1.0160326356276722029668653819493
 
         @JvmField
         var doUseIMU = false
@@ -63,7 +63,7 @@ class ThreeWheelOdometry : MultithreadRobotModule(), Odometry {
         return MathUtil.angleWrap(encoderHeading - angleOffset - encoderHeadingCovariance)
     }
 
-    private val encoderHeading: Double
+    val encoderHeading: Double
         get() = getEncoderHeading(
             odometerYL.currentPosition.toDouble(),
             odometerYR.currentPosition.toDouble()

@@ -28,8 +28,8 @@ import org.firstinspires.ftc.teamcode.robot.WoENrobot.openCVNode
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.shooter
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.spinOnce
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.wobbleManipulator
-import org.firstinspires.ftc.teamcode.robot.Shooter
 import org.firstinspires.ftc.teamcode.superclasses.MotionTask
+import org.firstinspires.ftc.teamcode.superclasses.Shooter
 import org.firstinspires.ftc.teamcode.superclasses.WobbleManipulator
 import java.lang.Math.toRadians
 
@@ -50,7 +50,7 @@ object MovementMacros {
         @JvmField
         var PartnerWobblePoseYOffset = 0.0
         @JvmField
-        var HighGoalShootingDistance = 215.0
+        var HighGoalShootingDistance = 205.0
         @JvmField
         var HighGoalShootingAngle = -4.3
         @JvmField

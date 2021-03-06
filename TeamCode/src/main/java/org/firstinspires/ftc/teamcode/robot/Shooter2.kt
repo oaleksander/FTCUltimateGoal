@@ -4,16 +4,17 @@ import com.acmerobotics.dashboard.config.Config
 import com.qualcomm.robotcore.hardware.*
 import com.qualcomm.robotcore.util.ElapsedTime
 import org.firstinspires.ftc.teamcode.misc.CommandSender
-import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig.kA
-import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig.kD
-import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig.kV_referenceVoltage
-import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig.kI
-import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig.kP
-import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig.kS
-import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig.kV
-import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig.maxI
-import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig.maxRPM
+import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig2.kA
+import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig2.kD
+import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig2.kV_referenceVoltage
+import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig2.kI
+import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig2.kP
+import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig2.kS
+import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig2.kV
+import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig2.maxI
+//import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig2.maxRPM
 import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule
+import org.firstinspires.ftc.teamcode.superclasses.Shooter
 import org.openftc.revextensions2.ExpansionHubServo
 import kotlin.math.abs
 import kotlin.math.sign
@@ -24,11 +25,11 @@ class Shooter2: MultithreadRobotModule() {
     private val encoderFailureDetectionTime = ElapsedTime()
 
     @Config
-    internal object ShooterConfig {
+    internal object ShooterConfig2 {
         @JvmField
-        var servoTime = 137.0
+        var servoTime = 55
         @JvmField
-        var servoReturnMultiplier = 2.6
+        var servoReturnMultiplier = 3.4
         @JvmField
         var lowRpm = 3470.0
         @JvmField
@@ -36,25 +37,25 @@ class Shooter2: MultithreadRobotModule() {
       //  @JvmField
       //  var timeRpm = 150.0
         @JvmField
-        var feederClose = 0.165
+        var feederClose = 0.23
         @JvmField
-        var feederOpen = 0.42
+        var feederOpen = 0.49
         @JvmField
-        var kP = 58.0
+        var kP = 186.0
         @JvmField
-        var kI = 0.001 //0.03
+        var kI = 1.77 //0.03
         @JvmField
-        var kD = 0.05
+        var kD = 0.0
         @JvmField
-        var kV = 0.5
+        var kV = 13.56
         @JvmField
-        var kA = 0.1
+        var kA = 1.0
         @JvmField
-        var kS = 0.6
+        var kS = 3000.0
         @JvmField
-        var maxI = 6000
-        @JvmField
-        var maxRPM = 5400
+        var maxI = 600000.0
+    //    @JvmField
+      //  var maxRPM = 5400.0
       //  @JvmField
       //  var kF = 14.89
         @JvmField
@@ -66,7 +67,7 @@ class Shooter2: MultithreadRobotModule() {
     private lateinit var feeder: ExpansionHubServo
     private val shooterPowerSender = CommandSender { p: Double -> shooterMotor.power = p }
     private val feederPositionSender = CommandSender { p: Double -> feeder.position = p }
-    private var shooterMode = ShooterMode.OFF
+    private var shooterMode = Shooter.ShooterMode.OFF
     private var ringsToShoot: Int = 0
     private var timeToAccelerateMs = 1.0
     private var accelerationIncrement = 1.0
@@ -89,32 +90,32 @@ class Shooter2: MultithreadRobotModule() {
         shooterMotor.direction = DcMotorSimple.Direction.FORWARD
         shooterMotor.mode = DcMotor.RunMode.STOP_AND_RESET_ENCODER
         shooterMotor.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
-        shootingMode = ShooterMode.OFF
+        shootingMode = Shooter.ShooterMode.OFF
         initializedservo()
         feederTime.reset()
     }
 
     private fun initializedservo() {
         feeder = opMode.hardwareMap.get(Servo::class.java, "feeder") as ExpansionHubServo
-        feeder.position = ShooterConfig.feederClose
+        feeder.position = ShooterConfig2.feederClose
     }
 
     override fun start() {
-        feeder.position = ShooterConfig.feederClose
+        feeder.position = ShooterConfig2.feederClose
         shooterMotor.power = 0.0
-        shootingMode = ShooterMode.OFF
+        shootingMode = Shooter.ShooterMode.OFF
         ringsToShoot = 0
     }
 
     override fun updateControlHub() {
-        if (ringsToShoot > 0 && feederTime.milliseconds() > ShooterConfig.servoTime * ShooterConfig.servoReturnMultiplier) {
+        if (ringsToShoot > 0 && feederTime.milliseconds() > ShooterConfig2.servoTime * ShooterConfig2.servoReturnMultiplier) {
             feedRing()
             ringsToShoot--
         }
-        setFeederPosition(feederTime.milliseconds() < ShooterConfig.servoTime && motorVelocityTarget != 0.0)
+        setFeederPosition(feederTime.milliseconds() < ShooterConfig2.servoTime && rpmTarget != 0.0)
     }
-    private var rpmError = 0.0
-    private var rpmErrorOld = 0.0
+    private var velocityError = 0.0
+    private var velocityErrorOld = 0.0
     private var P = 0.0
     private var D = 0.0
     private var I = 0.0
@@ -122,34 +123,36 @@ class Shooter2: MultithreadRobotModule() {
     private var A = 0.0
     private var S = 0.0
     private var power = 0.0
-    private var timeOld = WoENrobot.runTime.seconds()
+    private var timeOld = 0.0
     private var timeDelta = 0.0
     private var voltageDelta = 0.0
-    private var rpmTargetOld = 0.0
+    private var velocityTargetOld = 0.0
+    private var currentVelocity = 0.0
     override fun updateExpansionHub() {
         timeDelta = WoENrobot.runTime.seconds() - timeOld
         timeOld = WoENrobot.runTime.seconds()
-        currentRpm = getMotorRpm()
+        currentVelocity = getMotorVelocity()
+        currentRpm = currentVelocity * 2.5
         voltageDelta = kV_referenceVoltage / voltageSensor.voltage
-        if (rpmTarget != 0.0) {
-            rpmError = rpmTarget - currentRpm
-            P = rpmError * kP
-            D = (rpmError - rpmErrorOld) * kD / timeDelta
-            I += (kI * rpmError) * timeDelta
+        if (motorVelocityTarget != 0.0) {
+            velocityError = motorVelocityTarget - currentVelocity
+            P = velocityError * kP
+            D = (velocityError - velocityErrorOld) * kD / timeDelta
+            I += (kI * velocityError) * timeDelta
             if (abs(I) > maxI) I = sign(I) * maxI
-            V = kV * rpmTarget * voltageDelta
-            A = kA * (rpmTarget - rpmTargetOld) / timeDelta * voltageDelta
-            S = kS * sign(rpmTarget) * voltageDelta
-            power = (P + I + D + V + A + S) / maxRPM
-            rpmErrorOld = rpmError
-            rpmTargetOld = rpmTarget
+            V = kV * motorVelocityTarget * voltageDelta
+            A = kA * (motorVelocityTarget - velocityTargetOld) / timeDelta * voltageDelta
+            S = kS * sign(motorVelocityTarget) * voltageDelta
+            power = (P + I + D + V + A + S) / 32768
+            velocityErrorOld = velocityError
+            velocityTargetOld = motorVelocityTarget
         }
         else {
-            rpmError = 0.0
+            velocityError = 0.0
             power = 0.0
-            rpmErrorOld = 0.0
+            velocityErrorOld = 0.0
             I = 0.0
-            rpmTargetOld = 0.0
+            velocityTargetOld = 0.0
         }
         shooterPowerSender.send(power)
     }
@@ -158,30 +161,31 @@ class Shooter2: MultithreadRobotModule() {
     }
 
     private fun setFeederPosition(push: Boolean) {
-        feederPositionSender.send(if (push) ShooterConfig.feederOpen else ShooterConfig.feederClose)
+        feederPositionSender.send(if (push) ShooterConfig2.feederOpen else ShooterConfig2.feederClose)
     }
 
     private fun setShootersetings(Rpm: Double) {
         if (Rpm != rpmTarget) {
             rpmTarget = Rpm
+            motorVelocityTarget = rpmTarget * 0.4
         }
     }
 
-    private fun getMotorRpm(): Double = shooterMotor.velocity * 2.5
+    private fun getMotorVelocity(): Double = shooterMotor.velocity //* 2.5
 
-    var shootingMode: ShooterMode
+    var shootingMode: Shooter.ShooterMode
         get() = shooterMode
         set(mode) {
-            if (mode != ShooterMode.OFF && shooterMode == ShooterMode.OFF) rpmTime.reset()
+            if (mode != Shooter.ShooterMode.OFF && shooterMode == Shooter.ShooterMode.OFF) rpmTime.reset()
             shooterMode = mode
             when (mode) {
-                ShooterMode.HIGHGOAL -> setShootersetings(
-                    ShooterConfig.highRpm
+                Shooter.ShooterMode.HIGHGOAL -> setShootersetings(
+                    ShooterConfig2 .highRpm
                 )
-                ShooterMode.POWERSHOT -> setShootersetings(
-                    ShooterConfig.lowRpm
+                Shooter.ShooterMode.POWERSHOT -> setShootersetings(
+                    ShooterConfig2.lowRpm
                 )
-                ShooterMode.OFF -> setShootersetings(0.0)
+                Shooter.ShooterMode.OFF -> setShootersetings(0.0)
             }
         }
 
@@ -195,10 +199,6 @@ class Shooter2: MultithreadRobotModule() {
     }
 
     fun feedRings() {
-        ringsToShoot = 3
-    }
-
-    enum class ShooterMode {
-        HIGHGOAL, POWERSHOT, OFF
+        ringsToShoot = 4
     }
 }

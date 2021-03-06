@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.robot.WoENrobot.odometry
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.shooter
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.startRobot
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.wobbleManipulator
-import org.firstinspires.ftc.teamcode.robot.Shooter
+import org.firstinspires.ftc.teamcode.superclasses.Shooter
 
 @TeleOp
 class TeleOp_test : LinearOpMode() {
@@ -21,12 +21,12 @@ class TeleOp_test : LinearOpMode() {
         startRobot()
         odometry.robotCoordinates = Pose2D(0.0, 0.0, 0.0)
         /* Wobble */
-        val grabWobbleSwitch = ButtonSwitch { gamepad1.a }
+        val grabWobbleSwitch = ButtonSwitch {gamepad1.a}
         /* Conveyor */
-        val conveyorOnOffSwitch = ButtonSwitch { gamepad1.back }
+        val conveyorOnOffSwitch = ButtonSwitch {gamepad1.back}
         /* Shooter */
-        val shooterOnOffSwitch = ButtonSwitch { gamepad1.start }
-        val threeRingPresser = SinglePressButton { gamepad1.right_stick_button }
+        val shooterOnOffSwitch = ButtonSwitch {gamepad1.start}
+        val threeRingPresser = SinglePressButton {gamepad1.right_stick_button}
         while (opModeIsActive()) {
             /* Wobble */
             wobbleManipulator.grabWobble(grabWobbleSwitch.get())

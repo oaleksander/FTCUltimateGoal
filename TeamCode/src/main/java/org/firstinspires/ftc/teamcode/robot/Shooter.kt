@@ -5,13 +5,15 @@ import com.qualcomm.robotcore.hardware.*
 import com.qualcomm.robotcore.util.ElapsedTime
 import org.firstinspires.ftc.teamcode.misc.CommandSender
 import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule
+import org.firstinspires.ftc.teamcode.superclasses.Shooter
 import org.openftc.revextensions2.ExpansionHubServo
 import kotlin.math.abs
 
-class Shooter : MultithreadRobotModule() {
+class Shooter : MultithreadRobotModule(),Shooter{
     private val rpmTime = ElapsedTime()
     private val feederTime = ElapsedTime()
     private val encoderFailureDetectionTime = ElapsedTime()
+
 
     @Config
     internal object ShooterConfig {
@@ -26,9 +28,9 @@ class Shooter : MultithreadRobotModule() {
         @JvmField
         var timeRpm = 150.0
         @JvmField
-        var feederClose = 0.165
+        var feederClose = 0.225
         @JvmField
-        var feederOpen = 0.42
+        var feederOpen = 0.48
         @JvmField
         var kP = 58.0
         @JvmField
@@ -46,7 +48,7 @@ class Shooter : MultithreadRobotModule() {
     private lateinit var feeder: ExpansionHubServo
     private val shooterVelocitySender = CommandSender { p: Double -> shooterMotor.velocity = p }
     private val feederPositionSender = CommandSender { p: Double -> feeder.position = p }
-    private var shooterMode = ShooterMode.OFF
+    private var shooterMode = Shooter.ShooterMode.OFF
     private var ringsToShoot: Int = 0
     private var timeToAccelerateMs = 1.0
     private var accelerationIncrement = 1.0
@@ -79,7 +81,7 @@ class Shooter : MultithreadRobotModule() {
         shooterMotor.direction = DcMotorSimple.Direction.FORWARD
         shooterMotor.mode = DcMotor.RunMode.STOP_AND_RESET_ENCODER
         shooterMotor.mode = DcMotor.RunMode.RUN_USING_ENCODER
-        shootingMode = ShooterMode.OFF
+        shootingMode = Shooter.ShooterMode.OFF
         initializedservo()
         feederTime.reset()
     }
@@ -92,7 +94,7 @@ class Shooter : MultithreadRobotModule() {
     override fun start() {
         feeder.position = ShooterConfig.feederClose
         shooterMotor.velocity = 0.0
-        shootingMode = ShooterMode.OFF
+        shootingMode = Shooter.ShooterMode.OFF
         ringsToShoot = 0
     }
 
@@ -153,21 +155,21 @@ class Shooter : MultithreadRobotModule() {
 
     private fun getMotorRpm(): Double = shooterMotor.velocity * 2.5
 
-    var shootingMode: ShooterMode
+    var shootingMode: Shooter.ShooterMode
         get() = shooterMode
         set(mode) {
-            if (mode != ShooterMode.OFF && shooterMode == ShooterMode.OFF) rpmTime.reset()
+            if (mode != Shooter.ShooterMode.OFF && shooterMode == Shooter.ShooterMode.OFF) rpmTime.reset()
             shooterMode = mode
             when (mode) {
-                ShooterMode.HIGHGOAL -> setShootersetings(
+                Shooter.ShooterMode.HIGHGOAL -> setShootersetings(
                     ShooterConfig.highRpm,
                     ShooterConfig.timeRpm
                 )
-                ShooterMode.POWERSHOT -> setShootersetings(
+                Shooter.ShooterMode.POWERSHOT -> setShootersetings(
                     ShooterConfig.lowRpm,
                     ShooterConfig.timeRpm
                 )
-                ShooterMode.OFF -> setShootersetings(0.0, ShooterConfig.timeRpm)
+                Shooter.ShooterMode.OFF -> setShootersetings(0.0, ShooterConfig.timeRpm)
             }
         }
 
@@ -183,9 +185,4 @@ class Shooter : MultithreadRobotModule() {
     fun feedRings() {
         ringsToShoot = 3
     }
-
-    enum class ShooterMode {
-        HIGHGOAL, POWERSHOT, OFF
-    }
-
 }

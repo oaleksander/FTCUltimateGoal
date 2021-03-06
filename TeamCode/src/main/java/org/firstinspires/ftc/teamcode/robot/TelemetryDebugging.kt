@@ -14,6 +14,8 @@ import org.firstinspires.ftc.teamcode.robot.WoENrobot.runTime
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.shooter
 import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule
 import java.lang.Exception
+import java.lang.Math.toDegrees
+import java.lang.Math.toRadians
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.math.cos
 import kotlin.math.sin
@@ -113,11 +115,12 @@ class TelemetryDebugging : MultithreadRobotModule() {
                             movement.currentTarget,
                             "green"
                         )
+                        dashboardPacket.put("head", toDegrees(odometry.encoderHeading))
                         dashboardPacket.put("Loop frequency", loopFrequency)
                         // dashboardPacket.put("CH Loop frequency", controlHubLoopFrequency)
                         // dashboardPacket.put("EH Loop frequency", expansionHubloopFrequency)
-                        // dashboardPacket.put("Flywhel RPM",shooter.currentRpm);
-                        //  dashboardPacket.put("Flywhel target",shooter.rpmTarget);
+                        dashboardPacket.put("Flywheel RPM",shooter.currentRpm)
+                        dashboardPacket.put("Flywheel target",shooter.rpmTarget)
                         dashboardPacket.put("Status", "Running " + runTime.seconds())
                         dashboard.sendTelemetryPacket(dashboardPacket)
                     }

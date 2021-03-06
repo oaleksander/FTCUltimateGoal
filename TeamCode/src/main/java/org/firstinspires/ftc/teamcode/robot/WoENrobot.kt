@@ -16,7 +16,7 @@ object WoENrobot {
     val wobbleManipulator = ServoWobbleManipulator()
     val openCVNode = OpenCVNodeWebcam()
     val conveyor = Conveyor()
-    val shooter = Shooter()
+    val shooter = Shooter2()
     val telemetryDebugging = TelemetryDebugging()
     val ai = AI()
     //val odometry = FakeRobot();
@@ -139,7 +139,7 @@ object WoENrobot {
         if (opMode.isStopRequested) return
         runTime.reset()
         Arrays.stream(activeRobotModules).forEach { obj: MultithreadRobotModule -> obj.start() }
-        regulatorUpdater.start();
+        regulatorUpdater.start()
         //controlHubUpdater.start()
         //expansionHubUpdater.start()
         //otherUpdater.start()

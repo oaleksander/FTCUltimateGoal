@@ -126,7 +126,7 @@ class Conveyor : MultithreadRobotModule(),
                     motorCurrentTimer.reset()
             }
         } else {
-            currentMotorPower = -1.0
+            currentMotorPower = -conveyorPower
             motorCurrentTimer.reset()
         }
         conveyorAccelerationLimiter.setVelocity(currentMotorPower)

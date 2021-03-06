@@ -30,11 +30,11 @@ import static java.lang.Math.max;
 import static java.lang.Math.signum;
 
 @TeleOp
-@Disabled
+//@Disabled
 public class DrivetrainPidConfig extends LinearOpMode {
 
     @Config
-    @Disabled
+    //@Disabled
     public static class Constants {
         public static double achieveableMaxRPMFraction = 0.9;
         public static double achieveableMinRPMFraction = 0.05;

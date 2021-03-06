@@ -10,7 +10,7 @@ import org.firstinspires.ftc.teamcode.robot.WoENrobot.movement
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.shooter
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.startRobot
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.wobbleManipulator
-import org.firstinspires.ftc.teamcode.robot.Shooter
+import org.firstinspires.ftc.teamcode.superclasses.Shooter
 
 @TeleOp
 class TeleOp_Single : LinearOpMode() {
