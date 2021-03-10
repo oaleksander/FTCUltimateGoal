@@ -379,7 +379,7 @@ object MovementMacros {
                     distanceTolerance = 3.0,
                     angularTolerance = toRadians(3.0)
                 )
-                delay(4500.0)
+                delay(500.0)
                 shootHighGoal()
                 conveyor.enableConveyor = false
             }

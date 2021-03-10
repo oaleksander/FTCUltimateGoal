@@ -22,9 +22,9 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
         @JvmField
         var lookaheadRadius = 45.72
         @JvmField
-        var kP_distance = 7.4
+        var kP_distance = 4.2
         @JvmField
-        var kD_distance = 0.55
+        var kD_distance = 0.15
         @JvmField
         var kI_distance = 1.5
         //@JvmField TODO separate coeffs on angle and distance
