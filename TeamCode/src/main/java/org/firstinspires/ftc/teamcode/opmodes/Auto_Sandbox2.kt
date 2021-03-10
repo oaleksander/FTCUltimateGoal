@@ -14,7 +14,7 @@ class Auto_Sandbox2 : AutoOpMode() {
         while (opModeIsActive()) {
             movement.pos(Pose2D(Double.NaN, 100.0, Math.toRadians(0.0)))
             movement.pos(Pose2D(Double.NaN, -100.0, Math.toRadians(0.0)))
-            shootPOWERSHOTAngle()
+           // shootPOWERSHOTAngle()
         }
         //shootPowerShotDynamic()
     }
