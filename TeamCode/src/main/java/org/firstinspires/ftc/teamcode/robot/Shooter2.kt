@@ -12,7 +12,6 @@ import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig2.kP
 import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig2.kS
 import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig2.kV
 import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig2.maxI
-//import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig2.maxRPM
 import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule
 import org.firstinspires.ftc.teamcode.superclasses.Shooter
 import org.openftc.revextensions2.ExpansionHubServo
@@ -93,6 +92,7 @@ class Shooter2: MultithreadRobotModule() {
         shootingMode = Shooter.ShooterMode.OFF
         initializedservo()
         feederTime.reset()
+        rpmTime.reset()
     }
 
     private fun initializedservo() {
@@ -129,8 +129,8 @@ class Shooter2: MultithreadRobotModule() {
     private var velocityTargetOld = 0.0
     private var currentVelocity = 0.0
     override fun updateExpansionHub() {
-        timeDelta = WoENrobot.runTime.seconds() - timeOld
-        timeOld = WoENrobot.runTime.seconds()
+        timeDelta = rpmTime.seconds() - timeOld
+        timeOld = rpmTime.seconds()
         currentVelocity = getMotorVelocity()
         currentRpm = currentVelocity * 2.5
         voltageDelta = kV_referenceVoltage / voltageSensor.voltage
@@ -176,7 +176,7 @@ class Shooter2: MultithreadRobotModule() {
     var shootingMode: Shooter.ShooterMode
         get() = shooterMode
         set(mode) {
-            if (mode != Shooter.ShooterMode.OFF && shooterMode == Shooter.ShooterMode.OFF) rpmTime.reset()
+            //if (mode != Shooter.ShooterMode.OFF && shooterMode == Shooter.ShooterMode.OFF) rpmTime.reset()
             shooterMode = mode
             when (mode) {
                 Shooter.ShooterMode.HIGHGOAL -> setShootersetings(

@@ -21,8 +21,8 @@ import org.firstinspires.ftc.teamcode.robot.WoENHardware.shooterMotor
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.ai
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.forceInitRobot
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.startRobot
-import org.firstinspires.ftc.teamcode.robot.Shooter.ShooterConfig.feederClose
-import org.firstinspires.ftc.teamcode.robot.Shooter.ShooterConfig.feederOpen
+import org.firstinspires.ftc.teamcode.robot.legacy.Shooter.ShooterConfig.feederClose
+import org.firstinspires.ftc.teamcode.robot.legacy.Shooter.ShooterConfig.feederOpen
 
 @TeleOp
 class Diagnostic : LinearOpMode() {
