@@ -33,15 +33,7 @@ open class OpenCVNodeWebcam : RobotModule() {
     lateinit var webcam: OpenCvCamera
     override fun initialize() {
         try {
-            webcam = OpenCvCameraFactory.getInstance().createWebcam(
-                opMode.hardwareMap.get(
-                    WebcamName::class.java, "Webcam 1"
-                ), opMode.hardwareMap.appContext.resources.getIdentifier(
-                    "cameraMonitorViewId",
-                    "id",
-                    opMode.hardwareMap.appContext.packageName
-                )
-            )
+            webcam = OpenCvCameraFactory.getInstance().createWebcam(opMode.hardwareMap.get(WebcamName::class.java, "Webcam 1"), opMode.hardwareMap.appContext.resources.getIdentifier("cameraMonitorViewId", "id", opMode.hardwareMap.appContext.packageName))
 
             webcam.setPipeline(pipeline)
             webcam.openCameraDeviceAsync {

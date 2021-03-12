@@ -22,11 +22,11 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
         @JvmField
         var lookaheadRadius = 45.72
         @JvmField
-        var kP_distance = 4.9
+        var kP_distance = 11.8
         @JvmField
-        var kD_distance = 0.2
+        var kD_distance = 0.55
         @JvmField
-        var kI_distance = 1.9
+        var kI_distance = 2.9
         //@JvmField TODO separate coeffs on angle and distance
         //var kP_angle = 3.6
         //@JvmField
@@ -34,9 +34,9 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
         //@JvmField
         //var kI_angle = 0.6
         @JvmField
-        var antiWindupFraction_distance = 0.40
+        var antiWindupFraction_distance = 20.0
         @JvmField
-        var antiWindupFraction_angle = 0.40
+        var antiWindupFraction_angle = 20.0
     }
 
     private val minErrorDistanceDefault = 1.0
@@ -304,8 +304,8 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
                     MovementConfig.antiWindupFraction_angle * drivetrain.maxVelocity.z
                 ) * sign(integralError.z)
             )
-            diffError = odometry.robotVelocity * -1.0
         } else integralError = Vector3D()
+        diffError = odometry.robotVelocity * -1.0
         moveControllerTimer.reset()
         previousError = error
         previousTarget = target

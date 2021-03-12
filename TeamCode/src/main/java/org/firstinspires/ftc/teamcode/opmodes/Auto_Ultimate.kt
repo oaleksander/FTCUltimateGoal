@@ -20,11 +20,11 @@ class Auto_Ultimate : AutoOpMode() {
         avoidRingStack()
         shooting()
         moveWobble()
-        pickupRings()
-        if (runTime.seconds() < 23) {
+        pickupRings(true)
+       /* if (runTime.seconds() < 23) {
             pickSecondWobble()
             moveWobble()
-        }
+        }*/
         park()
     }
 }

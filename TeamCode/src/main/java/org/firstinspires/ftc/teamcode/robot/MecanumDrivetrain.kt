@@ -26,15 +26,15 @@ class MecanumDrivetrain : MultithreadRobotModule(), Drivetrain {
         @JvmField
         var achieveableMaxRPMFraction = 0.885
         @JvmField
-        var achieveableMinRPMFraction = 0.045
+        var achieveableMinRPMFraction = 0.095
         @JvmField
         var strafingMultiplier = 1.35
         @JvmField
         var rotationDecrepancy = 1.0
         @JvmField
-        var secondsToAccelerate = 0.33
+        var secondsToAccelerate = 0.13
         @JvmField
-        var kP = 26.0
+        var kP = 29.0
         @JvmField
         var kD = 0.0
         @JvmField

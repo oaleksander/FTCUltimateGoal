@@ -55,7 +55,7 @@ class Conveyor : MultithreadRobotModule(),
         @JvmField
         var distanceThreshold = 5.46
         @JvmField
-        var currentThreshold = 2.5
+        var currentThreshold = 4.0
     }
 
     override fun initialize() {

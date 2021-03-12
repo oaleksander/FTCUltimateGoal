@@ -32,6 +32,7 @@ import org.firstinspires.ftc.teamcode.superclasses.MotionTask
 import org.firstinspires.ftc.teamcode.superclasses.Shooter
 import org.firstinspires.ftc.teamcode.superclasses.WobbleManipulator
 import java.lang.Math.toRadians
+import kotlin.math.PI
 
 object MovementMacros {
 
@@ -94,8 +95,8 @@ object MovementMacros {
 
     private val partnerWobblePose: Vector2D
         get() = Vector2D(
-            93.91741046 * xSign - 30.1416 * sideSign,
-            -120.3139 + PartnerWobblePoseYOffset
+            98.91741046 * xSign - 30.1416 * sideSign,
+            -133.3139 + PartnerWobblePoseYOffset
         )
 
 
@@ -188,10 +189,10 @@ object MovementMacros {
         shooter.shootingMode = Shooter.ShooterMode.HIGHGOAL
         movement.pos(highGoalShootingPose)
         val shooterAccelerationTimeout = ElapsedTime()
-        while (opMode.opModeIsActive() && !shooter.isCorrectRpm(10.0) && shooterAccelerationTimeout.seconds() < 3)
+        while (opMode.opModeIsActive() && !shooter.isCorrectRpm(10.0) && shooterAccelerationTimeout.seconds() < 1.2)
             spinOnce()
         shooter.feedRings()
-        delay(1050.0)
+        delay(850.0)
         shooter.shootingMode = Shooter.ShooterMode.OFF
     }
 
@@ -323,7 +324,7 @@ object MovementMacros {
     private val ringStackPose: Vector2D
         get() = Vector2D(90.3747 * xSign -7.0, -56.9019)
 
-    fun pickupRings(): Boolean {
+    fun pickupRings(ultimate: Boolean = false): Boolean {
         val heading = movement.getError(Pose2D(ringStackPose, Double.NaN)).acot()
         when (openCVNode.stackSize) {
             StackSize.FOUR -> {
@@ -347,7 +348,7 @@ object MovementMacros {
                     distanceTolerance = 5.0,
                     angularTolerance = toRadians(5.0)
                 )
-                delay(1000.0)
+                delay(700.0)
                 //conveyor.enableConveyor(false)
                 shootHighGoal()
                 //conveyor.enableConveyor(true)
@@ -362,8 +363,18 @@ object MovementMacros {
                     distanceTolerance = 3.0,
                     angularTolerance = toRadians(3.0)
                 )
-                delay(750.0)
+                if (ultimate) {
+                    movement.pos(Pose2D(Double.NaN, Double.NaN, toRadians(180.0)))
+                    pickSecondWobble()
+                    movement.pos(Pose2D(Double.NaN, -100.0, 0.0 ))
+                    // avoidRingStack()
+                }
+                else
+                    delay(750.0)
                 shootHighGoal()
+                if (ultimate) {
+                    moveWobble()
+                }
                 conveyor.enableConveyor = false
             }
             StackSize.ONE -> {
@@ -379,11 +390,23 @@ object MovementMacros {
                     distanceTolerance = 3.0,
                     angularTolerance = toRadians(3.0)
                 )
-                delay(500.0)
+                if (ultimate) {
+                    movement.pos(Pose2D(Double.NaN, Double.NaN, toRadians(180.0)))
+                    pickSecondWobble()
+                    movement.pos(Pose2D(Double.NaN, -100.0, 0.0 ))
+                   // avoidRingStack()
+                }
+                else
+                    delay(500.0)
                 shootHighGoal()
                 conveyor.enableConveyor = false
+                if (ultimate) {
+                    moveWobble()
+                }
             }
-            StackSize.ZERO -> return false
+            StackSize.ZERO -> {
+                return false
+            }
         }
         return true
     }
