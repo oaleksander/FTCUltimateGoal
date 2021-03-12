@@ -22,10 +22,10 @@ open class OpenCVNodeWebcam : RobotModule() {
 
     @Config
     internal object OpenCVConfig {
-        @JvmField var lowH = 12.0
-        @JvmField var lowS = 160.0
-        @JvmField var lowV = 160.0
-        @JvmField var highH = 20.0
+        @JvmField var lowH = 7.0 //13
+        @JvmField var lowS = 110.0 //160
+        @JvmField var lowV = 110.0 //160
+        @JvmField var highH = 22.0 //20
         @JvmField var highS = 255.0
         @JvmField var highV = 255.0
     }
@@ -34,7 +34,6 @@ open class OpenCVNodeWebcam : RobotModule() {
     override fun initialize() {
         try {
             webcam = OpenCvCameraFactory.getInstance().createWebcam(opMode.hardwareMap.get(WebcamName::class.java, "Webcam 1"), opMode.hardwareMap.appContext.resources.getIdentifier("cameraMonitorViewId", "id", opMode.hardwareMap.appContext.packageName))
-
             webcam.setPipeline(pipeline)
             webcam.openCameraDeviceAsync {
                 webcam.startStreaming(

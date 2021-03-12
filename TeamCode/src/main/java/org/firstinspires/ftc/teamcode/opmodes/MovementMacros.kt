@@ -19,6 +19,7 @@ import org.firstinspires.ftc.teamcode.opmodes.MovementMacros.MovementMacrosConfi
 import org.firstinspires.ftc.teamcode.opmodes.MovementMacros.MovementMacrosConfig.RobotYfrontLength
 import org.firstinspires.ftc.teamcode.opmodes.MovementMacros.MovementMacrosConfig.WobblePlacementOffset
 import org.firstinspires.ftc.teamcode.robot.OpenCVNodeWebcam.StackSize
+import org.firstinspires.ftc.teamcode.robot.WoENrobot
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.conveyor
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.delay
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.movement
@@ -51,19 +52,19 @@ object MovementMacros {
         @JvmField
         var PartnerWobblePoseYOffset = 0.0
         @JvmField
-        var HighGoalShootingDistance = 205.0
+        var HighGoalShootingDistance = 208.0
         @JvmField
         var HighGoalShootingAngle = -4.3
         @JvmField
         var PowerShotShootingDistance = 200.4089
         @JvmField
-        var PowerShotShootingAngle = -4.7
+        var PowerShotShootingAngle = -4.3
         @JvmField
-        var RingStackApproachOffset = 58.0
+        var RingStackApproachOffset = 68.0
         @JvmField
-        var RingStackFirstRingOffset = 2.0
+        var RingStackFirstRingOffset = 0.0
         @JvmField
-        var RingStackFourthRingOffset = -19.0
+        var RingStackFourthRingOffset = -15.0
         @JvmField
         var ParkLineY = 26.462
         @JvmField
@@ -95,8 +96,8 @@ object MovementMacros {
 
     private val partnerWobblePose: Vector2D
         get() = Vector2D(
-            98.91741046 * xSign - 30.1416 * sideSign,
-            -133.3139 + PartnerWobblePoseYOffset
+            90.91741046 * xSign - 30.1416 * sideSign,
+            -136.3139 + PartnerWobblePoseYOffset
         )
 
 
@@ -326,6 +327,7 @@ object MovementMacros {
 
     fun pickupRings(ultimate: Boolean = false): Boolean {
         val heading = movement.getError(Pose2D(ringStackPose, Double.NaN)).acot()
+        var f = false
         when (openCVNode.stackSize) {
             StackSize.FOUR -> {
                 movement.pos(
@@ -337,14 +339,8 @@ object MovementMacros {
                     ), distanceTolerance = 5.0, angularTolerance = toRadians(5.0)
                 )
                 conveyor.enableConveyor = true
-                movement.pos(
-                    Pose2D(
-                        ringStackPose - Vector2D(
-                            0.0,
-                            RingStackFirstRingOffset
-                        ).rotatedCW(heading), heading + Math.PI
-                    ),
-                    linearVelocityFraction = .2,
+                movement.pos(Pose2D(ringStackPose - Vector2D(0.0, RingStackFirstRingOffset).rotatedCW(heading), heading + Math.PI),
+                    linearVelocityFraction = .18,
                     distanceTolerance = 5.0,
                     angularTolerance = toRadians(5.0)
                 )
@@ -359,12 +355,13 @@ object MovementMacros {
                             RingStackFourthRingOffset
                         ).rotatedCW(heading), heading + Math.PI
                     ),
-                    linearVelocityFraction = .4,
+                    linearVelocityFraction = .35,
                     distanceTolerance = 3.0,
                     angularTolerance = toRadians(3.0)
                 )
-                if (ultimate) {
-                    movement.pos(Pose2D(Double.NaN, Double.NaN, toRadians(180.0)))
+                if (ultimate && WoENrobot.runTime.milliseconds() < 18.0) {
+                    f = true
+                    movement.pos(Pose2D(Double.NaN, Double.NaN, PI))
                     pickSecondWobble()
                     movement.pos(Pose2D(Double.NaN, -100.0, 0.0 ))
                     // avoidRingStack()
@@ -372,7 +369,7 @@ object MovementMacros {
                 else
                     delay(750.0)
                 shootHighGoal()
-                if (ultimate) {
+                if (ultimate && f) {
                     moveWobble()
                 }
                 conveyor.enableConveyor = false
@@ -386,12 +383,13 @@ object MovementMacros {
                             RingStackFirstRingOffset
                         ).rotatedCW(heading), heading + Math.PI
                     ),
-                    linearVelocityFraction = .8,
+                    linearVelocityFraction = .3,
                     distanceTolerance = 3.0,
                     angularTolerance = toRadians(3.0)
                 )
                 if (ultimate) {
-                    movement.pos(Pose2D(Double.NaN, Double.NaN, toRadians(180.0)))
+                    f = true
+                    movement.pos(Pose2D(Double.NaN, Double.NaN, PI))
                     pickSecondWobble()
                     movement.pos(Pose2D(Double.NaN, -100.0, 0.0 ))
                    // avoidRingStack()
@@ -405,7 +403,13 @@ object MovementMacros {
                 }
             }
             StackSize.ZERO -> {
-                return false
+                if (ultimate) {
+                    movement.pos(Pose2D(Double.NaN, Double.NaN, PI))
+                    pickSecondWobble()
+                    movement.pos(Pose2D(Double.NaN, -100.0, 0.0 ))
+                    moveWobble()
+                    // avoidRingStack()
+                }
             }
         }
         return true

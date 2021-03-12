@@ -26,13 +26,13 @@ class Shooter2: MultithreadRobotModule() {
     @Config
     internal object ShooterConfig2 {
         @JvmField
-        var servoTime = 70
+        var servoTime = 55
         @JvmField
         var servoReturnMultiplier = 3.4
         @JvmField
-        var lowRpm = 3470.0
+        var lowRpm = 3300.0
         @JvmField
-        var highRpm = 4000.0
+        var highRpm = 3800.0
       //  @JvmField
       //  var timeRpm = 150.0
         @JvmField
@@ -199,6 +199,6 @@ class Shooter2: MultithreadRobotModule() {
     }
 
     fun feedRings() {
-        ringsToShoot = 3
+        ringsToShoot = 4
     }
 }

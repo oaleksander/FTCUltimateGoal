@@ -17,7 +17,8 @@ class Auto_Default : AutoOpMode() {
         conveyor.enableFullStackStopping = true
         conveyor.reverseBeforeStop = true
         avoidRingStack()
-        shootHighGoal()
+        shooting()
+        //shootHighGoal()
         moveWobble()
         pickupRings()
         park()
