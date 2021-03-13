@@ -107,13 +107,13 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
             }
         } else if (requestedVelocityPercent.radius() > 0.005) {
             if (pathFollowerIsActive()) stopPathFollowing()
-            drivetrain.setRobotVelocity(requestedVelocityPercent * drivetrain.maxVelocity)
-            //       followPath(odometry.robotCoordinates as MotionTask)
-        } else if (pathToFollow.size > 0 && doActiveBraking) moveLinear(pathToFollow[pathToFollow.size - 1]) else drivetrain.setRobotVelocity(
-            0.0,
-            0.0,
-            0.0
-        )
+            drivetrain.targetVelocity = requestedVelocityPercent * drivetrain.maxVelocity
+            if (pathToFollow.size > 0 && doActiveBraking) pathToFollow[pathToFollow.size - 1] = MotionTask(odometry.robotCoordinates)
+        } else
+            if (pathToFollow.size > 0 && doActiveBraking)
+                moveLinear(pathToFollow[pathToFollow.size - 1])
+            else
+                drivetrain.targetVelocity = Vector3D(.0,.0,.0)
     }
 
     val currentTarget: Pose2D
@@ -133,31 +133,6 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
      */
     fun pathFollowerIsActive(): Boolean {
         return bPathFollowerEnabled && !bPathFollowingFinished
-    }
-
-    /**
-     * Legacy synchronous go-to-point (with custom speeds)
-     *
-     * @param target                  Point to approach
-     * @param linearVelocityFraction  Array of points (motion tasks)
-     * @param angularVelocityFraction Array of points (motion tasks)
-     */
-
-    fun pos(
-        target: Pose2D?,
-        linearVelocityFraction: Double = 1.0,
-        angularVelocityFraction: Double = 1.0
-    ) {
-        followPath(
-            MotionTask(target),
-            linearVelocityFraction,
-            angularVelocityFraction,
-            minErrorDistanceDefault,
-            minErrorAngleDefault
-        )
-        while (pathFollowerIsActive() && opMode!!.opModeIsActive()) {
-            Thread.yield()
-        }
     }
 
     /**
@@ -357,7 +332,8 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
             (b * (b * robotPosition.x - a * robotPosition.y) - a * c) / (a * a + b * b),
             (a * (-b * robotPosition.x + a * robotPosition.y) - b * c) / (a * a + b * b)
         ) + Vector2D(0.0, lookaheadRadius).rotatedCW(angle)
-        if (abs(MathUtil.angleWrap(angle - if ((originPoint - robotPosition).radius() > lookaheadRadius) targetPoint.heading else robotPosition.heading)) > (if ((originPoint - robotPosition).radius() > lookaheadRadius * 2) Math.PI / 2 else Math.PI / 4))
+        if (abs(MathUtil.angleWrap(angle - if ((originPoint - robotPosition).radius() > lookaheadRadius) targetPoint.heading else robotPosition.heading))
+            > (if ((originPoint - robotPosition).radius() > lookaheadRadius * 2) Math.PI / 2 else Math.PI / 4))
             angle = MathUtil.angleWrap(
                 angle + if ((targetPoint - robotPosition).radius() > lookaheadRadius * 2 || abs(
                         MathUtil.angleWrap(targetPoint.heading - angle + Math.PI)
@@ -403,7 +379,7 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
             0.0,
             drivetrain.maxVelocity.z * maxAngularVelocityFraction
         ) * sign(velocityCommand.z)
-        drivetrain.setRobotVelocity(Vector3D(linearVelocity, angularVelocity))
+        drivetrain.targetVelocity = Vector3D(linearVelocity, angularVelocity)
     }
     /* public void holonomicMovePolar(double heading, double speed, double turn) {
         turn = Range.clip(turn, -1.0, 1.0);

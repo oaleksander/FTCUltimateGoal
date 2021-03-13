@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.robot
 import com.acmerobotics.dashboard.config.Config
 import com.qualcomm.robotcore.hardware.*
 import com.qualcomm.robotcore.util.ElapsedTime
+import com.qualcomm.robotcore.util.Range
 import org.firstinspires.ftc.teamcode.misc.CommandSender
 import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig2.kA
 import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig2.kD
@@ -53,10 +54,6 @@ class Shooter2: MultithreadRobotModule() {
         var kS = 3000.0
         @JvmField
         var maxI = 600000.0
-    //    @JvmField
-      //  var maxRPM = 5400.0
-      //  @JvmField
-      //  var kF = 14.89
         @JvmField
         var kV_referenceVoltage = 12.485
     }
@@ -70,8 +67,14 @@ class Shooter2: MultithreadRobotModule() {
     private var ringsToShoot: Int = 0
     private var timeToAccelerateMs = 1.0
     private var accelerationIncrement = 1.0
-    var rpmTarget = 6000.0
-        private set
+    private val maxInt16 = 32767.0
+    private val ticksToRpmMultiplier = 2.5
+    private val maxRpm: Double
+    get() = (maxInt16-kS)*ticksToRpmMultiplier/kV
+    var rpmTarget = 0.0
+        private set(value){
+            field = Range.clip(value,0.0,maxRpm)
+        }
     private var motorVelocityTarget = 0.0
     var currentRpm = 0.0
     var encoderFailureMode = false
@@ -80,12 +83,12 @@ class Shooter2: MultithreadRobotModule() {
     override fun initialize() {
         voltageSensor = WoENHardware.expansionHubVoltageSensor
         shooterMotor = WoENHardware.shooterMotor
-        /*val motorConfigurationType = shooterMotor.motorType.clone()
-        motorConfigurationType.achieveableMaxRPMFraction = 0.896476253
+        val motorConfigurationType = shooterMotor.motorType.clone()
+        motorConfigurationType.achieveableMaxRPMFraction = maxRpm/6000.0
         motorConfigurationType.ticksPerRev = 24.0
         motorConfigurationType.gearing = 1.0
         motorConfigurationType.maxRPM = 6000.0
-        shooterMotor.motorType = motorConfigurationType */
+        shooterMotor.motorType = motorConfigurationType
         shooterMotor.direction = DcMotorSimple.Direction.FORWARD
         shooterMotor.mode = DcMotor.RunMode.STOP_AND_RESET_ENCODER
         shooterMotor.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
@@ -116,8 +119,8 @@ class Shooter2: MultithreadRobotModule() {
     }
     private var velocityError = 0.0
     private var velocityErrorOld = 0.0
-    private var P = 0.0
     private var D = 0.0
+    private var P = 0.0
     private var I = 0.0
     private var V = 0.0
     private var A = 0.0
@@ -132,7 +135,7 @@ class Shooter2: MultithreadRobotModule() {
         timeDelta = rpmTime.seconds() - timeOld
         timeOld = rpmTime.seconds()
         currentVelocity = getMotorVelocity()
-        currentRpm = currentVelocity * 2.5
+        currentRpm = currentVelocity * ticksToRpmMultiplier
         if (motorVelocityTarget != 0.0) {
             voltageDelta = kV_referenceVoltage / voltageSensor.voltage
             velocityError = motorVelocityTarget - currentVelocity
@@ -143,7 +146,7 @@ class Shooter2: MultithreadRobotModule() {
             V = kV * motorVelocityTarget * voltageDelta
             A = kA * (motorVelocityTarget - velocityTargetOld) / timeDelta * voltageDelta
             S = kS * sign(motorVelocityTarget) * voltageDelta
-            power = (P + I + D + V + A + S) / 32768
+            power = (P + I + D + V + A + S) / maxInt16
             velocityErrorOld = velocityError
             velocityTargetOld = motorVelocityTarget
         }
