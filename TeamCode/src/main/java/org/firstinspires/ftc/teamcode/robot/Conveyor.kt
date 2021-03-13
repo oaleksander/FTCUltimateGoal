@@ -84,6 +84,7 @@ class Conveyor : MultithreadRobotModule(),
 
     private val aMPS: Double
         get() {
+            if (!enableConveyor && !forceReverse) return 0.0
             if (motorCurrentQueryTimer.milliseconds() > motorCurrentQueryTimeout) {
                 lastKnownMotorCurrent = abs(conveyor.getCurrent(CurrentUnit.AMPS))
                 motorCurrentQueryTimer.reset()

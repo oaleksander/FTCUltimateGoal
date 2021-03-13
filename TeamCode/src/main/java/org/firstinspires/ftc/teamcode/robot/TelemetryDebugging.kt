@@ -95,8 +95,8 @@ class TelemetryDebugging : MultithreadRobotModule() {
                             loopFrequency
                         )
                     )
-                    //  telemetry.addData("CH Loop frequency", "$controlHubLoopFrequency Hz")
-                    //  telemetry.addData("EH Loop frequency", "$expansionHubloopFrequency Hz")
+                      telemetry.addData("CH Loop frequency", "$controlHubLoopFrequency Hz")
+                      telemetry.addData("EH Loop frequency", "$expansionHubloopFrequency Hz")
                     val robotPosition = odometry.robotCoordinates
                     // telemetry.addLine("Odometry encoders").addData("odYL", WoENHardware.odometerYL.getCurrentPosition()).addData("odYR", WoENHardware.odometerYR.getCurrentPosition()).addData("odX", WoENHardware.odometerX.getCurrentPosition());
                     //telemetry.addLine("Robot position ").addData("Y", robotPosition.y).addData("X", robotPosition.x).addData("Head", Math.toDegrees(robotPosition.heading));
@@ -115,10 +115,10 @@ class TelemetryDebugging : MultithreadRobotModule() {
                             movement.currentTarget,
                             "green"
                         )
-                        dashboardPacket.put("head", toDegrees(odometry.encoderHeading))
+                        //dashboardPacket.put("head", toDegrees(odometry.encoderHeading))
                         dashboardPacket.put("Loop frequency", loopFrequency)
-                        // dashboardPacket.put("CH Loop frequency", controlHubLoopFrequency)
-                        // dashboardPacket.put("EH Loop frequency", expansionHubloopFrequency)
+                        dashboardPacket.put("CH Loop frequency", controlHubLoopFrequency)
+                        dashboardPacket.put("EH Loop frequency", expansionHubloopFrequency)
                         dashboardPacket.put("Flywheel RPM",shooter.currentRpm)
                         dashboardPacket.put("Flywheel target",shooter.rpmTarget)
                         dashboardPacket.put("Status", "Running " + runTime.seconds())
@@ -154,11 +154,11 @@ class TelemetryDebugging : MultithreadRobotModule() {
     }
 
     override fun updateControlHub() {
-      //  controlHubLoopCount.getAndIncrement()
+        controlHubLoopCount.getAndIncrement()
     }
 
     override fun updateExpansionHub() {
-       // expansionHubLooploopCount.getAndIncrement()
+        expansionHubLooploopCount.getAndIncrement()
     }
 
     override fun updateOther() {

@@ -133,8 +133,8 @@ class Shooter2: MultithreadRobotModule() {
         timeOld = rpmTime.seconds()
         currentVelocity = getMotorVelocity()
         currentRpm = currentVelocity * 2.5
-        voltageDelta = kV_referenceVoltage / voltageSensor.voltage
         if (motorVelocityTarget != 0.0) {
+            voltageDelta = kV_referenceVoltage / voltageSensor.voltage
             velocityError = motorVelocityTarget - currentVelocity
             P = velocityError * kP
             D = (velocityError - velocityErrorOld) * kD / timeDelta
@@ -148,6 +148,7 @@ class Shooter2: MultithreadRobotModule() {
             velocityTargetOld = motorVelocityTarget
         }
         else {
+            voltageDelta = 0.0
             velocityError = 0.0
             power = 0.0
             velocityErrorOld = 0.0

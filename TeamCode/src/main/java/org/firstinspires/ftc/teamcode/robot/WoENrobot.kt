@@ -139,10 +139,10 @@ object WoENrobot {
         if (opMode.isStopRequested) return
         runTime.reset()
         Arrays.stream(activeRobotModules).forEach { obj: MultithreadRobotModule -> obj.start() }
-        regulatorUpdater.start()
-        //controlHubUpdater.start()
-        //expansionHubUpdater.start()
-        //otherUpdater.start()
+        //regulatorUpdater.start()
+        controlHubUpdater.start()
+        expansionHubUpdater.start()
+        otherUpdater.start()
         setLedColors(0, 237, 255)
         opMode.telemetry.addData("Status", "Running")
         opMode.telemetry.update()
