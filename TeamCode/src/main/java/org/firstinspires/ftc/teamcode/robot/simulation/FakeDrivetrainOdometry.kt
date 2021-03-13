@@ -13,11 +13,12 @@ import org.firstinspires.ftc.teamcode.superclasses.Odometry
 import kotlin.math.abs
 import kotlin.math.sign
 
-class FakeDrivetrainOdometry : MultithreadRobotModule(), Drivetrain, Odometry {
+class FakeDrivetrainOdometry() : MultithreadRobotModule(), Drivetrain, Odometry {
    // private val maxVelocity = MecanumDrivetrain().maxVelocity
     private var started = false
-    private var targetVelocity = Vector3D(0.0, 0.0, 0.0)
     private var targetVelocityFC = Vector3D(0.0, 0.0, 0.0)
+    override val robotVelocity: Vector3D
+    get() = realVelocityFC
     private var realVelocityFC = Vector3D(0.0, 0.0, 0.0)
     private val zLimiter =
         motorAccelerationLimiter({realVelocityFC.z = it}, maxVelocity.z / 0.38)
@@ -27,6 +28,9 @@ class FakeDrivetrainOdometry : MultithreadRobotModule(), Drivetrain, Odometry {
         motorAccelerationLimiter({realVelocityFC.x = it}, maxVelocity.x / 0.38)
     private var currentPosition = Pose2D(0.0, 0.0, 0.0)
     private val updateTimer = ElapsedTime()
+
+    override var robotCoordinates = Pose2D()
+
     override fun initialize() {
         targetVelocity = Vector3D(0.0, 0.0, 0.0)
         realVelocityFC = Vector3D(0.0, 0.0, 0.0)
@@ -63,14 +67,15 @@ class FakeDrivetrainOdometry : MultithreadRobotModule(), Drivetrain, Odometry {
         updateTimer.reset()
     }
 
-    override fun setRobotVelocity(frontways: Double, sideways: Double, turn: Double) {
-        var frontWays = frontways
-        var sideWays = sideways
-        var Turn = turn
+    override var targetVelocity = Vector3D(0.0, 0.0, 0.0)
+    set(value) {
+        var frontWays = value.y
+        var sideWays = value.x
+        var Turn = value.z
         if (abs(frontWays) > maxVelocity.y) frontWays = maxVelocity.y * sign(frontWays)
         if (abs(sideWays) > maxVelocity.x) sideWays = maxVelocity.x * sign(sideWays)
         if (abs(Turn) > maxVelocity.z) Turn = maxVelocity.z * sign(Turn)
-        targetVelocity = Vector3D(sideWays, frontWays, Turn)
+        field = Vector3D(sideWays, frontWays, Turn)
         targetVelocityFC =
             Vector3D(Vector2D(sideWays, frontWays).rotatedCW(currentPosition.heading), Turn)
     }
@@ -78,15 +83,4 @@ class FakeDrivetrainOdometry : MultithreadRobotModule(), Drivetrain, Odometry {
     override val maxVelocity: Vector3D
             get() = MecanumDrivetrain().maxVelocity
 
-    override fun getRobotCoordinates(): Pose2D {
-        return currentPosition
-    }
-
-    override fun setRobotCoordinates(coordinates: Pose2D) {
-        currentPosition = coordinates.clone()
-    }
-
-    override fun getRobotVelocity(): Vector3D {
-        return realVelocityFC
-    }
 }
