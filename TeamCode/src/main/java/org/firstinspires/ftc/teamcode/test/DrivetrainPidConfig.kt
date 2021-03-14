@@ -19,6 +19,7 @@ import org.firstinspires.ftc.teamcode.misc.CommandSender
 import org.firstinspires.ftc.teamcode.misc.SinglePressButton
 import org.firstinspires.ftc.teamcode.misc.motorAccelerationLimiter
 import org.firstinspires.ftc.teamcode.robot.ThreeWheelOdometry
+import org.firstinspires.ftc.teamcode.robot.WoENHardware
 import kotlin.math.abs
 
 @TeleOp //@Disabled
@@ -140,6 +141,7 @@ class DrivetrainPidConfig : LinearOpMode() {
     lateinit var allHubs: List<LynxModule>
     override fun runOpMode() {
         waitForStart()
+        WoENHardware.assignHardware(hardwareMap)
         odometry.initialize(this)
         dashboard = FtcDashboard.getInstance()
         driveFrontLeft = hardwareMap.get(DcMotorEx::class.java, "driveFrontLeft")
