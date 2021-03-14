@@ -327,7 +327,6 @@ object MovementMacros {
 
     fun pickupRings(ultimate: Boolean = false): Boolean {
         val heading = movement.getError(Pose2D(ringStackPose, Double.NaN)).acot()
-        var f = false
         when (openCVNode.stackSize) {
             StackSize.FOUR -> {
                 movement.pos(
@@ -360,7 +359,6 @@ object MovementMacros {
                     angularTolerance = toRadians(3.0)
                 )
                 if (ultimate && WoENrobot.runTime.milliseconds() < 18.0) {
-                    f = true
                     movement.pos(Pose2D(Double.NaN, Double.NaN, PI))
                     pickSecondWobble()
                     movement.pos(Pose2D(Double.NaN, -100.0, 0.0 ))
@@ -369,7 +367,7 @@ object MovementMacros {
                 else
                     delay(750.0)
                 shootHighGoal()
-                if (ultimate && f) {
+                if (ultimate) {
                     moveWobble()
                 }
                 conveyor.enableConveyor = false
@@ -388,7 +386,6 @@ object MovementMacros {
                     angularTolerance = toRadians(3.0)
                 )
                 if (ultimate) {
-                    f = true
                     movement.pos(Pose2D(Double.NaN, Double.NaN, PI))
                     pickSecondWobble()
                     movement.pos(Pose2D(Double.NaN, -100.0, 0.0 ))

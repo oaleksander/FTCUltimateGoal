@@ -19,7 +19,7 @@ import org.openftc.revextensions2.RevBulkData
 import kotlin.math.cos
 
 @Deprecated("")
-class TwoWheelOdometry : MultithreadRobotModule(), Odometry {
+class TwoWheelOdometry {/*: MultithreadRobotModule(), Odometry {
     private val odometryWheelDiameterCm = 4.8
     private val odometryCountsPerCM = 1440 / (odometryWheelDiameterCm * Math.PI)
     private val odometryCMPerCounts = odometryWheelDiameterCm * Math.PI / 1440
@@ -147,5 +147,5 @@ class TwoWheelOdometry : MultithreadRobotModule(), Odometry {
                 ((-bulkData.getMotorVelocity(odometerY)).toDouble() - angularVelocity * odometerXcenterOffset) * odometryCMPerCounts
             ).rotatedCW(worldPosition.heading), angularVelocity
         )
-    }
+    }*/
 }

@@ -15,8 +15,8 @@ class LedStrip : MultithreadRobotModule() {
     private lateinit var ledStrip1: DcMotorEx
     private lateinit var ledStrip2: DcMotorEx
     private val ledTime = ElapsedTime()
-    private val setPowerLed1 = CommandSender { p: Double -> ledStrip1.power = p }
-    private val setPowerLed2 = CommandSender { p: Double -> ledStrip2.power = p }
+    private val setPowerLed1 = CommandSender ({ p: Double -> ledStrip1.power = p })
+    private val setPowerLed2 = CommandSender ({ p: Double -> ledStrip2.power = p })
 
 
     override fun initialize() {

@@ -24,7 +24,7 @@ class Conveyor : MultithreadRobotModule(),
     private val distanceQueryTimeout = 300.0
     private val motorCurrentQueryTimeout = 100.0
 
-    private val conveyorPowerSender = CommandSender {conveyor.power = it}
+    private val conveyorPowerSender = CommandSender ({conveyor.power = it})
 
     private val conveyorAccelerationLimiter = motorAccelerationLimiter({conveyorPowerSender}, 6.0) //motorAccelerationLimiter({conveyorPowerSender.send(it)}, 6.0)
 

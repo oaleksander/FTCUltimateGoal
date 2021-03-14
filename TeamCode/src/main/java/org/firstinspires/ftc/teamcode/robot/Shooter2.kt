@@ -61,8 +61,8 @@ class Shooter2: MultithreadRobotModule() {
     private lateinit var shooterMotor: DcMotorEx
     private lateinit var voltageSensor: VoltageSensor
     private lateinit var feeder: ExpansionHubServo
-    private val shooterPowerSender = CommandSender { p: Double -> shooterMotor.power = p }
-    private val feederPositionSender = CommandSender { p: Double -> feeder.position = p }
+    private val shooterPowerSender = CommandSender ({ p: Double -> shooterMotor.power = p })
+    private val feederPositionSender = CommandSender ({ p: Double -> feeder.position = p })
     private var shooterMode = Shooter.ShooterMode.OFF
     private var ringsToShoot: Int = 0
     private var timeToAccelerateMs = 1.0

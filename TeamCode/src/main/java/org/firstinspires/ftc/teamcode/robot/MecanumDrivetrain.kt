@@ -72,21 +72,21 @@ class MecanumDrivetrain : MultithreadRobotModule(), Drivetrain {
     private var maxAcceleration = theoreticalMaxSpeed / DrivetrainConfig.secondsToAccelerate
 
     /* Motor controllers */
-    private val mFLSender = CommandSender {driveFrontLeft.setVelocity(it, AngleUnit.RADIANS) }
+    private val mFLSender = CommandSender ({driveFrontLeft.setVelocity(it, AngleUnit.RADIANS) })
     private val mFLProfiler = motorAccelerationLimiter({mFLSender.send(it)}, maxAcceleration)
-    private val mFLDirectSender = CommandSender{driveRearRight.power = it}
+    private val mFLDirectSender = CommandSender({driveRearRight.power = it})
 
-    private val mFRSender = CommandSender {driveFrontRight.setVelocity(it, AngleUnit.RADIANS) }
+    private val mFRSender = CommandSender ({driveFrontRight.setVelocity(it, AngleUnit.RADIANS) })
     private val mFRProfiler = motorAccelerationLimiter({mFRSender.send(it) }, maxAcceleration)
-    private val mFRDirectSender = CommandSender{driveFrontRight.power = it}
+    private val mFRDirectSender = CommandSender({driveFrontRight.power = it})
 
-    private val mRLSender = CommandSender {driveRearLeft.setVelocity(it, AngleUnit.RADIANS) }
+    private val mRLSender = CommandSender ({driveRearLeft.setVelocity(it, AngleUnit.RADIANS) })
     private val mRLProfiler = motorAccelerationLimiter({mRLSender.send(it)}, maxAcceleration)
-    private val mRLDirectSender = CommandSender{driveRearLeft.power = it}
+    private val mRLDirectSender = CommandSender({driveRearLeft.power = it})
 
-    private val mRRSender = CommandSender {driveRearRight.setVelocity(it, AngleUnit.RADIANS) }
+    private val mRRSender = CommandSender ({driveRearRight.setVelocity(it, AngleUnit.RADIANS) })
     private val mRRProfiler = motorAccelerationLimiter({mRRSender.send(it)}, maxAcceleration)
-    private val mRRDirectSender = CommandSender{driveRearRight.power = it}
+    private val mRRDirectSender = CommandSender({driveRearRight.power = it})
 
     private lateinit var voltageSensor: VoltageSensor
     private var smartMode = false

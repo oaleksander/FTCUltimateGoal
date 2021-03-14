@@ -28,7 +28,7 @@ class Conveyor() : MultithreadRobotModule(),
     }
 
     private lateinit var sensorDistance: DistanceSensor
-    private val conveyorPowerSender = CommandSender { p: Double -> conveyorm.power = -p }
+    private val conveyorPowerSender = CommandSender ({ p: Double -> conveyorm.power = -p })
     private var full = false
     private var backOn = false
     private var stop = false

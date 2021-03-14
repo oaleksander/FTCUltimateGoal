@@ -24,8 +24,8 @@ class ServoWobbleManipulator : MultithreadRobotModule(), WobbleManipulator {
         var angleUp = 1.0
     }
 
-    private val closePositionSender = CommandSender {gripper.position = it}
-    private val anglePositionSender = CommandSender {leverArm.position = it}
+    private val closePositionSender = CommandSender ({gripper.position = it})
+    private val anglePositionSender = CommandSender ({leverArm.position = it})
     private var isDown = false
     private var posAngle = WobbleManipulator.Position.UP
     private var leverArmPosition = 0.0
