@@ -3,8 +3,6 @@ package org.firstinspires.ftc.teamcode.robot
 import com.acmerobotics.dashboard.config.Config
 import com.qualcomm.hardware.bosch.BNO055IMU
 import com.qualcomm.robotcore.hardware.DcMotor
-import com.qualcomm.robotcore.hardware.DcMotorEx
-import com.qualcomm.robotcore.hardware.DcMotorSimple
 import com.qualcomm.robotcore.util.ElapsedTime
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder
@@ -21,7 +19,22 @@ import kotlin.math.sin
 
 class ThreeWheelOdometry : MultithreadRobotModule(), Odometry {
     private val yWheelPairRadiusCm = 18.000
-    private var worldPosition = Pose2D()
+    override var robotCoordinates = Pose2D()
+        @Synchronized set
+    var startCoordinates = Pose2D()
+    set(value) {
+        robotCoordinates = value
+        field = value
+    }
+    override val robotVelocity: Vector3D
+    get() {
+        val angularVelocity = encoderDifferenceToAngle(currentYLVelocity, currentYRVelocity)
+        return Vector3D(
+            Vector2D(encoderTicksToDistance((currentXVelocity.toInt()))-angularVelocity*odometerXcenterOffset,
+                encoderTicksToDistance((currentYLVelocity + currentYRVelocity).toInt()/2)
+            ), angularVelocity
+        ).rotatedCW(robotCoordinates.heading)
+    }
     private var angleOffset = 0.0
     private lateinit var imu1: BNO055IMU
     private lateinit var imu2: BNO055IMU
@@ -31,11 +44,11 @@ class ThreeWheelOdometry : MultithreadRobotModule(), Odometry {
     private val endoderCPR = 8192.0
     private var odometryWheelDiameterCm = OdometryConfig.forwardMultiplier * 4.8
     private var odometryCountsPerCM = endoderCPR / (odometryWheelDiameterCm * Math.PI)
-    private var odometryCMPerCounts = odometryWheelDiameterCm * Math.PI / endoderCPR
+    private var encoderCMPerCounts = odometryWheelDiameterCm * Math.PI / endoderCPR
     private var odometerXcenterOffset =
-        -18.15937 * odometryCountsPerCM * cos(Math.toRadians(84.9452))
+        -18.15937 * cos(Math.toRadians(84.9452)) //* odometryCountsPerCM?
     private var radiansPerEncoderDifference =
-        OdometryConfig.headingMultiplier * (odometryCMPerCounts / (yWheelPairRadiusCm * 2.0))
+        OdometryConfig.headingMultiplier * (encoderCMPerCounts / (yWheelPairRadiusCm * 2.0))
     private var imuOffset1 = 0f
     private var imuOffset2 = 0f
     private var encoderHeadingCovariance = 0.0
@@ -59,19 +72,12 @@ class ThreeWheelOdometry : MultithreadRobotModule(), Odometry {
     }
 
     private var doUseIMULocal = OdometryConfig.doUseIMU
-    private fun calculateHeading(): Double {
-        return MathUtil.angleWrap(encoderHeading - angleOffset - encoderHeadingCovariance)
-    }
 
-    val encoderHeading: Double
-        get() = getEncoderHeading(
-            odometerYL.currentPosition.toDouble(),
-            odometerYR.currentPosition.toDouble()
-        )
+    private fun calculateHeading(): Double = MathUtil.angleWrap(encoderDifferenceToAngle(odometerYL.currentPosition.toDouble(), odometerYR.currentPosition.toDouble()) - angleOffset - encoderHeadingCovariance + startCoordinates.heading)
 
-    private fun getEncoderHeading(L: Double, R: Double): Double {
-        return (L - R) * radiansPerEncoderDifference
-    }
+    private fun encoderTicksToDistance(ticks: Int) = ticks.toDouble()*encoderCMPerCounts
+
+    private fun encoderDifferenceToAngle(L: Double, R: Double): Double = (L - R) * radiansPerEncoderDifference
 
     private fun initIMU() {
         imu1 = WoENHardware.controlHubIMU
@@ -133,7 +139,7 @@ class ThreeWheelOdometry : MultithreadRobotModule(), Odometry {
     override fun updateControlHub() {
         if (doUseIMULocal && imu1AccessTimer.seconds() > 1) {
             updateCHIMUHeading()
-            val angleDivergence = MathUtil.angleWrap(encoderHeading - currentIMU1Heading) //TODO
+            val angleDivergence = MathUtil.angleWrap(encoderDifferenceToAngle(ylOld.toDouble(),yrOld.toDouble()) - currentIMU1Heading)
             encoderHeadingCovariance = angleDivergence * (1.0 / 2.0)
             imu1AccessTimer.reset()
         }
@@ -141,38 +147,25 @@ class ThreeWheelOdometry : MultithreadRobotModule(), Odometry {
 
 
     override fun updateExpansionHub() {
-
         currentYLVelocity = odometerYL.correctedVelocity
         currentYLVelocity = odometerYR.correctedVelocity
         currentYLVelocity = odometerX.correctedVelocity
-        calculatePosition(worldPosition)
+        calculatePosition()
     }
 
     override fun updateOther() {
     }
 
-    @Synchronized
-    fun calculatePosition(initialPose: Pose2D) {
-        worldPosition = initialPose
-        val deltaWorldHeading = MathUtil.angleWrap(calculateHeading() - worldPosition.heading)
-        var deltaPosition = Vector2D(
-            (odometerX.currentPosition - xOld).toDouble() - deltaWorldHeading * odometerXcenterOffset,
-            (odometerYL.currentPosition - ylOld + (odometerYR.currentPosition - yrOld)).toDouble() / 2
+    private fun calculatePosition() {
+        val deltaHeading = MathUtil.angleWrap(calculateHeading() - robotCoordinates.heading)
+        var deltaPosition = Vector2D(encoderTicksToDistance(odometerX.currentPosition - xOld) - deltaHeading * odometerXcenterOffset, (encoderTicksToDistance(odometerYL.currentPosition - ylOld) + encoderTicksToDistance(odometerYR.currentPosition - yrOld))*0.5
         )
-        if (deltaWorldHeading != 0.0) {   //if deltaAngle = 0 radius of the arc is = Inf which causes model degeneracy
-            val arcAngle = deltaWorldHeading * 2
+        if (deltaHeading != 0.0) {   //if deltaAngle = 0 radius of the arc is = Inf which causes model degeneracy
+            val arcAngle = deltaHeading * 2
             val arcRadius = deltaPosition.radius() / arcAngle
-            deltaPosition = Vector2D(
-                arcRadius * (1 - cos(arcAngle)),
-                arcRadius * sin(arcAngle)
-            ).rotatedCW(deltaPosition.acot())
+            deltaPosition = Vector2D(arcRadius * (1 - cos(arcAngle)), arcRadius * sin(arcAngle)).rotatedCW(deltaPosition.acot())
         }
-        worldPosition = worldPosition.plus(
-            Pose2D(
-                deltaPosition.rotatedCW(worldPosition.heading),
-                deltaWorldHeading
-            )
-        )
+        robotCoordinates = robotCoordinates.plus(Pose2D(deltaPosition.rotatedCW(robotCoordinates.heading), deltaHeading))
         ylOld = odometerYL.currentPosition
         yrOld = odometerYR.currentPosition
         xOld = odometerX.currentPosition
@@ -182,10 +175,10 @@ class ThreeWheelOdometry : MultithreadRobotModule(), Odometry {
         doUseIMULocal = OdometryConfig.doUseIMU
         if (doUseIMULocal) initIMU()
         radiansPerEncoderDifference =
-            OdometryConfig.headingMultiplier * (odometryCMPerCounts / (yWheelPairRadiusCm * 2.0))
+            OdometryConfig.headingMultiplier * (encoderCMPerCounts / (yWheelPairRadiusCm * 2.0))
         odometryWheelDiameterCm = OdometryConfig.forwardMultiplier * 4.8
         odometryCountsPerCM = endoderCPR / (odometryWheelDiameterCm * Math.PI)
-        odometryCMPerCounts = odometryWheelDiameterCm * Math.PI / endoderCPR
+        encoderCMPerCounts = odometryWheelDiameterCm * Math.PI / endoderCPR
         odometerXcenterOffset =
             -21.7562349 * odometryCountsPerCM * cos(Math.toRadians(51.293002))
         WoENHardware.odometerYL.let{
@@ -208,49 +201,7 @@ class ThreeWheelOdometry : MultithreadRobotModule(), Odometry {
         xOld = odometerX.currentPosition
     }
 
-    /**
-     * Returns the robot's global coordinates
-     *
-     * @return robot position in (x,y,heading) form
-     */
-    override fun getRobotCoordinates(): Pose2D {
-        val poseTranslation = Vector2D(
-            worldPosition.x * odometryCMPerCounts,
-            worldPosition.y * odometryCMPerCounts
-        ).minus(yWheelPairCenterOffset.rotatedCW(worldPosition.heading))
-        return Pose2D(poseTranslation, worldPosition.heading)
-    }
-
-    override fun setRobotCoordinates(coordinates: Pose2D) {
-        ylOld = odometerYL.currentPosition
-        yrOld = odometerYR.currentPosition
-        xOld = odometerX.currentPosition
-        angleOffset = MathUtil.angleWrap(calculateHeading() + angleOffset - coordinates.heading)
-        calculatePosition(
-            Pose2D(
-                Vector2D(
-                    coordinates.x * odometryCountsPerCM,
-                    coordinates.y * odometryCountsPerCM
-                ).plus(
-                    yWheelPairCenterOffset.times(odometryCountsPerCM)
-                        .rotatedCW(worldPosition.heading)
-                ),
-                coordinates.heading
-            )
-        )
-    }
-
     private var currentYLVelocity: Double = .0
     private var currentYRVelocity: Double = .0
     private var currentXVelocity: Double = .0
-
-    override fun getRobotVelocity(): Vector3D {
-        val angularVelocity = getEncoderHeading(currentYLVelocity, currentYRVelocity)
-        return Vector3D(
-            Vector2D(
-                (currentXVelocity - angularVelocity * odometerXcenterOffset) * odometryCMPerCounts,
-                (currentYLVelocity + currentYRVelocity) * odometryCMPerCounts / 2
-            ).rotatedCW(worldPosition.heading), angularVelocity
-        )
-    }
 }
