@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.util.ElapsedTime
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
 import org.firstinspires.ftc.teamcode.misc.CommandSender
-import org.firstinspires.ftc.teamcode.misc.motorAccelerationLimiter
+import org.firstinspires.ftc.teamcode.misc.MotorAccelerationLimiter
 import org.firstinspires.ftc.teamcode.robot.Conveyor.ConveyorConfig.conveyorPower
 import org.firstinspires.ftc.teamcode.robot.WoENHardware.conveyorMotor
 import org.firstinspires.ftc.teamcode.robot.WoENHardware.ringDetector
@@ -26,7 +26,7 @@ class Conveyor : MultithreadRobotModule(),
 
     private val conveyorPowerSender = CommandSender ({conveyor.power = it})
 
-    private val conveyorAccelerationLimiter = motorAccelerationLimiter({conveyorPowerSender}, 6.0) //motorAccelerationLimiter({conveyorPowerSender.send(it)}, 6.0)
+    private val conveyorAccelerationLimiter = MotorAccelerationLimiter({ conveyorPowerSender }, 6.0) //motorAccelerationLimiter({conveyorPowerSender.send(it)}, 6.0)
 
     private val motorCurrentTimer = ElapsedTime()
     private val stackDetectionTimer = ElapsedTime()

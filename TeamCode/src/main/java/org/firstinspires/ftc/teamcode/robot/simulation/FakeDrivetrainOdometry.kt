@@ -5,7 +5,7 @@ import org.firstinspires.ftc.teamcode.math.MathUtil
 import org.firstinspires.ftc.teamcode.math.Pose2D
 import org.firstinspires.ftc.teamcode.math.Vector2D
 import org.firstinspires.ftc.teamcode.math.Vector3D
-import org.firstinspires.ftc.teamcode.misc.motorAccelerationLimiter
+import org.firstinspires.ftc.teamcode.misc.MotorAccelerationLimiter
 import org.firstinspires.ftc.teamcode.robot.MecanumDrivetrain
 import org.firstinspires.ftc.teamcode.superclasses.Drivetrain
 import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule
@@ -20,12 +20,9 @@ class FakeDrivetrainOdometry() : MultithreadRobotModule(), Drivetrain, Odometry 
     override val robotVelocity: Vector3D
     get() = realVelocityFC
     private var realVelocityFC = Vector3D(0.0, 0.0, 0.0)
-    private val zLimiter =
-        motorAccelerationLimiter({realVelocityFC.z = it}, maxVelocity.z / 0.38)
-    private val yLimiter =
-        motorAccelerationLimiter({realVelocityFC.y = it}, maxVelocity.y / 0.38)
-    private val xLimiter =
-        motorAccelerationLimiter({realVelocityFC.x = it}, maxVelocity.x / 0.38)
+    private val zLimiter = MotorAccelerationLimiter({ realVelocityFC.z = it }, maxVelocity.z / 0.38)
+    private val yLimiter = MotorAccelerationLimiter({ realVelocityFC.y = it }, maxVelocity.y / 0.38)
+    private val xLimiter = MotorAccelerationLimiter({ realVelocityFC.x = it }, maxVelocity.x / 0.38)
     private var currentPosition = Pose2D(0.0, 0.0, 0.0)
     private val updateTimer = ElapsedTime()
 

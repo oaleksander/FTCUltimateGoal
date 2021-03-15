@@ -1,22 +1,14 @@
-package org.firstinspires.ftc.teamcode.misc;
+package org.firstinspires.ftc.teamcode.misc
 
-import java.util.function.BooleanSupplier;
+import java.util.function.BooleanSupplier
 
-public class ButtonSwitch {
-
-    private boolean lastButtonState = false;
-    private boolean trigger = false;
-    private final BooleanSupplier booleanSupplier;
-
-    public ButtonSwitch(BooleanSupplier booleanSupplier) {
-        this.booleanSupplier = booleanSupplier;
-    }
-
-    public boolean get() {
-        boolean currentButtonState = booleanSupplier.getAsBoolean();
-        trigger = ((currentButtonState != lastButtonState) && currentButtonState) != trigger;
-        lastButtonState = currentButtonState;
-        return trigger;
+class ButtonSwitch(private val booleanSupplier: BooleanSupplier) {
+    private var lastButtonState = false
+    private var trigger = false
+    fun get(): Boolean {
+        val currentButtonState = booleanSupplier.asBoolean
+        trigger = (currentButtonState != lastButtonState && currentButtonState) != trigger
+        lastButtonState = currentButtonState
+        return trigger
     }
 }
-

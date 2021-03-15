@@ -17,7 +17,7 @@ import org.firstinspires.ftc.teamcode.math.Vector2D
 import org.firstinspires.ftc.teamcode.math.Vector3D
 import org.firstinspires.ftc.teamcode.misc.CommandSender
 import org.firstinspires.ftc.teamcode.misc.SinglePressButton
-import org.firstinspires.ftc.teamcode.misc.motorAccelerationLimiter
+import org.firstinspires.ftc.teamcode.misc.MotorAccelerationLimiter
 import org.firstinspires.ftc.teamcode.robot.ThreeWheelOdometry
 import org.firstinspires.ftc.teamcode.robot.WoENHardware
 import kotlin.math.abs
@@ -48,8 +48,7 @@ class DrivetrainPidConfig : LinearOpMode() {
     private val wheelCenterOffset = Vector2D(18.05253, 15.20000)
     private val forwardMultiplier = 1 / wheelRadius
     private var sidewaysMultiplier = forwardMultiplier * Constants.strafingMultiplier
-    private var turnMultiplier =
-        (wheelCenterOffset.x + wheelCenterOffset.y) * Constants.rotationDecrepancy / wheelRadius
+    private var turnMultiplier = (wheelCenterOffset.x + wheelCenterOffset.y) * Constants.rotationDecrepancy / wheelRadius
     private val tickPerRev = 480.0
     private val gearing = 20.0
     private val maxRPM = 300.0
@@ -133,10 +132,10 @@ class DrivetrainPidConfig : LinearOpMode() {
     private var powerRearLeft = 0.0
     private var powerRearRight = 0.0
     private val maxAcceleration = theoreticalMaxSpeed / 0.25
-    private val mFLProfiler = motorAccelerationLimiter({ value: Double -> CommandSender({ v: Double -> driveFrontLeft.setVelocity(v, AngleUnit.RADIANS) }).send(value) }, maxAcceleration)
-    private val mFRProfiler = motorAccelerationLimiter({ value: Double -> CommandSender({ v: Double -> driveFrontRight.setVelocity(v, AngleUnit.RADIANS) }).send(value) }, maxAcceleration)
-    private val mRLProfiler = motorAccelerationLimiter({ value: Double -> CommandSender({ v: Double -> driveRearLeft.setVelocity(v, AngleUnit.RADIANS) }).send(value) }, maxAcceleration)
-    private val mRRProfiler = motorAccelerationLimiter({ value: Double -> CommandSender({ v: Double -> driveRearRight.setVelocity(v, AngleUnit.RADIANS) }).send(value) }, maxAcceleration)
+    private val mFLProfiler = MotorAccelerationLimiter({ value: Double -> CommandSender({ v: Double -> driveFrontLeft.setVelocity(v, AngleUnit.RADIANS) }).send(value) }, maxAcceleration)
+    private val mFRProfiler = MotorAccelerationLimiter({ value: Double -> CommandSender({ v: Double -> driveFrontRight.setVelocity(v, AngleUnit.RADIANS) }).send(value) }, maxAcceleration)
+    private val mRLProfiler = MotorAccelerationLimiter({ value: Double -> CommandSender({ v: Double -> driveRearLeft.setVelocity(v, AngleUnit.RADIANS) }).send(value) }, maxAcceleration)
+    private val mRRProfiler = MotorAccelerationLimiter({ value: Double -> CommandSender({ v: Double -> driveRearRight.setVelocity(v, AngleUnit.RADIANS) }).send(value) }, maxAcceleration)
     lateinit var dashboard: FtcDashboard
     lateinit var allHubs: List<LynxModule>
     override fun runOpMode() {
