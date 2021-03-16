@@ -11,13 +11,13 @@ import org.firstinspires.ftc.teamcode.robot.Movement.MovementConfig.minErrorAngl
 import org.firstinspires.ftc.teamcode.robot.Movement.MovementConfig.minErrorDistanceDefault
 import org.firstinspires.ftc.teamcode.superclasses.Drivetrain
 import org.firstinspires.ftc.teamcode.superclasses.MotionTask
-import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule
+import org.firstinspires.ftc.teamcode.superclasses.MultithreadedRobotModule
 import org.firstinspires.ftc.teamcode.superclasses.Odometry
 import java.util.*
 import kotlin.math.abs
 import kotlin.math.sign
 
-class Movement(private val odometry: Odometry, private val drivetrain: Drivetrain) : MultithreadRobotModule() {
+class Movement(private val odometry: Odometry, private val drivetrain: Drivetrain) : MultithreadedRobotModule() {
     @Config
     internal object MovementConfig {
         @JvmField var lookaheadRadius = 45.72
@@ -147,7 +147,7 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
      */
     fun pos(target: Pose2D?, linearVelocityFraction: Double = 1.0, angularVelocityFraction: Double = 1.0, distanceTolerance: Double = minErrorDistanceDefault, angularTolerance: Double = minErrorAngleDefault) {
         followPath(MotionTask(target), linearVelocityFraction, angularVelocityFraction, distanceTolerance, angularTolerance)
-        while (pathFollowerIsActive() && opMode!!.opModeIsActive()) {
+        while (pathFollowerIsActive() && opMode.opModeIsActive()) {
             Thread.yield()
         }
     }

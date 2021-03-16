@@ -12,12 +12,12 @@ import org.firstinspires.ftc.teamcode.math.Pose2D
 import org.firstinspires.ftc.teamcode.math.Vector2D
 import org.firstinspires.ftc.teamcode.math.Vector3D
 import org.firstinspires.ftc.teamcode.misc.Encoder
-import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule
+import org.firstinspires.ftc.teamcode.superclasses.MultithreadedRobotModule
 import org.firstinspires.ftc.teamcode.superclasses.Odometry
 import kotlin.math.cos
 import kotlin.math.sin
 
-class ThreeWheelOdometry : MultithreadRobotModule(), Odometry {
+class ThreeWheelOdometry : MultithreadedRobotModule(), Odometry {
     private val yWheelPairRadiusCm = 18.000
     override var robotCoordinates = Pose2D()
         @Synchronized set

@@ -6,9 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 import com.qualcomm.robotcore.util.ElapsedTime
 import org.firstinspires.ftc.teamcode.robot.WoENHardware.assignHardware
 import org.firstinspires.ftc.teamcode.robot.WoENHardware.lynxModules
-import org.firstinspires.ftc.teamcode.robot.simulation.FakeDrivetrainOdometry
-import org.firstinspires.ftc.teamcode.robot.simulation.OpenCVNodePhonecam
-import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule
+import org.firstinspires.ftc.teamcode.superclasses.MultithreadedRobotModule
 import org.openftc.revextensions2.ExpansionHubEx
 import java.util.*
 
@@ -25,8 +23,15 @@ object WoENrobot {
     val odometry = ThreeWheelOdometry()
     val drivetrain = MecanumDrivetrain()
     val movement = Movement(odometry, drivetrain)
-    private val activeRobotModules = arrayOf(odometry, movement, drivetrain, wobbleManipulator, conveyor, shooter, telemetryDebugging,
-                                             ai) //
+    private val activeRobotModules = arrayOf(
+        odometry,
+        movement,
+        drivetrain,
+        wobbleManipulator,
+        conveyor,
+        shooter,
+        telemetryDebugging,
+        ai) //
 
 
     lateinit var opMode : LinearOpMode
@@ -46,7 +51,7 @@ object WoENrobot {
             controlHub.standardModule.bulkCachingMode = BulkCachingMode.MANUAL
             while (opMode.opModeIsActive() && !Thread.currentThread().isInterrupted) {
                 controlHub.standardModule.clearBulkCache()
-                Arrays.stream(activeRobotModules).forEach {obj : MultithreadRobotModule -> obj.updateControlHub()}
+                Arrays.stream(activeRobotModules).forEach {obj : MultithreadedRobotModule -> obj.updateControlHub()}
                 controlHubSpinCompleted = true
             }
 
@@ -59,7 +64,7 @@ object WoENrobot {
             expansionHub.standardModule.bulkCachingMode = BulkCachingMode.MANUAL
             while (opMode.opModeIsActive() && !Thread.currentThread().isInterrupted) {
                 expansionHub.standardModule.clearBulkCache()
-                Arrays.stream(activeRobotModules).forEach {obj : MultithreadRobotModule -> obj.updateExpansionHub()}
+                Arrays.stream(activeRobotModules).forEach {obj : MultithreadedRobotModule -> obj.updateExpansionHub()}
                 expansionHubSpinCompleted = true
             }
         } catch (e : InterruptedException) {
@@ -72,7 +77,7 @@ object WoENrobot {
                 while ((!controlHubSpinCompleted || !expansionHubSpinCompleted) && opMode.opModeIsActive()) {
                     Thread.yield()
                 }
-                Arrays.stream(activeRobotModules).forEach {obj : MultithreadRobotModule -> obj.updateOther()}
+                Arrays.stream(activeRobotModules).forEach {obj : MultithreadedRobotModule -> obj.updateOther()}
                 controlHubSpinCompleted = false
                 expansionHubSpinCompleted = false
                 spinCompleted = true
@@ -86,7 +91,7 @@ object WoENrobot {
             setBulkCachingMode(BulkCachingMode.MANUAL)
             while (opMode.opModeIsActive() && !Thread.currentThread().isInterrupted) {
                 clearBulkCaches()
-                Arrays.stream(activeRobotModules).forEach {obj : MultithreadRobotModule -> obj.updateAll()}
+                Arrays.stream(activeRobotModules).forEach {obj : MultithreadedRobotModule -> obj.updateAll()}
                 spinCompleted = true
             }
         } catch (e : Exception) {
@@ -128,7 +133,7 @@ object WoENrobot {
         opMode.waitForStart()
         if (opMode.isStopRequested) return
         runTime.reset()
-        Arrays.stream(activeRobotModules).forEach {obj : MultithreadRobotModule -> obj.start()}
+        Arrays.stream(activeRobotModules).forEach {obj : MultithreadedRobotModule -> obj.start()}
         //regulatorUpdater.start()
         controlHubUpdater.start()
         expansionHubUpdater.start()
@@ -145,7 +150,7 @@ object WoENrobot {
             opMode.telemetry.update()
         } else {
             opMode = OpMode
-            Arrays.stream(activeRobotModules).forEach {robotModule : MultithreadRobotModule -> robotModule.setOpMode(opMode)}
+            Arrays.stream(activeRobotModules).forEach{robotModule : MultithreadedRobotModule -> robotModule.opMode = opMode}
             if (regulatorUpdater.state != Thread.State.NEW) {
                 regulatorUpdater.interrupt()
                 regulatorUpdater = Thread(updateRegulators)
@@ -170,7 +175,7 @@ object WoENrobot {
         expansionHub = WoENHardware.expansionHub
         allHubs = lynxModules
         setBulkCachingMode(BulkCachingMode.MANUAL)
-        Arrays.stream(activeRobotModules).forEach {robotModule : MultithreadRobotModule -> robotModule.initialize(opMode)}
+        Arrays.stream(activeRobotModules).forEach {robotModule : MultithreadedRobotModule -> robotModule.initialize(opMode)}
         regulatorUpdater.interrupt()
         regulatorUpdater = Thread(updateRegulators)
         controlHubUpdater.interrupt()

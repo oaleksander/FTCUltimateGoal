@@ -7,12 +7,12 @@ import com.qualcomm.robotcore.hardware.Servo
 import com.qualcomm.robotcore.util.ElapsedTime
 import org.firstinspires.ftc.teamcode.robot.WoENHardware
 import org.firstinspires.ftc.teamcode.robot.WoENHardware.gripper
-import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule
+import org.firstinspires.ftc.teamcode.superclasses.MultithreadedRobotModule
 import org.firstinspires.ftc.teamcode.superclasses.WobbleManipulator
 import kotlin.math.abs
 
 @Deprecated("")
-class MotorWobbleManipulator : MultithreadRobotModule(), WobbleManipulator {
+class MotorWobbleManipulator : MultithreadedRobotModule(), WobbleManipulator {
     private val closeClose = 0.73
     private val closeOpen = 0.19
     private val minerror = 15.0

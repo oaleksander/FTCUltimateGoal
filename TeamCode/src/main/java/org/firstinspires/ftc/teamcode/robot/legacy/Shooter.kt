@@ -5,13 +5,13 @@ import com.qualcomm.robotcore.hardware.*
 import com.qualcomm.robotcore.util.ElapsedTime
 import org.firstinspires.ftc.teamcode.misc.CommandSender
 import org.firstinspires.ftc.teamcode.robot.WoENHardware
-import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule
+import org.firstinspires.ftc.teamcode.superclasses.MultithreadedRobotModule
 import org.firstinspires.ftc.teamcode.superclasses.Shooter
 import org.openftc.revextensions2.ExpansionHubServo
 import kotlin.math.abs
 
 @Deprecated("")
-class Shooter : MultithreadRobotModule(), Shooter {
+class Shooter : MultithreadedRobotModule(), Shooter {
     private val rpmTime = ElapsedTime()
     private val feederTime = ElapsedTime()
     private val encoderFailureDetectionTime = ElapsedTime()

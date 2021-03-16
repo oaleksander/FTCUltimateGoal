@@ -10,14 +10,14 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
 import org.firstinspires.ftc.teamcode.misc.CommandSender
 import org.firstinspires.ftc.teamcode.misc.MotorAccelerationLimiter
-import org.firstinspires.ftc.teamcode.robot.Conveyor.ConveyorConfig.conveyorPower
+import org.firstinspires.ftc.teamcode.robot.Conveyor.ConveyorConfig.ratedConveyorPower
 import org.firstinspires.ftc.teamcode.robot.WoENHardware.conveyorMotor
 import org.firstinspires.ftc.teamcode.robot.WoENHardware.ringDetector
 import org.firstinspires.ftc.teamcode.superclasses.Conveyor
-import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule
+import org.firstinspires.ftc.teamcode.superclasses.MultithreadedRobotModule
 import kotlin.math.abs
 
-class Conveyor : MultithreadRobotModule(), Conveyor {
+class Conveyor : MultithreadedRobotModule(), Conveyor {
     private lateinit var conveyor: DcMotorEx
     private lateinit var sensorDistance: DistanceSensor
     private val distanceQueryTimeout = 300.0
@@ -41,7 +41,7 @@ class Conveyor : MultithreadRobotModule(), Conveyor {
 
     @Config
     internal object ConveyorConfig {
-        @JvmField var conveyorPower = 1.0
+        @JvmField var ratedConveyorPower = 1.0
 
         @JvmField var motorLockingCurrentTimeout = 800.0
 
@@ -80,7 +80,7 @@ class Conveyor : MultithreadRobotModule(), Conveyor {
         return lastKnownDistance
     }
 
-    private val aMPS: Double
+    private val conveyorMotorCurrent: Double
         get() {
             if (!enableConveyor && !forceReverse) return 0.0
             if (motorCurrentQueryTimer.milliseconds() > motorCurrentQueryTimeout) {
@@ -109,15 +109,15 @@ class Conveyor : MultithreadRobotModule(), Conveyor {
             } else if (motorCurrentTimer.milliseconds() > ConveyorConfig.motorLockingCurrentTimeout) //reverse after locking
             {
                 if (motorCurrentTimer.milliseconds() < ConveyorConfig.motorLockingReverseTime + ConveyorConfig.motorLockingCurrentTimeout) {
-                    currentMotorPower = -if (enableConveyor) conveyorPower else 0.0
+                    currentMotorPower = -if (enableConveyor) ratedConveyorPower else 0.0
                 } else motorCurrentTimer.reset()
             } else {
-                currentMotorPower = +if (enableConveyor) conveyorPower else 0.0
-                if (aMPS < ConveyorConfig.currentThreshold) //locking detection
+                currentMotorPower = +if (enableConveyor) ratedConveyorPower else 0.0
+                if (conveyorMotorCurrent < ConveyorConfig.currentThreshold) //locking detection
                     motorCurrentTimer.reset()
             }
         } else {
-            currentMotorPower = -conveyorPower
+            currentMotorPower = -ratedConveyorPower
             motorCurrentTimer.reset()
         }
         conveyorAccelerationLimiter.setVelocity(currentMotorPower)

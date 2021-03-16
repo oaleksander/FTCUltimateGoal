@@ -6,12 +6,12 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple
 import com.qualcomm.robotcore.util.ElapsedTime
 import org.firstinspires.ftc.teamcode.misc.CommandSender
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.shooter
-import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule
+import org.firstinspires.ftc.teamcode.superclasses.MultithreadedRobotModule
 import kotlin.math.PI
 import kotlin.math.pow
 import kotlin.math.sin
 
-class LedStrip : MultithreadRobotModule() {
+class LedStrip : MultithreadedRobotModule() {
     private lateinit var ledStrip1: DcMotorEx
     private lateinit var ledStrip2: DcMotorEx
     private val ledTime = ElapsedTime()

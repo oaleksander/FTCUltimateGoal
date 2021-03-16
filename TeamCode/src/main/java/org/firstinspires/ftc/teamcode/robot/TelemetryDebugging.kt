@@ -11,12 +11,12 @@ import org.firstinspires.ftc.teamcode.robot.WoENrobot.movement
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.odometry
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.runTime
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.shooter
-import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule
+import org.firstinspires.ftc.teamcode.superclasses.MultithreadedRobotModule
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.math.cos
 import kotlin.math.sin
 
-class TelemetryDebugging : MultithreadRobotModule() {
+class TelemetryDebugging : MultithreadedRobotModule() {
     private val measurementTime = ElapsedTime()
     lateinit var dashboard: FtcDashboard
     lateinit var telemetry: Telemetry
@@ -33,12 +33,6 @@ class TelemetryDebugging : MultithreadRobotModule() {
         @JvmField var dashboardTelemetry = true
 
         @JvmField var refreshTimeMs = 50
-    }
-
-    override fun setOpMode(opMode: LinearOpMode) {
-        super.setOpMode(opMode)
-        dashboard = FtcDashboard.getInstance()
-        telemetry = opMode.telemetry
     }
 
     private fun createDashboardRectangle(position: Pose2D, color: String) {
@@ -120,6 +114,8 @@ class TelemetryDebugging : MultithreadRobotModule() {
     }
 
     override fun start() {
+        dashboard = FtcDashboard.getInstance()
+        telemetry = opMode.telemetry
         telemetryUpdater.interrupt()
         telemetryUpdater = Thread(updateTelemetry)
         telemetryUpdater.start()

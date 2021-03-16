@@ -11,10 +11,10 @@ import org.firstinspires.ftc.teamcode.misc.CommandSender
 import org.firstinspires.ftc.teamcode.robot.WoENHardware.conveyorMotor
 import org.firstinspires.ftc.teamcode.robot.WoENHardware.ringDetector
 import org.firstinspires.ftc.teamcode.superclasses.Conveyor
-import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule
+import org.firstinspires.ftc.teamcode.superclasses.MultithreadedRobotModule
 
 @Deprecated("")
-class Conveyor : MultithreadRobotModule(), Conveyor {
+class Conveyor : MultithreadedRobotModule(), Conveyor {
     private val conveyorTime = ElapsedTime()
     private val backOnTime = ElapsedTime()
     private val pauseTime = ElapsedTime()

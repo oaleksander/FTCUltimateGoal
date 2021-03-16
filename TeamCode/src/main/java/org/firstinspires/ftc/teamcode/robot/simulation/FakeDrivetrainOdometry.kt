@@ -8,12 +8,12 @@ import org.firstinspires.ftc.teamcode.math.Vector3D
 import org.firstinspires.ftc.teamcode.misc.MotorAccelerationLimiter
 import org.firstinspires.ftc.teamcode.robot.MecanumDrivetrain
 import org.firstinspires.ftc.teamcode.superclasses.Drivetrain
-import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule
+import org.firstinspires.ftc.teamcode.superclasses.MultithreadedRobotModule
 import org.firstinspires.ftc.teamcode.superclasses.Odometry
 import kotlin.math.abs
 import kotlin.math.sign
 
-class FakeDrivetrainOdometry : MultithreadRobotModule(), Drivetrain, Odometry {
+class FakeDrivetrainOdometry : MultithreadedRobotModule(), Drivetrain, Odometry {
     // private val maxVelocity = MecanumDrivetrain().maxVelocity
     private var started = false
     private var targetVelocityFC = Vector3D(0.0, 0.0, 0.0)

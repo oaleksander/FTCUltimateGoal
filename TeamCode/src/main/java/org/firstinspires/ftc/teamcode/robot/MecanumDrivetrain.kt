@@ -15,11 +15,11 @@ import org.firstinspires.ftc.teamcode.misc.CommandSender
 import org.firstinspires.ftc.teamcode.misc.MotorAccelerationLimiter
 import org.firstinspires.ftc.teamcode.robot.WoENHardware.controlHubVoltageSensor
 import org.firstinspires.ftc.teamcode.superclasses.Drivetrain
-import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule
+import org.firstinspires.ftc.teamcode.superclasses.MultithreadedRobotModule
 import kotlin.math.abs
 import kotlin.math.sign
 
-class MecanumDrivetrain : MultithreadRobotModule(), Drivetrain {
+class MecanumDrivetrain : MultithreadedRobotModule(), Drivetrain {
     /* Motor parameters constatnts. */
     @Config
     internal object DrivetrainConfig {

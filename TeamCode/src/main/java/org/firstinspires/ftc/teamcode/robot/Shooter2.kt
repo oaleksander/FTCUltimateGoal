@@ -13,13 +13,13 @@ import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig2.kS
 import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig2.kV
 import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig2.kV_referenceVoltage
 import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig2.maxI
-import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule
+import org.firstinspires.ftc.teamcode.superclasses.MultithreadedRobotModule
 import org.firstinspires.ftc.teamcode.superclasses.Shooter
 import org.openftc.revextensions2.ExpansionHubServo
 import kotlin.math.abs
 import kotlin.math.sign
 
-class Shooter2 : MultithreadRobotModule() {
+class Shooter2 : MultithreadedRobotModule() {
     private val rpmTime = ElapsedTime()
     private val feederTime = ElapsedTime()
     private val encoderFailureDetectionTime = ElapsedTime()

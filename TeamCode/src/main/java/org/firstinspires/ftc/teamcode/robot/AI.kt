@@ -6,11 +6,11 @@ import com.qualcomm.robotcore.hardware.Servo
 import com.qualcomm.robotcore.util.ElapsedTime
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
-import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule
+import org.firstinspires.ftc.teamcode.superclasses.MultithreadedRobotModule
 import org.openftc.revextensions2.ExpansionHubEx
 import org.openftc.revextensions2.ExpansionHubMotor
 
-class AI : MultithreadRobotModule() {
+class AI : MultithreadedRobotModule() {
     private val AItime = ElapsedTime()
     private val AItimeControlHub = ElapsedTime()
     private val AItimeExpansionHub = ElapsedTime()

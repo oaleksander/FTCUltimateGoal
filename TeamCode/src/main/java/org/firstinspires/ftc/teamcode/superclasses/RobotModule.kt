@@ -1,27 +1,17 @@
-package org.firstinspires.ftc.teamcode.superclasses;
+package org.firstinspires.ftc.teamcode.superclasses
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 
-@SuppressWarnings("EmptyMethod")
-public abstract class RobotModule {
+abstract class RobotModule {
+    lateinit var opMode: LinearOpMode
 
-    protected LinearOpMode opMode = null;
+    open fun initialize() {}
 
-    public void setOpMode(LinearOpMode opMode) {
-        this.opMode = opMode;
+    fun initialize(opMode: LinearOpMode) {
+        this.opMode = opMode
+        initialize()
     }
 
-    public void initialize() {
-    }
-
-    public final void initialize(LinearOpMode opMode) {
-        setOpMode(opMode);
-        initialize();
-    }
-
-    public void start() {
-    }
-
-    public void updateAll() {
-    }
+    open fun start() {}
+    open fun updateAll() {}
 }

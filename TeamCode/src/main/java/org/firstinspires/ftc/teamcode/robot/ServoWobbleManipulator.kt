@@ -2,11 +2,11 @@ package org.firstinspires.ftc.teamcode.robot
 
 import com.acmerobotics.dashboard.config.Config
 import org.firstinspires.ftc.teamcode.misc.CommandSender
-import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule
+import org.firstinspires.ftc.teamcode.superclasses.MultithreadedRobotModule
 import org.firstinspires.ftc.teamcode.superclasses.WobbleManipulator
 import org.openftc.revextensions2.ExpansionHubServo
 
-class ServoWobbleManipulator : MultithreadRobotModule(), WobbleManipulator {
+class ServoWobbleManipulator : MultithreadedRobotModule(), WobbleManipulator {
     private lateinit var gripper: ExpansionHubServo
     private lateinit var leverArm: ExpansionHubServo
 
