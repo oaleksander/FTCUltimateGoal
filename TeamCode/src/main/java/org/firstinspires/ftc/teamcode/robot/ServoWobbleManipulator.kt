@@ -12,20 +12,19 @@ class ServoWobbleManipulator : MultithreadRobotModule(), WobbleManipulator {
 
     @Config
     object WobbleServoPositions {
-        @JvmField
-        var gripperClose = 0.92
-        @JvmField
-        var gripperOpen = 0.19
-        @JvmField
-        var angleDown = 0.18
-        @JvmField
-        var angleMedium = 0.6
-        @JvmField
-        var angleUp = 1.0
+        @JvmField var gripperClose = 0.92
+
+        @JvmField var gripperOpen = 0.19
+
+        @JvmField var angleDown = 0.18
+
+        @JvmField var angleMedium = 0.6
+
+        @JvmField var angleUp = 1.0
     }
 
-    private val closePositionSender = CommandSender ({gripper.position = it})
-    private val anglePositionSender = CommandSender ({leverArm.position = it})
+    private val closePositionSender = CommandSender({ gripper.position = it })
+    private val anglePositionSender = CommandSender({ leverArm.position = it })
     private var isDown = false
     private var posAngle = WobbleManipulator.Position.UP
     private var leverArmPosition = 0.0
@@ -65,8 +64,7 @@ class ServoWobbleManipulator : MultithreadRobotModule(), WobbleManipulator {
             if (!isDown) {
                 isDown = true
                 if (posAngle != WobbleManipulator.Position.MEDIUM) setAngle(WobbleManipulator.Position.MEDIUM) else setAngle(
-                    WobbleManipulator.Position.DOWN
-                )
+                     WobbleManipulator.Position.DOWN)
             }
         } else isDown = false
     }
@@ -74,9 +72,9 @@ class ServoWobbleManipulator : MultithreadRobotModule(), WobbleManipulator {
     override fun setAngle(Positions: WobbleManipulator.Position) {
         posAngle = Positions
         leverArmPosition = when (Positions) {
-            WobbleManipulator.Position.UP -> WobbleServoPositions.angleUp
-            WobbleManipulator.Position.DOWN -> WobbleServoPositions.angleDown
-            WobbleManipulator.Position.MEDIUM -> WobbleServoPositions.angleMedium
+             WobbleManipulator.Position.UP -> WobbleServoPositions.angleUp
+             WobbleManipulator.Position.DOWN -> WobbleServoPositions.angleDown
+             WobbleManipulator.Position.MEDIUM -> WobbleServoPositions.angleMedium
         }
     }
 }

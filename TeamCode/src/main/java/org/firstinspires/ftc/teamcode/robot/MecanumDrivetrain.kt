@@ -23,26 +23,25 @@ class MecanumDrivetrain : MultithreadRobotModule(), Drivetrain {
     /* Motor parameters constatnts. */
     @Config
     internal object DrivetrainConfig {
-        @JvmField
-        var achieveableMaxRPMFraction = 0.885
-        @JvmField
-        var achieveableMinRPMFraction = 0.095
-        @JvmField
-        var strafingMultiplier = 1.35
-        @JvmField
-        var rotationDecrepancy = 1.0
-        @JvmField
-        var secondsToAccelerate = 0.13
-        @JvmField
-        var kP = 29.0
-        @JvmField
-        var kD = 0.0
-        @JvmField
-        var kI = 0.1
-        @JvmField
-        var kF = 15.10
-        @JvmField
-        var kF_referenceVoltage = 13.0
+        @JvmField var achieveableMaxRPMFraction = 0.885
+
+        @JvmField var achieveableMinRPMFraction = 0.095
+
+        @JvmField var strafingMultiplier = 1.35
+
+        @JvmField var rotationDecrepancy = 1.0
+
+        @JvmField var secondsToAccelerate = 0.13
+
+        @JvmField var kP = 29.0
+
+        @JvmField var kD = 0.0
+
+        @JvmField var kI = 0.1
+
+        @JvmField var kF = 15.10
+
+        @JvmField var kF_referenceVoltage = 13.0
     }
 
     /* Physical constants */
@@ -51,17 +50,19 @@ class MecanumDrivetrain : MultithreadRobotModule(), Drivetrain {
     private val wheelCenterOffset = Vector2D(18.05253, 15.20000)
     private val forwardMultiplier = (1 / wheelRadius) / gearRatio
     private var sidewaysMultiplier = forwardMultiplier * DrivetrainConfig.strafingMultiplier
-    private var turnMultiplier =
-        (wheelCenterOffset.x + wheelCenterOffset.y) * DrivetrainConfig.rotationDecrepancy / wheelRadius
+    private var turnMultiplier = (wheelCenterOffset.x + wheelCenterOffset.y) * DrivetrainConfig.rotationDecrepancy / wheelRadius
     private val tickPerRev = 480.0
     private val gearing = 20.0
     private val maxRPM = 300.0
     private val theoreticalMaxSpeed = maxRPM / 60 * Math.PI * 2
     private var maxMotorVelocity = DrivetrainConfig.achieveableMaxRPMFraction * theoreticalMaxSpeed
-    set(value) { field = Range.clip(abs(value), 0.0, theoreticalMaxSpeed)}
-    private var minMotorVelocity =
-        DrivetrainConfig.achieveableMinRPMFraction * theoreticalMaxSpeed //http://b1-srv-kms-1.sch239.net:8239
-    set(value) {field = Range.clip(abs(value), 0.0, theoreticalMaxSpeed)}
+        set(value) {
+            field = Range.clip(abs(value), 0.0, theoreticalMaxSpeed)
+        }
+    private var minMotorVelocity = DrivetrainConfig.achieveableMinRPMFraction * theoreticalMaxSpeed //http://b1-srv-kms-1.sch239.net:8239
+        set(value) {
+            field = Range.clip(abs(value), 0.0, theoreticalMaxSpeed)
+        }
 
     /* Drivetrain hardware members. */
     private lateinit var driveFrontLeft: DcMotorEx
@@ -72,26 +73,26 @@ class MecanumDrivetrain : MultithreadRobotModule(), Drivetrain {
     private var maxAcceleration = theoreticalMaxSpeed / DrivetrainConfig.secondsToAccelerate
 
     /* Motor controllers */
-    private val mFLSender = CommandSender ({driveFrontLeft.setVelocity(it, AngleUnit.RADIANS) })
-    private val mFLProfiler = motorAccelerationLimiter({mFLSender.send(it)}, maxAcceleration)
-    private val mFLDirectSender = CommandSender({driveRearRight.power = it})
+    private val mFLSender = CommandSender({ driveFrontLeft.setVelocity(it, AngleUnit.RADIANS) })
+    private val mFLProfiler = motorAccelerationLimiter({ mFLSender.send(it) }, maxAcceleration)
+    private val mFLDirectSender = CommandSender({ driveRearRight.power = it })
 
-    private val mFRSender = CommandSender ({driveFrontRight.setVelocity(it, AngleUnit.RADIANS) })
-    private val mFRProfiler = motorAccelerationLimiter({mFRSender.send(it) }, maxAcceleration)
-    private val mFRDirectSender = CommandSender({driveFrontRight.power = it})
+    private val mFRSender = CommandSender({ driveFrontRight.setVelocity(it, AngleUnit.RADIANS) })
+    private val mFRProfiler = motorAccelerationLimiter({ mFRSender.send(it) }, maxAcceleration)
+    private val mFRDirectSender = CommandSender({ driveFrontRight.power = it })
 
-    private val mRLSender = CommandSender ({driveRearLeft.setVelocity(it, AngleUnit.RADIANS) })
-    private val mRLProfiler = motorAccelerationLimiter({mRLSender.send(it)}, maxAcceleration)
-    private val mRLDirectSender = CommandSender({driveRearLeft.power = it})
+    private val mRLSender = CommandSender({ driveRearLeft.setVelocity(it, AngleUnit.RADIANS) })
+    private val mRLProfiler = motorAccelerationLimiter({ mRLSender.send(it) }, maxAcceleration)
+    private val mRLDirectSender = CommandSender({ driveRearLeft.power = it })
 
-    private val mRRSender = CommandSender ({driveRearRight.setVelocity(it, AngleUnit.RADIANS) })
-    private val mRRProfiler = motorAccelerationLimiter({mRRSender.send(it)}, maxAcceleration)
-    private val mRRDirectSender = CommandSender({driveRearRight.power = it})
+    private val mRRSender = CommandSender({ driveRearRight.setVelocity(it, AngleUnit.RADIANS) })
+    private val mRRProfiler = motorAccelerationLimiter({ mRRSender.send(it) }, maxAcceleration)
+    private val mRRDirectSender = CommandSender({ driveRearRight.power = it })
 
     private lateinit var voltageSensor: VoltageSensor
     private var smartMode = false
 
-    override var targetVelocity = Vector3D(.0,.0,.0)
+    override var targetVelocity = Vector3D(.0, .0, .0)
 
     private var velocityFrontLeft = 0.0
     private var velocityFrontRight = 0.0
@@ -110,29 +111,17 @@ class MecanumDrivetrain : MultithreadRobotModule(), Drivetrain {
         mRLProfiler.maxAcceleration = theoreticalMaxSpeed / DrivetrainConfig.secondsToAccelerate
         mRRProfiler.maxAcceleration = theoreticalMaxSpeed / DrivetrainConfig.secondsToAccelerate
 
-        turnMultiplier =
-            (wheelCenterOffset.x + wheelCenterOffset.y) * DrivetrainConfig.rotationDecrepancy / wheelRadius
+        turnMultiplier = (wheelCenterOffset.x + wheelCenterOffset.y) * DrivetrainConfig.rotationDecrepancy / wheelRadius
         setMotor0PowerBehaviors(ZeroPowerBehavior.BRAKE)
-        setMotorConfiguration(
-            DrivetrainConfig.achieveableMaxRPMFraction,
-            tickPerRev,
-            gearing,
-            maxRPM
-        )
+        setMotorConfiguration(DrivetrainConfig.achieveableMaxRPMFraction, tickPerRev, gearing, maxRPM)
         try {
-            setPIDFCoefficients(
-                PIDFCoefficients(
-                    DrivetrainConfig.kP,
-                    DrivetrainConfig.kD,
-                    DrivetrainConfig.kI,
-                    DrivetrainConfig.kF * DrivetrainConfig.kF_referenceVoltage / voltageSensor.voltage
-                )
-            )
+            setPIDFCoefficients(PIDFCoefficients(DrivetrainConfig.kP, DrivetrainConfig.kD, DrivetrainConfig.kI,
+                                                 DrivetrainConfig.kF * DrivetrainConfig.kF_referenceVoltage / voltageSensor.voltage))
         } catch (e: UnsupportedOperationException) {
             opMode.telemetry.addData("Drivetrain PIDF error ", e.message)
         }
         setSmartMode(true)
-        targetVelocity = Vector3D(.0,.0,.0)
+        targetVelocity = Vector3D(.0, .0, .0)
     }
 
     fun setSmartMode(SmartMode: Boolean) {
@@ -175,43 +164,14 @@ class MecanumDrivetrain : MultithreadRobotModule(), Drivetrain {
         driveRearRight.setPIDFCoefficients(RunMode.RUN_USING_ENCODER, pidfCoefficients)
     }
 
-    private fun setMotorConfiguration(
-        achieveableMaxRPMFraction: Double,
-        tickPerRev: Double,
-        gearing: Double,
-        maxRPM: Double
-    ) {
-        setMotorConfiguration(
-            driveFrontLeft,
-            achieveableMaxRPMFraction,
-            tickPerRev,
-            gearing,
-            maxRPM
-        )
-        setMotorConfiguration(
-            driveFrontRight,
-            achieveableMaxRPMFraction,
-            tickPerRev,
-            gearing,
-            maxRPM
-        )
+    private fun setMotorConfiguration(achieveableMaxRPMFraction: Double, tickPerRev: Double, gearing: Double, maxRPM: Double) {
+        setMotorConfiguration(driveFrontLeft, achieveableMaxRPMFraction, tickPerRev, gearing, maxRPM)
+        setMotorConfiguration(driveFrontRight, achieveableMaxRPMFraction, tickPerRev, gearing, maxRPM)
         setMotorConfiguration(driveRearLeft, achieveableMaxRPMFraction, tickPerRev, gearing, maxRPM)
-        setMotorConfiguration(
-            driveRearRight,
-            achieveableMaxRPMFraction,
-            tickPerRev,
-            gearing,
-            maxRPM
-        )
+        setMotorConfiguration(driveRearRight, achieveableMaxRPMFraction, tickPerRev, gearing, maxRPM)
     }
 
-    private fun setMotorConfiguration(
-        dcMotor: DcMotorEx,
-        achieveableMaxRPMFraction: Double,
-        tickPerRev: Double,
-        gearing: Double,
-        maxRPM: Double
-    ) {
+    private fun setMotorConfiguration(dcMotor: DcMotorEx, achieveableMaxRPMFraction: Double, tickPerRev: Double, gearing: Double, maxRPM: Double) {
         val motorConfigurationType = dcMotor.motorType.clone()
         motorConfigurationType.achieveableMaxRPMFraction = achieveableMaxRPMFraction
         motorConfigurationType.ticksPerRev = tickPerRev
@@ -225,13 +185,15 @@ class MecanumDrivetrain : MultithreadRobotModule(), Drivetrain {
     }
 
     override fun updateControlHub() {
-        val motorVelocity = Vector3D(targetVelocity.x * sidewaysMultiplier,targetVelocity.y * forwardMultiplier,targetVelocity.z * turnMultiplier)
+        val motorVelocity = Vector3D(targetVelocity.x * sidewaysMultiplier, targetVelocity.y * forwardMultiplier,
+                                     targetVelocity.z * turnMultiplier)
         velocityFrontLeft = motorVelocity.y + motorVelocity.x + motorVelocity.z
         velocityFrontRight = motorVelocity.y - motorVelocity.x - motorVelocity.z
         velocityRearLeft = motorVelocity.y - motorVelocity.x + motorVelocity.z
         velocityRearRight = motorVelocity.y + motorVelocity.x - motorVelocity.z
 
-        var maxabs = abs(velocityFrontLeft).coerceAtLeast(abs(velocityFrontRight)).coerceAtLeast(abs(velocityRearLeft)).coerceAtLeast(abs(velocityRearRight))
+        var maxabs = abs(velocityFrontLeft).coerceAtLeast(abs(velocityFrontRight)).coerceAtLeast(abs(velocityRearLeft))
+            .coerceAtLeast(abs(velocityRearRight))
         if (maxabs > maxMotorVelocity) {
             maxabs /= maxMotorVelocity
             velocityFrontLeft /= maxabs
@@ -265,13 +227,9 @@ class MecanumDrivetrain : MultithreadRobotModule(), Drivetrain {
 
 
     private fun limitMinSpeed(speed: Double): Double {
-        return speed.coerceAtLeast(minMotorVelocity)*sign(speed)
+        return speed.coerceAtLeast(minMotorVelocity) * sign(speed)
     }
 
     override val maxVelocity: Vector3D
-        get() = Vector3D(
-            maxMotorVelocity / forwardMultiplier,
-            maxMotorVelocity / forwardMultiplier,
-            maxMotorVelocity / turnMultiplier
-        )
+        get() = Vector3D(maxMotorVelocity / forwardMultiplier, maxMotorVelocity / forwardMultiplier, maxMotorVelocity / turnMultiplier)
 }

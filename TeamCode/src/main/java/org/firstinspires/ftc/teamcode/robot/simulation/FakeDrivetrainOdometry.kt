@@ -13,19 +13,16 @@ import org.firstinspires.ftc.teamcode.superclasses.Odometry
 import kotlin.math.abs
 import kotlin.math.sign
 
-class FakeDrivetrainOdometry() : MultithreadRobotModule(), Drivetrain, Odometry {
-   // private val maxVelocity = MecanumDrivetrain().maxVelocity
+class FakeDrivetrainOdometry : MultithreadRobotModule(), Drivetrain, Odometry {
+    // private val maxVelocity = MecanumDrivetrain().maxVelocity
     private var started = false
     private var targetVelocityFC = Vector3D(0.0, 0.0, 0.0)
     override val robotVelocity: Vector3D
-    get() = realVelocityFC
+        get() = realVelocityFC
     private var realVelocityFC = Vector3D(0.0, 0.0, 0.0)
-    private val zLimiter =
-        motorAccelerationLimiter({realVelocityFC.z = it}, maxVelocity.z / 0.35)
-    private val yLimiter =
-        motorAccelerationLimiter({realVelocityFC.y = it}, maxVelocity.y / 0.35)
-    private val xLimiter =
-        motorAccelerationLimiter({realVelocityFC.x = it}, maxVelocity.x / 0.35)
+    private val zLimiter = motorAccelerationLimiter({ realVelocityFC.z = it }, maxVelocity.z / 0.35)
+    private val yLimiter = motorAccelerationLimiter({ realVelocityFC.y = it }, maxVelocity.y / 0.35)
+    private val xLimiter = motorAccelerationLimiter({ realVelocityFC.x = it }, maxVelocity.x / 0.35)
     private val updateTimer = ElapsedTime()
 
     override var robotCoordinates = Pose2D()
@@ -63,25 +60,23 @@ class FakeDrivetrainOdometry() : MultithreadRobotModule(), Drivetrain, Odometry 
         xLimiter.setVelocity(targetVelocityFC.x)
         robotCoordinates.y += realVelocityFC.y * updateTimer.seconds()
         robotCoordinates.x += realVelocityFC.x * updateTimer.seconds()
-        robotCoordinates.heading =
-            MathUtil.angleWrap(this.robotCoordinates.heading + realVelocityFC.z * updateTimer.seconds())
+        robotCoordinates.heading = MathUtil.angleWrap(this.robotCoordinates.heading + realVelocityFC.z * updateTimer.seconds())
         updateTimer.reset()
     }
 
     override var targetVelocity = Vector3D(0.0, 0.0, 0.0)
-    set(value) {
-        var frontWays = value.y
-        var sideWays = value.x
-        var turn = value.z
-        if (abs(frontWays) > maxVelocity.y) frontWays = maxVelocity.y * sign(frontWays)
-        if (abs(sideWays) > maxVelocity.x) sideWays = maxVelocity.x * sign(sideWays)
-        if (abs(turn) > maxVelocity.z) turn = maxVelocity.z * sign(turn)
-        field = Vector3D(sideWays, frontWays, turn)
-        targetVelocityFC =
-            Vector3D(Vector2D(sideWays, frontWays).rotatedCW(this.robotCoordinates.heading), turn)
-    }
+        set(value) {
+            var frontWays = value.y
+            var sideWays = value.x
+            var turn = value.z
+            if (abs(frontWays) > maxVelocity.y) frontWays = maxVelocity.y * sign(frontWays)
+            if (abs(sideWays) > maxVelocity.x) sideWays = maxVelocity.x * sign(sideWays)
+            if (abs(turn) > maxVelocity.z) turn = maxVelocity.z * sign(turn)
+            field = Vector3D(sideWays, frontWays, turn)
+            targetVelocityFC = Vector3D(Vector2D(sideWays, frontWays).rotatedCW(this.robotCoordinates.heading), turn)
+        }
 
     override val maxVelocity: Vector3D
-            get() = MecanumDrivetrain().maxVelocity
+        get() = MecanumDrivetrain().maxVelocity
 
 }

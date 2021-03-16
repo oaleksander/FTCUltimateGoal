@@ -6,7 +6,7 @@ import java.util.Locale;
 
 import static org.firstinspires.ftc.teamcode.math.MathUtil.angleWrap;
 
-public class Pose2D extends Vector2D{
+public class Pose2D extends Vector2D {
     public double heading;
 
     public Pose2D(double x, double y, double heading) {
@@ -77,7 +77,9 @@ public class Pose2D extends Vector2D{
     }
 
     @Override
-    public int hashCode() { return Double.valueOf(x).hashCode() ^ Double.valueOf(y).hashCode() ^ Double.valueOf(heading).hashCode(); }
+    public int hashCode() {
+        return Double.valueOf(x).hashCode() ^ Double.valueOf(y).hashCode() ^ Double.valueOf(heading).hashCode();
+    }
 
     @Override
     public @NotNull String toString() {
@@ -85,7 +87,7 @@ public class Pose2D extends Vector2D{
     }
 
     @Override
-    public Pose2D clone(){
-        return new Pose2D(this.x,this.y,this.heading);
+    public Pose2D clone() {
+        return new Pose2D(this.x, this.y, this.heading);
     }
 }

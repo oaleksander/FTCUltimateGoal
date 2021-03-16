@@ -107,9 +107,9 @@ class MotorWobbleManipulator : MultithreadRobotModule(), WobbleManipulator {
 
     override fun setAngle(Positions: WobbleManipulator.Position) {
         when (Positions) {
-            WobbleManipulator.Position.UP -> setposlever(0.0)
-            WobbleManipulator.Position.DOWN -> setposlever(920.0)
-            WobbleManipulator.Position.MEDIUM -> setposlever(550.0)
+             WobbleManipulator.Position.UP -> setposlever(0.0)
+             WobbleManipulator.Position.DOWN -> setposlever(920.0)
+             WobbleManipulator.Position.MEDIUM -> setposlever(550.0)
         }
     }
 

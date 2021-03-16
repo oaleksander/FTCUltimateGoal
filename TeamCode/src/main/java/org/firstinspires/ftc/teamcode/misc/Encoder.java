@@ -20,8 +20,7 @@ public class Encoder {
     }
 
     public enum Direction {
-        FORWARD(1),
-        REVERSE(-1);
+        FORWARD(1), REVERSE(-1);
 
         private final int multiplier;
 
@@ -69,7 +68,7 @@ public class Encoder {
     }
 
     public int getCurrentPosition() {
-        int multiplier = direction.getMultiplier() * (motor.getDirection() == DcMotorSimple.Direction.FORWARD?1:-1);
+        int multiplier = direction.getMultiplier() * (motor.getDirection() == DcMotorSimple.Direction.FORWARD ? 1 : -1);
         int currentPosition = motor.getCurrentPosition() * multiplier;
         if (currentPosition != lastPosition) {
             double currentTime = clock.seconds();
@@ -82,7 +81,7 @@ public class Encoder {
     }
 
     public double getRawVelocity() {
-        int multiplier = direction.getMultiplier() * (motor.getDirection() == DcMotorSimple.Direction.FORWARD?1:-1);
+        int multiplier = direction.getMultiplier() * (motor.getDirection() == DcMotorSimple.Direction.FORWARD ? 1 : -1);
         return motor.getVelocity() * multiplier;
     }
 

@@ -47,7 +47,7 @@ public class MotionTask extends Pose2D {
 
     @Override
     public MotionTask clone() {
-        return new MotionTask(this.x,this.y,this.heading,this.actionOnConpletion);
+        return new MotionTask(this.x, this.y, this.heading, this.actionOnConpletion);
     }
 
 

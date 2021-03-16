@@ -41,9 +41,6 @@
       <option name="ASSIGNMENT_WRAP" value="0" />
       <option name="FIELD_ANNOTATION_WRAP" value="0" />
       <option name="WRAP_ON_TYPING" value="0" />
-      <indentOptions>
-        <option name="INDENT_SIZE" value="5" />
-      </indentOptions>
     </codeStyleSettings>
   </code_scheme>
 </component>

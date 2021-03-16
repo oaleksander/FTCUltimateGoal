@@ -33,19 +33,15 @@ class TeleOp_Single : LinearOpMode() {
             /* Conveyor */
             conveyor.enableConveyor = conveyorOnOffSwitch.get()
             /* Shooter */
-            shooter.shootingMode = if (shooterOnOffSwitch.get())
-                if (shooterSpeedSwitch.get()) Shooter.ShooterMode.POWERSHOT
-                else Shooter.ShooterMode.HIGHGOAL
+            shooter.shootingMode = if (shooterOnOffSwitch.get()) if (shooterSpeedSwitch.get()) Shooter.ShooterMode.POWERSHOT
+            else Shooter.ShooterMode.HIGHGOAL
             else Shooter.ShooterMode.OFF
             conveyor.forceReverse = gamepad1.dpad_right
             if (gamepad1.a) shooter.feedRing()
             if (threeRingPresser.get()) shooter.feedRings()
             /* Drivetrain */
-            movement.humanSetVelocity(
-                gamepad1.left_stick_x.toDouble(),
-                -gamepad1.left_stick_y.toDouble(),
-                if (gamepad1.right_bumper) 0.25 else gamepad1.right_trigger.toDouble() - if (gamepad1.left_bumper) 0.25 else gamepad1.left_trigger.toDouble()
-            )
+            movement.humanSetVelocity(gamepad1.left_stick_x.toDouble(), -gamepad1.left_stick_y.toDouble(),
+                                      if (gamepad1.right_bumper) 0.25 else gamepad1.right_trigger.toDouble() - if (gamepad1.left_bumper) 0.25 else gamepad1.left_trigger.toDouble())
         }
     }
 }

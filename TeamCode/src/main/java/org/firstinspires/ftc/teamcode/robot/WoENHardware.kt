@@ -45,9 +45,8 @@ object WoENHardware {
 
 
     @JvmOverloads
-    fun assignHardware(
-        hwMap: HardwareMap = OpModeManagerImpl.getOpModeManagerOfActivity(AppUtil.getInstance().rootActivity).hardwareMap
-    ) {
+    fun assignHardware(hwMap: HardwareMap = OpModeManagerImpl.getOpModeManagerOfActivity(
+         AppUtil.getInstance().rootActivity).hardwareMap) {
 
         hardwareMap = hwMap
 

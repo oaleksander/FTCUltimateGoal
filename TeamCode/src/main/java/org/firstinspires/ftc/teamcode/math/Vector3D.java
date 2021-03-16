@@ -46,13 +46,12 @@ public class Vector3D extends Vector2D implements Cloneable {
 
     @Override
     public Vector3D rotatedCW(double angle) {
-        return new Vector3D(super.rotatedCW(angle),z);
+        return new Vector3D(super.rotatedCW(angle), z);
     }
 
     public Vector3D normalize() {
         double r = radius();
-        if (r != 0)
-            return new Vector3D(x / r, y / r, z / r);
+        if (r != 0) return new Vector3D(x / r, y / r, z / r);
         return this;
     }
 
@@ -91,7 +90,9 @@ public class Vector3D extends Vector2D implements Cloneable {
     }
 
     @Override
-    public int hashCode() { return Double.valueOf(x).hashCode() ^ Double.valueOf(y).hashCode() ^ Double.valueOf(z).hashCode(); }
+    public int hashCode() {
+        return Double.valueOf(x).hashCode() ^ Double.valueOf(y).hashCode() ^ Double.valueOf(z).hashCode();
+    }
 
     @Override
     public @NotNull String toString() {

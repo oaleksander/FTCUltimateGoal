@@ -15,8 +15,8 @@ class LedStrip : MultithreadRobotModule() {
     private lateinit var ledStrip1: DcMotorEx
     private lateinit var ledStrip2: DcMotorEx
     private val ledTime = ElapsedTime()
-    private val setPowerLed1 = CommandSender ({ p: Double -> ledStrip1.power = p })
-    private val setPowerLed2 = CommandSender ({ p: Double -> ledStrip2.power = p })
+    private val setPowerLed1 = CommandSender({ p: Double -> ledStrip1.power = p })
+    private val setPowerLed2 = CommandSender({ p: Double -> ledStrip2.power = p })
 
 
     override fun initialize() {
@@ -66,7 +66,7 @@ class LedStrip : MultithreadRobotModule() {
     }
 
     private fun smoothyLed(led: CommandSender, time: Double = 1500.0, maxPower: Double = 1.0) {
-        val x = if (time != 0.0) PI/time else 1.0
+        val x = if (time != 0.0) PI / time else 1.0
         led.send(sin(ledTime.milliseconds() * x).pow(2) * maxPower)
     }
 
@@ -101,19 +101,19 @@ class LedStrip : MultithreadRobotModule() {
 
     fun setLedMode(mode: LedMode, ledPower1: Double = 1.0, ledPower2: Double = 1.0, ledTime1: Double = 1500.0, ledTime2: Double = 1500.0) {
         when (mode) {
-            LedMode.ON -> {
-                onLed(setPowerLed1, ledPower1)
-                onLed(setPowerLed2, ledPower2)
-            }
-            LedMode.INFORMSHOOTER -> infromLed()
-            LedMode.SMOOTHLY -> {
-                smoothyLed(setPowerLed1, ledTime1, ledPower1)
-                smoothyLed(setPowerLed2, ledTime2, ledPower2)
-            }
-            LedMode.OFF -> {
-                offLed(setPowerLed1)
-                offLed(setPowerLed2)
-            }
+             LedMode.ON -> {
+                  onLed(setPowerLed1, ledPower1)
+                  onLed(setPowerLed2, ledPower2)
+             }
+             LedMode.INFORMSHOOTER -> infromLed()
+             LedMode.SMOOTHLY -> {
+                  smoothyLed(setPowerLed1, ledTime1, ledPower1)
+                  smoothyLed(setPowerLed2, ledTime2, ledPower2)
+             }
+             LedMode.OFF -> {
+                  offLed(setPowerLed1)
+                  offLed(setPowerLed2)
+             }
         }
     }
 }

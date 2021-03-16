@@ -36,7 +36,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ReadWriteFile;
 
-import org.firstinspires.ftc.robotcore.external.Func;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
@@ -189,14 +188,9 @@ public class SensorBNO055IMUCalibration2 extends LinearOpMode {
             angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         });
 
-        telemetry.addLine()
-                .addData("status", () -> imu.getSystemStatus().toShortString())
-                .addData("calib", () -> imu.getCalibrationStatus().toString());
+        telemetry.addLine().addData("status", () -> imu.getSystemStatus().toShortString()).addData("calib", () -> imu.getCalibrationStatus().toString());
 
-        telemetry.addLine()
-                .addData("heading", () -> formatAngle(angles.angleUnit, angles.firstAngle))
-                .addData("roll", () -> formatAngle(angles.angleUnit, angles.secondAngle))
-                .addData("pitch", () -> formatAngle(angles.angleUnit, angles.thirdAngle));
+        telemetry.addLine().addData("heading", () -> formatAngle(angles.angleUnit, angles.firstAngle)).addData("roll", () -> formatAngle(angles.angleUnit, angles.secondAngle)).addData("pitch", () -> formatAngle(angles.angleUnit, angles.thirdAngle));
     }
 
     //----------------------------------------------------------------------------------------------

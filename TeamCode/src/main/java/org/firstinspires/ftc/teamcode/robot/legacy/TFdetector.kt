@@ -66,10 +66,8 @@ class TFdetector(opMode: LinearOpMode?) : Runnable {
          * Initialize the TensorFlow Object Detection engine.
          */
         val tfodParameters = TFObjectDetector.Parameters(
-            opMode!!.hardwareMap.appContext.resources.getIdentifier(
-                "tfodMonitorViewId", "id", opMode!!.hardwareMap.appContext.packageName
-            )
-        )
+             opMode!!.hardwareMap.appContext.resources.getIdentifier("tfodMonitorViewId", "id",
+                                                                     opMode!!.hardwareMap.appContext.packageName))
         tfodParameters.minResultConfidence = 0.5f
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia)
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT)
@@ -80,8 +78,7 @@ class TFdetector(opMode: LinearOpMode?) : Runnable {
         private const val TFOD_MODEL_ASSET = "UltimateGoal.tflite"
         private const val LABEL_FIRST_ELEMENT = "4"
         private const val LABEL_SECOND_ELEMENT = "1"
-        private const val VUFORIA_KEY =
-            "AYQyDib/////AAABmWoLWPk9RUbvpT7hIVtMz+KJ7Wgtz7khQCon2wk+3/Mt+oIFV0pwc6vrhxOD2hI8Vh9IvPuTzPC2zBiOYGLIrg9m4lskp19GIKC6mv4bGqkZC0aLiJWnW5SSZRC5inIVhz+PxiQVYqhTVUskF9/ab2xuAFxohYL2mqdxuZPGyqLvpqEwuWWKiecF3S2fkKeQ+3yyryRMQhSd648Tl1NzaRWWXsUDStrFLfCAp+K922bBJaquOpraQ6aP1vu/oPlu7fbxxAcJytVPX81ASdjyPd4gDPp/tYEPk/xs7avDKYvdnBUM/RKxmIVkiWtFuiA5ug2DHM3mPfxm0peM8+2kQVjbGQLRUJdKKmp/QBjCfVOp"
+        private const val VUFORIA_KEY = "AYQyDib/////AAABmWoLWPk9RUbvpT7hIVtMz+KJ7Wgtz7khQCon2wk+3/Mt+oIFV0pwc6vrhxOD2hI8Vh9IvPuTzPC2zBiOYGLIrg9m4lskp19GIKC6mv4bGqkZC0aLiJWnW5SSZRC5inIVhz+PxiQVYqhTVUskF9/ab2xuAFxohYL2mqdxuZPGyqLvpqEwuWWKiecF3S2fkKeQ+3yyryRMQhSd648Tl1NzaRWWXsUDStrFLfCAp+K922bBJaquOpraQ6aP1vu/oPlu7fbxxAcJytVPX81ASdjyPd4gDPp/tYEPk/xs7avDKYvdnBUM/RKxmIVkiWtFuiA5ug2DHM3mPfxm0peM8+2kQVjbGQLRUJdKKmp/QBjCfVOp"
     }
 
     init {

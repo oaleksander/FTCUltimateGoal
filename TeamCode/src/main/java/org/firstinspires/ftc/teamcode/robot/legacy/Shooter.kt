@@ -9,8 +9,9 @@ import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule
 import org.firstinspires.ftc.teamcode.superclasses.Shooter
 import org.openftc.revextensions2.ExpansionHubServo
 import kotlin.math.abs
+
 @Deprecated("")
-class Shooter : MultithreadRobotModule(),Shooter{
+class Shooter : MultithreadRobotModule(), Shooter {
     private val rpmTime = ElapsedTime()
     private val feederTime = ElapsedTime()
     private val encoderFailureDetectionTime = ElapsedTime()
@@ -18,37 +19,36 @@ class Shooter : MultithreadRobotModule(),Shooter{
 
     @Config
     internal object ShooterConfig {
-        @JvmField
-        var servoTime = 137.0
-        @JvmField
-        var servoReturnMultiplier = 2.6
-        @JvmField
-        var lowRpm = 3470.0
-        @JvmField
-        var highRpm = 4000.0
-        @JvmField
-        var timeRpm = 150.0
-        @JvmField
-        var feederClose = 0.225
-        @JvmField
-        var feederOpen = 0.48
-        @JvmField
-        var kP = 58.0
-        @JvmField
-        var kI = 0.001 //0.03
-        @JvmField
-        var kD = 0.05
-        @JvmField
-        var kF = 14.89
-        @JvmField
-        var kF_referenceVoltage = 12.485
+        @JvmField var servoTime = 137.0
+
+        @JvmField var servoReturnMultiplier = 2.6
+
+        @JvmField var lowRpm = 3470.0
+
+        @JvmField var highRpm = 4000.0
+
+        @JvmField var timeRpm = 150.0
+
+        @JvmField var feederClose = 0.225
+
+        @JvmField var feederOpen = 0.48
+
+        @JvmField var kP = 58.0
+
+        @JvmField var kI = 0.001 //0.03
+
+        @JvmField var kD = 0.05
+
+        @JvmField var kF = 14.89
+
+        @JvmField var kF_referenceVoltage = 12.485
     }
 
     private lateinit var shooterMotor: DcMotorEx
     private lateinit var voltageSensor: VoltageSensor
     private lateinit var feeder: ExpansionHubServo
-    private val shooterVelocitySender = CommandSender ({ p: Double -> shooterMotor.velocity = p })
-    private val feederPositionSender = CommandSender ({ p: Double -> feeder.position = p })
+    private val shooterVelocitySender = CommandSender({ p: Double -> shooterMotor.velocity = p })
+    private val feederPositionSender = CommandSender({ p: Double -> feeder.position = p })
     private var shooterMode = Shooter.ShooterMode.OFF
     private var ringsToShoot: Int = 0
     private var timeToAccelerateMs = 1.0
@@ -70,12 +70,8 @@ class Shooter : MultithreadRobotModule(),Shooter{
         motorConfigurationType.maxRPM = 6000.0
         shooterMotor.motorType = motorConfigurationType
         try {
-            shooterMotor.setVelocityPIDFCoefficients(
-                ShooterConfig.kP,
-                ShooterConfig.kI,
-                ShooterConfig.kD,
-                ShooterConfig.kF * ShooterConfig.kF_referenceVoltage / voltageSensor.voltage
-            )
+            shooterMotor.setVelocityPIDFCoefficients(ShooterConfig.kP, ShooterConfig.kI, ShooterConfig.kD,
+                                                     ShooterConfig.kF * ShooterConfig.kF_referenceVoltage / voltageSensor.voltage)
         } catch (e: UnsupportedOperationException) {
             opMode.telemetry.addData("Shooter PIDF error ", e.message)
         }
@@ -108,11 +104,10 @@ class Shooter : MultithreadRobotModule(),Shooter{
     }
 
     override fun updateExpansionHub() {
-        shooterVelocitySender.send(if (rpmTime.milliseconds() >= timeToAccelerateMs) motorVelocityTarget else rpmTime.milliseconds() * accelerationIncrement * motorVelocityTarget)
+        shooterVelocitySender.send(
+             if (rpmTime.milliseconds() >= timeToAccelerateMs) motorVelocityTarget else rpmTime.milliseconds() * accelerationIncrement * motorVelocityTarget)
         if (encoderFailureDetectionTime.seconds() > 1) if (motorVelocityTarget == 0.0 || getMotorRpm() != 0.0) encoderFailureDetectionTime.reset()
-        if (motorVelocityTarget != 0.0 && ringsToShoot == 0) updatePIDFCoeffs(
-            encoderFailureDetectionTime.seconds() > 3
-        )
+        if (motorVelocityTarget != 0.0 && ringsToShoot == 0) updatePIDFCoeffs(encoderFailureDetectionTime.seconds() > 3)
         currentRpm = getMotorRpm()
     }
 
@@ -125,17 +120,10 @@ class Shooter : MultithreadRobotModule(),Shooter{
             this.encoderFailureMode = encoderFailureMode
             pidfUpdateTimer.reset()
             try {
-                if (this.encoderFailureMode) shooterMotor.setVelocityPIDFCoefficients(
-                    0.0,
-                    0.0,
-                    0.0,
-                    ShooterConfig.kF * ShooterConfig.kF_referenceVoltage / voltageSensor.voltage
-                ) else shooterMotor.setVelocityPIDFCoefficients(
-                    ShooterConfig.kP,
-                    ShooterConfig.kI,
-                    ShooterConfig.kD,
-                    ShooterConfig.kF * ShooterConfig.kF_referenceVoltage / voltageSensor.voltage
-                )
+                if (this.encoderFailureMode) shooterMotor.setVelocityPIDFCoefficients(0.0, 0.0, 0.0,
+                                                                                      ShooterConfig.kF * ShooterConfig.kF_referenceVoltage / voltageSensor.voltage) else shooterMotor.setVelocityPIDFCoefficients(
+                     ShooterConfig.kP, ShooterConfig.kI, ShooterConfig.kD,
+                     ShooterConfig.kF * ShooterConfig.kF_referenceVoltage / voltageSensor.voltage)
             } catch (ignored: UnsupportedOperationException) {
             }
         }
@@ -162,15 +150,9 @@ class Shooter : MultithreadRobotModule(),Shooter{
             if (mode != Shooter.ShooterMode.OFF && shooterMode == Shooter.ShooterMode.OFF) rpmTime.reset()
             shooterMode = mode
             when (mode) {
-                Shooter.ShooterMode.HIGHGOAL -> setShootersetings(
-                    ShooterConfig.highRpm,
-                    ShooterConfig.timeRpm
-                )
-                Shooter.ShooterMode.POWERSHOT -> setShootersetings(
-                    ShooterConfig.lowRpm,
-                    ShooterConfig.timeRpm
-                )
-                Shooter.ShooterMode.OFF -> setShootersetings(0.0, ShooterConfig.timeRpm)
+                 Shooter.ShooterMode.HIGHGOAL -> setShootersetings(ShooterConfig.highRpm, ShooterConfig.timeRpm)
+                 Shooter.ShooterMode.POWERSHOT -> setShootersetings(ShooterConfig.lowRpm, ShooterConfig.timeRpm)
+                 Shooter.ShooterMode.OFF -> setShootersetings(0.0, ShooterConfig.timeRpm)
             }
         }
 

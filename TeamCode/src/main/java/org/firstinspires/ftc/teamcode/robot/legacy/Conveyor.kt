@@ -14,21 +14,20 @@ import org.firstinspires.ftc.teamcode.superclasses.Conveyor
 import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule
 
 @Deprecated("")
-class Conveyor() : MultithreadRobotModule(),
-    Conveyor {
+class Conveyor : MultithreadRobotModule(), Conveyor {
     private val conveyorTime = ElapsedTime()
     private val backOnTime = ElapsedTime()
     private val pauseTime = ElapsedTime()
     private val backOnAftertime = ElapsedTime()
     private lateinit var conveyorm: DcMotorEx
     override var enableConveyor = false
-    set(value) {
-        field = value
-        conveyorPower = if (value) 1.0 else 0.0
-    }
+        set(value) {
+            field = value
+            conveyorPower = if (value) 1.0 else 0.0
+        }
 
     private lateinit var sensorDistance: DistanceSensor
-    private val conveyorPowerSender = CommandSender ({ p: Double -> conveyorm.power = -p })
+    private val conveyorPowerSender = CommandSender({ p: Double -> conveyorm.power = -p })
     private var full = false
     private var backOn = false
     private var stop = false

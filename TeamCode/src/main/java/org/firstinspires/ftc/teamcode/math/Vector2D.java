@@ -4,7 +4,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
 
-public class Vector2D{
+public class Vector2D {
 
     public double x;
     public double y;
@@ -67,8 +67,7 @@ public class Vector2D{
         if (this == o) return true;
         if (!(o instanceof Vector2D)) return false;
         Vector2D vector2D = (Vector2D) o;
-        return MathUtil.approxEquals(vector2D.x, x) &&
-                MathUtil.approxEquals(vector2D.y, y);
+        return MathUtil.approxEquals(vector2D.x, x) && MathUtil.approxEquals(vector2D.y, y);
     }
 
     @Override
@@ -82,8 +81,8 @@ public class Vector2D{
     }
 
     @Override
-    public Vector2D clone(){
-        return new Vector2D(this.x,this.y);
+    public Vector2D clone() {
+        return new Vector2D(this.x, this.y);
     }
 
 }

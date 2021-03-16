@@ -6,6 +6,8 @@ import org.firstinspires.ftc.teamcode.robot.ServoWobbleManipulator.WobbleServoPo
 import org.firstinspires.ftc.teamcode.robot.ServoWobbleManipulator.WobbleServoPositions.angleUp
 import org.firstinspires.ftc.teamcode.robot.ServoWobbleManipulator.WobbleServoPositions.gripperClose
 import org.firstinspires.ftc.teamcode.robot.ServoWobbleManipulator.WobbleServoPositions.gripperOpen
+import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig2.feederClose
+import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig2.feederOpen
 import org.firstinspires.ftc.teamcode.robot.WoENHardware.conveyorMotor
 import org.firstinspires.ftc.teamcode.robot.WoENHardware.driveFrontLeft
 import org.firstinspires.ftc.teamcode.robot.WoENHardware.driveFrontRight
@@ -21,8 +23,6 @@ import org.firstinspires.ftc.teamcode.robot.WoENHardware.shooterMotor
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.ai
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.forceInitRobot
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.startRobot
-import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig2.feederClose
-import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig2.feederOpen
 
 @TeleOp
 class Diagnostic : LinearOpMode() {

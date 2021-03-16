@@ -17,35 +17,33 @@ import java.util.*
 import kotlin.math.abs
 import kotlin.math.sign
 
-class Movement(private val odometry: Odometry, private val drivetrain: Drivetrain) :
-    MultithreadRobotModule() {
+class Movement(private val odometry: Odometry, private val drivetrain: Drivetrain) : MultithreadRobotModule() {
     @Config
     internal object MovementConfig {
-        @JvmField
-        var lookaheadRadius = 45.72
-        @JvmField
-        var kP_distance = 11.3
-        @JvmField
-        var kD_distance = 1.5
-        @JvmField
-        var kI_distance = 11.0
+        @JvmField var lookaheadRadius = 45.72
+
+        @JvmField var kP_distance = 11.3
+
+        @JvmField var kD_distance = 1.5
+
+        @JvmField var kI_distance = 11.0
+
         //@JvmField TODO separate coeffs on angle and distance
         //var kP_angle = 3.6
         //@JvmField
         //var kD_angle = 0.15
         //@JvmField
         //var kI_angle = 0.6
-        @JvmField
-        var antiWindupFraction_distance = .2
-        @JvmField
-        var antiWindupFraction_angle = .2
-        @JvmField
-        var minErrorDistanceDefault = 1.0
-        @JvmField
-        var minErrorAngleDefault = Math.toRadians(0.35)
+        @JvmField var antiWindupFraction_distance = .2
+
+        @JvmField var antiWindupFraction_angle = .2
+
+        @JvmField var minErrorDistanceDefault = 1.0
+
+        @JvmField var minErrorAngleDefault = Math.toRadians(0.35)
     }
 
-   // private val minErrorDistanceDefault = 1.0
+    // private val minErrorDistanceDefault = 1.0
     //private val minErrorAngleDefault =
     private var maxLinearVelocityFraction = 1.0
     private var maxAngularVelocityFraction = 1.0
@@ -99,20 +97,14 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
         if (pathFollowerIsActive() && requestedVelocityPercent.radius() < 0.005) {
             if (pathFollowingTimer.seconds() > 4) nTargetPoint++ else {
                 val currentTarget = removeNaN(pathToFollow[nTargetPoint], odometry.robotCoordinates)
-                val previousTarget =
-                    removeNaN(pathToFollow[nTargetPoint - 1], odometry.robotCoordinates)
-                if (WoENrobot.movement.movePurePursuit(
-                        previousTarget,
-                        currentTarget,
-                        MovementConfig.lookaheadRadius
-                    )
-                ) {
+                val previousTarget = removeNaN(pathToFollow[nTargetPoint - 1], odometry.robotCoordinates)
+                if (WoENrobot.movement.movePurePursuit(previousTarget, currentTarget, MovementConfig.lookaheadRadius)) {
                     if (WoENrobot.movement.moveLinear(currentTarget)) {
                         pathFollowingTimer.reset()
                         if (actionOnCompletionExecutor.state == Thread.State.NEW) actionOnCompletionExecutor.start() else if (actionOnCompletionExecutor.state == Thread.State.TERMINATED) {
                             nTargetPoint++
-                            if (nTargetPoint < pathToFollow.size) actionOnCompletionExecutor =
-                                Thread(pathToFollow[nTargetPoint].actionOnConpletion)
+                            if (nTargetPoint < pathToFollow.size) actionOnCompletionExecutor = Thread(
+                                 pathToFollow[nTargetPoint].actionOnConpletion)
                         }
                     }
                 }
@@ -121,11 +113,8 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
             if (pathFollowerIsActive()) stopPathFollowing()
             drivetrain.targetVelocity = requestedVelocityPercent * drivetrain.maxVelocity
             if (pathToFollow.size > 0 && doActiveBraking) pathToFollow[pathToFollow.size - 1] = MotionTask(odometry.robotCoordinates)
-        } else
-            if (pathToFollow.size > 0 && doActiveBraking)
-                moveLinear(pathToFollow[pathToFollow.size - 1])
-            else
-                drivetrain.targetVelocity = Vector3D(.0,.0,.0)
+        } else if (pathToFollow.size > 0 && doActiveBraking) moveLinear(pathToFollow[pathToFollow.size - 1])
+        else drivetrain.targetVelocity = Vector3D(.0, .0, .0)
     }
 
     val currentTarget: Pose2D
@@ -156,20 +145,8 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
      * @param distanceTolerance       Minimum distance error
      * @param angularTolerance        Minimum angular error
      */
-    fun pos(
-        target: Pose2D?,
-        linearVelocityFraction: Double = 1.0,
-        angularVelocityFraction: Double = 1.0,
-        distanceTolerance: Double = minErrorDistanceDefault,
-        angularTolerance: Double = minErrorAngleDefault
-    ) {
-        followPath(
-            MotionTask(target),
-            linearVelocityFraction,
-            angularVelocityFraction,
-            distanceTolerance,
-            angularTolerance
-        )
+    fun pos(target: Pose2D?, linearVelocityFraction: Double = 1.0, angularVelocityFraction: Double = 1.0, distanceTolerance: Double = minErrorDistanceDefault, angularTolerance: Double = minErrorAngleDefault) {
+        followPath(MotionTask(target), linearVelocityFraction, angularVelocityFraction, distanceTolerance, angularTolerance)
         while (pathFollowerIsActive() && opMode!!.opModeIsActive()) {
             Thread.yield()
         }
@@ -185,20 +162,8 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
      * @param angularTolerance        Minimum angular error
      */
 
-    fun followPath(
-        motionTask: MotionTask?,
-        linearVelocityFraction: Double = 1.0,
-        angularVelocityFraction: Double = 1.0,
-        distanceTolerance: Double = minErrorDistanceDefault,
-        angularTolerance: Double = minErrorAngleDefault
-    ) {
-        followPath(
-            ArrayList(listOf(motionTask)),
-            linearVelocityFraction,
-            angularVelocityFraction,
-            distanceTolerance,
-            angularTolerance
-        )
+    fun followPath(motionTask: MotionTask?, linearVelocityFraction: Double = 1.0, angularVelocityFraction: Double = 1.0, distanceTolerance: Double = minErrorDistanceDefault, angularTolerance: Double = minErrorAngleDefault) {
+        followPath(ArrayList(listOf(motionTask)), linearVelocityFraction, angularVelocityFraction, distanceTolerance, angularTolerance)
     }
 
     /**
@@ -210,13 +175,7 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
      * @param distanceTolerance       Minimum distance error
      * @param angularTolerance        Minimum angular error
      */
-    fun followPath(
-        pathToFollow: ArrayList<MotionTask>,
-        linearVelocityFraction: Double = 1.0,
-        angularVelocityFraction: Double = 1.0,
-        distanceTolerance: Double = minErrorDistanceDefault,
-        angularTolerance: Double = minErrorAngleDefault
-    ) {
+    fun followPath(pathToFollow: ArrayList<MotionTask>, linearVelocityFraction: Double = 1.0, angularVelocityFraction: Double = 1.0, distanceTolerance: Double = minErrorDistanceDefault, angularTolerance: Double = minErrorAngleDefault) {
         minErrorDistanceCurrent = distanceTolerance
         minErrorAngleCurrent = angularTolerance
         setMaxLinearVelocityFraction(linearVelocityFraction)
@@ -269,43 +228,22 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
         val error = getError(target)
         val diffError = odometry.robotVelocity * -1.0
         if (target == previousTarget) {
-            integralError += Vector3D(
-                (error.x + previousError.x) * 0.5,
-                (error.y + previousError.y) * 0.5,
-                MathUtil.angleAverage(error.heading, previousError.heading)
-            ) * moveControllerTimer.seconds()
-            integralError = Vector3D(
-                Range.clip(
-                    abs(integralError.x),
-                    0.0,
-                    MovementConfig.antiWindupFraction_distance * MovementConfig.kI_distance * drivetrain.maxVelocity.x
-                ) * sign(integralError.x),
-                Range.clip(
-                    abs(integralError.y),
-                    0.0,
-                    MovementConfig.antiWindupFraction_distance * MovementConfig.kI_distance * drivetrain.maxVelocity.y
-                ) * sign(integralError.y),
-                Range.clip(
-                    abs(integralError.z),
-                    0.0,
-                    MovementConfig.antiWindupFraction_angle * MovementConfig.kI_distance * drivetrain.maxVelocity.z
-                ) * sign(integralError.z)
-            )
+            integralError += Vector3D((error.x + previousError.x) * 0.5, (error.y + previousError.y) * 0.5,
+                                      MathUtil.angleAverage(error.heading, previousError.heading)) * moveControllerTimer.seconds()
+            integralError = Vector3D(Range.clip(abs(integralError.x), 0.0,
+                                                MovementConfig.antiWindupFraction_distance * MovementConfig.kI_distance * drivetrain.maxVelocity.x) * sign(
+                 integralError.x), Range.clip(abs(integralError.y), 0.0,
+                                              MovementConfig.antiWindupFraction_distance * MovementConfig.kI_distance * drivetrain.maxVelocity.y) * sign(
+                 integralError.y), Range.clip(abs(integralError.z), 0.0,
+                                              MovementConfig.antiWindupFraction_angle * MovementConfig.kI_distance * drivetrain.maxVelocity.z) * sign(
+                 integralError.z))
         } else integralError = Vector3D()
         moveControllerTimer.reset()
         previousError = error
         previousTarget = target
-        val control =
-            Vector3D(error) * MovementConfig.kP_distance + integralError * MovementConfig.kI_distance + diffError * MovementConfig.kD_distance
-        if (velocity != null)
-            holonomicMoveFC(
-                Vector3D(
-                    (error as Vector2D).normalize() * velocity.radius(),
-                    control.z
-                )
-            )
-        else
-            holonomicMoveFC(control)
+        val control = Vector3D(error) * MovementConfig.kP_distance + integralError * MovementConfig.kI_distance + diffError * MovementConfig.kD_distance
+        if (velocity != null) holonomicMoveFC(Vector3D((error as Vector2D).normalize() * velocity.radius(), control.z))
+        else holonomicMoveFC(control)
         return abs(error.heading) < minErrorAngleCurrent && error.radius() < minErrorDistanceCurrent
         //drivetrain.setRobotVelocity(0, 0, 0);
     }
@@ -328,34 +266,26 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
      * @param lookaheadRadius Pure pursuit lookahead radius
      * @return If robotPosition is within lookahead radius of the target
      */
-    private fun movePurePursuit(
-        originPoint: Vector2D,
-        targetPoint: Pose2D,
-        lookaheadRadius: Double
-    ): Boolean {
+    private fun movePurePursuit(originPoint: Vector2D, targetPoint: Pose2D, lookaheadRadius: Double): Boolean {
         val robotPosition = odometry.robotCoordinates
         if (originPoint.x == targetPoint.x && originPoint.y == targetPoint.y) return true
         val a = originPoint.y - targetPoint.y
         val b = targetPoint.x - originPoint.x
         val c = originPoint.x * targetPoint.y - originPoint.y * targetPoint.x
         var angle = MathUtil.angleWrap((targetPoint - originPoint).acot())
-        val lookAheadPoint = Vector2D(
-            (b * (b * robotPosition.x - a * robotPosition.y) - a * c) / (a * a + b * b),
-            (a * (-b * robotPosition.x + a * robotPosition.y) - b * c) / (a * a + b * b)
-        ) + Vector2D(0.0, lookaheadRadius).rotatedCW(angle)
-        if (abs(MathUtil.angleWrap(angle - if ((originPoint - robotPosition).radius() > lookaheadRadius) targetPoint.heading else robotPosition.heading))
-            > (if ((originPoint - robotPosition).radius() > lookaheadRadius * 2) Math.PI / 2 else Math.PI / 4))
-            angle = MathUtil.angleWrap(
-                angle + if ((targetPoint - robotPosition).radius() > lookaheadRadius * 2 || abs(
-                        MathUtil.angleWrap(targetPoint.heading - angle + Math.PI)
-                    ) < Math.PI / 4
-                ) Math.PI else Math.PI / 2 * sign(MathUtil.angleWrap(targetPoint.heading - angle))
-            )
+        val lookAheadPoint = Vector2D((b * (b * robotPosition.x - a * robotPosition.y) - a * c) / (a * a + b * b),
+                                      (a * (-b * robotPosition.x + a * robotPosition.y) - b * c) / (a * a + b * b)) + Vector2D(0.0,
+                                                                                                                               lookaheadRadius).rotatedCW(
+             angle)
+        if (abs(MathUtil.angleWrap(
+                  angle - if ((originPoint - robotPosition).radius() > lookaheadRadius) targetPoint.heading else robotPosition.heading)) > (if ((originPoint - robotPosition).radius() > lookaheadRadius * 2) Math.PI / 2 else Math.PI / 4)) angle = MathUtil.angleWrap(
+             angle + if ((targetPoint - robotPosition).radius() > lookaheadRadius * 2 || abs(
+                       MathUtil.angleWrap(targetPoint.heading - angle + Math.PI)) < Math.PI / 4) Math.PI else Math.PI / 2 * sign(
+                  MathUtil.angleWrap(targetPoint.heading - angle)))
         if ((targetPoint - originPoint).radius() <= (lookAheadPoint - originPoint).radius()) {
             if (getError(targetPoint).radius() < lookaheadRadius) return true
             moveLinear(Pose2D(targetPoint, angle))
-        } else
-            moveLinear(Pose2D(lookAheadPoint, angle), drivetrain.maxVelocity)
+        } else moveLinear(Pose2D(lookAheadPoint, angle), drivetrain.maxVelocity)
         return false
     }
 
@@ -376,20 +306,11 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
      * @param velocityCommand Robot velocities in cm/s
      */
     private fun holonomicMoveFC(velocityCommand: Vector3D) {
-        var linearVelocity = Vector2D(
-            velocityCommand.x,
-            velocityCommand.y
-        ).rotatedCW(-odometry.robotCoordinates.heading)
-        linearVelocity = linearVelocity.normalize() * Range.clip(
-            linearVelocity.radius(),
-            0.0,
-            drivetrain.maxVelocity.y * maxLinearVelocityFraction
-        )
-        val angularVelocity = Range.clip(
-            abs(velocityCommand.z),
-            0.0,
-            drivetrain.maxVelocity.z * maxAngularVelocityFraction
-        ) * sign(velocityCommand.z)
+        var linearVelocity = Vector2D(velocityCommand.x, velocityCommand.y).rotatedCW(-odometry.robotCoordinates.heading)
+        linearVelocity = linearVelocity.normalize() * Range.clip(linearVelocity.radius(), 0.0,
+                                                                 drivetrain.maxVelocity.y * maxLinearVelocityFraction)
+        val angularVelocity = Range.clip(abs(velocityCommand.z), 0.0, drivetrain.maxVelocity.z * maxAngularVelocityFraction) * sign(
+             velocityCommand.z)
         drivetrain.targetVelocity = Vector3D(linearVelocity, angularVelocity)
     }
     /* public void holonomicMovePolar(double heading, double speed, double turn) {

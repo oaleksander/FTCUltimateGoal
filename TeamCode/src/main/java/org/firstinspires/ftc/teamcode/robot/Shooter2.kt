@@ -7,11 +7,11 @@ import com.qualcomm.robotcore.util.Range
 import org.firstinspires.ftc.teamcode.misc.CommandSender
 import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig2.kA
 import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig2.kD
-import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig2.kV_referenceVoltage
 import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig2.kI
 import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig2.kP
 import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig2.kS
 import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig2.kV
+import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig2.kV_referenceVoltage
 import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig2.maxI
 import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule
 import org.firstinspires.ftc.teamcode.superclasses.Shooter
@@ -19,50 +19,49 @@ import org.openftc.revextensions2.ExpansionHubServo
 import kotlin.math.abs
 import kotlin.math.sign
 
-class Shooter2: MultithreadRobotModule() {
+class Shooter2 : MultithreadRobotModule() {
     private val rpmTime = ElapsedTime()
     private val feederTime = ElapsedTime()
     private val encoderFailureDetectionTime = ElapsedTime()
 
     @Config
     internal object ShooterConfig2 {
-        @JvmField
-        var servoTime = 55
-        @JvmField
-        var servoReturnMultiplier = 3.4
-        @JvmField
-        var lowRpm = 3300.0
-        @JvmField
-        var highRpm = 3800.0
-      //  @JvmField
-      //  var timeRpm = 150.0
-        @JvmField
-        var feederClose = 0.23
-        @JvmField
-        var feederOpen = 0.49
-        @JvmField
-        var kP = 186.0
-        @JvmField
-        var kI = 1.77 //0.03
-        @JvmField
-        var kD = 0.0
-        @JvmField
-        var kV = 13.56
-        @JvmField
-        var kA = 1.0
-        @JvmField
-        var kS = 3000.0
-        @JvmField
-        var maxI = 600000.0
-        @JvmField
-        var kV_referenceVoltage = 12.485
+        @JvmField var servoTime = 55
+
+        @JvmField var servoReturnMultiplier = 3.4
+
+        @JvmField var lowRpm = 3300.0
+
+        @JvmField var highRpm = 3800.0
+
+        //  @JvmField
+        //  var timeRpm = 150.0
+        @JvmField var feederClose = 0.23
+
+        @JvmField var feederOpen = 0.49
+
+        @JvmField var kP = 186.0
+
+        @JvmField var kI = 1.77 //0.03
+
+        @JvmField var kD = 0.0
+
+        @JvmField var kV = 13.56
+
+        @JvmField var kA = 1.0
+
+        @JvmField var kS = 3000.0
+
+        @JvmField var maxI = 600000.0
+
+        @JvmField var kV_referenceVoltage = 12.485
     }
 
     private lateinit var shooterMotor: DcMotorEx
     private lateinit var voltageSensor: VoltageSensor
     private lateinit var feeder: ExpansionHubServo
-    private val shooterPowerSender = CommandSender ({ p: Double -> shooterMotor.power = p })
-    private val feederPositionSender = CommandSender ({ p: Double -> feeder.position = p })
+    private val shooterPowerSender = CommandSender({ p: Double -> shooterMotor.power = p })
+    private val feederPositionSender = CommandSender({ p: Double -> feeder.position = p })
     private var shooterMode = Shooter.ShooterMode.OFF
     private var ringsToShoot: Int = 0
     private var timeToAccelerateMs = 1.0
@@ -70,10 +69,10 @@ class Shooter2: MultithreadRobotModule() {
     private val maxInt16 = 32767.0
     private val ticksToRpmMultiplier = 2.5
     private val maxRpm: Double
-    get() = (maxInt16-kS)*ticksToRpmMultiplier/kV
+        get() = (maxInt16 - kS) * ticksToRpmMultiplier / kV
     var rpmTarget = 0.0
-        private set(value){
-            field = Range.clip(value,0.0,maxRpm)
+        private set(value) {
+            field = Range.clip(value, 0.0, maxRpm)
         }
     private var motorVelocityTarget = 0.0
     var currentRpm = 0.0
@@ -84,7 +83,7 @@ class Shooter2: MultithreadRobotModule() {
         voltageSensor = WoENHardware.expansionHubVoltageSensor
         shooterMotor = WoENHardware.shooterMotor
         val motorConfigurationType = shooterMotor.motorType.clone()
-        motorConfigurationType.achieveableMaxRPMFraction = maxRpm/6000.0
+        motorConfigurationType.achieveableMaxRPMFraction = maxRpm / 6000.0
         motorConfigurationType.ticksPerRev = 24.0
         motorConfigurationType.gearing = 1.0
         motorConfigurationType.maxRPM = 6000.0
@@ -117,6 +116,7 @@ class Shooter2: MultithreadRobotModule() {
         }
         setFeederPosition(feederTime.milliseconds() < ShooterConfig2.servoTime && rpmTarget != 0.0)
     }
+
     private var velocityError = 0.0
     private var velocityErrorOld = 0.0
     private var D = 0.0
@@ -149,8 +149,7 @@ class Shooter2: MultithreadRobotModule() {
             power = (P + I + D + V + A + S) / maxInt16
             velocityErrorOld = velocityError
             velocityTargetOld = motorVelocityTarget
-        }
-        else {
+        } else {
             voltageDelta = 0.0
             velocityError = 0.0
             power = 0.0
@@ -183,13 +182,9 @@ class Shooter2: MultithreadRobotModule() {
             //if (mode != Shooter.ShooterMode.OFF && shooterMode == Shooter.ShooterMode.OFF) rpmTime.reset()
             shooterMode = mode
             when (mode) {
-                Shooter.ShooterMode.HIGHGOAL -> setShootersetings(
-                    ShooterConfig2 .highRpm
-                )
-                Shooter.ShooterMode.POWERSHOT -> setShootersetings(
-                    ShooterConfig2.lowRpm
-                )
-                Shooter.ShooterMode.OFF -> setShootersetings(0.0)
+                 Shooter.ShooterMode.HIGHGOAL -> setShootersetings(ShooterConfig2.highRpm)
+                 Shooter.ShooterMode.POWERSHOT -> setShootersetings(ShooterConfig2.lowRpm)
+                 Shooter.ShooterMode.OFF -> setShootersetings(0.0)
             }
         }
 
