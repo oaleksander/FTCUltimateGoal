@@ -255,7 +255,7 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
      */
     private fun moveLinear(target: Pose2D, velocity: Vector2D? = null): Boolean {
         val error = getError(target)
-        var diffError = Vector3D()
+        val diffError = odometry.robotVelocity * -1.0
         if (target == previousTarget) {
             integralError += Vector3D(
                 (error.x + previousError.x) * 0.5,
@@ -280,7 +280,6 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
                 ) * sign(integralError.z)
             )
         } else integralError = Vector3D()
-        diffError = odometry.robotVelocity * -1.0
         moveControllerTimer.reset()
         previousError = error
         previousTarget = target
