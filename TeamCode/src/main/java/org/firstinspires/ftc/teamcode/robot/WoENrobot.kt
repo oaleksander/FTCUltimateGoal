@@ -14,22 +14,22 @@ import java.util.*
 
 object WoENrobot {
     val wobbleManipulator = ServoWobbleManipulator()
-    val openCVNode = OpenCVNodePhonecam()
+    val openCVNode = OpenCVNodeWebcam()
     val conveyor = Conveyor()
     val shooter = Shooter2()
     val telemetryDebugging = TelemetryDebugging()
     val ai = AI()
-    val odometry = FakeDrivetrainOdometry()
-    val drivetrain = odometry
+    //val odometry = FakeDrivetrainOdometry()
+    //val drivetrain = odometry
 
-    //val odometry = ThreeWheelOdometry()
-    //val drivetrain = MecanumDrivetrain()
+    val odometry = ThreeWheelOdometry()
+    val drivetrain = MecanumDrivetrain()
     val movement = Movement(odometry, drivetrain)
     private val activeRobotModules = arrayOf(odometry, movement, drivetrain, wobbleManipulator, conveyor, shooter, telemetryDebugging,
                                              ai) //
 
 
-    lateinit var opMode: LinearOpMode
+    lateinit var opMode : LinearOpMode
     var robotIsInitialized = false
     val runTime = ElapsedTime()
 
@@ -38,19 +38,19 @@ object WoENrobot {
     @Volatile var expansionHubSpinCompleted = false
 
     @Volatile var spinCompleted = false
-    lateinit var controlHub: ExpansionHubEx
-    lateinit var expansionHub: ExpansionHubEx
-    private lateinit var allHubs: List<LynxModule>
+    lateinit var controlHub : ExpansionHubEx
+    lateinit var expansionHub : ExpansionHubEx
+    private lateinit var allHubs : List<LynxModule>
     var updateControlHub = Runnable {
         try {
             controlHub.standardModule.bulkCachingMode = BulkCachingMode.MANUAL
             while (opMode.opModeIsActive() && !Thread.currentThread().isInterrupted) {
                 controlHub.standardModule.clearBulkCache()
-                Arrays.stream(activeRobotModules).forEach { obj: MultithreadRobotModule -> obj.updateControlHub() }
+                Arrays.stream(activeRobotModules).forEach {obj : MultithreadRobotModule -> obj.updateControlHub()}
                 controlHubSpinCompleted = true
             }
 
-        } catch (e: InterruptedException) {
+        } catch (e : InterruptedException) {
         }
     }
     private var controlHubUpdater = Thread(updateControlHub)
@@ -59,10 +59,10 @@ object WoENrobot {
             expansionHub.standardModule.bulkCachingMode = BulkCachingMode.MANUAL
             while (opMode.opModeIsActive() && !Thread.currentThread().isInterrupted) {
                 expansionHub.standardModule.clearBulkCache()
-                Arrays.stream(activeRobotModules).forEach { obj: MultithreadRobotModule -> obj.updateExpansionHub() }
+                Arrays.stream(activeRobotModules).forEach {obj : MultithreadRobotModule -> obj.updateExpansionHub()}
                 expansionHubSpinCompleted = true
             }
-        } catch (e: InterruptedException) {
+        } catch (e : InterruptedException) {
         }
     }
     private var expansionHubUpdater = Thread(updateExpansionHub)
@@ -72,12 +72,12 @@ object WoENrobot {
                 while ((!controlHubSpinCompleted || !expansionHubSpinCompleted) && opMode.opModeIsActive()) {
                     Thread.yield()
                 }
-                Arrays.stream(activeRobotModules).forEach { obj: MultithreadRobotModule -> obj.updateOther() }
+                Arrays.stream(activeRobotModules).forEach {obj : MultithreadRobotModule -> obj.updateOther()}
                 controlHubSpinCompleted = false
                 expansionHubSpinCompleted = false
                 spinCompleted = true
             }
-        } catch (e: InterruptedException) {
+        } catch (e : InterruptedException) {
         }
     }
     private var otherUpdater = Thread(updateOther)
@@ -86,15 +86,15 @@ object WoENrobot {
             setBulkCachingMode(BulkCachingMode.MANUAL)
             while (opMode.opModeIsActive() && !Thread.currentThread().isInterrupted) {
                 clearBulkCaches()
-                Arrays.stream(activeRobotModules).forEach { obj: MultithreadRobotModule -> obj.updateAll() }
+                Arrays.stream(activeRobotModules).forEach {obj : MultithreadRobotModule -> obj.updateAll()}
                 spinCompleted = true
             }
-        } catch (e: Exception) {
+        } catch (e : Exception) {
             opMode.requestOpModeStop()
         }
     }
     private var regulatorUpdater = Thread(updateRegulators)
-    fun fullInitWithCV(OpMode: LinearOpMode) {
+    fun fullInitWithCV(OpMode : LinearOpMode) {
         openCVNode.initialize(OpMode)
         forceInitRobot(OpMode)
     }
@@ -115,7 +115,7 @@ object WoENrobot {
         }
     }
 
-    fun delay(delay_ms: Double) {
+    fun delay(delay_ms : Double) {
         val timer = ElapsedTime()
         timer.reset()
         while (timer.milliseconds() < delay_ms && opMode.opModeIsActive()) {
@@ -128,7 +128,7 @@ object WoENrobot {
         opMode.waitForStart()
         if (opMode.isStopRequested) return
         runTime.reset()
-        Arrays.stream(activeRobotModules).forEach { obj: MultithreadRobotModule -> obj.start() }
+        Arrays.stream(activeRobotModules).forEach {obj : MultithreadRobotModule -> obj.start()}
         //regulatorUpdater.start()
         controlHubUpdater.start()
         expansionHubUpdater.start()
@@ -138,14 +138,14 @@ object WoENrobot {
         opMode.telemetry.update()
     }
 
-    fun initRobot(OpMode: LinearOpMode) {
+    fun initRobot(OpMode : LinearOpMode) {
         if (!robotIsInitialized) {
             forceInitRobot(OpMode)
             opMode.telemetry.addData("Status", "Initialization successful")
             opMode.telemetry.update()
         } else {
             opMode = OpMode
-            Arrays.stream(activeRobotModules).forEach { robotModule: MultithreadRobotModule -> robotModule.setOpMode(opMode) }
+            Arrays.stream(activeRobotModules).forEach {robotModule : MultithreadRobotModule -> robotModule.setOpMode(opMode)}
             if (regulatorUpdater.state != Thread.State.NEW) {
                 regulatorUpdater.interrupt()
                 regulatorUpdater = Thread(updateRegulators)
@@ -161,7 +161,7 @@ object WoENrobot {
         }
     }
 
-    fun forceInitRobot(OpMode: LinearOpMode) {
+    fun forceInitRobot(OpMode : LinearOpMode) {
         opMode = OpMode
         opMode.telemetry.addData("Status", "Initializing...")
         opMode.telemetry.update()
@@ -170,7 +170,7 @@ object WoENrobot {
         expansionHub = WoENHardware.expansionHub
         allHubs = lynxModules
         setBulkCachingMode(BulkCachingMode.MANUAL)
-        Arrays.stream(activeRobotModules).forEach { robotModule: MultithreadRobotModule -> robotModule.initialize(opMode) }
+        Arrays.stream(activeRobotModules).forEach {robotModule : MultithreadRobotModule -> robotModule.initialize(opMode)}
         regulatorUpdater.interrupt()
         regulatorUpdater = Thread(updateRegulators)
         controlHubUpdater.interrupt()
@@ -185,17 +185,17 @@ object WoENrobot {
         opMode.telemetry.update()
     }
 
-    fun simpleInit(OpMode: LinearOpMode) {
+    fun simpleInit(OpMode : LinearOpMode) {
         initRobot(OpMode)
         startRobot()
     }
 
-    fun setLedColors(r: Int, g: Int, b: Int) {
+    fun setLedColors(r : Int, g : Int, b : Int) {
         controlHub.setLedColor(r, g, b)
         expansionHub.setLedColor(r, g, b)
     }
 
-    private fun setBulkCachingMode(mode: BulkCachingMode?) {
+    private fun setBulkCachingMode(mode : BulkCachingMode?) {
         for (module in allHubs) module.bulkCachingMode = mode
     }
 
@@ -203,7 +203,7 @@ object WoENrobot {
         for (module in allHubs) module.clearBulkCache()
     }
 
-    fun fullInit(OpMode: LinearOpMode) {
+    fun fullInit(OpMode : LinearOpMode) {
         forceInitRobot(OpMode)
     }
 }
