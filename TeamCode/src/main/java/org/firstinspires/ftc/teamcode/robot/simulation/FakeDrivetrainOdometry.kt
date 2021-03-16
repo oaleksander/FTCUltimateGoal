@@ -21,12 +21,11 @@ class FakeDrivetrainOdometry() : MultithreadRobotModule(), Drivetrain, Odometry 
     get() = realVelocityFC
     private var realVelocityFC = Vector3D(0.0, 0.0, 0.0)
     private val zLimiter =
-        motorAccelerationLimiter({realVelocityFC.z = it}, maxVelocity.z / 0.38)
+        motorAccelerationLimiter({realVelocityFC.z = it}, maxVelocity.z / 0.35)
     private val yLimiter =
-        motorAccelerationLimiter({realVelocityFC.y = it}, maxVelocity.y / 0.38)
+        motorAccelerationLimiter({realVelocityFC.y = it}, maxVelocity.y / 0.35)
     private val xLimiter =
-        motorAccelerationLimiter({realVelocityFC.x = it}, maxVelocity.x / 0.38)
-    private var currentPosition = Pose2D(0.0, 0.0, 0.0)
+        motorAccelerationLimiter({realVelocityFC.x = it}, maxVelocity.x / 0.35)
     private val updateTimer = ElapsedTime()
 
     override var robotCoordinates = Pose2D()
@@ -34,7 +33,7 @@ class FakeDrivetrainOdometry() : MultithreadRobotModule(), Drivetrain, Odometry 
     override fun initialize() {
         targetVelocity = Vector3D(0.0, 0.0, 0.0)
         realVelocityFC = Vector3D(0.0, 0.0, 0.0)
-        currentPosition = Pose2D(0.0, 0.0, 0.0)
+        robotCoordinates = Pose2D(0.0, 0.0, 0.0)
         updateTimer.reset()
     }
 
@@ -56,14 +55,16 @@ class FakeDrivetrainOdometry() : MultithreadRobotModule(), Drivetrain, Odometry 
             started = true
             updateTimer.reset()
         }
-        // realVelocityFC.x = targetVelocityFC.x;
+        //realVelocityFC.x = targetVelocityFC.x
+        //realVelocityFC.y = targetVelocityFC.y
+        //realVelocityFC.z = targetVelocityFC.z
         zLimiter.setVelocity(targetVelocityFC.z)
         yLimiter.setVelocity(targetVelocityFC.y)
         xLimiter.setVelocity(targetVelocityFC.x)
-        currentPosition.y += realVelocityFC.y * updateTimer.seconds()
-        currentPosition.x += realVelocityFC.x * updateTimer.seconds()
-        currentPosition.heading =
-            MathUtil.angleWrap(currentPosition.heading + realVelocityFC.z * updateTimer.seconds())
+        robotCoordinates.y += realVelocityFC.y * updateTimer.seconds()
+        robotCoordinates.x += realVelocityFC.x * updateTimer.seconds()
+        robotCoordinates.heading =
+            MathUtil.angleWrap(this.robotCoordinates.heading + realVelocityFC.z * updateTimer.seconds())
         updateTimer.reset()
     }
 
@@ -71,13 +72,13 @@ class FakeDrivetrainOdometry() : MultithreadRobotModule(), Drivetrain, Odometry 
     set(value) {
         var frontWays = value.y
         var sideWays = value.x
-        var Turn = value.z
+        var turn = value.z
         if (abs(frontWays) > maxVelocity.y) frontWays = maxVelocity.y * sign(frontWays)
         if (abs(sideWays) > maxVelocity.x) sideWays = maxVelocity.x * sign(sideWays)
-        if (abs(Turn) > maxVelocity.z) Turn = maxVelocity.z * sign(Turn)
-        field = Vector3D(sideWays, frontWays, Turn)
+        if (abs(turn) > maxVelocity.z) turn = maxVelocity.z * sign(turn)
+        field = Vector3D(sideWays, frontWays, turn)
         targetVelocityFC =
-            Vector3D(Vector2D(sideWays, frontWays).rotatedCW(currentPosition.heading), Turn)
+            Vector3D(Vector2D(sideWays, frontWays).rotatedCW(this.robotCoordinates.heading), turn)
     }
 
     override val maxVelocity: Vector3D

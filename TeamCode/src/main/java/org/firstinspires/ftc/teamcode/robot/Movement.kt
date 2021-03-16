@@ -7,6 +7,8 @@ import org.firstinspires.ftc.teamcode.math.MathUtil
 import org.firstinspires.ftc.teamcode.math.Pose2D
 import org.firstinspires.ftc.teamcode.math.Vector2D
 import org.firstinspires.ftc.teamcode.math.Vector3D
+import org.firstinspires.ftc.teamcode.robot.Movement.MovementConfig.minErrorAngleDefault
+import org.firstinspires.ftc.teamcode.robot.Movement.MovementConfig.minErrorDistanceDefault
 import org.firstinspires.ftc.teamcode.superclasses.Drivetrain
 import org.firstinspires.ftc.teamcode.superclasses.MotionTask
 import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule
@@ -24,9 +26,9 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
         @JvmField
         var kP_distance = 11.3
         @JvmField
-        var kD_distance = 0.65
+        var kD_distance = 1.5
         @JvmField
-        var kI_distance = 3.9
+        var kI_distance = 11.0
         //@JvmField TODO separate coeffs on angle and distance
         //var kP_angle = 3.6
         //@JvmField
@@ -34,13 +36,17 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
         //@JvmField
         //var kI_angle = 0.6
         @JvmField
-        var antiWindupFraction_distance = 23.0
+        var antiWindupFraction_distance = .2
         @JvmField
-        var antiWindupFraction_angle = 23.0
+        var antiWindupFraction_angle = .2
+        @JvmField
+        var minErrorDistanceDefault = 1.0
+        @JvmField
+        var minErrorAngleDefault = Math.toRadians(0.35)
     }
 
-    private val minErrorDistanceDefault = 1.0
-    private val minErrorAngleDefault = Math.toRadians(0.32)
+   // private val minErrorDistanceDefault = 1.0
+    //private val minErrorAngleDefault =
     private var maxLinearVelocityFraction = 1.0
     private var maxAngularVelocityFraction = 1.0
     private var minErrorDistanceCurrent = minErrorDistanceDefault
@@ -62,6 +68,12 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
         start()
     }
 
+
+    /**
+     * Enable holding position by encoders even when target position is reached
+     *
+     * @param doActiveBraking if robot should brake with encoders
+     */
     fun setActiveBraking(doActiveBraking: Boolean) {
         this.doActiveBraking = doActiveBraking
     }
@@ -129,7 +141,7 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
     /**
      * Checks whether path follower was disabled or have finished its job
      *
-     * @return Whether path follower is active
+     * @return whether the path follower is active
      */
     fun pathFollowerIsActive(): Boolean {
         return bPathFollowerEnabled && !bPathFollowingFinished
@@ -148,7 +160,7 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
         target: Pose2D?,
         linearVelocityFraction: Double = 1.0,
         angularVelocityFraction: Double = 1.0,
-        distanceTolerance: Double = minErrorAngleDefault,
+        distanceTolerance: Double = minErrorDistanceDefault,
         angularTolerance: Double = minErrorAngleDefault
     ) {
         followPath(
@@ -266,17 +278,17 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
                 Range.clip(
                     abs(integralError.x),
                     0.0,
-                    MovementConfig.antiWindupFraction_distance * drivetrain.maxVelocity.x
+                    MovementConfig.antiWindupFraction_distance * MovementConfig.kI_distance * drivetrain.maxVelocity.x
                 ) * sign(integralError.x),
                 Range.clip(
                     abs(integralError.y),
                     0.0,
-                    MovementConfig.antiWindupFraction_distance * drivetrain.maxVelocity.y
+                    MovementConfig.antiWindupFraction_distance * MovementConfig.kI_distance * drivetrain.maxVelocity.y
                 ) * sign(integralError.y),
                 Range.clip(
                     abs(integralError.z),
                     0.0,
-                    MovementConfig.antiWindupFraction_angle * drivetrain.maxVelocity.z
+                    MovementConfig.antiWindupFraction_angle * MovementConfig.kI_distance * drivetrain.maxVelocity.z
                 ) * sign(integralError.z)
             )
         } else integralError = Vector3D()
