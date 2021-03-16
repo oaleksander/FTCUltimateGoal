@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.misc
 
 import com.qualcomm.robotcore.util.ElapsedTime
+import org.firstinspires.ftc.teamcode.math.MathUtil
 import java.util.function.DoubleConsumer
 
 class CommandSender(private val doubleConsumer: DoubleConsumer, timeout_ms: Double = 3000.0) {
@@ -8,12 +9,8 @@ class CommandSender(private val doubleConsumer: DoubleConsumer, timeout_ms: Doub
     private var timeout = timeout_ms
     private var lastValue = Double.NaN
 
-   /* constructor(doubleConsumer: DoubleConsumer) {
-        this.doubleConsumer = doubleConsumer
-    } */
-
     fun send(value: Double) {
-        if (value != lastValue || lastCommandTimer.milliseconds() > timeout) {
+        if (!MathUtil.approxEquals(value,lastValue)|| lastCommandTimer.milliseconds() > timeout) {
             doubleConsumer.accept(value)
             lastValue = value
             lastCommandTimer.reset()
