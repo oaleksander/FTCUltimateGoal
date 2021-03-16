@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.math;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Locale;
 
 import static org.firstinspires.ftc.teamcode.math.MathUtil.angleWrap;
@@ -68,14 +70,17 @@ public class Pose2D extends Vector2D{
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
+        if (!(o instanceof Pose2D)) return false;
+        if (!super.equals((Vector2D) o)) return false;
         Pose2D pose2D = (Pose2D) o;
         return MathUtil.approxEquals(pose2D.heading, heading);
     }
 
     @Override
-    public String toString() {
+    public int hashCode() { return Double.valueOf(x).hashCode() ^ Double.valueOf(y).hashCode() ^ Double.valueOf(heading).hashCode(); }
+
+    @Override
+    public @NotNull String toString() {
         return String.format(Locale.getDefault(), "{x: %.3f, y: %.3f, θ: %.3f}", x, y, heading);
     }
 

@@ -6,12 +6,7 @@ public class MathUtil {
     public static final double EPSILON = 1e-6;
 
     public static boolean approxEquals(double d1, double d2) {
-        if (Double.isInfinite(d1)) {
-            // Infinity - infinity is NaN, so we need a special case
-            return d1 == d2;
-        } else {
-            return Math.abs(d1 - d2) < EPSILON;
-        }
+        return Math.abs(d1 - d2) < EPSILON;
     }
 
     public static double angleWrap(double angle) {

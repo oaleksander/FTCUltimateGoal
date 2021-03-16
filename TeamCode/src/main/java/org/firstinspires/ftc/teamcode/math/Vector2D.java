@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.math;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Locale;
 
 public class Vector2D{
@@ -63,7 +65,7 @@ public class Vector2D{
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof Vector2D)) return false;
         Vector2D vector2D = (Vector2D) o;
         return MathUtil.approxEquals(vector2D.x, x) &&
                 MathUtil.approxEquals(vector2D.y, y);
@@ -75,7 +77,7 @@ public class Vector2D{
     }
 
     @Override
-    public String toString() {
+    public @NotNull String toString() {
         return String.format(Locale.getDefault(), "(%.1f, %.1f)", x, y);
     }
 

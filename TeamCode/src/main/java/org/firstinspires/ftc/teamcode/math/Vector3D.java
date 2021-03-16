@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.math;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Locale;
 
 public class Vector3D extends Vector2D implements Cloneable {
@@ -42,6 +44,11 @@ public class Vector3D extends Vector2D implements Cloneable {
         return new Vector3D(x * d, y * d, z * d);
     }
 
+    @Override
+    public Vector3D rotatedCW(double angle) {
+        return new Vector3D(super.rotatedCW(angle),z);
+    }
+
     public Vector3D normalize() {
         double r = radius();
         if (r != 0)
@@ -77,14 +84,17 @@ public class Vector3D extends Vector2D implements Cloneable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof Vector3D)) return false;
         if (!super.equals(o)) return false;
         Vector3D Vector3D = (Vector3D) o;
         return MathUtil.approxEquals(Vector3D.z, z);
     }
 
     @Override
-    public String toString() {
+    public int hashCode() { return Double.valueOf(x).hashCode() ^ Double.valueOf(y).hashCode() ^ Double.valueOf(z).hashCode(); }
+
+    @Override
+    public @NotNull String toString() {
         return String.format(Locale.getDefault(), "{x: %.3f, y: %.3f, z: %.3f}", x, y, z);
     }
 
