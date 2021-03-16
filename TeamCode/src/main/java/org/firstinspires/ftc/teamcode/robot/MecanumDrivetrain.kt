@@ -12,7 +12,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.firstinspires.ftc.teamcode.math.Vector2D
 import org.firstinspires.ftc.teamcode.math.Vector3D
 import org.firstinspires.ftc.teamcode.misc.CommandSender
-import org.firstinspires.ftc.teamcode.misc.motorAccelerationLimiter
+import org.firstinspires.ftc.teamcode.misc.MotorAccelerationLimiter
 import org.firstinspires.ftc.teamcode.robot.WoENHardware.controlHubVoltageSensor
 import org.firstinspires.ftc.teamcode.superclasses.Drivetrain
 import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule
@@ -74,19 +74,19 @@ class MecanumDrivetrain : MultithreadRobotModule(), Drivetrain {
 
     /* Motor controllers */
     private val mFLSender = CommandSender({ driveFrontLeft.setVelocity(it, AngleUnit.RADIANS) })
-    private val mFLProfiler = motorAccelerationLimiter({ mFLSender.send(it) }, maxAcceleration)
+    private val mFLProfiler = MotorAccelerationLimiter({ mFLSender.send(it) }, maxAcceleration)
     private val mFLDirectSender = CommandSender({ driveRearRight.power = it })
 
     private val mFRSender = CommandSender({ driveFrontRight.setVelocity(it, AngleUnit.RADIANS) })
-    private val mFRProfiler = motorAccelerationLimiter({ mFRSender.send(it) }, maxAcceleration)
+    private val mFRProfiler = MotorAccelerationLimiter({ mFRSender.send(it) }, maxAcceleration)
     private val mFRDirectSender = CommandSender({ driveFrontRight.power = it })
 
     private val mRLSender = CommandSender({ driveRearLeft.setVelocity(it, AngleUnit.RADIANS) })
-    private val mRLProfiler = motorAccelerationLimiter({ mRLSender.send(it) }, maxAcceleration)
+    private val mRLProfiler = MotorAccelerationLimiter({ mRLSender.send(it) }, maxAcceleration)
     private val mRLDirectSender = CommandSender({ driveRearLeft.power = it })
 
     private val mRRSender = CommandSender({ driveRearRight.setVelocity(it, AngleUnit.RADIANS) })
-    private val mRRProfiler = motorAccelerationLimiter({ mRRSender.send(it) }, maxAcceleration)
+    private val mRRProfiler = MotorAccelerationLimiter({ mRRSender.send(it) }, maxAcceleration)
     private val mRRDirectSender = CommandSender({ driveRearRight.power = it })
 
     private lateinit var voltageSensor: VoltageSensor
