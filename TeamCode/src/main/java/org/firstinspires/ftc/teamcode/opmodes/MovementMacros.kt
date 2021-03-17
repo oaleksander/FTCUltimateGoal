@@ -152,28 +152,28 @@ object MovementMacros {
                           angle + toRadians(HighGoalShootingAngle))
         }
 
-    fun shootHighGoal() {
+    fun shootHighGoal(shootOnlyOneRing: Boolean = false) {
         shooter.shootingMode = Shooter.ShooterMode.HIGHGOAL
         movement.pos(highGoalShootingPose)
         val shooterAccelerationTimeout = ElapsedTime()
         while (opMode.opModeIsActive() && !shooter.isCorrectRpm(10.0) && shooterAccelerationTimeout.seconds() < 1.2) spinOnce()
         shooter.feedRings()
-        delay(850.0)
+        delay(if (shootOnlyOneRing) shooter.timeToShootOneRing else shooter.timeToShootThreeRings)
         shooter.shootingMode = Shooter.ShooterMode.OFF
     }
 
-    /*
+
     fun shootHighGoalAsync() {
-        shooter.shootingMode = rpm.ShooterMode.HIGHGOAL
+        shooter.shootingMode = Shooter.ShooterMode.HIGHGOAL
         movement.followPath(MotionTask(highGoalShootingPose) {
             val shooterAccelerationTimeout = ElapsedTime()
-            while (opMode.opModeIsActive() && !shooter.isCorrectRpm() && shooterAccelerationTimeout.seconds() < 3 && movement.pathFollowerIsActive())
+            while (opMode.opModeIsActive() && !shooter.isCorrectRpm() && shooterAccelerationTimeout.seconds() < 1.2 && movement.pathFollowerIsActive())
                 spinOnce()
             if (movement.pathFollowerIsActive()) shooter.feedRings()
         })
         //  while(movement.pathFollowerIsActive()&&getOpMode().opModeIsActive()) {spinOnce();}
     }
-     */
+
 
     enum class PowerShot {
         LEFT, MEDIUM, RIGHT
@@ -213,7 +213,7 @@ object MovementMacros {
             shooterAccelerationTimeout.reset()
             while (opMode.opModeIsActive() && !shooter.isCorrectRpm() && shooterAccelerationTimeout.seconds() < 2) spinOnce()
             shooter.feedRing()
-            delay(200.0)
+            delay(shooter.timeToShootOneRing)
         }
         shooter.shootingMode = Shooter.ShooterMode.OFF
     }
@@ -293,7 +293,7 @@ object MovementMacros {
                                linearVelocityFraction = .7, distanceTolerance = 3.0, angularTolerance = toRadians(3.0))
                   if (pickWobbleBetweenRings) pickSecondWobble()
                   else delay(500.0)
-                  shootHighGoal()
+                  shootHighGoal(shootOnlyOneRing = true)
              }
              StackSize.ZERO -> {
                   if (pickWobbleBetweenRings) pickSecondWobble()
