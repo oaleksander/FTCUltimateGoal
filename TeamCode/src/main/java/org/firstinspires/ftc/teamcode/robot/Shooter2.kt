@@ -54,7 +54,7 @@ class Shooter2 : MultithreadedRobotModule() {
 
         @JvmField var kS = 3000.0
 
-        @JvmField var maxI = 600000.0
+        @JvmField var maxI = 16384
 
         @JvmField var kV_referenceVoltage = 12.485
     }
