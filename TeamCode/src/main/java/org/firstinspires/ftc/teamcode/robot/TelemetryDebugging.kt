@@ -47,9 +47,9 @@ class TelemetryDebugging : MultithreadedRobotModule() {
             bxPoints[i] += bx
             byPoints[i] += by
         }
-        dashboardPacket.fieldOverlay().setStroke("cyan").setStrokeWidth(2)
+        dashboardPacket.fieldOverlay().setStroke("#00EEFF").setStrokeWidth(2) //cyan
             .strokeLine(bx, by, (bxPoints[0] + bxPoints[3]) / 2, (byPoints[0] + byPoints[3]) / 2)
-        dashboardPacket.fieldOverlay().setStroke("orange").setStrokeWidth(1)
+        dashboardPacket.fieldOverlay().setStroke("#FFA700").setStrokeWidth(1) //orange
             .strokeLine(bx, by, (bxPoints[0] + bxPoints[3]) / 2, (byPoints[0] + byPoints[3]) / 2)
         dashboardPacket.fieldOverlay().setStroke(color).setStrokeWidth(1).strokePolygon(bxPoints, byPoints)
     }
@@ -80,7 +80,7 @@ class TelemetryDebugging : MultithreadedRobotModule() {
                     if (TelemetryConfig.dashboardTelemetry) {
                         dashboardPacket = TelemetryPacket()
                         createDashboardRectangle(robotPosition, "black")
-                        if (movement.pathFollowerIsActive()) createDashboardRectangle(movement.currentTarget, "green")
+                        if (movement.pathFollowerIsActive()) createDashboardRectangle(movement.currentTarget, "#66CC66")
                         //dashboardPacket.put("head", toDegrees(odometry.encoderHeading))
                         dashboardPacket.put("Loop frequency", loopFrequency)
                         dashboardPacket.put("CH Loop frequency", controlHubLoopFrequency)
@@ -99,16 +99,20 @@ class TelemetryDebugging : MultithreadedRobotModule() {
             updaterIsActive = false
         } catch (e: Exception) {
             telemetry.clear()
-            telemetry.addData("Telemetry Error", e.message)
+            telemetry.addData("Telemetry Error", e.toString())
+            dashboardPacket = TelemetryPacket()
+            dashboardPacket.put("Telemetry Error", e.toString())
+            dashboard.sendTelemetryPacket(dashboardPacket)
+            e.printStackTrace()
             telemetry.update()
         }
     }
     private var telemetryUpdater = Thread(updateTelemetry)
     override fun initialize() {
+        dashboard = FtcDashboard.getInstance()
+        telemetry = opMode.telemetry
         measurementTime.reset()
         loopCount.getAndSet(0)
-        //  telemetry = dashboard.getTelemetry();
-        //  telemetry = new MultipleTelemetry(opMode.telemetry,dashboard.getTelemetry());
         telemetry.msTransmissionInterval = TelemetryConfig.refreshTimeMs
         //dashboard.startCameraStream(openCVNode.webcam,5.0);
     }

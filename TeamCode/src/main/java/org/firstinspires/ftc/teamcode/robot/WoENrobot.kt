@@ -6,22 +6,28 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 import com.qualcomm.robotcore.util.ElapsedTime
 import org.firstinspires.ftc.teamcode.robot.WoENHardware.assignHardware
 import org.firstinspires.ftc.teamcode.robot.WoENHardware.lynxModules
+import org.firstinspires.ftc.teamcode.robot.simulation.FakeDrivetrainOdometry
+import org.firstinspires.ftc.teamcode.robot.simulation.OpenCVNodePhonecam
 import org.firstinspires.ftc.teamcode.superclasses.MultithreadedRobotModule
 import org.openftc.revextensions2.ExpansionHubEx
 import java.util.*
 
 object WoENrobot {
     val wobbleManipulator = ServoWobbleManipulator()
-    val openCVNode = OpenCVNodeWebcam()
     val conveyor = Conveyor()
     val shooter = Shooter2()
     val telemetryDebugging = TelemetryDebugging()
     val ai = AI()
-    //val odometry = FakeDrivetrainOdometry()
-    //val drivetrain = odometry
-
+     /*
+    val odometry = FakeDrivetrainOdometry()
+    val drivetrain = odometry
+    val openCVNode = OpenCVNodePhonecam()
+     */
+    // /*
     val odometry = ThreeWheelOdometry()
     val drivetrain = MecanumDrivetrain()
+    val openCVNode = OpenCVNodeWebcam()
+    // */
     val movement = Movement(odometry, drivetrain)
     private val activeRobotModules = arrayOf(
         odometry,
@@ -56,6 +62,9 @@ object WoENrobot {
             }
 
         } catch (e : InterruptedException) {
+        } catch (e: Exception) {
+            opMode.requestOpModeStop()
+            e.printStackTrace()
         }
     }
     private var controlHubUpdater = Thread(updateControlHub)
@@ -68,6 +77,9 @@ object WoENrobot {
                 expansionHubSpinCompleted = true
             }
         } catch (e : InterruptedException) {
+        } catch (e: Exception) {
+            opMode.requestOpModeStop()
+            e.printStackTrace()
         }
     }
     private var expansionHubUpdater = Thread(updateExpansionHub)
@@ -83,6 +95,9 @@ object WoENrobot {
                 spinCompleted = true
             }
         } catch (e : InterruptedException) {
+        } catch (e: Exception) {
+            opMode.requestOpModeStop()
+            e.printStackTrace()
         }
     }
     private var otherUpdater = Thread(updateOther)
@@ -96,6 +111,7 @@ object WoENrobot {
             }
         } catch (e : Exception) {
             opMode.requestOpModeStop()
+            e.printStackTrace()
         }
     }
     private var regulatorUpdater = Thread(updateRegulators)

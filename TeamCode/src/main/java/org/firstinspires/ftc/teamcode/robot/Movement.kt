@@ -26,7 +26,7 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
 
         @JvmField var kD_distance = 1.5
 
-        @JvmField var kI_distance = 11.0
+        @JvmField var kI_distance = 12.0
 
         //@JvmField TODO separate coeffs on angle and distance
         //var kP_angle = 3.6
@@ -121,7 +121,7 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
         get() {
             return try {
                 removeNaN(pathToFollow[nTargetPoint], odometry.robotCoordinates)
-            } catch (e: ArrayIndexOutOfBoundsException) {
+            } catch (e: IndexOutOfBoundsException) {
                 Pose2D()
             }
         }
