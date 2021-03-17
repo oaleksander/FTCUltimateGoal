@@ -155,7 +155,7 @@ class ThreeWheelOdometry : MultithreadedRobotModule(), Odometry {
         odometryWheelDiameterCm = OdometryConfig.forwardMultiplier * 4.8
         odometryCountsPerCM = endoderCPR / (odometryWheelDiameterCm * Math.PI)
         encoderCMPerCounts = odometryWheelDiameterCm * Math.PI / endoderCPR
-        odometerXcenterOffset = -21.7562349 * odometryCountsPerCM * cos(Math.toRadians(51.293002))
+        //odometerXcenterOffset = -21.7562349 * odometryCountsPerCM * cos(Math.toRadians(51.293002))
         WoENHardware.odometerYL.let {
             odometerYL = Encoder(it, Encoder.Direction.REVERSE)
             it.mode = DcMotor.RunMode.STOP_AND_RESET_ENCODER

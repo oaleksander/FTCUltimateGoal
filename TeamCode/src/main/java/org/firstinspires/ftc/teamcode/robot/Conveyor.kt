@@ -25,7 +25,7 @@ class Conveyor : MultithreadedRobotModule(), Conveyor {
 
     private val conveyorPowerSender = CommandSender({ conveyor.power = it })
 
-    private val conveyorAccelerationLimiter = MotorAccelerationLimiter({ conveyorPowerSender }, 6.0) //motorAccelerationLimiter({conveyorPowerSender.send(it)}, 6.0)
+    private val conveyorAccelerationLimiter = MotorAccelerationLimiter({ conveyorPowerSender.send(it) }, 6.0) //motorAccelerationLimiter({conveyorPowerSender.send(it)}, 6.0)
 
     private val motorCurrentTimer = ElapsedTime()
     private val stackDetectionTimer = ElapsedTime()

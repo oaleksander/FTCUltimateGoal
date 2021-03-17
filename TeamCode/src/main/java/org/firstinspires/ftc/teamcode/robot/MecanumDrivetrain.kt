@@ -227,7 +227,7 @@ class MecanumDrivetrain : MultithreadedRobotModule(), Drivetrain {
 
 
     private fun limitMinSpeed(speed: Double): Double {
-        return speed.coerceAtLeast(minMotorVelocity) * sign(speed)
+        return abs(speed).coerceAtLeast(minMotorVelocity) * sign(speed)
     }
 
     override val maxVelocity: Vector3D
