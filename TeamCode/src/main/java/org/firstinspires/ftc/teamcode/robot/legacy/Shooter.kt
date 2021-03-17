@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.robot.legacy
 
 import com.acmerobotics.dashboard.config.Config
+import com.qualcomm.robotcore.eventloop.opmode.Disabled
 import com.qualcomm.robotcore.hardware.*
 import com.qualcomm.robotcore.util.ElapsedTime
 import org.firstinspires.ftc.teamcode.misc.CommandSender
@@ -18,7 +19,8 @@ class Shooter : MultithreadedRobotModule(), Shooter {
 
 
     @Config
-    internal object ShooterConfig {
+    @Disabled
+    internal object ShooterConfigOld {
         @JvmField var servoTime = 137.0
 
         @JvmField var servoReturnMultiplier = 2.6
@@ -70,8 +72,8 @@ class Shooter : MultithreadedRobotModule(), Shooter {
         motorConfigurationType.maxRPM = 6000.0
         shooterMotor.motorType = motorConfigurationType
         try {
-            shooterMotor.setVelocityPIDFCoefficients(ShooterConfig.kP, ShooterConfig.kI, ShooterConfig.kD,
-                                                     ShooterConfig.kF * ShooterConfig.kF_referenceVoltage / voltageSensor.voltage)
+            shooterMotor.setVelocityPIDFCoefficients(ShooterConfigOld.kP, ShooterConfigOld.kI, ShooterConfigOld.kD,
+                                                     ShooterConfigOld.kF * ShooterConfigOld.kF_referenceVoltage / voltageSensor.voltage)
         } catch (e: UnsupportedOperationException) {
             opMode.telemetry.addData("Shooter PIDF error ", e.message)
         }
@@ -85,22 +87,22 @@ class Shooter : MultithreadedRobotModule(), Shooter {
 
     private fun initializedservo() {
         feeder = opMode.hardwareMap.get(Servo::class.java, "feeder") as ExpansionHubServo
-        feeder.position = ShooterConfig.feederClose
+        feeder.position = ShooterConfigOld.feederClose
     }
 
     override fun start() {
-        feeder.position = ShooterConfig.feederClose
+        feeder.position = ShooterConfigOld.feederClose
         shooterMotor.velocity = 0.0
         shootingMode = Shooter.ShooterMode.OFF
         ringsToShoot = 0
     }
 
     override fun updateControlHub() {
-        if (ringsToShoot > 0 && feederTime.milliseconds() > ShooterConfig.servoTime * ShooterConfig.servoReturnMultiplier) {
+        if (ringsToShoot > 0 && feederTime.milliseconds() > ShooterConfigOld.servoTime * ShooterConfigOld.servoReturnMultiplier) {
             feedRing()
             ringsToShoot--
         }
-        setFeederPosition(feederTime.milliseconds() < ShooterConfig.servoTime && motorVelocityTarget != 0.0)
+        setFeederPosition(feederTime.milliseconds() < ShooterConfigOld.servoTime && motorVelocityTarget != 0.0)
     }
 
     override fun updateExpansionHub() {
@@ -121,16 +123,16 @@ class Shooter : MultithreadedRobotModule(), Shooter {
             pidfUpdateTimer.reset()
             try {
                 if (this.encoderFailureMode) shooterMotor.setVelocityPIDFCoefficients(0.0, 0.0, 0.0,
-                                                                                      ShooterConfig.kF * ShooterConfig.kF_referenceVoltage / voltageSensor.voltage) else shooterMotor.setVelocityPIDFCoefficients(
-                     ShooterConfig.kP, ShooterConfig.kI, ShooterConfig.kD,
-                     ShooterConfig.kF * ShooterConfig.kF_referenceVoltage / voltageSensor.voltage)
+                                                                                      ShooterConfigOld.kF * ShooterConfigOld.kF_referenceVoltage / voltageSensor.voltage) else shooterMotor.setVelocityPIDFCoefficients(
+                    ShooterConfigOld.kP, ShooterConfigOld.kI, ShooterConfigOld.kD,
+                    ShooterConfigOld.kF * ShooterConfigOld.kF_referenceVoltage / voltageSensor.voltage)
             } catch (ignored: UnsupportedOperationException) {
             }
         }
     }
 
     private fun setFeederPosition(push: Boolean) {
-        feederPositionSender.send(if (push) ShooterConfig.feederOpen else ShooterConfig.feederClose)
+        feederPositionSender.send(if (push) ShooterConfigOld.feederOpen else ShooterConfigOld.feederClose)
     }
 
     private fun setShootersetings(Rpm: Double, time: Double) {
@@ -150,9 +152,9 @@ class Shooter : MultithreadedRobotModule(), Shooter {
             if (mode != Shooter.ShooterMode.OFF && shooterMode == Shooter.ShooterMode.OFF) rpmTime.reset()
             shooterMode = mode
             when (mode) {
-                 Shooter.ShooterMode.HIGHGOAL -> setShootersetings(ShooterConfig.highRpm, ShooterConfig.timeRpm)
-                 Shooter.ShooterMode.POWERSHOT -> setShootersetings(ShooterConfig.lowRpm, ShooterConfig.timeRpm)
-                 Shooter.ShooterMode.OFF -> setShootersetings(0.0, ShooterConfig.timeRpm)
+                 Shooter.ShooterMode.HIGHGOAL -> setShootersetings(ShooterConfigOld.highRpm, ShooterConfigOld.timeRpm)
+                 Shooter.ShooterMode.POWERSHOT -> setShootersetings(ShooterConfigOld.lowRpm, ShooterConfigOld.timeRpm)
+                 Shooter.ShooterMode.OFF -> setShootersetings(0.0, ShooterConfigOld.timeRpm)
             }
         }
 
