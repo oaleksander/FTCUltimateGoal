@@ -20,7 +20,7 @@ class TeleOp_test : LinearOpMode() {
         WoENrobot.initRobot(this)
         startRobot()
         /* Auto Shooting */
-        val autoShootingPresser = SinglePressButton { gamepad1.touchpad }
+        val autoShootingPresser = SinglePressButton { gamepad1.dpad_up }
         /* Wobble */
         val grabWobbleSwitch = ButtonSwitch { gamepad1.b }
         /* Conveyor */

@@ -25,19 +25,19 @@ class MecanumDrivetrain : MultithreadedRobotModule(), Drivetrain {
     internal object DrivetrainConfig {
         @JvmField var achieveableMaxRPMFraction = 0.885
 
-        @JvmField var achieveableMinRPMFraction = 0.095
+        @JvmField var achieveableMinRPMFraction = 0.045
 
-        @JvmField var strafingMultiplier = 1.35
+        @JvmField var strafingMultiplier = 1.25
 
         @JvmField var rotationDecrepancy = 1.0
 
-        @JvmField var secondsToAccelerate = 0.13
+        @JvmField var secondsToAccelerate = 0.10
 
-        @JvmField var kP = 29.0
+        @JvmField var kP = 45.0
 
         @JvmField var kD = 0.0
 
-        @JvmField var kI = 0.1
+        @JvmField var kI = 0.05
 
         @JvmField var kF = 15.10
 
@@ -112,7 +112,6 @@ class MecanumDrivetrain : MultithreadedRobotModule(), Drivetrain {
         mRRProfiler.maxAcceleration = theoreticalMaxSpeed / DrivetrainConfig.secondsToAccelerate
 
         turnMultiplier = (wheelCenterOffset.x + wheelCenterOffset.y) * DrivetrainConfig.rotationDecrepancy / wheelRadius
-        setMotor0PowerBehaviors(ZeroPowerBehavior.BRAKE)
         setMotorConfiguration(DrivetrainConfig.achieveableMaxRPMFraction, tickPerRev, gearing, maxRPM)
         try {
             setPIDFCoefficients(PIDFCoefficients(DrivetrainConfig.kP, DrivetrainConfig.kD, DrivetrainConfig.kI,
@@ -120,6 +119,7 @@ class MecanumDrivetrain : MultithreadedRobotModule(), Drivetrain {
         } catch (e: UnsupportedOperationException) {
             opMode.telemetry.addData("Drivetrain PIDF error ", e.message)
         }
+        setMotor0PowerBehaviors(ZeroPowerBehavior.BRAKE)
         setSmartMode(true)
         targetVelocity = Vector3D(.0, .0, .0)
     }

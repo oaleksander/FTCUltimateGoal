@@ -52,7 +52,7 @@ object MovementMacros {
         @JvmField var HighGoalShootingDistance = 208.0
         @JvmField var HighGoalShootingAngle = -4.3
         @JvmField var PowerShotShootingDistance = 200.4089
-        @JvmField var PowerShotShootingAngle = -4.3
+        @JvmField var PowerShotShootingAngle = -1.3
         @JvmField var RingStackApproachOffset = 68.0
         @JvmField var RingStackFirstRingOffset = 5.0
         @JvmField var RingStackFourthRingOffset = -15.0
@@ -164,12 +164,13 @@ object MovementMacros {
 
 
     fun shootHighGoalAsync() {
-        shooter.shootingMode = Shooter.ShooterMode.HIGHGOAL
+       //. shooter.shootingMode = Shooter.ShooterMode.HIGHGOAL
         movement.followPath(MotionTask(highGoalShootingPose) {
             val shooterAccelerationTimeout = ElapsedTime()
             while (opMode.opModeIsActive() && !shooter.isCorrectRpm() && shooterAccelerationTimeout.seconds() < 1.2 && movement.pathFollowerIsActive())
                 spinOnce()
-            if (movement.pathFollowerIsActive()) shooter.feedRings()
+            //if (movement.pathFollowerIsActive())
+        shooter.feedRings()
         })
         //  while(movement.pathFollowerIsActive()&&getOpMode().opModeIsActive()) {spinOnce();}
     }
@@ -279,12 +280,12 @@ object MovementMacros {
                   conveyor.enableConveyor = true
                   movement.pos(Pose2D(ringStackPose - Vector2D(0.0, RingStackFirstRingOffset).rotatedCW(heading), heading + PI),
                                linearVelocityFraction = .18, distanceTolerance = 5.0, angularTolerance = toRadians(5.0))
-                  delay(700.0)
+                  //delay(700.0)
                   shootHighGoal()
                   movement.pos(Pose2D(ringStackPose - Vector2D(0.0, RingStackFourthRingOffset).rotatedCW(heading), heading + PI),
                                linearVelocityFraction = .35, distanceTolerance = 3.0, angularTolerance = toRadians(3.0))
-                  if (pickWobbleBetweenRings && runTime.milliseconds() < 18.0) pickSecondWobble()
-                  else delay(750.0)
+                  if (pickWobbleBetweenRings) pickSecondWobble()
+                  ///else delay(750.0)
                   shootHighGoal()
              }
              StackSize.ONE -> {
@@ -292,7 +293,7 @@ object MovementMacros {
                   movement.pos(Pose2D(ringStackPose - Vector2D(0.0, RingStackFirstRingOffset).rotatedCW(heading), heading + PI),
                                linearVelocityFraction = .7, distanceTolerance = 3.0, angularTolerance = toRadians(3.0))
                   if (pickWobbleBetweenRings) pickSecondWobble()
-                  else delay(500.0)
+                  //else delay(500.0)
                   shootHighGoal(shootOnlyOneRing = true)
              }
              StackSize.ZERO -> {

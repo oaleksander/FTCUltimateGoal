@@ -69,7 +69,7 @@ class TelemetryDebugging : MultithreadedRobotModule() {
                     telemetry.addData("EH Loop frequency", "$expansionHubloopFrequency Hz")
                     val robotPosition = odometry.robotCoordinates
                     // telemetry.addLine("Odometry encoders").addData("odYL", WoENHardware.odometerYL.getCurrentPosition()).addData("odYR", WoENHardware.odometerYR.getCurrentPosition()).addData("odX", WoENHardware.odometerX.getCurrentPosition());
-                    //telemetry.addLine("Robot position ").addData("Y", robotPosition.y).addData("X", robotPosition.x).addData("Head", Math.toDegrees(robotPosition.heading));
+                    telemetry.addLine("Robot position ").addData("Y", robotPosition.y).addData("X", robotPosition.x).addData("Head", Math.toDegrees(robotPosition.heading));
                     //   Vector3D velocity = odometry.getRobotVelocity();
                     //     telemetry.addLine("Robot velocity ").addData("Y", velocity.y).addData("X", velocity.x).addData("Head", Math.toDegrees(velocity.z));
                     telemetry.addLine("Shooter ").addData("Mode", shooter.shootingMode)
@@ -81,7 +81,7 @@ class TelemetryDebugging : MultithreadedRobotModule() {
                         dashboardPacket = TelemetryPacket()
                         createDashboardRectangle(robotPosition, "black")
                         if (movement.pathFollowerIsActive()) createDashboardRectangle(movement.currentTarget, "#66CC66")
-                        //dashboardPacket.put("head", toDegrees(odometry.encoderHeading))
+                        dashboardPacket.put("Head", Math.toDegrees(robotPosition.heading))
                         dashboardPacket.put("Loop frequency", loopFrequency)
                         dashboardPacket.put("CH Loop frequency", controlHubLoopFrequency)
                         dashboardPacket.put("EH Loop frequency", expansionHubloopFrequency)

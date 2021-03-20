@@ -59,7 +59,7 @@ class ThreeWheelOdometry : MultithreadedRobotModule(), Odometry {
     internal object OdometryConfig {
         @JvmField var forwardMultiplier = 1.00
 
-        @JvmField var headingMultiplier = 1.0160326356276722029668653819493
+        @JvmField var headingMultiplier = 1.01940189866745445606466932397
 
         @JvmField var doUseIMU = false
     }

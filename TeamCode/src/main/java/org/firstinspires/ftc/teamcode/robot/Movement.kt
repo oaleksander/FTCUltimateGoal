@@ -21,26 +21,19 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
     @Config
     internal object MovementConfig {
         @JvmField var lookaheadRadius = 45.72
-
-        @JvmField var kP_distance = 11.3
-
+        @JvmField var kP_distance = 4.5
         @JvmField var kD_distance = 1.5
-
-        @JvmField var kI_distance = 12.0
-
+        @JvmField var kI_distance = 6.0
         //@JvmField TODO separate coeffs on angle and distance
         //var kP_angle = 3.6
         //@JvmField
         //var kD_angle = 0.15
         //@JvmField
         //var kI_angle = 0.6
-        @JvmField var antiWindupFraction_distance = .2
-
-        @JvmField var antiWindupFraction_angle = .2
-
-        @JvmField var minErrorDistanceDefault = 1.0
-
-        @JvmField var minErrorAngleDefault = Math.toRadians(0.35)
+        @JvmField var antiWindupFraction_distance = .13
+        @JvmField var antiWindupFraction_angle = .13
+        @JvmField var minErrorDistanceDefault = 1.5
+        @JvmField var minErrorAngleDefault = Math.toRadians(0.4)
     }
 
     // private val minErrorDistanceDefault = 1.0
@@ -110,10 +103,10 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
                 }
             }
         } else if (requestedVelocityPercent.radius() > 0.005) {
-           // if (pathFollowerIsActive()) stopPathFollowing()
+            if (pathFollowerIsActive()) stopPathFollowing()
             drivetrain.targetVelocity = requestedVelocityPercent * drivetrain.maxVelocity
            // if (pathToFollow.size > 0 && doActiveBraking) pathToFollow[pathToFollow.size - 1] = MotionTask(odometry.robotCoordinates)
-        } //else if (pathToFollow.size > 0 && doActiveBraking) moveLinear(pathToFollow[pathToFollow.size - 1])
+        } else if (pathToFollow.size > 0 && doActiveBraking) moveLinear(pathToFollow[pathToFollow.size - 1])
         else drivetrain.targetVelocity = Vector3D(.0, .0, .0)
     }
 

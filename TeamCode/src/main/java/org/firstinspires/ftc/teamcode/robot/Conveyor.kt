@@ -67,7 +67,7 @@ class Conveyor : MultithreadedRobotModule(), Conveyor {
 
     private fun initializedrive() {
         conveyor = conveyorMotor
-        conveyor.direction = DcMotorSimple.Direction.FORWARD //Should be intaking rings at +1.0
+        conveyor.direction = DcMotorSimple.Direction.REVERSE //Should be intaking rings at +1.0
         conveyor.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
     }
 
