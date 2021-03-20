@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.*
 import com.qualcomm.robotcore.util.ElapsedTime
 import com.qualcomm.robotcore.util.Range
 import org.firstinspires.ftc.teamcode.misc.CommandSender
+import org.firstinspires.ftc.teamcode.misc.RegulatorPIDVAS
 import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig.kA
 import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig.kD
 import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig.kI
@@ -15,6 +16,7 @@ import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig.kV_referenceV
 import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig.maxI
 import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig.servoReturnMultiplier
 import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig.servoTime
+import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig.feederClose
 import org.firstinspires.ftc.teamcode.superclasses.MultithreadedRobotModule
 import org.firstinspires.ftc.teamcode.superclasses.Shooter
 import org.openftc.revextensions2.ExpansionHubServo
@@ -54,7 +56,7 @@ class Shooter2 : MultithreadedRobotModule() {
 
         @JvmField var kS = 3000.0
 
-        @JvmField var maxI = 16384
+        @JvmField var maxI = 16384.0
 
         @JvmField var kV_referenceVoltage = 12.485
     }
@@ -68,6 +70,7 @@ class Shooter2 : MultithreadedRobotModule() {
     private lateinit var voltageSensor: VoltageSensor
     private lateinit var feeder: ExpansionHubServo
     private val shooterPowerSender = CommandSender({ p: Double -> shooterMotor.power = p })
+    private val shooterRegulator = RegulatorPIDVAS({pi: Double -> shooterPowerSender.send(pi)}, {currentVelocity}, {voltageSensor.voltage}, {kP}, {kD}, {kI}, {kV}, {kA}, {kS}, {maxI}, {kV_referenceVoltage})
     private val feederPositionSender = CommandSender({ p: Double -> feeder.position = p })
     private var shooterMode = Shooter.ShooterMode.OFF
     private var ringsToShoot: Int = 0
@@ -106,22 +109,22 @@ class Shooter2 : MultithreadedRobotModule() {
 
     private fun initializedservo() {
         feeder = opMode.hardwareMap.get(Servo::class.java, "feeder") as ExpansionHubServo
-        feeder.position = ShooterConfig.feederClose
+        feeder.position = feederClose
     }
 
     override fun start() {
-        feeder.position = ShooterConfig.feederClose
+        feeder.position = feederClose
         shooterMotor.power = 0.0
         shootingMode = Shooter.ShooterMode.OFF
         ringsToShoot = 0
     }
 
     override fun updateControlHub() {
-        if (ringsToShoot > 0 && feederTime.milliseconds() > ShooterConfig.servoTime * ShooterConfig.servoReturnMultiplier) {
+        if (ringsToShoot > 0 && feederTime.milliseconds() > servoTime * servoReturnMultiplier) {
             feedRing()
             ringsToShoot--
         }
-        setFeederPosition(feederTime.milliseconds() < ShooterConfig.servoTime && rpmTarget != 0.0)
+        setFeederPosition(feederTime.milliseconds() < servoTime && rpmTarget != 0.0)
     }
 
     private var velocityError = 0.0
@@ -139,11 +142,13 @@ class Shooter2 : MultithreadedRobotModule() {
     private var velocityTargetOld = 0.0
     private var currentVelocity = 0.0
     override fun updateExpansionHub() {
-        timeDelta = rpmTime.seconds() - timeOld
-        timeOld = rpmTime.seconds()
+
+        //timeDelta = rpmTime.seconds() - timeOld
+        //timeOld = rpmTime.seconds()
         currentVelocity = getMotorVelocity()
         currentRpm = currentVelocity * ticksToRpmMultiplier
-        if (motorVelocityTarget != 0.0) {
+        shooterRegulator.updateRegulator(motorVelocityTarget)
+        /*if (motorVelocityTarget != 0.0) {
             voltageDelta = kV_referenceVoltage / voltageSensor.voltage
             velocityError = motorVelocityTarget - currentVelocity
             P = velocityError * kP
@@ -164,14 +169,14 @@ class Shooter2 : MultithreadedRobotModule() {
             I = 0.0
             velocityTargetOld = 0.0
         }
-        shooterPowerSender.send(power)
+        shooterPowerSender.send(power)*/
     }
 
     override fun updateOther() {
     }
 
     private fun setFeederPosition(push: Boolean) {
-        feederPositionSender.send(if (push) ShooterConfig.feederOpen else ShooterConfig.feederClose)
+        feederPositionSender.send(if (push) ShooterConfig.feederOpen else feederClose)
     }
 
     private fun setShootersetings(Rpm: Double) {

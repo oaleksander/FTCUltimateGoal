@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode.misc
 import com.qualcomm.robotcore.hardware.DcMotorEx
 import com.qualcomm.robotcore.util.ElapsedTime
 import com.qualcomm.robotcore.hardware.DcMotorSimple
+import kotlin.math.abs
+import kotlin.math.sign
 
 /**
  * Wraps a motor instance to provide corrected velocity counts and allow reversing without changing the corresponding
@@ -43,8 +45,8 @@ class Encoder(private val motor: DcMotorEx, var direction: Direction) {
         private const val CPS_STEP = 0x10000
         private fun inverseOverflow(input: Double, estimate: Double): Double {
             var real = input
-            while (Math.abs(estimate - real) > CPS_STEP / 2.0) {
-                real += Math.signum(estimate - real) * CPS_STEP
+            while (abs(estimate - real) > CPS_STEP / 2.0) {
+                real += sign(estimate - real) * CPS_STEP
             }
             return real
         }

@@ -1,12 +1,13 @@
 package org.firstinspires.ftc.teamcode.misc
 
-import com.qualcomm.robotcore.hardware.DcMotorEx
-import com.qualcomm.robotcore.hardware.VoltageSensor
 import com.qualcomm.robotcore.util.ElapsedTime
+import java.util.function.DoubleConsumer
+import java.util.function.DoubleSupplier
 import kotlin.math.abs
 import kotlin.math.sign
 
-class RegulatorPIDVAS (var motorRegulator: DcMotorEx, var voltageSensor: VoltageSensor, private val kP: Double = 0.0, private val kD: Double = 0.0, private val kI: Double = 0.0, private val kV: Double = 0.0, private val kA: Double = 0.0, private val kS: Double = 0.0, private val maxI: Double = 600000.0, private val kV_referenceVoltage: Double = 12.485){
+class RegulatorPIDVAS (private val doubleConsumer: DoubleConsumer, private val doubleVelocity: DoubleSupplier, private val doubleSupplier: DoubleSupplier, private val kP: DoubleSupplier, private val kD: DoubleSupplier,
+                       private val kI: DoubleSupplier, private val kV: DoubleSupplier, private val kA: DoubleSupplier, private val kS: DoubleSupplier, private val maxI: DoubleSupplier, private val kV_referenceVoltage: DoubleSupplier){
     private val updateTime = ElapsedTime()
     private var velocityError = 0.0
     private var velocityErrorOld = 0.0
@@ -21,27 +22,29 @@ class RegulatorPIDVAS (var motorRegulator: DcMotorEx, var voltageSensor: Voltage
     private var timeDelta = 0.0
     private var voltageDelta = 0.0
     private var velocityTargetOld = 0.0
-    private var currentVelocity = 0.0
     private val maxInt16 = 32767.0
-    fun updateRegulator(target: Double):Double {
+    private var currentVelocity = 0.0
+    /*fun updateCoefficients() {
+
+    }*/
+    fun updateRegulator(target: Double) {
         timeDelta = updateTime.seconds() - timeOld
         timeOld = updateTime.seconds()
+        currentVelocity = doubleVelocity.asDouble
         if (target != 0.0) {
-            currentVelocity = motorRegulator.velocity
-            voltageDelta = kV_referenceVoltage / voltageSensor.voltage
+            voltageDelta = kV_referenceVoltage.asDouble / doubleSupplier.asDouble
             velocityError = target - currentVelocity
-            P = velocityError * kP
-            D = (velocityError - velocityErrorOld) * kD / timeDelta
-            I += (kI * velocityError) * timeDelta
-            if (abs(I) > maxI) I = sign(I) * maxI
-            V = kV * target * voltageDelta
-            A = kA * (target - velocityTargetOld) / timeDelta * voltageDelta
-            S = kS * sign(target) * voltageDelta
+            P = velocityError * kP.asDouble
+            D = (velocityError - velocityErrorOld) * kD.asDouble / timeDelta
+            I += (kI.asDouble * velocityError) * timeDelta
+            if (abs(I) > maxI.asDouble) I = sign(I) * maxI.asDouble
+            V = kV.asDouble * target * voltageDelta
+            A = kA.asDouble * (target - velocityTargetOld) / timeDelta * voltageDelta
+            S = kS.asDouble * sign(target) * voltageDelta
             power = (P + I + D + V + A + S) / maxInt16
             velocityErrorOld = velocityError
             velocityTargetOld = target
         } else {
-            currentVelocity = 0.0
             voltageDelta = 0.0
             velocityError = 0.0
             power = 0.0
@@ -49,6 +52,6 @@ class RegulatorPIDVAS (var motorRegulator: DcMotorEx, var voltageSensor: Voltage
             I = 0.0
             velocityTargetOld = 0.0
         }
-        return power
+        doubleConsumer.accept(power)
     }
 }
