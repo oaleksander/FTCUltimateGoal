@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.math
 
 import kotlin.math.PI
 import kotlin.math.abs
-import kotlin.math.min
 import kotlin.math.sqrt
 
 object MathUtil {
@@ -14,18 +13,18 @@ object MathUtil {
     }
 
     @JvmStatic
-    fun angleWrap(Angle: Double): Double {
-        var angle = Angle
-        while (angle > PI) angle -= PI * 2
-        while (angle < -PI) angle += PI * 2
-        return angle
+    fun angleWrap(angle: Double): Double {
+        var correctedAngle = angle
+        while (correctedAngle > PI) correctedAngle -= PI * 2
+        while (correctedAngle < -PI) correctedAngle += PI * 2
+        return correctedAngle
     }
 
-    fun angleWrapHalf(Angle: Double): Double {
-        var angle = Angle
-        while (angle > PI / 2) angle -= PI
-        while (angle < -PI / 2) angle += PI
-        return angle
+    fun angleWrapHalf(angle: Double): Double {
+        var correctedAngle = angle
+        while (correctedAngle > PI / 2) correctedAngle -= PI
+        while (correctedAngle < -PI / 2) correctedAngle += PI
+        return correctedAngle
     }
 
     @JvmStatic
@@ -38,11 +37,10 @@ object MathUtil {
     }
 
     @JvmStatic
-    fun cosFromSin(sin: Double, Angle: Double): Double {
-        var angle = Angle
+    fun cosFromSin(sin: Double, angle: Double): Double {
+        val correctedAngle = angleWrap(angle)
         var cos = sqrt(1 - sin * sin)
-        angle = angleWrap(angle)
-        if (angle > PI / 2 || angle < -PI / 2) cos *= -1.0
+        if (correctedAngle > PI / 2 || correctedAngle < -PI / 2) cos *= -1.0
         return cos
     }
 }
