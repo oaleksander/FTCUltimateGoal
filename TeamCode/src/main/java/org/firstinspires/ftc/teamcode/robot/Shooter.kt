@@ -6,24 +6,25 @@ import com.qualcomm.robotcore.util.ElapsedTime
 import com.qualcomm.robotcore.util.Range
 import org.firstinspires.ftc.teamcode.misc.CommandSender
 import org.firstinspires.ftc.teamcode.misc.RegulatorPIDVAS
-import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig.kA
-import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig.kD
-import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig.kI
-import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig.kP
-import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig.kS
-import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig.kV
-import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig.kV_referenceVoltage
-import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig.maxI
-import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig.servoReturnMultiplier
-import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig.servoTime
-import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig.feederClose
+import org.firstinspires.ftc.teamcode.robot.Shooter.ShooterConfig.kA
+import org.firstinspires.ftc.teamcode.robot.Shooter.ShooterConfig.kD
+import org.firstinspires.ftc.teamcode.robot.Shooter.ShooterConfig.kI
+import org.firstinspires.ftc.teamcode.robot.Shooter.ShooterConfig.kP
+import org.firstinspires.ftc.teamcode.robot.Shooter.ShooterConfig.kS
+import org.firstinspires.ftc.teamcode.robot.Shooter.ShooterConfig.kV
+import org.firstinspires.ftc.teamcode.robot.Shooter.ShooterConfig.kV_referenceVoltage
+import org.firstinspires.ftc.teamcode.robot.Shooter.ShooterConfig.maxI
+import org.firstinspires.ftc.teamcode.robot.Shooter.ShooterConfig.servoReturnMultiplier
+import org.firstinspires.ftc.teamcode.robot.Shooter.ShooterConfig.servoTime
+import org.firstinspires.ftc.teamcode.robot.Shooter.ShooterConfig.feederClose
 import org.firstinspires.ftc.teamcode.superclasses.MultithreadedRobotModule
 import org.firstinspires.ftc.teamcode.superclasses.Shooter
+import org.firstinspires.ftc.teamcode.superclasses.VoltageSupplier
 import org.openftc.revextensions2.ExpansionHubServo
 import kotlin.math.abs
 import kotlin.math.sign
 
-class Shooter2 : MultithreadedRobotModule() {
+class Shooter(private val voltageSupplier: VoltageSupplier) : MultithreadedRobotModule(), Shooter {
     private val rpmTime = ElapsedTime()
     private val feederTime = ElapsedTime()
     private val encoderFailureDetectionTime = ElapsedTime()
@@ -67,11 +68,10 @@ class Shooter2 : MultithreadedRobotModule() {
     get() = timeToShootOneRing * 3
 
     private lateinit var shooterMotor: DcMotorEx
-    private lateinit var voltageSensor: VoltageSensor
     private lateinit var feeder: ExpansionHubServo
-    private val shooterPowerSender = CommandSender({ p: Double -> shooterMotor.power = p })
-    private val shooterRegulator = RegulatorPIDVAS({pi: Double -> shooterPowerSender.send(pi)}, {currentVelocity}, {voltageSensor.voltage}, {kP}, {kD}, {kI}, {kV}, {kA}, {kS}, {maxI}, {kV_referenceVoltage})
-    private val feederPositionSender = CommandSender({ p: Double -> feeder.position = p })
+    private val shooterPowerSender = CommandSender({shooterMotor.power = it})
+    private val shooterRegulator = RegulatorPIDVAS({shooterPowerSender.send(it)}, {currentVelocity}, {voltageSupplier.voltage}, {kP}, {kD}, {kI}, {kV}, {kA}, {kS}, {maxI}, {kV_referenceVoltage})
+    private val feederPositionSender = CommandSender({feeder.position = it})
     private var shooterMode = Shooter.ShooterMode.OFF
     private var ringsToShoot: Int = 0
     private var timeToAccelerateMs = 1.0
@@ -90,7 +90,6 @@ class Shooter2 : MultithreadedRobotModule() {
         private set
 
     override fun initialize() {
-        voltageSensor = WoENHardware.expansionHubVoltageSensor
         shooterMotor = WoENHardware.shooterMotor
         val motorConfigurationType = shooterMotor.motorType.clone()
         motorConfigurationType.achieveableMaxRPMFraction = maxRpm / 6000.0
@@ -149,7 +148,7 @@ class Shooter2 : MultithreadedRobotModule() {
         currentRpm = currentVelocity * ticksToRpmMultiplier
         shooterRegulator.updateRegulator(motorVelocityTarget)
         /*if (motorVelocityTarget != 0.0) {
-            voltageDelta = kV_referenceVoltage / voltageSensor.voltage
+            voltageDelta = kV_referenceVoltage / voltageSupplier.voltage
             velocityError = motorVelocityTarget - currentVelocity
             P = velocityError * kP
             D = (velocityError - velocityErrorOld) * kD / timeDelta

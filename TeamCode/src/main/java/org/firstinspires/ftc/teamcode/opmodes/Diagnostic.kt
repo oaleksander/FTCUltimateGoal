@@ -6,8 +6,8 @@ import org.firstinspires.ftc.teamcode.robot.ServoWobbleManipulator.WobbleServoPo
 import org.firstinspires.ftc.teamcode.robot.ServoWobbleManipulator.WobbleServoPositions.angleUp
 import org.firstinspires.ftc.teamcode.robot.ServoWobbleManipulator.WobbleServoPositions.gripperClose
 import org.firstinspires.ftc.teamcode.robot.ServoWobbleManipulator.WobbleServoPositions.gripperOpen
-import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig.feederClose
-import org.firstinspires.ftc.teamcode.robot.Shooter2.ShooterConfig.feederOpen
+import org.firstinspires.ftc.teamcode.robot.Shooter.ShooterConfig.feederClose
+import org.firstinspires.ftc.teamcode.robot.Shooter.ShooterConfig.feederOpen
 import org.firstinspires.ftc.teamcode.robot.WoENHardware.conveyorMotor
 import org.firstinspires.ftc.teamcode.robot.WoENHardware.driveFrontLeft
 import org.firstinspires.ftc.teamcode.robot.WoENHardware.driveFrontRight

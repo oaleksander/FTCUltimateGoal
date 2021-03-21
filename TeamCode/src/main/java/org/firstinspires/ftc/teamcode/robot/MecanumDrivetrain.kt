@@ -13,13 +13,13 @@ import org.firstinspires.ftc.teamcode.math.Vector2D
 import org.firstinspires.ftc.teamcode.math.Vector3D
 import org.firstinspires.ftc.teamcode.misc.CommandSender
 import org.firstinspires.ftc.teamcode.misc.MotorAccelerationLimiter
-import org.firstinspires.ftc.teamcode.robot.WoENHardware.controlHubVoltageSensor
 import org.firstinspires.ftc.teamcode.superclasses.Drivetrain
 import org.firstinspires.ftc.teamcode.superclasses.MultithreadedRobotModule
+import org.firstinspires.ftc.teamcode.superclasses.VoltageSupplier
 import kotlin.math.abs
 import kotlin.math.sign
 
-class MecanumDrivetrain : MultithreadedRobotModule(), Drivetrain {
+class MecanumDrivetrain(private val voltageSupplier: VoltageSupplier) : MultithreadedRobotModule(), Drivetrain {
     /* Motor parameters constatnts. */
     @Config
     internal object DrivetrainConfig {
@@ -100,7 +100,6 @@ class MecanumDrivetrain : MultithreadedRobotModule(), Drivetrain {
     private var velocityRearRight = 0.0
     override fun initialize() {
         assignNames()
-        voltageSensor = controlHubVoltageSensor
         setMotorDirections()
         maxMotorVelocity = DrivetrainConfig.achieveableMaxRPMFraction * theoreticalMaxSpeed
         minMotorVelocity = DrivetrainConfig.achieveableMinRPMFraction * theoreticalMaxSpeed
@@ -115,7 +114,7 @@ class MecanumDrivetrain : MultithreadedRobotModule(), Drivetrain {
         setMotorConfiguration(DrivetrainConfig.achieveableMaxRPMFraction, tickPerRev, gearing, maxRPM)
         try {
             setPIDFCoefficients(PIDFCoefficients(DrivetrainConfig.kP, DrivetrainConfig.kD, DrivetrainConfig.kI,
-                                                 DrivetrainConfig.kF * DrivetrainConfig.kF_referenceVoltage / voltageSensor.voltage))
+                                                 DrivetrainConfig.kF * DrivetrainConfig.kF_referenceVoltage / voltageSupplier.voltage))
         } catch (e: UnsupportedOperationException) {
             opMode.telemetry.addData("Drivetrain PIDF error ", e.message)
         }
