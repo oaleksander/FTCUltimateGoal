@@ -24,23 +24,14 @@ class MecanumDrivetrain(private val voltageSupplier: VoltageSupplier) : Multithr
     @Config
     internal object DrivetrainConfig {
         @JvmField var achieveableMaxRPMFraction = 0.885
-
         @JvmField var achieveableMinRPMFraction = 0.045
-
         @JvmField var strafingMultiplier = 1.25
-
         @JvmField var rotationDecrepancy = 1.0
-
         @JvmField var secondsToAccelerate = 0.10
-
         @JvmField var kP = 45.0
-
         @JvmField var kD = 0.0
-
         @JvmField var kI = 0.05
-
         @JvmField var kF = 15.10
-
         @JvmField var kF_referenceVoltage = 13.0
     }
 

@@ -31,7 +31,7 @@ class ThreeWheelOdometry : MultithreadedRobotModule(), Odometry {
             val angularVelocity = encoderDifferenceToAngle(currentYLVelocity, currentYRVelocity)
             return Vector3D(Vector2D(encoderTicksToDistance((currentXVelocity.toInt())) - angularVelocity * odometerXcenterOffset,
                                      encoderTicksToDistance((currentYLVelocity + currentYRVelocity).toInt() / 2)), angularVelocity).rotatedCW(
-                 robotCoordinates.heading) as Vector3D
+                 robotCoordinates.heading)
         }
     private var angleOffset = 0.0
     private lateinit var imu1: BNO055IMU

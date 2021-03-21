@@ -97,7 +97,7 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
                         if (actionOnCompletionExecutor.state == Thread.State.NEW) actionOnCompletionExecutor.start() else if (actionOnCompletionExecutor.state == Thread.State.TERMINATED) {
                             nTargetPoint++
                             if (nTargetPoint < pathToFollow.size) actionOnCompletionExecutor = Thread(
-                                 pathToFollow[nTargetPoint].actionOnConpletion)
+                                 pathToFollow[nTargetPoint].actionOnCompletion)
                         }
                     }
                 }
@@ -106,8 +106,10 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
             if (pathFollowerIsActive()) stopPathFollowing()
             drivetrain.targetVelocity = requestedVelocityPercent * drivetrain.maxVelocity
            // if (pathToFollow.size > 0 && doActiveBraking) pathToFollow[pathToFollow.size - 1] = MotionTask(odometry.robotCoordinates)
-        } else if (pathToFollow.size > 0 && doActiveBraking) moveLinear(pathToFollow[pathToFollow.size - 1])
-        else drivetrain.targetVelocity = Vector3D(.0, .0, .0)
+        } else {
+            if (pathToFollow.size > 0 && doActiveBraking) moveLinear(pathToFollow[pathToFollow.size - 1])
+            else drivetrain.targetVelocity = Vector3D(.0, .0, .0)
+        }
     }
 
     val currentTarget: Pose2D
@@ -138,7 +140,7 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
      * @param distanceTolerance       Minimum distance error
      * @param angularTolerance        Minimum angular error
      */
-    fun pos(target: Pose2D?, linearVelocityFraction: Double = 1.0, angularVelocityFraction: Double = 1.0, distanceTolerance: Double = minErrorDistanceDefault, angularTolerance: Double = minErrorAngleDefault) {
+    fun pos(target: Pose2D, linearVelocityFraction: Double = 1.0, angularVelocityFraction: Double = 1.0, distanceTolerance: Double = minErrorDistanceDefault, angularTolerance: Double = minErrorAngleDefault) {
         followPath(MotionTask(target), linearVelocityFraction, angularVelocityFraction, distanceTolerance, angularTolerance)
         while (pathFollowerIsActive() && opMode.opModeIsActive()) {
             Thread.yield()
@@ -155,7 +157,7 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
      * @param angularTolerance        Minimum angular error
      */
 
-    fun followPath(motionTask: MotionTask?, linearVelocityFraction: Double = 1.0, angularVelocityFraction: Double = 1.0, distanceTolerance: Double = minErrorDistanceDefault, angularTolerance: Double = minErrorAngleDefault) {
+    fun followPath(motionTask: MotionTask, linearVelocityFraction: Double = 1.0, angularVelocityFraction: Double = 1.0, distanceTolerance: Double = minErrorDistanceDefault, angularTolerance: Double = minErrorAngleDefault) {
         followPath(ArrayList(listOf(motionTask)), linearVelocityFraction, angularVelocityFraction, distanceTolerance, angularTolerance)
     }
 
@@ -181,7 +183,7 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
         nTargetPoint = 1
         bPathFollowerEnabled = true
         bPathFollowingFinished = false
-        actionOnCompletionExecutor = Thread(pathToFollow[nTargetPoint].actionOnConpletion)
+        actionOnCompletionExecutor = Thread(pathToFollow[nTargetPoint].actionOnCompletion)
         pathFollowingTimer.reset()
     }
 

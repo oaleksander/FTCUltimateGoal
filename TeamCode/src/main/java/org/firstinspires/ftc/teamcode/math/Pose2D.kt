@@ -1,93 +1,37 @@
-package org.firstinspires.ftc.teamcode.math;
+package org.firstinspires.ftc.teamcode.math
 
-import org.jetbrains.annotations.NotNull;
+import org.firstinspires.ftc.teamcode.math.MathUtil.angleWrap
+import org.firstinspires.ftc.teamcode.math.MathUtil.approxEquals
+import java.util.*
 
-import java.util.Locale;
+open class Pose2D @JvmOverloads constructor(x: Double = 0.0, y: Double = 0.0, heading: Double = 0.0) : Vector2D(x, y), Cloneable {
+    @JvmField var heading: Double = angleWrap(heading)
 
-import static org.firstinspires.ftc.teamcode.math.MathUtil.angleWrap;
+    constructor(p: Vector2D, heading: Double) : this(p.x, p.y, angleWrap(heading))
 
-public class Pose2D extends Vector2D {
-    public double heading;
+    operator fun plus(p2: Pose2D) = Pose2D(x + p2.x, y + p2.y, heading + p2.heading)
 
-    public Pose2D(double x, double y, double heading) {
-        super(x, y);
-        this.heading = angleWrap(heading);
+    operator fun times(p2: Pose2D) = Pose2D(x * p2.x, y * p2.y, heading * p2.heading)
+
+    operator fun div(p2: Pose2D) = Pose2D(x / p2.x, y / p2.y, heading / p2.heading)
+
+    operator fun div(d: Double) = Pose2D(x / d, y / d, heading / d)
+
+    operator fun minus(p2: Pose2D) = Pose2D(x - p2.x, y - p2.y, heading - p2.heading)
+
+    override operator fun times(d: Double) = Pose2D(x * d, y * d, heading * d)
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Pose2D) return false
+        if (!super.equals(other as Vector2D?)) return false
+        return approxEquals(other.heading, heading)
     }
 
-    public Pose2D() {
-        this(0, 0, 0);
-    }
+    override fun hashCode() = x.hashCode() xor y.hashCode() xor heading.hashCode()
 
-    public Pose2D(Vector2D p, double heading) {
-        this(p.x, p.y, angleWrap(heading));
-    }
+    override fun toString() = String.format(Locale.getDefault(), "{x: %.3f, y: %.3f, θ: %.3f}", x, y, heading)
 
-    public Pose2D plus(Pose2D p2) {
-        return new Pose2D(x + p2.x, y + p2.y, heading + p2.heading);
-    }
+    override fun clone() = Pose2D(x, y, heading)
 
-
-    public Pose2D times(Pose2D p2) {
-        return new Pose2D(x * p2.x, y * p2.y, heading * p2.heading);
-    }
-
-    public Pose2D div(Pose2D p2) {
-        return new Pose2D(x / p2.x, y / p2.y, heading / p2.heading);
-    }
-
-    public Pose2D div(double d) {
-        return new Pose2D(x / d, y / d, heading / d);
-    }
-
-    public Pose2D minus(Pose2D p2) {
-        return new Pose2D(x - p2.x, y - p2.y, heading - p2.heading);
-    }
-
-    public Pose2D times(double d) {
-        return new Pose2D(x * d, y * d, heading * d);
-    }
-
-    public void clampAbs(Pose2D p2) {
-        x = Math.copySign(minAbs(x, p2.x), x);
-        y = Math.copySign(minAbs(y, p2.y), y);
-        heading = Math.copySign(minAbs(heading, p2.heading), heading);
-    }
-
-    public void applyFriction(Pose2D friction) {
-        x = reduceUpToZero(x, friction.x);
-        y = reduceUpToZero(y, friction.y);
-        heading = reduceUpToZero(heading, friction.heading);
-    }
-
-    private double reduceUpToZero(double d, double reduction) {
-        return d - minAbs(d, Math.copySign(reduction, d));
-    }
-
-    private double minAbs(double a, double b) {
-        return Math.abs(a) < Math.abs(b) ? a : b;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Pose2D)) return false;
-        if (!super.equals((Vector2D) o)) return false;
-        Pose2D pose2D = (Pose2D) o;
-        return MathUtil.approxEquals(pose2D.heading, heading);
-    }
-
-    @Override
-    public int hashCode() {
-        return Double.valueOf(x).hashCode() ^ Double.valueOf(y).hashCode() ^ Double.valueOf(heading).hashCode();
-    }
-
-    @Override
-    public @NotNull String toString() {
-        return String.format(Locale.getDefault(), "{x: %.3f, y: %.3f, θ: %.3f}", x, y, heading);
-    }
-
-    @Override
-    public Pose2D clone() {
-        return new Pose2D(this.x, this.y, this.heading);
-    }
 }

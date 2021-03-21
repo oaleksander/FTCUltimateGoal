@@ -1,106 +1,50 @@
-package org.firstinspires.ftc.teamcode.math;
+package org.firstinspires.ftc.teamcode.math
 
-import org.jetbrains.annotations.NotNull;
+import org.firstinspires.ftc.teamcode.math.MathUtil.approxEquals
+import org.firstinspires.ftc.teamcode.math.MathUtil.minAbs
+import java.util.*
+import kotlin.math.sqrt
+import kotlin.math.withSign
 
-import java.util.Locale;
+class Vector3D @JvmOverloads constructor(x: Double = 0.0, y: Double = 0.0, var z: Double = 0.0) : Vector2D(x, y), Cloneable {
+    constructor(p: Pose2D) : this(p.x, p.y, p.heading)
+    constructor(p: Vector2D?, z: Double) : this(p!!.x, p.y, z)
 
-public class Vector3D extends Vector2D implements Cloneable {
-    public double z;
+    operator fun plus(p2: Vector3D) = Vector3D(x + p2.x, y + p2.y, z + p2.z)
 
-    public Vector3D(double x, double y, double z) {
-        super(x, y);
-        this.z = z;
+    operator fun times(p2: Vector3D) = Vector3D(x * p2.x, y * p2.y, z * p2.z)
+
+    operator fun div(d: Double) = Vector3D(x / d, y / d, z / d)
+
+    operator fun minus(p2: Vector3D) = Vector3D(x - p2.x, y - p2.y, z - p2.z)
+
+    override fun times(d: Double) = Vector3D(x * d, y * d, z * d)
+
+    override fun rotatedCW(angle: Double) = Vector3D(super.rotatedCW(angle), z)
+
+    override fun normalize(): Vector3D {
+        val r = radius()
+        return if (r != 0.0) Vector3D(x / r, y / r, z / r) else this
     }
 
-    public Vector3D(Pose2D p) {
-        this(p.x, p.y, p.heading);
+    override fun radius() = sqrt(x * x + y * y + z * z)
+
+    fun clampAbs(p2: Vector3D) {
+        x = minAbs(x, p2.x).withSign(x)
+        y = minAbs(y, p2.y).withSign(y)
+        z = minAbs(z, p2.z).withSign(z)
     }
 
-    public Vector3D() {
-        this(0, 0, 0);
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Vector3D) return false
+        if (!super.equals(other)) return false
+        return approxEquals(other.z, z)
     }
 
-    public Vector3D(Vector2D p, double z) {
-        this(p.x, p.y, z);
-    }
+    override fun hashCode() = x.hashCode() xor y.hashCode() xor z.hashCode()
 
-    public Vector3D plus(Vector3D p2) {
-        return new Vector3D(x + p2.x, y + p2.y, z + p2.z);
-    }
+    override fun toString() = String.format(Locale.getDefault(), "{x: %.3f, y: %.3f, z: %.3f}", x, y, z)
 
-    public Vector3D times(Vector3D p2) {
-        return new Vector3D(x * p2.x, y * p2.y, z * p2.z);
-    }
-
-    public Vector3D div(double d) {
-        return new Vector3D(x / d, y / d, z / d);
-    }
-
-    public Vector3D minus(Vector3D p2) {
-        return new Vector3D(x - p2.x, y - p2.y, z - p2.z);
-    }
-
-    public Vector3D times(double d) {
-        return new Vector3D(x * d, y * d, z * d);
-    }
-
-    @Override
-    public Vector3D rotatedCW(double angle) {
-        return new Vector3D(super.rotatedCW(angle), z);
-    }
-
-    public Vector3D normalize() {
-        double r = radius();
-        if (r != 0) return new Vector3D(x / r, y / r, z / r);
-        return this;
-    }
-
-    public double radius() {
-        return Math.sqrt(x * x + y * y + z * z);
-    }
-
-
-    public void clampAbs(Vector3D p2) {
-        x = Math.copySign(minAbs(x, p2.x), x);
-        y = Math.copySign(minAbs(y, p2.y), y);
-        z = Math.copySign(minAbs(z, p2.z), z);
-    }
-
-    public void applyFriction(Vector3D friction) {
-        x = reduceUpToZero(x, friction.x);
-        y = reduceUpToZero(y, friction.y);
-        z = reduceUpToZero(z, friction.z);
-    }
-
-    private double reduceUpToZero(double d, double reduction) {
-        return d - minAbs(d, Math.copySign(reduction, d));
-    }
-
-    private double minAbs(double a, double b) {
-        return Math.abs(a) < Math.abs(b) ? a : b;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Vector3D)) return false;
-        if (!super.equals(o)) return false;
-        Vector3D Vector3D = (Vector3D) o;
-        return MathUtil.approxEquals(Vector3D.z, z);
-    }
-
-    @Override
-    public int hashCode() {
-        return Double.valueOf(x).hashCode() ^ Double.valueOf(y).hashCode() ^ Double.valueOf(z).hashCode();
-    }
-
-    @Override
-    public @NotNull String toString() {
-        return String.format(Locale.getDefault(), "{x: %.3f, y: %.3f, z: %.3f}", x, y, z);
-    }
-
-    @Override
-    public Vector3D clone() {
-        return new Vector3D(this.x, this.y, this.z);
-    }
+    override fun clone() = Vector3D(x, y, z)
 }

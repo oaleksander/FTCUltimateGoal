@@ -1,88 +1,57 @@
-package org.firstinspires.ftc.teamcode.math;
+package org.firstinspires.ftc.teamcode.math
 
-import org.jetbrains.annotations.NotNull;
+import org.firstinspires.ftc.teamcode.math.MathUtil.approxEquals
+import org.firstinspires.ftc.teamcode.math.MathUtil.cosFromSin
+import java.util.*
+import kotlin.math.atan2
+import kotlin.math.sin
+import kotlin.math.sqrt
 
-import java.util.Locale;
-
-public class Vector2D {
-
-    public double x;
-    public double y;
-
-    public Vector2D(double x, double y) {
-        this.x = x;
-        this.y = y;
+open class Vector2D @JvmOverloads constructor(var x: Double = 0.0, var y: Double = 0.0): Cloneable {
+    fun rotated(angle: Double): Vector2D {
+        val sina = Math.sin(angle)
+        val cosa = cosFromSin(sina, angle)
+        return Vector2D(x * cosa - y * sina, x * sina + y * cosa)
     }
 
-    public Vector2D() {
-        this(0, 0);
+    open fun rotatedCW(angle: Double): Vector2D {
+        val sina = sin(angle)
+        val cosa = cosFromSin(sina, angle)
+        return Vector2D(x * cosa + y * sina, -x * sina + y * cosa)
     }
 
-    public Vector2D rotated(double angle) {
-        double sina = Math.sin(angle);
-        double cosa = MathUtil.cosFromSin(sina, angle);
-        return new Vector2D(x * cosa - y * sina, x * sina + y * cosa);
+    open fun normalize(): Vector2D {
+        val r = radius()
+        return if (r != 0.0) {
+            Vector2D(x / r, y / r)
+        } else this
     }
 
-    public Vector2D rotatedCW(double angle) {
-        double sina = Math.sin(angle);
-        double cosa = MathUtil.cosFromSin(sina, angle);
-        return new Vector2D(x * cosa + y * sina, -x * sina + y * cosa);
+    operator fun plus(p: Vector2D): Vector2D {
+        return Vector2D(x + p.x, y + p.y)
     }
 
-    public Vector2D normalize() {
-        double r = radius();
-        if (r != 0) {
-            return new Vector2D(x / r, y / r);
-        }
-        return this;
+    operator fun minus(p: Vector2D): Vector2D {
+        return Vector2D(x - p.x, y - p.y)
     }
 
-    public Vector2D plus(Vector2D p) {
-        return new Vector2D(this.x + p.x, this.y + p.y);
+    fun atan() = atan2(y, x)
+
+    fun acot() = atan2(x, y)
+
+    open fun radius() = sqrt(x * x + y * y)
+
+    open operator fun times(d: Double) = Vector2D(x * d, y * d)
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Vector2D) return false
+        return approxEquals(other.x, x) && approxEquals(other.y, y)
     }
 
-    public Vector2D minus(Vector2D p) {
-        return new Vector2D(this.x - p.x, this.y - p.y);
-    }
+    override fun hashCode() = x.hashCode() xor y.hashCode()
 
-    public double atan() {
-        return Math.atan2(y, x);
-    }
+    override fun toString() = String.format(Locale.getDefault(), "(%.1f, %.1f)", x, y)
 
-    public double acot() {
-        return Math.atan2(x, y);
-    }
-
-    public double radius() {
-        return Math.sqrt(x * x + y * y);
-    }
-
-    public Vector2D times(double d) {
-        return new Vector2D(x * d, y * d);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Vector2D)) return false;
-        Vector2D vector2D = (Vector2D) o;
-        return MathUtil.approxEquals(vector2D.x, x) && MathUtil.approxEquals(vector2D.y, y);
-    }
-
-    @Override
-    public int hashCode() {
-        return Double.valueOf(x).hashCode() ^ Double.valueOf(y).hashCode();
-    }
-
-    @Override
-    public @NotNull String toString() {
-        return String.format(Locale.getDefault(), "(%.1f, %.1f)", x, y);
-    }
-
-    @Override
-    public Vector2D clone() {
-        return new Vector2D(this.x, this.y);
-    }
-
+    public override fun clone(): Vector2D = Vector2D(x, y)
 }
