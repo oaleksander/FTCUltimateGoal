@@ -36,4 +36,5 @@ repositories {
 apply from: '../build.dependencies.gradle'
 
 dependencies {
+    implementation 'androidx.preference:preference:1.1.1'
 }
