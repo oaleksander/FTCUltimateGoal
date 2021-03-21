@@ -7,6 +7,7 @@ import org.firstinspires.ftc.teamcode.math.Vector2D
 import org.firstinspires.ftc.teamcode.math.Vector3D
 import org.firstinspires.ftc.teamcode.misc.MotorAccelerationLimiter
 import org.firstinspires.ftc.teamcode.robot.MecanumDrivetrain
+import org.firstinspires.ftc.teamcode.robot.VoltageSupplier
 import org.firstinspires.ftc.teamcode.superclasses.Drivetrain
 import org.firstinspires.ftc.teamcode.superclasses.MultithreadedRobotModule
 import org.firstinspires.ftc.teamcode.superclasses.Odometry
@@ -20,6 +21,9 @@ class FakeDrivetrainOdometry : MultithreadedRobotModule(), Drivetrain, Odometry 
     override val robotVelocity: Vector3D
         get() = realVelocityFC
     private var realVelocityFC = Vector3D(0.0, 0.0, 0.0)
+
+    override val maxVelocity: Vector3D = MecanumDrivetrain(VoltageSupplier()).maxVelocity
+
     private val zLimiter = MotorAccelerationLimiter({ realVelocityFC.z = it }, maxVelocity.z / 0.35)
     private val yLimiter = MotorAccelerationLimiter({ realVelocityFC.y = it }, maxVelocity.y / 0.35)
     private val xLimiter = MotorAccelerationLimiter({ realVelocityFC.x = it }, maxVelocity.x / 0.35)
@@ -76,7 +80,5 @@ class FakeDrivetrainOdometry : MultithreadedRobotModule(), Drivetrain, Odometry 
             targetVelocityFC = Vector3D(Vector2D(sideWays, frontWays).rotatedCW(this.robotCoordinates.heading), turn)
         }
 
-    override val maxVelocity: Vector3D
-        get() = MecanumDrivetrain().maxVelocity
 
 }
