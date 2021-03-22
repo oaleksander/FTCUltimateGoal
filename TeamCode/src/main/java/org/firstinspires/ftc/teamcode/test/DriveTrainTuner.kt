@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.test
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.qualcomm.robotcore.util.ElapsedTime
 import org.firstinspires.ftc.teamcode.misc.SinglePressButton
 import org.firstinspires.ftc.teamcode.robot.WoENrobot
@@ -9,6 +10,7 @@ import org.firstinspires.ftc.teamcode.robot.WoENrobot.movement
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.startRobot
 import kotlin.math.sin
 
+@TeleOp
 class DriveTrainTuner: LinearOpMode() {
     override fun runOpMode() {
         val sineWaveTimer = ElapsedTime()

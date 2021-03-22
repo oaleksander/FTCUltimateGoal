@@ -126,6 +126,7 @@ import org.firstinspires.inspection.RcInspectionActivity;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -206,16 +207,17 @@ public class FtcRobotControllerActivity extends Activity {
 
         if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(intent.getAction())) {
             UsbDevice usbDevice = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+            assert usbDevice != null;
             RobotLog.vv(TAG, "ACTION_USB_DEVICE_ATTACHED: %s", usbDevice.getDeviceName());
 
-            if (usbDevice != null) {  // paranoia
+            //if (usbDevice != null) {  // paranoia
                 // We might get attachment notifications before the event loop is set up, so
                 // we hold on to them and pass them along only when we're good and ready.
                 if (receivedUsbAttachmentNotifications != null) { // *total* paranoia
                     receivedUsbAttachmentNotifications.add(usbDevice);
                     passReceivedUsbAttachmentsToEventLoop();
                 }
-            }
+           // }
         }
     }
 
@@ -547,7 +549,7 @@ public class FtcRobotControllerActivity extends Activity {
         if (id == R.id.action_program_and_manage) {
             if (isRobotRunning()) {
                 Intent programmingModeIntent = new Intent(AppUtil.getDefContext(), ProgramAndManageActivity.class);
-                RobotControllerWebInfo webInfo = programmingModeManager.getWebServer().getConnectionInformation();
+                RobotControllerWebInfo webInfo = Objects.requireNonNull(programmingModeManager.getWebServer()).getConnectionInformation();
                 programmingModeIntent.putExtra(LaunchActivityConstantsList.RC_WEB_INFO, webInfo.toJson());
                 startActivity(programmingModeIntent);
             } else {
