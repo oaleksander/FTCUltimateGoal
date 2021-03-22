@@ -19,7 +19,7 @@ class DriveTrainTuner: LinearOpMode() {
         startRobot()
         while (opModeIsActive()) {
             if(sineWaveResetter.get()) sineWaveTimer.reset()
-            movement.humanSetVelocity(gamepad1.left_stick_x.toDouble(),if(gamepad1.dpad_up) sin(sineWaveTimer.seconds() * Math.PI / 3.0) else -gamepad1.left_stick_y.toDouble(),
+            movement.humanSetVelocity(gamepad1.left_stick_x.toDouble(),if(gamepad1.dpad_up) sin(sineWaveTimer.seconds() * Math.PI / 2.0) else -gamepad1.left_stick_y.toDouble(),
                                                 gamepad1.right_trigger.toDouble() -  gamepad1.left_trigger.toDouble())
         }
     }
