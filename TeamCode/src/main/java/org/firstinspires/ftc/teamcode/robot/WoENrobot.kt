@@ -20,16 +20,16 @@ object WoENrobot {
     val shooter = Shooter(voltageSupplier)
     val telemetryDebugging = TelemetryDebugging()
     val ai = AI()
-    // /*
+     /*
     val odometry = FakeDrivetrainOdometry()
     val drivetrain = odometry
     val openCVNode = OpenCVNodePhonecam()
-    // */
-     /*
+     */
+    // /*
     val odometry = ThreeWheelOdometry()
     val drivetrain = MecanumDrivetrain(voltageSupplier)
     val openCVNode = OpenCVNodeWebcam()
-     */
+    // */
     val movement = Movement(odometry, drivetrain)
     private val activeRobotModules = arrayOf(
         voltageSupplier,
