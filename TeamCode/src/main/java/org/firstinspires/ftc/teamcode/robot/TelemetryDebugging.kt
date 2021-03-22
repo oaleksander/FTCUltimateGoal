@@ -7,6 +7,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 import com.qualcomm.robotcore.util.ElapsedTime
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.math.Pose2D
+import org.firstinspires.ftc.teamcode.robot.TelemetryDebugging.TelemetryConfig.publishVelocityInfo
+import org.firstinspires.ftc.teamcode.robot.WoENrobot.drivetrain
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.movement
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.odometry
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.runTime
@@ -31,8 +33,8 @@ class TelemetryDebugging : MultithreadedRobotModule() {
     @Config
     internal object TelemetryConfig {
         @JvmField var dashboardTelemetry = true
-
         @JvmField var refreshTimeMs = 50
+        @JvmField var publishVelocityInfo = false
     }
 
     private fun createDashboardRectangle(position: Pose2D, color: String) {
@@ -81,13 +83,27 @@ class TelemetryDebugging : MultithreadedRobotModule() {
                         dashboardPacket = TelemetryPacket()
                         createDashboardRectangle(robotPosition, "black")
                         if (movement.pathFollowerIsActive()) createDashboardRectangle(movement.currentTarget, "#66CC66")
-                        dashboardPacket.put("Head", Math.toDegrees(robotPosition.heading))
+                        dashboardPacket.put("Status", "Running " + runTime.seconds())
                         dashboardPacket.put("Loop frequency", loopFrequency)
                         dashboardPacket.put("CH Loop frequency", controlHubLoopFrequency)
                         dashboardPacket.put("EH Loop frequency", expansionHubloopFrequency)
+                        dashboardPacket.put("Head", Math.toDegrees(robotPosition.heading))
                         dashboardPacket.put("Flywheel RPM", shooter.currentRpm)
                         dashboardPacket.put("Flywheel target", shooter.rpmTarget)
-                        dashboardPacket.put("Status", "Running " + runTime.seconds())
+                        if(publishVelocityInfo) {
+                            val targetVelocity = drivetrain.targetVelocity
+                            val drivetrainVelocity = drivetrain.robotVelocity
+                            val odometryVelocity = odometry.robotVelocity
+                            dashboardPacket.put("targetX", targetVelocity.x)
+                            dashboardPacket.put("targetY", targetVelocity.y)
+                            dashboardPacket.put("targetH", targetVelocity.z)
+                            dashboardPacket.put("driveX", drivetrainVelocity.x)
+                            dashboardPacket.put("driveY", drivetrainVelocity.y)
+                            dashboardPacket.put("driveH", drivetrainVelocity.z)
+                            dashboardPacket.put("odoX", odometryVelocity.x)
+                            dashboardPacket.put("odoY", odometryVelocity.y)
+                            dashboardPacket.put("odoH", odometryVelocity.z)
+                        }
                         dashboard.sendTelemetryPacket(dashboardPacket)
                     }
 

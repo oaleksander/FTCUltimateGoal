@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.FtcDashboard
 import com.acmerobotics.dashboard.config.Config
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry
 import com.qualcomm.hardware.lynx.LynxModule
+import com.qualcomm.robotcore.eventloop.opmode.Disabled
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.qualcomm.robotcore.hardware.DcMotor
@@ -22,9 +23,12 @@ import org.firstinspires.ftc.teamcode.robot.ThreeWheelOdometry
 import org.firstinspires.ftc.teamcode.robot.WoENHardware
 import kotlin.math.abs
 
-@TeleOp //@Disabled
-class DrivetrainPidConfig : LinearOpMode() {
-    @Config //@Disabled
+@TeleOp
+@Disabled
+@Deprecated("See DriveTrainTuner")
+class DrivetrainPidConfigOld : LinearOpMode() {
+    @Config
+    @Disabled
     object Constants {
         @JvmField var achieveableMaxRPMFraction = 0.9
 

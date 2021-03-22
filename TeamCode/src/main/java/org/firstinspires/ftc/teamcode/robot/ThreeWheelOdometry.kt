@@ -18,6 +18,19 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 class ThreeWheelOdometry : MultithreadedRobotModule(), Odometry {
+
+    @Config
+    internal object OdometryConfig {
+        @JvmField var forwardMultiplier = 1.00
+
+        @JvmField var headingMultiplier = 1.01940189866745445606466932397
+
+        @JvmField var doUseIMU = false
+    }
+
+    override val status
+    get() = "ThreeWheelOdometry: pos{YL=$ylOld YR=$yrOld X=$xOld} vel{YL=$currentYLVelocity YR=$currentYRVelocity X=$currentXVelocity}"
+
     private val yWheelPairRadiusCm = 18.000
     override var robotCoordinates = Pose2D()
         @Synchronized set
@@ -26,13 +39,8 @@ class ThreeWheelOdometry : MultithreadedRobotModule(), Odometry {
             robotCoordinates = value
             field = value
         }
-    override val robotVelocity: Vector3D
-        get() {
-            val angularVelocity = encoderDifferenceToAngle(currentYLVelocity, currentYRVelocity)
-            return Vector3D(Vector2D(encoderTicksToDistance((currentXVelocity.toInt())) - angularVelocity * odometerXcenterOffset,
-                                     encoderTicksToDistance((currentYLVelocity + currentYRVelocity).toInt() / 2)), angularVelocity).rotatedCW(
-                 robotCoordinates.heading)
-        }
+    override var robotVelocity: Vector3D = Vector3D()
+
     private var angleOffset = 0.0
     private lateinit var imu1: BNO055IMU
     private lateinit var imu2: BNO055IMU
@@ -54,15 +62,6 @@ class ThreeWheelOdometry : MultithreadedRobotModule(), Odometry {
     private val yWheelPairCenterOffset = Vector2D(0.0, 6.35375)
     private val imu1AccessTimer = ElapsedTime()
     private val imu2AccessTimer = ElapsedTime()
-
-    @Config
-    internal object OdometryConfig {
-        @JvmField var forwardMultiplier = 1.00
-
-        @JvmField var headingMultiplier = 1.01940189866745445606466932397
-
-        @JvmField var doUseIMU = false
-    }
 
     private var doUseIMULocal = OdometryConfig.doUseIMU
 
@@ -127,6 +126,7 @@ class ThreeWheelOdometry : MultithreadedRobotModule(), Odometry {
         currentYLVelocity = odometerYR.correctedVelocity
         currentYLVelocity = odometerX.correctedVelocity
         calculatePosition()
+        calculateVelocity()
     }
 
     override fun updateOther() {
@@ -146,6 +146,12 @@ class ThreeWheelOdometry : MultithreadedRobotModule(), Odometry {
         ylOld = odometerYL.currentPosition
         yrOld = odometerYR.currentPosition
         xOld = odometerX.currentPosition
+    }
+    private fun calculateVelocity() {
+        val angularVelocity = encoderDifferenceToAngle(currentYLVelocity, currentYRVelocity)
+        robotVelocity = Vector3D(Vector2D(encoderTicksToDistance((currentXVelocity.toInt())) - angularVelocity * odometerXcenterOffset,
+                                 encoderTicksToDistance((currentYLVelocity + currentYRVelocity).toInt() / 2)), angularVelocity).rotatedCW(
+            robotCoordinates.heading)
     }
 
     override fun initialize() {

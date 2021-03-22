@@ -18,8 +18,7 @@ class FakeDrivetrainOdometry : MultithreadedRobotModule(), Drivetrain, Odometry 
     // private val maxVelocity = MecanumDrivetrain().maxVelocity
     private var started = false
     private var targetVelocityFC = Vector3D(0.0, 0.0, 0.0)
-    override val robotVelocity: Vector3D
-        get() = realVelocityFC
+    override var robotVelocity: Vector3D = Vector3D()
     private var realVelocityFC = Vector3D(0.0, 0.0, 0.0)
 
     override val maxVelocity: Vector3D = MecanumDrivetrain(VoltageSupplier()).maxVelocity
@@ -62,6 +61,7 @@ class FakeDrivetrainOdometry : MultithreadedRobotModule(), Drivetrain, Odometry 
         zLimiter.setVelocity(targetVelocityFC.z)
         yLimiter.setVelocity(targetVelocityFC.y)
         xLimiter.setVelocity(targetVelocityFC.x)
+        robotVelocity = realVelocityFC
         robotCoordinates.y += realVelocityFC.y * updateTimer.seconds()
         robotCoordinates.x += realVelocityFC.x * updateTimer.seconds()
         robotCoordinates.heading = MathUtil.angleWrap(this.robotCoordinates.heading + realVelocityFC.z * updateTimer.seconds())

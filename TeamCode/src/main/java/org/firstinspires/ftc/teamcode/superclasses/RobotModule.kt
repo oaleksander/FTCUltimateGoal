@@ -14,4 +14,7 @@ abstract class RobotModule {
 
     open fun start() {}
     open fun updateAll() {}
+
+    open val status: String
+    get() = this.toString()
 }

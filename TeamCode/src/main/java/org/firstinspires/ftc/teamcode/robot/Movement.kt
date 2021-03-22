@@ -7,6 +7,8 @@ import org.firstinspires.ftc.teamcode.math.MathUtil
 import org.firstinspires.ftc.teamcode.math.Pose2D
 import org.firstinspires.ftc.teamcode.math.Vector2D
 import org.firstinspires.ftc.teamcode.math.Vector3D
+import org.firstinspires.ftc.teamcode.robot.Movement.MovementConfig.kD_distance
+import org.firstinspires.ftc.teamcode.robot.Movement.MovementConfig.kP_distance
 import org.firstinspires.ftc.teamcode.robot.Movement.MovementConfig.minErrorAngleDefault
 import org.firstinspires.ftc.teamcode.robot.Movement.MovementConfig.minErrorDistanceDefault
 import org.firstinspires.ftc.teamcode.superclasses.Drivetrain
@@ -21,17 +23,17 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
     @Config
     internal object MovementConfig {
         @JvmField var lookaheadRadius = 45.72
-        @JvmField var kP_distance = 4.5
-        @JvmField var kD_distance = 1.5
-        @JvmField var kI_distance = 6.0
+        @JvmField var kP_distance = 5.0
+        @JvmField var kD_distance = 5.0
+        @JvmField var kI_distance = 0.5
         //@JvmField TODO separate coeffs on angle and distance
         //var kP_angle = 3.6
         //@JvmField
         //var kD_angle = 0.15
         //@JvmField
         //var kI_angle = 0.6
-        @JvmField var antiWindupFraction_distance = .13
-        @JvmField var antiWindupFraction_angle = .13
+        @JvmField var antiWindupFraction_distance = .15
+        @JvmField var antiWindupFraction_angle = .15
         @JvmField var minErrorDistanceDefault = 1.5
         @JvmField var minErrorAngleDefault = Math.toRadians(0.4)
     }
@@ -222,7 +224,7 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
     private fun moveLinear(target: Pose2D, velocity: Vector2D? = null): Boolean {
         val error = getError(target)
         val diffError = odometry.robotVelocity * -1.0
-        if (target == previousTarget) {
+        if (target == previousTarget && velocity == null) {
             integralError += Vector3D((error.x + previousError.x) * 0.5, (error.y + previousError.y) * 0.5,
                                       MathUtil.angleAverage(error.heading, previousError.heading)) * moveControllerTimer.seconds()
             integralError = Vector3D(Range.clip(abs(integralError.x), 0.0,
@@ -236,7 +238,10 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
         moveControllerTimer.reset()
         previousError = error
         previousTarget = target
-        val control = Vector3D(error) * MovementConfig.kP_distance + integralError * MovementConfig.kI_distance + diffError * MovementConfig.kD_distance
+        val control =
+            (Vector3D(error) * kP_distance).clampAbs(drivetrain.maxVelocity) +
+            (integralError * MovementConfig.kI_distance).clampAbs(drivetrain.maxVelocity) +
+            (diffError * kD_distance).clampAbs(drivetrain.maxVelocity)
         if (velocity != null) holonomicMoveFC(Vector3D((error as Vector2D).normalize() * velocity.radius(), control.z))
         else holonomicMoveFC(control)
         return abs(error.heading) < minErrorAngleCurrent && error.radius() < minErrorDistanceCurrent
@@ -280,7 +285,7 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
         if ((targetPoint - originPoint).radius() <= (lookAheadPoint - originPoint).radius()) {
             if (getError(targetPoint).radius() < lookaheadRadius) return true
             moveLinear(Pose2D(targetPoint, angle))
-        } else moveLinear(Pose2D(lookAheadPoint, angle), drivetrain.maxVelocity)
+        } else moveLinear(Pose2D(lookAheadPoint, angle), Vector3D(getError(targetPoint))*kP_distance-odometry.robotVelocity*kD_distance)
         return false
     }
 
@@ -324,11 +329,11 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
      * @param odometryPose odometry Pose to replace NaNs with
      * @return Pose without NaNs
      */
-    fun removeNaN(pose2D: Pose2D, odometryPose: Pose2D): Pose2D {
+    private fun removeNaN(pose2D: Pose2D, odometryPose: Pose2D): Pose2D {
         val newPose = pose2D.clone()
-        if (java.lang.Double.isNaN(pose2D.x)) newPose.x = odometryPose.x
-        if (java.lang.Double.isNaN(pose2D.y)) newPose.y = odometryPose.y
-        if (java.lang.Double.isNaN(pose2D.heading)) newPose.heading = odometryPose.heading
+        if (pose2D.x.isNaN()) newPose.x = odometryPose.x
+        if (pose2D.y.isNaN()) newPose.y = odometryPose.y
+        if (pose2D.heading.isNaN()) newPose.heading = odometryPose.heading
         return newPose
     }
 }

@@ -29,11 +29,7 @@ class Vector3D @JvmOverloads constructor(x: Double = 0.0, y: Double = 0.0, var z
 
     override fun radius() = sqrt(x * x + y * y + z * z)
 
-    fun clampAbs(p2: Vector3D) {
-        x = minAbs(x, p2.x).withSign(x)
-        y = minAbs(y, p2.y).withSign(y)
-        z = minAbs(z, p2.z).withSign(z)
-    }
+    fun clampAbs(p2: Vector3D) = Vector3D(minAbs(x, p2.x).withSign(x),minAbs(y, p2.y).withSign(y),minAbs(z, p2.z).withSign(z))
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
