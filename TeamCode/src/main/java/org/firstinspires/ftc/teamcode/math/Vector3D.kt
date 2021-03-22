@@ -6,7 +6,7 @@ import java.util.*
 import kotlin.math.sqrt
 import kotlin.math.withSign
 
-class Vector3D @JvmOverloads constructor(x: Double = 0.0, y: Double = 0.0, var z: Double = 0.0) : Vector2D(x, y), Cloneable {
+class Vector3D constructor(x: Double = 0.0, y: Double = 0.0, var z: Double = 0.0) : Vector2D(x, y), Cloneable {
     constructor(p: Pose2D) : this(p.x, p.y, p.heading)
     constructor(p: Vector2D?, z: Double) : this(p!!.x, p.y, z)
 

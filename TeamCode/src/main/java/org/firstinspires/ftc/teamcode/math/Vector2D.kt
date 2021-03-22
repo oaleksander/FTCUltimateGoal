@@ -7,7 +7,7 @@ import kotlin.math.atan2
 import kotlin.math.sin
 import kotlin.math.sqrt
 
-open class Vector2D @JvmOverloads constructor(var x: Double = 0.0, var y: Double = 0.0): Cloneable {
+open class Vector2D constructor(var x: Double = 0.0, var y: Double = 0.0): Cloneable {
     fun rotated(angle: Double): Vector2D {
         val sina = Math.sin(angle)
         val cosa = cosFromSin(sina, angle)
