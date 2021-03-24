@@ -13,13 +13,9 @@ class ServoWobbleManipulator : MultithreadedRobotModule(), WobbleManipulator {
     @Config
     object WobbleServoPositions {
         @JvmField var gripperClose = 0.92
-
         @JvmField var gripperOpen = 0.19
-
         @JvmField var angleDown = 0.18
-
         @JvmField var angleMedium = 0.6
-
         @JvmField var angleUp = 1.0
     }
 

@@ -7,11 +7,13 @@ import com.qualcomm.robotcore.util.ElapsedTime
 import org.firstinspires.ftc.teamcode.misc.CommandSender
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.shooter
 import org.firstinspires.ftc.teamcode.superclasses.MultithreadedRobotModule
+import org.firstinspires.ftc.teamcode.superclasses.LedStrip
+import org.firstinspires.ftc.teamcode.superclasses.LedStrip.LedMode
 import kotlin.math.PI
 import kotlin.math.pow
 import kotlin.math.sin
 
-class LedStrip : MultithreadedRobotModule() {
+class LedStrip: MultithreadedRobotModule(), LedStrip {
     private lateinit var ledStrip1: DcMotorEx
     private lateinit var ledStrip2: DcMotorEx
     private val ledTime = ElapsedTime()
@@ -93,10 +95,6 @@ class LedStrip : MultithreadedRobotModule() {
 
     private fun offLed(led: CommandSender) {
         led.send(0.0)
-    }
-
-    enum class LedMode {
-        SMOOTHLY, ON, OFF, INFORMSHOOTER
     }
 
     fun setLedMode(mode: LedMode, ledPower1: Double = 1.0, ledPower2: Double = 1.0, ledTime1: Double = 1500.0, ledTime2: Double = 1500.0) {

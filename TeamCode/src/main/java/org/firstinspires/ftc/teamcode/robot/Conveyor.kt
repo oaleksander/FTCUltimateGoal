@@ -42,17 +42,11 @@ class Conveyor : MultithreadedRobotModule(), Conveyor {
     @Config
     internal object ConveyorConfig {
         @JvmField var ratedConveyorPower = 1.0
-
         @JvmField var motorLockingCurrentTimeout = 800.0
-
         @JvmField var motorLockingReverseTime = 600.0
-
         @JvmField var stackDetectionTimeout = 1000.0
-
         @JvmField var stackDetectionReverseTime = 600.0
-
         @JvmField var distanceThreshold = 5.46
-
         @JvmField var currentThreshold = 4.0
     }
 

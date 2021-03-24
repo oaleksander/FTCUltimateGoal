@@ -32,33 +32,18 @@ class Shooter(private val voltageSupplier: VoltageSupplier) : MultithreadedRobot
     @Config
     internal object ShooterConfig {
         @JvmField var servoTime = 55
-
         @JvmField var servoReturnMultiplier = 3.4
-
         @JvmField var lowRpm = 3300.0
-
         @JvmField var highRpm = 3800.0
-
-        //  @JvmField
-        //  var timeRpm = 150.0
         @JvmField var feederClose = 0.23
-
         @JvmField var feederOpen = 0.49
-
         @JvmField var kP = 186.0
-
-        @JvmField var kI = 1.77 //0.03
-
+        @JvmField var kI = 1.77
         @JvmField var kD = 0.0
-
         @JvmField var kV = 13.56
-
         @JvmField var kA = 1.0
-
         @JvmField var kS = 3000.0
-
         @JvmField var maxI = 16384.0
-
         @JvmField var kV_referenceVoltage = 12.485
     }
 
@@ -74,8 +59,22 @@ class Shooter(private val voltageSupplier: VoltageSupplier) : MultithreadedRobot
     private val feederPositionSender = CommandSender({feeder.position = it})
     private var shooterMode = Shooter.ShooterMode.OFF
     private var ringsToShoot: Int = 0
+    private var currentVelocity = 0.0 /*
     private var timeToAccelerateMs = 1.0
     private var accelerationIncrement = 1.0
+    private var velocityError = 0.0
+    private var velocityErrorOld = 0.0
+    private var D = 0.0
+    private var P = 0.0
+    private var I = 0.0
+    private var V = 0.0
+    private var A = 0.0
+    private var S = 0.0
+    private var power = 0.0
+    private var timeOld = 0.0
+    private var timeDelta = 0.0
+    private var voltageDelta = 0.0
+    private var velocityTargetOld = 0.0 */
     private val maxInt16 = 32767.0
     private val ticksToRpmMultiplier = 2.5
     private val maxRpm: Double
@@ -91,12 +90,12 @@ class Shooter(private val voltageSupplier: VoltageSupplier) : MultithreadedRobot
 
     override fun initialize() {
         shooterMotor = WoENHardware.shooterMotor
-        val motorConfigurationType = shooterMotor.motorType.clone()
+        /*val motorConfigurationType = shooterMotor.motorType.clone()
         motorConfigurationType.achieveableMaxRPMFraction = maxRpm / 6000.0
         motorConfigurationType.ticksPerRev = 24.0
         motorConfigurationType.gearing = 1.0
         motorConfigurationType.maxRPM = 6000.0
-        shooterMotor.motorType = motorConfigurationType
+        shooterMotor.motorType = motorConfigurationType */
         shooterMotor.direction = DcMotorSimple.Direction.FORWARD
         shooterMotor.mode = DcMotor.RunMode.STOP_AND_RESET_ENCODER
         shooterMotor.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
@@ -126,20 +125,6 @@ class Shooter(private val voltageSupplier: VoltageSupplier) : MultithreadedRobot
         setFeederPosition(feederTime.milliseconds() < servoTime && rpmTarget != 0.0)
     }
 
-    private var velocityError = 0.0
-    private var velocityErrorOld = 0.0
-    private var D = 0.0
-    private var P = 0.0
-    private var I = 0.0
-    private var V = 0.0
-    private var A = 0.0
-    private var S = 0.0
-    private var power = 0.0
-    private var timeOld = 0.0
-    private var timeDelta = 0.0
-    private var voltageDelta = 0.0
-    private var velocityTargetOld = 0.0
-    private var currentVelocity = 0.0
     override fun updateExpansionHub() {
 
         //timeDelta = rpmTime.seconds() - timeOld
