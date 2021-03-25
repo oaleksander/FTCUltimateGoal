@@ -168,12 +168,12 @@ class MecanumDrivetrain2 (private val voltageSupplier: VoltageSupplier) : Multit
         targetVelocityRL = limitMinSpeed(targetVelocityRL)
         targetVelocityRR = limitMinSpeed(targetVelocityRR)
 
-        mFLReg.updateRegulator(targetVelocityFL)
-        mFRReg.updateRegulator(targetVelocityFR)
-        mRLReg.updateRegulator(targetVelocityRL)
-        mRRReg.updateRegulator(targetVelocityRR)
+        mFLReg.updateRegulator(targetVelocityFL * radianToEncoder)
+        mFRReg.updateRegulator(targetVelocityFR * radianToEncoder)
+        mRLReg.updateRegulator(targetVelocityRL * radianToEncoder)
+        mRRReg.updateRegulator(targetVelocityRR * radianToEncoder)
     }
-
+    private val radianToEncoder = 76.394372684109761169064206418807
     override fun updateExpansionHub() {
     }
 
