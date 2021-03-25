@@ -18,6 +18,7 @@ import org.firstinspires.ftc.teamcode.robot.MecanumDrivetrain2.DrivetrainConfig.
 import org.firstinspires.ftc.teamcode.robot.MecanumDrivetrain2.DrivetrainConfig.kV
 import org.firstinspires.ftc.teamcode.robot.MecanumDrivetrain2.DrivetrainConfig.kV_referenceVoltage
 import org.firstinspires.ftc.teamcode.robot.MecanumDrivetrain2.DrivetrainConfig.maxI
+import org.firstinspires.ftc.teamcode.robot.MecanumDrivetrain2.DrivetrainConfig.secondsToAccelerate
 import org.firstinspires.ftc.teamcode.superclasses.Drivetrain
 import org.firstinspires.ftc.teamcode.superclasses.MultithreadedRobotModule
 import org.firstinspires.ftc.teamcode.superclasses.VelocityOdometry
@@ -71,16 +72,20 @@ class MecanumDrivetrain2 (private val voltageSupplier: VoltageSupplier) : Multit
 
     /* Motor controllers */
     private val mFLSender = CommandSender({ driveFrontLeft.power = it })
-    private val mFLReg = RegulatorPIDVAS({ mFLSender.send(it)},{measuredVelocityFL}, {voltageSupplier.voltage}, {kP}, {kD}, {kI}, {kV}, {kA}, {kS}, {maxI}, {kV_referenceVoltage})
+    private val mFLProfiler = MotorAccelerationLimiter({ mFLSender.send(it) }, {theoreticalMaxSpeed / secondsToAccelerate / radianToEncoder})
+    private val mFLReg = RegulatorPIDVAS({ mFLProfiler.setVelocity(it)},{measuredVelocityFL}, {voltageSupplier.voltage}, {kP}, {kD}, {kI}, {kV}, {kA}, {kS}, {maxI}, {kV_referenceVoltage})
 
     private val mFRSender = CommandSender({ driveFrontRight.power = it })
-    private val mFRReg = RegulatorPIDVAS({ mFRSender.send(it)},{measuredVelocityFR}, {voltageSupplier.voltage}, {kP}, {kD}, {kI}, {kV}, {kA}, {kS}, {maxI}, {kV_referenceVoltage})
+    private val mFRProfiler = MotorAccelerationLimiter({ mFRSender.send(it)}, {theoreticalMaxSpeed / secondsToAccelerate / radianToEncoder})
+    private val mFRReg = RegulatorPIDVAS({ mFRProfiler.setVelocity(it)},{measuredVelocityFR}, {voltageSupplier.voltage}, {kP}, {kD}, {kI}, {kV}, {kA}, {kS}, {maxI}, {kV_referenceVoltage})
 
     private val mRLSender = CommandSender({ driveRearLeft.power = it })
-    private val mRLReg = RegulatorPIDVAS({ mRLSender.send(it)},{measuredVelocityRL}, {voltageSupplier.voltage}, {kP}, {kD}, {kI}, {kV}, {kA}, {kS}, {maxI}, {kV_referenceVoltage})
+    private val mRLProfiler = MotorAccelerationLimiter({ mRLSender.send(it)}, {theoreticalMaxSpeed / secondsToAccelerate / radianToEncoder})
+    private val mRLReg = RegulatorPIDVAS({ mRLProfiler.setVelocity(it)},{measuredVelocityRL}, {voltageSupplier.voltage}, {kP}, {kD}, {kI}, {kV}, {kA}, {kS}, {maxI}, {kV_referenceVoltage})
 
     private val mRRSender = CommandSender({ driveRearRight.power = it })
-    private val mRRReg = RegulatorPIDVAS({ mRRSender.send(it)},{measuredVelocityRR}, {voltageSupplier.voltage}, {kP}, {kD}, {kI}, {kV}, {kA}, {kS}, {maxI}, {kV_referenceVoltage})
+    private val mRRProfiler = MotorAccelerationLimiter({ mRRSender.send(it)}, {theoreticalMaxSpeed / secondsToAccelerate / radianToEncoder})
+    private val mRRReg = RegulatorPIDVAS({ mRRProfiler.setVelocity(it)},{measuredVelocityRR}, {voltageSupplier.voltage}, {kP}, {kD}, {kI}, {kV}, {kA}, {kS}, {maxI}, {kV_referenceVoltage})
 
     override var targetVelocity = Vector3D(.0, .0, .0)
 
