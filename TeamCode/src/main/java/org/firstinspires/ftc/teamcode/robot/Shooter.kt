@@ -24,9 +24,7 @@ import org.openftc.revextensions2.ExpansionHubServo
 import kotlin.math.abs
 
 class Shooter(private val voltageSupplier: VoltageSupplier) : MultithreadedRobotModule(), Shooter {
-    private val rpmTime = ElapsedTime()
     private val feederTime = ElapsedTime()
-    private val encoderFailureDetectionTime = ElapsedTime()
 
     @Config
     internal object ShooterConfig {
@@ -58,22 +56,7 @@ class Shooter(private val voltageSupplier: VoltageSupplier) : MultithreadedRobot
     private val feederPositionSender = CommandSender({feeder.position = it})
     private var shooterMode = Shooter.ShooterMode.OFF
     private var ringsToShoot: Int = 0
-    private var currentVelocity = 0.0 /*
-    private var timeToAccelerateMs = 1.0
-    private var accelerationIncrement = 1.0
-    private var velocityError = 0.0
-    private var velocityErrorOld = 0.0
-    private var D = 0.0
-    private var P = 0.0
-    private var I = 0.0
-    private var V = 0.0
-    private var A = 0.0
-    private var S = 0.0
-    private var power = 0.0
-    private var timeOld = 0.0
-    private var timeDelta = 0.0
-    private var voltageDelta = 0.0
-    private var velocityTargetOld = 0.0 */
+    private var currentVelocity = 0.0
     private val maxInt16 = 32767.0
     private val ticksToRpmMultiplier = 2.5
     private val maxRpm: Double
@@ -89,19 +72,12 @@ class Shooter(private val voltageSupplier: VoltageSupplier) : MultithreadedRobot
 
     override fun initialize() {
         shooterMotor = WoENHardware.shooterMotor
-        /*val motorConfigurationType = shooterMotor.motorType.clone()
-        motorConfigurationType.achieveableMaxRPMFraction = maxRpm / 6000.0
-        motorConfigurationType.ticksPerRev = 24.0
-        motorConfigurationType.gearing = 1.0
-        motorConfigurationType.maxRPM = 6000.0
-        shooterMotor.motorType = motorConfigurationType */
         shooterMotor.direction = DcMotorSimple.Direction.FORWARD
         shooterMotor.mode = DcMotor.RunMode.STOP_AND_RESET_ENCODER
         shooterMotor.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
         shootingMode = Shooter.ShooterMode.OFF
         initializedservo()
         feederTime.reset()
-        rpmTime.reset()
     }
 
     private fun initializedservo() {
@@ -125,34 +101,9 @@ class Shooter(private val voltageSupplier: VoltageSupplier) : MultithreadedRobot
     }
 
     override fun updateExpansionHub() {
-
-        //timeDelta = rpmTime.seconds() - timeOld
-        //timeOld = rpmTime.seconds()
         currentVelocity = getMotorVelocity()
         currentRpm = currentVelocity * ticksToRpmMultiplier
         shooterRegulator.update(motorVelocityTarget)
-        /*if (motorVelocityTarget != 0.0) {
-            voltageDelta = kV_referenceVoltage / voltageSupplier.voltage
-            velocityError = motorVelocityTarget - currentVelocity
-            P = velocityError * kP
-            D = (velocityError - velocityErrorOld) * kD / timeDelta
-            I += (kI * velocityError) * timeDelta
-            if (abs(I) > maxI) I = sign(I) * maxI
-            V = kV * motorVelocityTarget * voltageDelta
-            A = kA * (motorVelocityTarget - velocityTargetOld) / timeDelta * voltageDelta
-            S = kS * sign(motorVelocityTarget) * voltageDelta
-            power = (P + I + D + V + A + S) / maxInt16
-            velocityErrorOld = velocityError
-            velocityTargetOld = motorVelocityTarget
-        } else {
-            voltageDelta = 0.0
-            velocityError = 0.0
-            power = 0.0
-            velocityErrorOld = 0.0
-            I = 0.0
-            velocityTargetOld = 0.0
-        }
-        shooterPowerSender.send(power)*/
     }
 
     override fun updateOther() {
@@ -162,7 +113,7 @@ class Shooter(private val voltageSupplier: VoltageSupplier) : MultithreadedRobot
         feederPositionSender.send(if (push) ShooterConfig.feederOpen else feederClose)
     }
 
-    private fun setShootersetings(Rpm: Double) {
+    private fun setShooterSetings(Rpm: Double) {
         if (Rpm != rpmTarget) {
             rpmTarget = Rpm
             motorVelocityTarget = rpmTarget * 0.4
@@ -177,9 +128,9 @@ class Shooter(private val voltageSupplier: VoltageSupplier) : MultithreadedRobot
             //if (mode != Shooter.ShooterMode.OFF && shooterMode == Shooter.ShooterMode.OFF) rpmTime.reset()
             shooterMode = mode
             when (mode) {
-                 Shooter.ShooterMode.HIGHGOAL -> setShootersetings(ShooterConfig.highRpm)
-                 Shooter.ShooterMode.POWERSHOT -> setShootersetings(ShooterConfig.lowRpm)
-                 Shooter.ShooterMode.OFF -> setShootersetings(0.0)
+                 Shooter.ShooterMode.HIGHGOAL -> setShooterSetings(ShooterConfig.highRpm)
+                 Shooter.ShooterMode.POWERSHOT -> setShooterSetings(ShooterConfig.lowRpm)
+                 Shooter.ShooterMode.OFF -> setShooterSetings(0.0)
             }
         }
 

@@ -40,8 +40,8 @@ class Diagnostic : LinearOpMode() {
         telemetry.addData("RingDetector", ai.diagnosticRange(ringDetector))
         telemetry.addData("See Servo", "")
         telemetry.update()
-        ai.diagnositcServo(feeder, feederOpen, feederClose)
-        ai.diagnositcServo(leverArm, angleDown, angleUp)
-        ai.diagnositcServo(gripper, gripperOpen, gripperClose)
+        ai.diagnosticServo(feeder, feederOpen, feederClose)
+        ai.diagnosticServo(leverArm, angleDown, angleUp)
+        ai.diagnosticServo(gripper, gripperOpen, gripperClose)
     }
 }

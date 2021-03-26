@@ -27,7 +27,7 @@ import kotlin.math.abs
 import kotlin.math.sign
 
 class MecanumDrivetrain(private val voltageSupplier: VoltageSupplier) : MultithreadedRobotModule(), Drivetrain, VelocityOdometry {
-    /* Motor parameters constatnts. */
+    /* Motor parameters constants. */
     @Config
     internal object DrivetrainConfig {
         @JvmField var achievableMaxVeloictyFraction = 0.885

@@ -15,8 +15,8 @@ import org.firstinspires.ftc.teamcode.opmodes.MovementMacros.MovementMacrosConfi
 import org.firstinspires.ftc.teamcode.opmodes.MovementMacros.MovementMacrosConfig.RingStackApproachOffset
 import org.firstinspires.ftc.teamcode.opmodes.MovementMacros.MovementMacrosConfig.RingStackFirstRingOffset
 import org.firstinspires.ftc.teamcode.opmodes.MovementMacros.MovementMacrosConfig.RingStackFourthRingOffset
-import org.firstinspires.ftc.teamcode.opmodes.MovementMacros.MovementMacrosConfig.RobotYbackLength
-import org.firstinspires.ftc.teamcode.opmodes.MovementMacros.MovementMacrosConfig.RobotYfrontLength
+import org.firstinspires.ftc.teamcode.opmodes.MovementMacros.MovementMacrosConfig.RobotYBackLength
+import org.firstinspires.ftc.teamcode.opmodes.MovementMacros.MovementMacrosConfig.RobotYFrontLength
 import org.firstinspires.ftc.teamcode.opmodes.MovementMacros.MovementMacrosConfig.WobblePlacementOffset
 import org.firstinspires.ftc.teamcode.robot.OpenCVNodeWebcam.StackSize
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.conveyor
@@ -25,7 +25,6 @@ import org.firstinspires.ftc.teamcode.robot.WoENrobot.movement
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.odometry
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.opMode
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.openCVNode
-import org.firstinspires.ftc.teamcode.robot.WoENrobot.runTime
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.shooter
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.spinOnce
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.wobbleManipulator
@@ -57,8 +56,8 @@ object MovementMacros {
         @JvmField var RingStackFirstRingOffset = 5.0
         @JvmField var RingStackFourthRingOffset = -15.0
         @JvmField var ParkLineY = 26.462
-        @JvmField var RobotYbackLength = 29.85498
-        @JvmField var RobotYfrontLength = 37.2
+        @JvmField var RobotYBackLength = 29.85498
+        @JvmField var RobotYFrontLength = 37.2
         @JvmField var ParkingTolerance = 5.0
         //TODO Servo travel times
     }
@@ -87,8 +86,8 @@ object MovementMacros {
         wobbleManipulator.setAngle(WobbleManipulator.Position.MEDIUM)
         val wobblePose = wobblePose
         val error: Vector2D = movement.getError(Pose2D(wobblePose, Double.NaN))
-        movement.followPath(MotionTask(wobblePose.minus(Vector2D(0.0, WobblePlacementOffset.radius()).rotatedCW(error.acot())),
-                                       error.acot() - WobblePlacementOffset.acot()), distanceTolerance = 3.0,
+        movement.followPath(MotionTask(wobblePose.minus(Vector2D(0.0, WobblePlacementOffset.radius()).rotatedCW(error.aCot())),
+                                       error.aCot() - WobblePlacementOffset.aCot()), distanceTolerance = 3.0,
                             angularTolerance = toRadians(3.0))
         val leverServoTimer = ElapsedTime()
         while (movement.pathFollowerIsActive() && opMode.opModeIsActive()) {
@@ -108,9 +107,9 @@ object MovementMacros {
         wobbleManipulator.setAngle(WobbleManipulator.Position.DOWN)
         val wobblePose = partnerWobblePose
         val error: Vector2D = movement.getError(Pose2D(wobblePose, Double.NaN))
-        movement.pos(Pose2D(Double.NaN, Double.NaN, error.acot()), angularTolerance = toRadians(10.0))
-        movement.followPath(MotionTask(wobblePose.minus(Vector2D(0.0, WobblePlacementOffset.radius()).rotatedCW(error.acot())),
-                                       error.acot() - WobblePlacementOffset.acot()), distanceTolerance = 1.5,
+        movement.pos(Pose2D(Double.NaN, Double.NaN, error.aCot()), angularTolerance = toRadians(10.0))
+        movement.followPath(MotionTask(wobblePose.minus(Vector2D(0.0, WobblePlacementOffset.radius()).rotatedCW(error.aCot())),
+                                       error.aCot() - WobblePlacementOffset.aCot()), distanceTolerance = 1.5,
                             angularTolerance = toRadians(1.0))
         while (movement.pathFollowerIsActive() && opMode.opModeIsActive()) {
             if (movement.getError(Pose2D(wobblePose, Double.NaN)).radius() < 75) wobbleManipulator.setAngle(
@@ -147,7 +146,7 @@ object MovementMacros {
     private val highGoalShootingPose: Pose2D
         get() {
             val error = movement.getError(Pose2D(highGoalPose, Double.NaN))
-            val angle = Range.clip(error.acot(), toRadians(-13.0), toRadians(13.0))
+            val angle = Range.clip(error.aCot(), toRadians(-13.0), toRadians(13.0))
             return Pose2D(highGoalPose - Vector2D(0.0, HighGoalShootingDistance).rotatedCW(angle),
                           angle + toRadians(HighGoalShootingAngle))
         }
@@ -189,19 +188,19 @@ object MovementMacros {
     }
 
     private fun powerShotShootingPose(powerShot: PowerShot): Pose2D {
-        val heading = Range.clip(movement.getError(Pose2D(powerShotPose(PowerShot.MEDIUM), Double.NaN)).acot(), toRadians(-17.0),
+        val heading = Range.clip(movement.getError(Pose2D(powerShotPose(PowerShot.MEDIUM), Double.NaN)).aCot(), toRadians(-17.0),
                                  toRadians(17.0))
         val shootingCoordinates = powerShotPose(PowerShot.MEDIUM).minus(Vector2D(0.0, PowerShotShootingDistance).rotatedCW(heading))
         return when (powerShot) {
              PowerShot.LEFT -> Pose2D(shootingCoordinates,
                                       heading + toRadians(PowerShotShootingAngle) + powerShotPose(PowerShot.LEFT).minus(
-                                           shootingCoordinates).acot() - powerShotPose(PowerShot.MEDIUM).minus(shootingCoordinates)
-                                           .acot())
+                                           shootingCoordinates).aCot() - powerShotPose(PowerShot.MEDIUM).minus(shootingCoordinates)
+                                           .aCot())
              PowerShot.MEDIUM -> Pose2D(shootingCoordinates, heading + toRadians(PowerShotShootingAngle))
              PowerShot.RIGHT -> Pose2D(shootingCoordinates,
                                        heading + toRadians(PowerShotShootingAngle) + powerShotPose(PowerShot.RIGHT).minus(
-                                            shootingCoordinates).acot() - powerShotPose(PowerShot.MEDIUM).minus(shootingCoordinates)
-                                            .acot())
+                                            shootingCoordinates).aCot() - powerShotPose(PowerShot.MEDIUM).minus(shootingCoordinates)
+                                            .aCot())
         }
     }
 
@@ -272,7 +271,7 @@ object MovementMacros {
         get() = Vector2D(90.3747 * xSign - 7.0, -56.9019)
 
     fun pickupRings(pickWobbleBetweenRings: Boolean = false) {
-        val heading = movement.getError(Pose2D(ringStackPose, Double.NaN)).acot()
+        val heading = movement.getError(Pose2D(ringStackPose, Double.NaN)).aCot()
         when (openCVNode.stackSize) {
              StackSize.FOUR -> {
                   movement.pos(Pose2D(ringStackPose - Vector2D(0.0, RingStackApproachOffset).rotatedCW(heading), heading + PI),
@@ -309,11 +308,11 @@ object MovementMacros {
 
     fun park() {
         if (odometry.robotCoordinates.y > ParkLineY) {
-            movement.pos(Pose2D(89.6372 * xSign + 67.3092 * sideSign, ParkLineY + RobotYbackLength - ParkingTolerance, 0.0),
+            movement.pos(Pose2D(89.6372 * xSign + 67.3092 * sideSign, ParkLineY + RobotYBackLength - ParkingTolerance, 0.0),
                          distanceTolerance = ParkingTolerance, angularTolerance = toRadians(5.0))
         } else {
             wobbleManipulator.setAngle(WobbleManipulator.Position.MEDIUM)
-            movement.pos(Pose2D(89.6372 * xSign + 67.3092 * sideSign, ParkLineY - RobotYfrontLength + ParkingTolerance, 0.0),
+            movement.pos(Pose2D(89.6372 * xSign + 67.3092 * sideSign, ParkLineY - RobotYFrontLength + ParkingTolerance, 0.0),
                          distanceTolerance = ParkingTolerance, angularTolerance = toRadians(5.0))
             delay(20.0)
         }
@@ -322,7 +321,7 @@ object MovementMacros {
     /*
         @Deprecated("")
         fun shootTargets() {
-            //shooter.setShootersetings(3850, 500);
+            //shooter.setShooterSettings(3850, 500);
             shooter.shootingMode = rpm.ShooterMode.HIGHGOAL
             if (sideSign.toInt() == 1 && xSign.toInt() == 1)
                 movement.pos(Pose2D((xSign * 121).toDouble(), -48.5, toRadians(-8.5)))

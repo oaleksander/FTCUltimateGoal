@@ -2,13 +2,10 @@ package org.firstinspires.ftc.teamcode.opmodes
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
-import org.firstinspires.ftc.teamcode.math.Pose2D
 import org.firstinspires.ftc.teamcode.misc.ButtonSwitch
 import org.firstinspires.ftc.teamcode.misc.SinglePressButton
 import org.firstinspires.ftc.teamcode.robot.WoENrobot
-import org.firstinspires.ftc.teamcode.robot.WoENrobot.forceInitRobot
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.movement
-import org.firstinspires.ftc.teamcode.robot.WoENrobot.odometry
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.shooter
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.startRobot
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.wobbleManipulator
@@ -40,7 +37,7 @@ class TeleOp_test : LinearOpMode() {
             if(!movement.pathFollowerIsActive()) {
                 /* Wobble */
                 wobbleManipulator.grabWobble(grabWobbleSwitch.get())
-                wobbleManipulator.upmediumdown(gamepad1.y, gamepad1.x) // correct
+                wobbleManipulator.upMediumDown(gamepad1.y, gamepad1.x) // correct
                 /* Conveyor */
                 WoENrobot.conveyor.enableConveyor = conveyorOnOffSwitch.get()
                 /* Shooter */

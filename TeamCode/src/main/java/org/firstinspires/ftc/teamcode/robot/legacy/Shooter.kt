@@ -22,27 +22,16 @@ class Shooter : MultithreadedRobotModule(), Shooter {
     @Disabled
     internal object ShooterConfigOld {
         @JvmField var servoTime = 137.0
-
         @JvmField var servoReturnMultiplier = 2.6
-
         @JvmField var lowRpm = 3470.0
-
         @JvmField var highRpm = 4000.0
-
         @JvmField var timeRpm = 150.0
-
         @JvmField var feederClose = 0.225
-
         @JvmField var feederOpen = 0.48
-
         @JvmField var kP = 58.0
-
         @JvmField var kI = 0.001 //0.03
-
         @JvmField var kD = 0.05
-
         @JvmField var kF = 14.89
-
         @JvmField var kF_referenceVoltage = 12.485
     }
 

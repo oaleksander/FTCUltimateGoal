@@ -8,10 +8,10 @@ class VoltageSupplier: MultithreadedRobotModule(), VoltageSupplier{
     private val defaultVoltage = 12.0
     override var voltage: Double = defaultVoltage
 
-    lateinit var volageSensor: VoltageSensor
+    lateinit var voltageSensor: VoltageSensor
 
     override fun initialize() {
-        volageSensor = WoENHardware.controlHubVoltageSensor
+        voltageSensor = WoENHardware.controlHubVoltageSensor
     }
 
     override fun updateControlHub() {
@@ -20,6 +20,6 @@ class VoltageSupplier: MultithreadedRobotModule(), VoltageSupplier{
         TODO Rolling average
         TODO Query timeout
          */
-        voltage = volageSensor.voltage
+        voltage = voltageSensor.voltage
     }
 }

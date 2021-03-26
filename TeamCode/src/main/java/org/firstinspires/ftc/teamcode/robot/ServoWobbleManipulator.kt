@@ -34,8 +34,8 @@ class ServoWobbleManipulator : MultithreadedRobotModule(), WobbleManipulator {
         anglePositionSender.send(leverArmPosition)
     }
 
-    override fun grabWobble(dograb: Boolean) {
-        gripperPosition = if (dograb) WobbleServoPositions.gripperClose else WobbleServoPositions.gripperOpen
+    override fun grabWobble(doGrab: Boolean) {
+        gripperPosition = if (doGrab) WobbleServoPositions.gripperClose else WobbleServoPositions.gripperOpen
     }
 
     override fun start() {
@@ -53,10 +53,10 @@ class ServoWobbleManipulator : MultithreadedRobotModule(), WobbleManipulator {
     override fun updateOther() {
     }
 
-    override fun upmediumdown(upmedium: Boolean, updown: Boolean) {
-        if (upmedium && !updown) {
+    override fun upMediumDown(upMedium: Boolean, upDown: Boolean) {
+        if (upMedium && !upDown) {
             setAngle(WobbleManipulator.Position.UP)
-        } else if (updown && !upmedium) {
+        } else if (upDown && !upMedium) {
             if (!isDown) {
                 isDown = true
                 if (posAngle != WobbleManipulator.Position.MEDIUM) setAngle(WobbleManipulator.Position.MEDIUM) else setAngle(

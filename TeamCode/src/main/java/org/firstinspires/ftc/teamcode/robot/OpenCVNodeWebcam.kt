@@ -62,9 +62,7 @@ open class OpenCVNodeWebcam : RobotModule() {
     }
 
     @Volatile var stackSize = StackSize.ZERO
-
     @Volatile var mean = 0.0
-
     @Volatile var aspectRatio = 0.0
 
     enum class StackSize {

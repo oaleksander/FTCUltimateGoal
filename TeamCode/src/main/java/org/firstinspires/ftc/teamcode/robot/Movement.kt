@@ -204,7 +204,7 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
     }
 
     fun setMinLinearVelocityFraction(minLinearVelocityFraction: Double) {
-        MovementConfig.antiWindupFraction_distance = minLinearVelocityFraction
+        antiWindupFraction_distance = minLinearVelocityFraction
     }
 
     fun setMaxAngleVelocityFraction(maxAngleVelocityFraction: Double) {
@@ -212,7 +212,7 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
     }
 
     fun setMinAngleVelocityFraction(minAngleVelocityFraction: Double) {
-        MovementConfig.antiWindupFraction_angle = minAngleVelocityFraction
+        antiWindupFraction_angle = minAngleVelocityFraction
     }
 
     private val moveControllerTimer = ElapsedTime()
@@ -277,7 +277,7 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
         val a = originPoint.y - targetPoint.y
         val b = targetPoint.x - originPoint.x
         val c = originPoint.x * targetPoint.y - originPoint.y * targetPoint.x
-        var angle = MathUtil.angleWrap((targetPoint - originPoint).acot())
+        var angle = MathUtil.angleWrap((targetPoint - originPoint).aCot())
         val lookAheadPoint = Vector2D((b * (b * robotPosition.x - a * robotPosition.y) - a * c) / (a * a + b * b),
                                       (a * (-b * robotPosition.x + a * robotPosition.y) - b * c) / (a * a + b * b)) + Vector2D(0.0,
                                                                                                                                lookaheadRadius).rotatedCW(

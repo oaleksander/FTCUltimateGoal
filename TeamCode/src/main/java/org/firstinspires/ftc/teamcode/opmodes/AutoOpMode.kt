@@ -36,7 +36,7 @@ open class AutoOpMode : LinearOpMode() {
         setLedColors(color.x.toInt(), color.y.toInt(), color.z.toInt())
         val indicator = if (runTime.seconds() % 1 > 0.5) if (runTime.seconds() % 1 > 0.75) "/" else "|" else if (runTime.seconds() % 1 > 0.25) "—" else "\\"
         telemetry.addLine(
-            "Use gamedad 1 X/B to select alliance color, dpad L/R to select alliance side, dpad UP/DOWN to change starting delay. $indicator")
+            "Use gamepad 1 X/B to select alliance color, dpad L/R to select alliance side, dpad UP/DOWN to change starting delay. $indicator")
         xSign = if (gamepad1.b) 1 else if (gamepad1.x) -1 else xSign
         sideSign = if (gamepad1.dpad_right || gamepad1.left_stick_x > 0.5) 1 else if (gamepad1.dpad_left || gamepad1.left_stick_x < -0.5) -1 else sideSign
         delayAtStart = Range.clip(

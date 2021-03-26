@@ -45,11 +45,11 @@ class ThreeWheelOdometry : MultithreadedRobotModule(), Odometry {
     private lateinit var odometerYL: Encoder
     private lateinit var odometerYR: Encoder
     private lateinit var odometerX: Encoder
-    private val endoderCPR = 8192.0
-    private var odometryWheelDiameterCm = OdometryConfig.forwardMultiplier * 4.8
-    private var odometryCountsPerCM = endoderCPR / (odometryWheelDiameterCm * Math.PI)
-    private var encoderCMPerCounts = odometryWheelDiameterCm * Math.PI / endoderCPR
-    private var odometerXcenterOffset = -18.15937 * cos(Math.toRadians(84.9452)) //* odometryCountsPerCM?
+    private val encoderCPR = 8192.0
+    private var odometerWheelDiameterCm = OdometryConfig.forwardMultiplier * 4.8
+    private var odometerCountsPerCM = encoderCPR / (odometerWheelDiameterCm * Math.PI)
+    private var encoderCMPerCounts = odometerWheelDiameterCm * Math.PI / encoderCPR
+    private var odometerXCenterOffset = -18.15937 * cos(Math.toRadians(84.9452)) //* odometerCountsPerCM?
     private var radiansPerEncoderDifference = OdometryConfig.headingMultiplier * (encoderCMPerCounts / (yWheelPairRadiusCm * 2.0))
     private var imuOffset1 = 0f
     private var imuOffset2 = 0f
@@ -132,13 +132,13 @@ class ThreeWheelOdometry : MultithreadedRobotModule(), Odometry {
 
     private fun calculatePosition() {
         val deltaHeading = MathUtil.angleWrap(calculateHeading() - robotCoordinates.heading)
-        var deltaPosition = Vector2D(encoderTicksToDistance(odometerX.currentPosition - xOld) - deltaHeading * odometerXcenterOffset,
+        var deltaPosition = Vector2D(encoderTicksToDistance(odometerX.currentPosition - xOld) - deltaHeading * odometerXCenterOffset,
                                      (encoderTicksToDistance(odometerYL.currentPosition - ylOld) + encoderTicksToDistance(
                                           odometerYR.currentPosition - yrOld)) * 0.5)
         if (deltaHeading != 0.0) {   //if deltaAngle = 0 radius of the arc is = Inf which causes model degeneracy
             val arcAngle = deltaHeading * 2
             val arcRadius = deltaPosition.radius() / arcAngle
-            deltaPosition = Vector2D(arcRadius * (1 - cos(arcAngle)), arcRadius * sin(arcAngle)).rotatedCW(deltaPosition.acot())
+            deltaPosition = Vector2D(arcRadius * (1 - cos(arcAngle)), arcRadius * sin(arcAngle)).rotatedCW(deltaPosition.aCot())
         }
         robotCoordinates = robotCoordinates.plus(Pose2D(deltaPosition.rotatedCW(robotCoordinates.heading), deltaHeading))
         ylOld = odometerYL.currentPosition
@@ -147,8 +147,8 @@ class ThreeWheelOdometry : MultithreadedRobotModule(), Odometry {
     }
     private fun calculateVelocity() {
         val angularVelocity = encoderDifferenceToAngle(currentYLVelocity, currentYRVelocity)
-        robotVelocity = Vector3D(Vector2D(encoderTicksToDistance((currentXVelocity.toInt())) - angularVelocity * odometerXcenterOffset,
-                                 encoderTicksToDistance((currentYLVelocity + currentYRVelocity).toInt() / 2)), angularVelocity).rotatedCW(
+        robotVelocity = Vector3D(Vector2D(encoderTicksToDistance((currentXVelocity.toInt())) - angularVelocity * odometerXCenterOffset,
+                                          encoderTicksToDistance((currentYLVelocity + currentYRVelocity).toInt() / 2)), angularVelocity).rotatedCW(
             robotCoordinates.heading)
     }
 
@@ -156,10 +156,10 @@ class ThreeWheelOdometry : MultithreadedRobotModule(), Odometry {
         doUseIMULocal = OdometryConfig.doUseIMU
         if (doUseIMULocal) initIMU()
         radiansPerEncoderDifference = OdometryConfig.headingMultiplier * (encoderCMPerCounts / (yWheelPairRadiusCm * 2.0))
-        odometryWheelDiameterCm = OdometryConfig.forwardMultiplier * 4.8
-        odometryCountsPerCM = endoderCPR / (odometryWheelDiameterCm * Math.PI)
-        encoderCMPerCounts = odometryWheelDiameterCm * Math.PI / endoderCPR
-        //odometerXcenterOffset = -21.7562349 * odometryCountsPerCM * cos(Math.toRadians(51.293002))
+        odometerWheelDiameterCm = OdometryConfig.forwardMultiplier * 4.8
+        odometerCountsPerCM = encoderCPR / (odometerWheelDiameterCm * Math.PI)
+        encoderCMPerCounts = odometerWheelDiameterCm * Math.PI / encoderCPR
+        //odometerXCenterOffset = -21.7562349 * odometerCountsPerCM * cos(Math.toRadians(51.293002))
         WoENHardware.odometerYL.let {
             odometerYL = Encoder(it, Encoder.Direction.REVERSE)
             it.mode = DcMotor.RunMode.STOP_AND_RESET_ENCODER

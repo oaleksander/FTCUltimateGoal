@@ -29,7 +29,7 @@ class TeleOp_Single : LinearOpMode() {
         while (opModeIsActive()) {
             /* Wobble */
             wobbleManipulator.grabWobble(grabWobbleSwitch.get())
-            wobbleManipulator.upmediumdown(gamepad1.y, gamepad1.x) // correct
+            wobbleManipulator.upMediumDown(gamepad1.y, gamepad1.x) // correct
             /* Conveyor */
             conveyor.enableConveyor = conveyorOnOffSwitch.get()
             /* Shooter */

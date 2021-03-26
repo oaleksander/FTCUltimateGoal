@@ -9,15 +9,15 @@ import kotlin.math.sqrt
 
 open class Vector2D constructor(var x: Double = 0.0, var y: Double = 0.0): Cloneable {
     fun rotated(angle: Double): Vector2D {
-        val sina = Math.sin(angle)
-        val cosa = cosFromSin(sina, angle)
-        return Vector2D(x * cosa - y * sina, x * sina + y * cosa)
+        val sinA = sin(angle)
+        val cosA = cosFromSin(sinA, angle)
+        return Vector2D(x * cosA - y * sinA, x * sinA + y * cosA)
     }
 
     open fun rotatedCW(angle: Double): Vector2D {
-        val sina = sin(angle)
-        val cosa = cosFromSin(sina, angle)
-        return Vector2D(x * cosa + y * sina, -x * sina + y * cosa)
+        val sinA = sin(angle)
+        val cosA = cosFromSin(sinA, angle)
+        return Vector2D(x * cosA + y * sinA, -x * sinA + y * cosA)
     }
 
     open fun normalize(): Vector2D {
@@ -35,9 +35,9 @@ open class Vector2D constructor(var x: Double = 0.0, var y: Double = 0.0): Clone
         return Vector2D(x - p.x, y - p.y)
     }
 
-    fun atan() = atan2(y, x)
+    fun aTan() = atan2(y, x)
 
-    fun acot() = atan2(x, y)
+    fun aCot() = atan2(x, y)
 
     open fun radius() = sqrt(x * x + y * y)
 

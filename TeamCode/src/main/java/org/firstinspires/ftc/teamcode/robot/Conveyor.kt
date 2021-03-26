@@ -51,22 +51,22 @@ class Conveyor : MultithreadedRobotModule(), Conveyor {
     }
 
     override fun initialize() {
-        initializecolor()
-        initializedrive()
+        initializeColor()
+        initializeDrive()
     }
 
-    private fun initializecolor() {
+    private fun initializeColor() {
         sensorDistance = ringDetector
     }
 
-    private fun initializedrive() {
+    private fun initializeDrive() {
         conveyor = conveyorMotor
         conveyor.direction = DcMotorSimple.Direction.REVERSE //Should be intaking rings at +1.0
         conveyor.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
     }
 
 
-    private fun getdistance(): Double {
+    private fun getDistance(): Double {
         if (distanceQueryTimer.milliseconds() > distanceQueryTimeout) {
             lastKnownDistance = sensorDistance.getDistance(DistanceUnit.CM)
             distanceQueryTimer.reset()
@@ -85,7 +85,7 @@ class Conveyor : MultithreadedRobotModule(), Conveyor {
         }
 
     override fun updateControlHub() {
-        if (!forceReverse && !(reverseBeforeStop && !enableConveyor) && enableFullStackStopping) if (getdistance() >= ConveyorConfig.distanceThreshold) {
+        if (!forceReverse && !(reverseBeforeStop && !enableConveyor) && enableFullStackStopping) if (getDistance() >= ConveyorConfig.distanceThreshold) {
             stackDetectionTimer.reset() //Full collector detection
         }
     }

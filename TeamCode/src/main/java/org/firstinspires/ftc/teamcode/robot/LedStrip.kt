@@ -67,12 +67,12 @@ class LedStrip: MultithreadedRobotModule(), LedStrip {
         }
     }
 
-    private fun smoothyLed(led: CommandSender, time: Double = 1500.0, maxPower: Double = 1.0) {
+    private fun smoothLed(led: CommandSender, time: Double = 1500.0, maxPower: Double = 1.0) {
         val x = if (time != 0.0) PI / time else 1.0
         led.send(sin(ledTime.milliseconds() * x).pow(2) * maxPower)
     }
 
-    private fun infromLed() {
+    private fun informLed() {
         when {
             shooter.currentRpm == 0.0 -> {
                 setPowerLed1.send(0.0)
@@ -103,10 +103,10 @@ class LedStrip: MultithreadedRobotModule(), LedStrip {
                   onLed(setPowerLed1, ledPower1)
                   onLed(setPowerLed2, ledPower2)
              }
-             LedMode.INFORMSHOOTER -> infromLed()
+             LedMode.INFORMSHOOTER -> informLed()
              LedMode.SMOOTHLY -> {
-                  smoothyLed(setPowerLed1, ledTime1, ledPower1)
-                  smoothyLed(setPowerLed2, ledTime2, ledPower2)
+                  smoothLed(setPowerLed1, ledTime1, ledPower1)
+                  smoothLed(setPowerLed2, ledTime2, ledPower2)
              }
              LedMode.OFF -> {
                   offLed(setPowerLed1)
