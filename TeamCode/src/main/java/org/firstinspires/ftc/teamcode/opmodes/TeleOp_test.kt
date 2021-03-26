@@ -33,6 +33,7 @@ class TeleOp_test : LinearOpMode() {
         while (opModeIsActive()) {
             /* Auto Shooting */
             if(autoShootingPresser.get()) {
+                movement.doActiveBraking = true
                 if (movement.pathFollowerIsActive()) movement.stopPathFollowing()
                 else MovementMacros.shootHighGoalAsync()
             }
@@ -51,6 +52,7 @@ class TeleOp_test : LinearOpMode() {
                 if (threeRingPresser.get()) shooter.feedRings()
             }
             /* Drivetrain */
+            movement.doActiveBraking = false
             movement.humanSetVelocity(gamepad1.left_stick_x.toDouble(), -gamepad1.left_stick_y.toDouble(),
                                       if (gamepad1.right_bumper) 0.25 else gamepad1.right_trigger.toDouble() - if (gamepad1.left_bumper) 0.25 else gamepad1.left_trigger.toDouble())
         }

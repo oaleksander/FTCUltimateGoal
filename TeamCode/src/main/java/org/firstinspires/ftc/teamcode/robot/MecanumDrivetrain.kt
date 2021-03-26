@@ -1,62 +1,68 @@
 package org.firstinspires.ftc.teamcode.robot
 
 import com.acmerobotics.dashboard.config.Config
-import com.qualcomm.robotcore.eventloop.opmode.Disabled
-import com.qualcomm.robotcore.hardware.DcMotor.RunMode
-import com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior
+import com.qualcomm.robotcore.hardware.DcMotor
 import com.qualcomm.robotcore.hardware.DcMotorEx
 import com.qualcomm.robotcore.hardware.DcMotorSimple
 import com.qualcomm.robotcore.hardware.PIDFCoefficients
-import com.qualcomm.robotcore.hardware.VoltageSensor
-import com.qualcomm.robotcore.util.Range
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.firstinspires.ftc.teamcode.math.Vector2D
 import org.firstinspires.ftc.teamcode.math.Vector3D
 import org.firstinspires.ftc.teamcode.misc.CommandSender
-import org.firstinspires.ftc.teamcode.misc.MotorAccelerationLimiter
+import org.firstinspires.ftc.teamcode.misc.RegulatorPIDVAS
+import org.firstinspires.ftc.teamcode.robot.MecanumDrivetrain.DrivetrainConfig.kA
+import org.firstinspires.ftc.teamcode.robot.MecanumDrivetrain.DrivetrainConfig.kD
+import org.firstinspires.ftc.teamcode.robot.MecanumDrivetrain.DrivetrainConfig.kI
+import org.firstinspires.ftc.teamcode.robot.MecanumDrivetrain.DrivetrainConfig.kP
+import org.firstinspires.ftc.teamcode.robot.MecanumDrivetrain.DrivetrainConfig.kS
+import org.firstinspires.ftc.teamcode.robot.MecanumDrivetrain.DrivetrainConfig.kV
+import org.firstinspires.ftc.teamcode.robot.MecanumDrivetrain.DrivetrainConfig.kV_referenceVoltage
+import org.firstinspires.ftc.teamcode.robot.MecanumDrivetrain.DrivetrainConfig.maxI
+import org.firstinspires.ftc.teamcode.robot.MecanumDrivetrain.DrivetrainConfig.motorControllerMode
 import org.firstinspires.ftc.teamcode.superclasses.Drivetrain
 import org.firstinspires.ftc.teamcode.superclasses.MultithreadedRobotModule
 import org.firstinspires.ftc.teamcode.superclasses.VelocityOdometry
 import org.firstinspires.ftc.teamcode.superclasses.VoltageSupplier
+import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.sign
-//@Deprecated("")
+
 class MecanumDrivetrain(private val voltageSupplier: VoltageSupplier) : MultithreadedRobotModule(), Drivetrain, VelocityOdometry {
     /* Motor parameters constatnts. */
     @Config
-   // @Disabled
     internal object DrivetrainConfig {
-        @JvmField var achieveableMaxRPMFraction = 0.885
-        @JvmField var achieveableMinRPMFraction = 0.045
+        @JvmField var achievableMaxVeloictyFraction = 0.885
+        @JvmField var achievableMinVelocityFraction = 0.045
         @JvmField var strafingMultiplier = 1.25
-        @JvmField var rotationDecrepancy = 1.0
+        @JvmField var rotationDiscrepancy = 1.0
+        @JvmField var motorControllerMode = MotorControllerMode.EXTERNAL_PID
         @JvmField var secondsToAccelerate = 0.10
         @JvmField var kP = 45.0
         @JvmField var kD = 0.0
         @JvmField var kI = 0.05
-        @JvmField var kF = 15.10
-        @JvmField var kF_referenceVoltage = 13.0
+        @JvmField var kV = 15.10
+        @JvmField var kA = 0.0
+        @JvmField var kS = 0.0
+        @JvmField var maxI = 60000000000.0
+        @JvmField var kV_referenceVoltage = 13.0
     }
 
     /* Physical constants */
-    private val wheelRadius = 9.8 / 2
-    private val gearRatio = 17.0 / 13.0
+    private val wheelRadius = 9.8 / 2.0
+    private val gearRatio = (1.0 / 20.0) * (17.0 / 13.0)
+    private val maxRPM = 6000.0
+    private val encoderCPR = 24
+    private val radiansToEncoderTicksMultiplier = encoderCPR / (PI * 2)
     private val wheelCenterOffset = Vector2D(18.05253, 15.20000)
-    private val forwardMultiplier = (1 / wheelRadius) / gearRatio
-    private var sidewaysMultiplier = forwardMultiplier * DrivetrainConfig.strafingMultiplier
-    private var turnMultiplier = (wheelCenterOffset.x + wheelCenterOffset.y) * DrivetrainConfig.rotationDecrepancy / wheelRadius
-    private val tickPerRev = 480.0
-    private val gearing = 20.0
-    private val maxRPM = 300.0
-    private val theoreticalMaxSpeed = maxRPM / 60 * Math.PI * 2
-    private var maxMotorVelocity = DrivetrainConfig.achieveableMaxRPMFraction * theoreticalMaxSpeed
-        set(value) {
-            field = Range.clip(abs(value), 0.0, theoreticalMaxSpeed)
-        }
-    private var minMotorVelocity = DrivetrainConfig.achieveableMinRPMFraction * theoreticalMaxSpeed //http://b1-srv-kms-1.sch239.net:8239
-        set(value) {
-            field = Range.clip(abs(value), 0.0, theoreticalMaxSpeed)
-        }
+    private val forwardMultiplier = radiansToEncoderTicksMultiplier / (wheelRadius * gearRatio)
+    private val theoreticalMaxTickVelocity = (maxRPM / 60.0) * encoderCPR
+    private val sidewaysMultiplier
+        get() = forwardMultiplier * DrivetrainConfig.strafingMultiplier
+    private val turnMultiplier
+        get() = radiansToEncoderTicksMultiplier * (wheelCenterOffset.x + wheelCenterOffset.y) * DrivetrainConfig.rotationDiscrepancy / wheelRadius
+    private val maxMotorTickVelocity
+        get() = DrivetrainConfig.achievableMaxVeloictyFraction * theoreticalMaxTickVelocity
+    private val minMotorTickVelocity
+        get() = DrivetrainConfig.achievableMinVelocityFraction * theoreticalMaxTickVelocity
 
     /* Drivetrain hardware members. */
     private lateinit var driveFrontLeft: DcMotorEx
@@ -64,64 +70,84 @@ class MecanumDrivetrain(private val voltageSupplier: VoltageSupplier) : Multithr
     private lateinit var driveRearLeft: DcMotorEx
     private lateinit var driveRearRight: DcMotorEx
 
-    private var maxAcceleration = theoreticalMaxSpeed / DrivetrainConfig.secondsToAccelerate
-
     /* Motor controllers */
-    private val mFLSender = CommandSender({ driveFrontLeft.setVelocity(it, AngleUnit.RADIANS) })
-    private val mFLProfiler = MotorAccelerationLimiter({ mFLSender.send(it) }, {theoreticalMaxSpeed / DrivetrainConfig.secondsToAccelerate})
-    private val mFLDirectSender = CommandSender({ driveFrontLeft.power = it })
+    private val mFLPowerSender = CommandSender({ driveFrontLeft.power = it })
+    private val mFLVelocitySender = CommandSender({ driveFrontLeft.velocity = it })
 
-    private val mFRSender = CommandSender({ driveFrontRight.setVelocity(it, AngleUnit.RADIANS) })
-    private val mFRProfiler = MotorAccelerationLimiter({ mFRSender.send(it) }, {theoreticalMaxSpeed / DrivetrainConfig.secondsToAccelerate})
-    private val mFRDirectSender = CommandSender({ driveFrontRight.power = it })
+    //private val mFLProfiler = MotorAccelerationLimiter({ mFLSender.send(it) }, {theoreticalMaxTickVelocity / secondsToAccelerate})
+    private val mFLReg = RegulatorPIDVAS({ mFLPowerSender.send(it) }, { measuredVelocityFL }, { voltageSupplier.voltage },
+                                         { if (motorControllerMode == MotorControllerMode.EXTERNAL_PID) kP else 0.0 },
+                                         { if (motorControllerMode == MotorControllerMode.EXTERNAL_PID) kI else 0.0 },
+                                         { if (motorControllerMode == MotorControllerMode.EXTERNAL_PID) kD else 0.0 }, { kV }, { kA },
+                                         { kS }, { maxI }, { kV_referenceVoltage })
 
-    private val mRLSender = CommandSender({ driveRearLeft.setVelocity(it, AngleUnit.RADIANS) })
-    private val mRLProfiler = MotorAccelerationLimiter({ mRLSender.send(it) }, {theoreticalMaxSpeed / DrivetrainConfig.secondsToAccelerate})
-    private val mRLDirectSender = CommandSender({ driveRearLeft.power = it })
+    private val mFRPowerSender = CommandSender({ driveFrontRight.power = it })
+    private val mFRVelocitySender = CommandSender({ driveFrontRight.velocity = it })
 
-    private val mRRSender = CommandSender({ driveRearRight.setVelocity(it, AngleUnit.RADIANS) })
-    private val mRRProfiler = MotorAccelerationLimiter({ mRRSender.send(it) }, {theoreticalMaxSpeed / DrivetrainConfig.secondsToAccelerate})
-    private val mRRDirectSender = CommandSender({ driveRearRight.power = it })
+    //  private val mFRProfiler = MotorAccelerationLimiter({ mFRSender.send(it)}, {theoreticalMaxTickVelocity / secondsToAccelerate})
+    private val mFRReg = RegulatorPIDVAS({ mFRPowerSender.send(it) }, { measuredVelocityFR }, { voltageSupplier.voltage },
+                                         { if (motorControllerMode == MotorControllerMode.EXTERNAL_PID) kP else 0.0 },
+                                         { if (motorControllerMode == MotorControllerMode.EXTERNAL_PID) kI else 0.0 },
+                                         { if (motorControllerMode == MotorControllerMode.EXTERNAL_PID) kD else 0.0 }, { kV }, { kA },
+                                         { kS }, { maxI }, { kV_referenceVoltage })
 
-    private lateinit var voltageSensor: VoltageSensor
-    private var smartMode = false
+    private val mRLPowerSender = CommandSender({ driveRearLeft.power = it })
+    private val mRLVelocitySender = CommandSender({ driveRearLeft.velocity = it })
+
+    // private val mRLProfiler = MotorAccelerationLimiter({ mRLSender.send(it)}, {theoreticalMaxTickVelocity / secondsToAccelerate})
+    private val mRLReg = RegulatorPIDVAS({ mRLPowerSender.send(it) }, { measuredVelocityRL }, { voltageSupplier.voltage },
+                                         { if (motorControllerMode == MotorControllerMode.EXTERNAL_PID) kP else 0.0 },
+                                         { if (motorControllerMode == MotorControllerMode.EXTERNAL_PID) kI else 0.0 },
+                                         { if (motorControllerMode == MotorControllerMode.EXTERNAL_PID) kD else 0.0 }, { kV }, { kA },
+                                         { kS }, { maxI }, { kV_referenceVoltage })
+
+    private val mRRPowerSender = CommandSender({ driveRearRight.power = it })
+    private val mRRVelocitySender = CommandSender({ driveRearRight.velocity = it })
+
+    // private val mRRProfiler = MotorAccelerationLimiter({ mRRSender.send(it)}, {theoreticalMaxTickVelocity / secondsToAccelerate})
+    private val mRRReg = RegulatorPIDVAS({ mRRVelocitySender.send(it) }, { measuredVelocityRR }, { voltageSupplier.voltage },
+                                         { if (motorControllerMode == MotorControllerMode.EXTERNAL_PID) kP else 0.0 },
+                                         { if (motorControllerMode == MotorControllerMode.EXTERNAL_PID) kI else 0.0 },
+                                         { if (motorControllerMode == MotorControllerMode.EXTERNAL_PID) kD else 0.0 }, { kV }, { kA },
+                                         { kS }, { maxI }, { kV_referenceVoltage })
 
     override var targetVelocity = Vector3D(.0, .0, .0)
 
-    private var targetVelocityFL = 0.0
-    private var targetVelocityFR = 0.0
-    private var targetVelocityRL = 0.0
-    private var targetVelocityRR = 0.0
+    private var targetTickVelocityFL = 0.0
+    private var targetTickVelocityFR = 0.0
+    private var targetTickVelocityRL = 0.0
+    private var targetTickVelocityRR = 0.0
     private var measuredVelocityFL = 0.0
     private var measuredVelocityFR = 0.0
     private var measuredVelocityRL = 0.0
     private var measuredVelocityRR = 0.0
     override fun initialize() {
-        assignNames()
+        assignHardware()
         setMotorDirections()
-        maxMotorVelocity = DrivetrainConfig.achieveableMaxRPMFraction * theoreticalMaxSpeed
-        minMotorVelocity = DrivetrainConfig.achieveableMinRPMFraction * theoreticalMaxSpeed
-        sidewaysMultiplier = forwardMultiplier * DrivetrainConfig.strafingMultiplier
-
-        turnMultiplier = (wheelCenterOffset.x + wheelCenterOffset.y) * DrivetrainConfig.rotationDecrepancy / wheelRadius
-        setMotorConfiguration(DrivetrainConfig.achieveableMaxRPMFraction, tickPerRev, gearing, maxRPM)
-        try {
-            setPIDFCoefficients(PIDFCoefficients(DrivetrainConfig.kP, DrivetrainConfig.kD, DrivetrainConfig.kI,
-                                                 DrivetrainConfig.kF * DrivetrainConfig.kF_referenceVoltage / voltageSupplier.voltage))
-        } catch (e: UnsupportedOperationException) {
-            opMode.telemetry.addData("Drivetrain PIDF error ", e.message)
+        setMotorMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER)
+        when (motorControllerMode) {
+            MotorControllerMode.FEEDFORWARD -> {
+                setMotorMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER)
+            }
+            MotorControllerMode.EXTERNAL_PID -> {
+                setMotorMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER)
+            }
+            MotorControllerMode.INTERNAL_PID -> {
+                setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER)
+                try {
+                    setInternalPIDFCoefficients(PIDFCoefficients(kP, kI, kD, kV))
+                } catch (e: UnsupportedOperationException) {
+                    opMode.telemetry.addData("Drivetrain PIDF error ", e.message)
+                    e.printStackTrace()
+                }
+            }
         }
-        setMotor0PowerBehaviors(ZeroPowerBehavior.BRAKE)
-        setSmartMode(true)
+        setMotorMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER)
+        setMotor0PowerBehaviors(DcMotor.ZeroPowerBehavior.BRAKE)
         targetVelocity = Vector3D(.0, .0, .0)
     }
 
-    fun setSmartMode(SmartMode: Boolean) {
-        smartMode = SmartMode
-        setMotorMode(if (SmartMode) RunMode.RUN_USING_ENCODER else RunMode.RUN_WITHOUT_ENCODER)
-    }
-
-    private fun assignNames() {
+    private fun assignHardware() {
         driveFrontLeft = WoENHardware.driveFrontLeft
         driveFrontRight = WoENHardware.driveFrontRight
         driveRearLeft = WoENHardware.driveRearLeft
@@ -135,45 +161,25 @@ class MecanumDrivetrain(private val voltageSupplier: VoltageSupplier) : Multithr
         driveRearRight.direction = DcMotorSimple.Direction.REVERSE
     }
 
-    private fun setMotor0PowerBehaviors(zeroPowerBehavior: ZeroPowerBehavior) {
+    private fun setMotor0PowerBehaviors(zeroPowerBehavior: DcMotor.ZeroPowerBehavior) {
         driveFrontLeft.zeroPowerBehavior = zeroPowerBehavior
         driveFrontRight.zeroPowerBehavior = zeroPowerBehavior
         driveRearLeft.zeroPowerBehavior = zeroPowerBehavior
         driveRearRight.zeroPowerBehavior = zeroPowerBehavior
     }
 
-    private fun setMotorMode(runMode: RunMode) {
+    private fun setMotorMode(runMode: DcMotor.RunMode) {
         driveFrontLeft.mode = runMode
         driveFrontRight.mode = runMode
         driveRearLeft.mode = runMode
         driveRearRight.mode = runMode
     }
 
-    private fun setPIDFCoefficients(pidfCoefficients: PIDFCoefficients) {
-        driveFrontLeft.setPIDFCoefficients(RunMode.RUN_USING_ENCODER, pidfCoefficients)
-        driveFrontRight.setPIDFCoefficients(RunMode.RUN_USING_ENCODER, pidfCoefficients)
-        driveRearLeft.setPIDFCoefficients(RunMode.RUN_USING_ENCODER, pidfCoefficients)
-        driveRearRight.setPIDFCoefficients(RunMode.RUN_USING_ENCODER, pidfCoefficients)
-    }
-
-    private fun setMotorConfiguration(achieveableMaxRPMFraction: Double, tickPerRev: Double, gearing: Double, maxRPM: Double) {
-        setMotorConfiguration(driveFrontLeft, achieveableMaxRPMFraction, tickPerRev, gearing, maxRPM)
-        setMotorConfiguration(driveFrontRight, achieveableMaxRPMFraction, tickPerRev, gearing, maxRPM)
-        setMotorConfiguration(driveRearLeft, achieveableMaxRPMFraction, tickPerRev, gearing, maxRPM)
-        setMotorConfiguration(driveRearRight, achieveableMaxRPMFraction, tickPerRev, gearing, maxRPM)
-    }
-
-    private fun setMotorConfiguration(dcMotor: DcMotorEx, achieveableMaxRPMFraction: Double, tickPerRev: Double, gearing: Double, maxRPM: Double) {
-        val motorConfigurationType = dcMotor.motorType.clone()
-        motorConfigurationType.achieveableMaxRPMFraction = achieveableMaxRPMFraction
-        motorConfigurationType.ticksPerRev = tickPerRev
-        motorConfigurationType.gearing = gearing
-        motorConfigurationType.maxRPM = maxRPM
-        dcMotor.motorType = motorConfigurationType
-    }
-
-    private fun resetEncoders() {
-        setMotorMode(RunMode.STOP_AND_RESET_ENCODER)
+    private fun setInternalPIDFCoefficients(pidfCoefficients: PIDFCoefficients) {
+        driveFrontLeft.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoefficients)
+        driveFrontRight.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoefficients)
+        driveRearLeft.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoefficients)
+        driveRearRight.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoefficients)
     }
 
     override fun updateControlHub() {
@@ -182,56 +188,64 @@ class MecanumDrivetrain(private val voltageSupplier: VoltageSupplier) : Multithr
         measuredVelocityRL = driveRearLeft.velocity
         measuredVelocityRR = driveRearRight.velocity
 
-        robotVelocity = Vector3D((measuredVelocityFL - measuredVelocityFR - measuredVelocityRL - measuredVelocityRR) / (4 * sidewaysMultiplier),
-                                 (measuredVelocityFL + measuredVelocityFR + measuredVelocityRL + measuredVelocityRR) / (4 * forwardMultiplier),
-                                 (measuredVelocityFL - measuredVelocityFR + measuredVelocityRL - measuredVelocityRR) / (4 * turnMultiplier))
+        robotVelocity = Vector3D(
+            (measuredVelocityFL - measuredVelocityFR - measuredVelocityRL - measuredVelocityRR) / (4 * sidewaysMultiplier),
+            (measuredVelocityFL + measuredVelocityFR + measuredVelocityRL + measuredVelocityRR) / (4 * forwardMultiplier),
+            (measuredVelocityFL - measuredVelocityFR + measuredVelocityRL - measuredVelocityRR) / (4 * turnMultiplier))
 
         val targetChassisVelocityTicks = Vector3D(targetVelocity.x * sidewaysMultiplier, targetVelocity.y * forwardMultiplier,
                                                   targetVelocity.z * turnMultiplier)
-        targetVelocityFL = targetChassisVelocityTicks.y + targetChassisVelocityTicks.x + targetChassisVelocityTicks.z
-        targetVelocityFR = targetChassisVelocityTicks.y - targetChassisVelocityTicks.x - targetChassisVelocityTicks.z
-        targetVelocityRL = targetChassisVelocityTicks.y - targetChassisVelocityTicks.x + targetChassisVelocityTicks.z
-        targetVelocityRR = targetChassisVelocityTicks.y + targetChassisVelocityTicks.x - targetChassisVelocityTicks.z
+        targetTickVelocityFL = targetChassisVelocityTicks.y + targetChassisVelocityTicks.x + targetChassisVelocityTicks.z
+        targetTickVelocityFR = targetChassisVelocityTicks.y - targetChassisVelocityTicks.x - targetChassisVelocityTicks.z
+        targetTickVelocityRL = targetChassisVelocityTicks.y - targetChassisVelocityTicks.x + targetChassisVelocityTicks.z
+        targetTickVelocityRR = targetChassisVelocityTicks.y + targetChassisVelocityTicks.x - targetChassisVelocityTicks.z
 
-        var maxabs = abs(targetVelocityFL).coerceAtLeast(abs(targetVelocityFR)).coerceAtLeast(abs(targetVelocityRL))
-            .coerceAtLeast(abs(targetVelocityRR))
-        if (maxabs > maxMotorVelocity) {
-            maxabs /= maxMotorVelocity
-            targetVelocityFL /= maxabs
-            targetVelocityFR /= maxabs
-            targetVelocityRL /= maxabs
-            targetVelocityRR /= maxabs
+        var maxabs = abs(targetTickVelocityFL).coerceAtLeast(abs(targetTickVelocityFR)).coerceAtLeast(abs(targetTickVelocityRL))
+            .coerceAtLeast(abs(targetTickVelocityRR))
+        if (maxabs > maxMotorTickVelocity) {
+            maxabs /= maxMotorTickVelocity
+            targetTickVelocityFL /= maxabs
+            targetTickVelocityFR /= maxabs
+            targetTickVelocityRL /= maxabs
+            targetTickVelocityRR /= maxabs
         }
-        targetVelocityFL = limitMinSpeed(targetVelocityFL)
-        targetVelocityFR = limitMinSpeed(targetVelocityFR)
-        targetVelocityRL = limitMinSpeed(targetVelocityRL)
-        targetVelocityRR = limitMinSpeed(targetVelocityRR)
+        targetTickVelocityFL = limitMinSpeed(targetTickVelocityFL)
+        targetTickVelocityFR = limitMinSpeed(targetTickVelocityFR)
+        targetTickVelocityRL = limitMinSpeed(targetTickVelocityRL)
+        targetTickVelocityRR = limitMinSpeed(targetTickVelocityRR)
 
-        if (smartMode) {
-            mFLProfiler.setVelocity(targetVelocityFL)
-            mFRProfiler.setVelocity(targetVelocityFR)
-            mRLProfiler.setVelocity(targetVelocityRL)
-            mRRProfiler.setVelocity(targetVelocityRR)
-        } else {
-            mFLDirectSender.send(targetVelocityFL / maxMotorVelocity)
-            mFRDirectSender.send(targetVelocityFR / maxMotorVelocity)
-            mRLDirectSender.send(targetVelocityRL / maxMotorVelocity)
-            mRRDirectSender.send(targetVelocityRR / maxMotorVelocity)
+        when (motorControllerMode) {
+            MotorControllerMode.FEEDFORWARD -> {
+                mFLReg.update(targetTickVelocityFL)
+                mFRReg.update(targetTickVelocityFR)
+                mRLReg.update(targetTickVelocityRL)
+                mRRReg.update(targetTickVelocityRR)
+            }
+            MotorControllerMode.EXTERNAL_PID -> {
+                mFLReg.update(targetTickVelocityFL)
+                mFRReg.update(targetTickVelocityFR)
+                mRLReg.update(targetTickVelocityRL)
+                mRRReg.update(targetTickVelocityRR)
+            }
+            MotorControllerMode.INTERNAL_PID -> {
+                mFLVelocitySender.send(targetTickVelocityFL)
+                mFRVelocitySender.send(targetTickVelocityFR)
+                mRLVelocitySender.send(targetTickVelocityRL)
+                mRRVelocitySender.send(targetTickVelocityRR)
+            }
         }
     }
-
-    override fun updateExpansionHub() {
-    }
-
-    override fun updateOther() {
-    }
-
 
     private fun limitMinSpeed(speed: Double): Double {
-        return abs(speed).coerceAtLeast(minMotorVelocity) * sign(speed)
+        return abs(speed).coerceAtLeast(minMotorTickVelocity) * sign(speed)
     }
 
     override val maxVelocity: Vector3D
-        get() = Vector3D(maxMotorVelocity / forwardMultiplier, maxMotorVelocity / forwardMultiplier, maxMotorVelocity / turnMultiplier)
+        get() = Vector3D(maxMotorTickVelocity / forwardMultiplier, maxMotorTickVelocity / forwardMultiplier,
+                         maxMotorTickVelocity / turnMultiplier)
     override var robotVelocity: Vector3D = Vector3D()
+
+    enum class MotorControllerMode {
+        FEEDFORWARD, EXTERNAL_PID, INTERNAL_PID
+    }
 }

@@ -7,6 +7,8 @@ import org.firstinspires.ftc.teamcode.math.MathUtil
 import org.firstinspires.ftc.teamcode.math.Pose2D
 import org.firstinspires.ftc.teamcode.math.Vector2D
 import org.firstinspires.ftc.teamcode.math.Vector3D
+import org.firstinspires.ftc.teamcode.robot.Movement.MovementConfig.antiWindupFraction_angle
+import org.firstinspires.ftc.teamcode.robot.Movement.MovementConfig.antiWindupFraction_distance
 import org.firstinspires.ftc.teamcode.robot.Movement.MovementConfig.kD_distance
 import org.firstinspires.ftc.teamcode.robot.Movement.MovementConfig.kP_distance
 import org.firstinspires.ftc.teamcode.robot.Movement.MovementConfig.minErrorAngleDefault
@@ -186,6 +188,7 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
         bPathFollowerEnabled = true
         bPathFollowingFinished = false
         actionOnCompletionExecutor = Thread(pathToFollow[nTargetPoint].actionOnCompletion)
+        integralError = Vector3D()
         pathFollowingTimer.reset()
     }
 
@@ -227,13 +230,15 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
         if (target == previousTarget && velocity == null) {
             integralError += Vector3D((error.x + previousError.x) * 0.5, (error.y + previousError.y) * 0.5,
                                       MathUtil.angleAverage(error.heading, previousError.heading)) * moveControllerTimer.seconds()
-            integralError = Vector3D(Range.clip(abs(integralError.x), 0.0,
+            /*integralError = Vector3D(Range.clip(abs(integralError.x), 0.0,
                                                 MovementConfig.antiWindupFraction_distance * MovementConfig.kI_distance * drivetrain.maxVelocity.x) * sign(
                  integralError.x), Range.clip(abs(integralError.y), 0.0,
                                               MovementConfig.antiWindupFraction_distance * MovementConfig.kI_distance * drivetrain.maxVelocity.y) * sign(
                  integralError.y), Range.clip(abs(integralError.z), 0.0,
                                               MovementConfig.antiWindupFraction_angle * MovementConfig.kI_distance * drivetrain.maxVelocity.z) * sign(
-                 integralError.z))
+
+                 integralError.z))*/
+            integralError = integralError.clampAbs(drivetrain.maxVelocity * Vector3D(antiWindupFraction_distance, antiWindupFraction_distance, antiWindupFraction_angle) * MovementConfig.kI_distance)
         } else integralError = Vector3D()
         moveControllerTimer.reset()
         previousError = error

@@ -22,7 +22,6 @@ import org.firstinspires.ftc.teamcode.superclasses.Shooter
 import org.firstinspires.ftc.teamcode.superclasses.VoltageSupplier
 import org.openftc.revextensions2.ExpansionHubServo
 import kotlin.math.abs
-import kotlin.math.sign
 
 class Shooter(private val voltageSupplier: VoltageSupplier) : MultithreadedRobotModule(), Shooter {
     private val rpmTime = ElapsedTime()
@@ -131,7 +130,7 @@ class Shooter(private val voltageSupplier: VoltageSupplier) : MultithreadedRobot
         //timeOld = rpmTime.seconds()
         currentVelocity = getMotorVelocity()
         currentRpm = currentVelocity * ticksToRpmMultiplier
-        shooterRegulator.updateRegulator(motorVelocityTarget)
+        shooterRegulator.update(motorVelocityTarget)
         /*if (motorVelocityTarget != 0.0) {
             voltageDelta = kV_referenceVoltage / voltageSupplier.voltage
             velocityError = motorVelocityTarget - currentVelocity

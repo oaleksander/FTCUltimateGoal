@@ -6,8 +6,8 @@ import java.util.function.DoubleSupplier
 import kotlin.math.abs
 import kotlin.math.sign
 
-class RegulatorPIDVAS (private val doubleConsumer: DoubleConsumer, private val doubleVelocity: DoubleSupplier, private val doubleSupplier: DoubleSupplier, private val kP: DoubleSupplier, private val kD: DoubleSupplier,
-                       private val kI: DoubleSupplier, private val kV: DoubleSupplier, private val kA: DoubleSupplier, private val kS: DoubleSupplier, private val maxI: DoubleSupplier, private val kV_referenceVoltage: DoubleSupplier, private val activeBreaking: Boolean = true){
+class RegulatorPIDVAS (private val doubleConsumer: DoubleConsumer, private val doubleVelocity: DoubleSupplier, private val doubleSupplier: DoubleSupplier, private val kP: DoubleSupplier, private val kI: DoubleSupplier,
+                       private val kD: DoubleSupplier, private val kV: DoubleSupplier, private val kA: DoubleSupplier, private val kS: DoubleSupplier, private val maxI: DoubleSupplier, private val kV_referenceVoltage: DoubleSupplier, private val activeBraking: Boolean = true){
     private val updateTime = ElapsedTime()
     private var velocityError = 0.0
     private var velocityErrorOld = 0.0
@@ -27,7 +27,7 @@ class RegulatorPIDVAS (private val doubleConsumer: DoubleConsumer, private val d
     /*fun updateCoefficients() {
 
     }*/
-    fun updateRegulator(target: Double) {
+    fun update(target: Double) {
         timeDelta = updateTime.seconds() - timeOld
         timeOld = updateTime.seconds()
         currentVelocity = doubleVelocity.asDouble
@@ -52,7 +52,7 @@ class RegulatorPIDVAS (private val doubleConsumer: DoubleConsumer, private val d
             I = 0.0
             velocityTargetOld = 0.0
         }
-        if (!activeBreaking && sign(target) != sign(power)) power = 0.0
+        if (!activeBraking && sign(target) != sign(power)) power = 0.0
         doubleConsumer.accept(power)
     }
 }
