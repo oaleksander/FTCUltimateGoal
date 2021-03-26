@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients
 import org.firstinspires.ftc.teamcode.math.Vector2D
 import org.firstinspires.ftc.teamcode.math.Vector3D
 import org.firstinspires.ftc.teamcode.misc.CommandSender
+import org.firstinspires.ftc.teamcode.misc.MotorAccelerationLimiter
 import org.firstinspires.ftc.teamcode.misc.RegulatorPIDVAS
 import org.firstinspires.ftc.teamcode.robot.MecanumDrivetrain.DrivetrainConfig.kA
 import org.firstinspires.ftc.teamcode.robot.MecanumDrivetrain.DrivetrainConfig.kD
@@ -18,6 +19,7 @@ import org.firstinspires.ftc.teamcode.robot.MecanumDrivetrain.DrivetrainConfig.k
 import org.firstinspires.ftc.teamcode.robot.MecanumDrivetrain.DrivetrainConfig.kV_referenceVoltage
 import org.firstinspires.ftc.teamcode.robot.MecanumDrivetrain.DrivetrainConfig.maxI
 import org.firstinspires.ftc.teamcode.robot.MecanumDrivetrain.DrivetrainConfig.motorControllerMode
+import org.firstinspires.ftc.teamcode.robot.MecanumDrivetrain.DrivetrainConfig.secondsToAccelerate
 import org.firstinspires.ftc.teamcode.superclasses.Drivetrain
 import org.firstinspires.ftc.teamcode.superclasses.MultithreadedRobotModule
 import org.firstinspires.ftc.teamcode.superclasses.VelocityOdometry
@@ -73,43 +75,39 @@ class MecanumDrivetrain(private val voltageSupplier: VoltageSupplier) : Multithr
     /* Motor controllers */
     private val mFLPowerSender = CommandSender({ driveFrontLeft.power = it })
     private val mFLVelocitySender = CommandSender({ driveFrontLeft.velocity = it })
-
-    //private val mFLProfiler = MotorAccelerationLimiter({ mFLSender.send(it) }, {theoreticalMaxTickVelocity / secondsToAccelerate})
     private val mFLReg = RegulatorPIDVAS({ mFLPowerSender.send(it) }, { measuredVelocityFL }, { voltageSupplier.voltage },
                                          { if (motorControllerMode == MotorControllerMode.EXTERNAL_PID) kP else 0.0 },
                                          { if (motorControllerMode == MotorControllerMode.EXTERNAL_PID) kI else 0.0 },
                                          { if (motorControllerMode == MotorControllerMode.EXTERNAL_PID) kD else 0.0 }, { kV }, { kA },
                                          { kS }, { maxI }, { kV_referenceVoltage })
+    private val mFLProfiler = MotorAccelerationLimiter({ mFLReg.update(it) }, {theoreticalMaxTickVelocity / secondsToAccelerate})
 
     private val mFRPowerSender = CommandSender({ driveFrontRight.power = it })
     private val mFRVelocitySender = CommandSender({ driveFrontRight.velocity = it })
-
-    //  private val mFRProfiler = MotorAccelerationLimiter({ mFRSender.send(it)}, {theoreticalMaxTickVelocity / secondsToAccelerate})
     private val mFRReg = RegulatorPIDVAS({ mFRPowerSender.send(it) }, { measuredVelocityFR }, { voltageSupplier.voltage },
                                          { if (motorControllerMode == MotorControllerMode.EXTERNAL_PID) kP else 0.0 },
                                          { if (motorControllerMode == MotorControllerMode.EXTERNAL_PID) kI else 0.0 },
                                          { if (motorControllerMode == MotorControllerMode.EXTERNAL_PID) kD else 0.0 }, { kV }, { kA },
                                          { kS }, { maxI }, { kV_referenceVoltage })
+    private val mFRProfiler = MotorAccelerationLimiter({ mFRReg.update(it)}, {theoreticalMaxTickVelocity / secondsToAccelerate})
 
     private val mRLPowerSender = CommandSender({ driveRearLeft.power = it })
     private val mRLVelocitySender = CommandSender({ driveRearLeft.velocity = it })
-
-    // private val mRLProfiler = MotorAccelerationLimiter({ mRLSender.send(it)}, {theoreticalMaxTickVelocity / secondsToAccelerate})
     private val mRLReg = RegulatorPIDVAS({ mRLPowerSender.send(it) }, { measuredVelocityRL }, { voltageSupplier.voltage },
                                          { if (motorControllerMode == MotorControllerMode.EXTERNAL_PID) kP else 0.0 },
                                          { if (motorControllerMode == MotorControllerMode.EXTERNAL_PID) kI else 0.0 },
                                          { if (motorControllerMode == MotorControllerMode.EXTERNAL_PID) kD else 0.0 }, { kV }, { kA },
                                          { kS }, { maxI }, { kV_referenceVoltage })
+    private val mRLProfiler = MotorAccelerationLimiter({ mRLReg.update(it)}, {theoreticalMaxTickVelocity / secondsToAccelerate})
 
     private val mRRPowerSender = CommandSender({ driveRearRight.power = it })
     private val mRRVelocitySender = CommandSender({ driveRearRight.velocity = it })
-
-    // private val mRRProfiler = MotorAccelerationLimiter({ mRRSender.send(it)}, {theoreticalMaxTickVelocity / secondsToAccelerate})
-    private val mRRReg = RegulatorPIDVAS({ mRRVelocitySender.send(it) }, { measuredVelocityRR }, { voltageSupplier.voltage },
+    private val mRRReg = RegulatorPIDVAS({ mRRPowerSender.send(it) }, { measuredVelocityRR }, { voltageSupplier.voltage },
                                          { if (motorControllerMode == MotorControllerMode.EXTERNAL_PID) kP else 0.0 },
                                          { if (motorControllerMode == MotorControllerMode.EXTERNAL_PID) kI else 0.0 },
                                          { if (motorControllerMode == MotorControllerMode.EXTERNAL_PID) kD else 0.0 }, { kV }, { kA },
                                          { kS }, { maxI }, { kV_referenceVoltage })
+    private val mRRProfiler = MotorAccelerationLimiter({ mRRReg.update(it)}, {theoreticalMaxTickVelocity / secondsToAccelerate})
 
     override var targetVelocity = Vector3D(.0, .0, .0)
 
@@ -222,10 +220,10 @@ class MecanumDrivetrain(private val voltageSupplier: VoltageSupplier) : Multithr
                 mRRReg.update(targetTickVelocityRR)
             }
             MotorControllerMode.EXTERNAL_PID -> {
-                mFLReg.update(targetTickVelocityFL)
-                mFRReg.update(targetTickVelocityFR)
-                mRLReg.update(targetTickVelocityRL)
-                mRRReg.update(targetTickVelocityRR)
+                mFLProfiler.setVelocity(targetTickVelocityFL)
+                mFRProfiler.setVelocity(targetTickVelocityFR)
+                mRLProfiler.setVelocity(targetTickVelocityRL)
+                mRRProfiler.setVelocity(targetTickVelocityRR)
             }
             MotorControllerMode.INTERNAL_PID -> {
                 mFLVelocitySender.send(targetTickVelocityFL)
