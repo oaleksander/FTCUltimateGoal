@@ -140,7 +140,6 @@ class MecanumDrivetrain(private val voltageSupplier: VoltageSupplier) : Multithr
                 }
             }
         }
-        setMotorMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER)
         setMotor0PowerBehaviors(DcMotor.ZeroPowerBehavior.BRAKE)
         targetVelocity = Vector3D(.0, .0, .0)
     }
