@@ -9,7 +9,11 @@ import org.firstinspires.ftc.teamcode.math.Vector2D
 import org.firstinspires.ftc.teamcode.math.Vector3D
 import org.firstinspires.ftc.teamcode.robot.Movement.MovementConfig.antiWindupFraction_angle
 import org.firstinspires.ftc.teamcode.robot.Movement.MovementConfig.antiWindupFraction_distance
+import org.firstinspires.ftc.teamcode.robot.Movement.MovementConfig.kD_angle
 import org.firstinspires.ftc.teamcode.robot.Movement.MovementConfig.kD_distance
+import org.firstinspires.ftc.teamcode.robot.Movement.MovementConfig.kI_angle
+import org.firstinspires.ftc.teamcode.robot.Movement.MovementConfig.kI_distance
+import org.firstinspires.ftc.teamcode.robot.Movement.MovementConfig.kP_angle
 import org.firstinspires.ftc.teamcode.robot.Movement.MovementConfig.kP_distance
 import org.firstinspires.ftc.teamcode.robot.Movement.MovementConfig.minErrorAngleDefault
 import org.firstinspires.ftc.teamcode.robot.Movement.MovementConfig.minErrorDistanceDefault
@@ -26,8 +30,11 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
     internal object MovementConfig {
         @JvmField var lookaheadRadius = 45.72
         @JvmField var kP_distance = 5.0
-        @JvmField var kD_distance = 0.5
+        @JvmField var kD_distance = 1.5
         @JvmField var kI_distance = 5.0
+        @JvmField var kP_angle = 5.0
+        @JvmField var kD_angle = 1.5
+        @JvmField var kI_angle = 5.0
         //@JvmField TODO separate coeffs on angle and distance
         //var kP_angle = 3.6
         //@JvmField
@@ -39,6 +46,15 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
         @JvmField var minErrorDistanceDefault = 1.5
         @JvmField var minErrorAngleDefault = Math.toRadians(0.4)
     }
+
+    val kP: Vector3D
+    get() = Vector3D(kP_distance, kP_distance, kP_angle)
+
+    val kI: Vector3D
+        get() = Vector3D(kI_distance, kI_distance, kI_angle)
+
+    val kD: Vector3D
+        get() = Vector3D(kD_distance, kD_distance, kD_angle)
 
     // private val minErrorDistanceDefault = 1.0
     //private val minErrorAngleDefault =
@@ -238,15 +254,16 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
                                               MovementConfig.antiWindupFraction_angle * MovementConfig.kI_distance * drivetrain.maxVelocity.z) * sign(
 
                  integralError.z))*/
-            integralError = integralError.clampAbs(drivetrain.maxVelocity * Vector3D(antiWindupFraction_distance, antiWindupFraction_distance, antiWindupFraction_angle) * MovementConfig.kI_distance)
+            integralError = integralError.clampAbs(drivetrain.maxVelocity * Vector3D(antiWindupFraction_distance, antiWindupFraction_distance, antiWindupFraction_angle) * kI)
         } else integralError = Vector3D()
         moveControllerTimer.reset()
         previousError = error
         previousTarget = target
+        integralError = Vector3D(Vector2D(.0,integralError.radius()).rotatedCW(error.heading),integralError.z )
         val control =
-            (Vector3D(error) * kP_distance).clampAbs(drivetrain.maxVelocity) +
-            (integralError * MovementConfig.kI_distance).clampAbs(drivetrain.maxVelocity) +
-            (diffError * kD_distance).clampAbs(drivetrain.maxVelocity)
+            (Vector3D(error) * kP).clampAbs(drivetrain.maxVelocity) +
+            (integralError * kI).clampAbs(drivetrain.maxVelocity) +
+            (diffError * kD).clampAbs(drivetrain.maxVelocity)
         if (velocity != null) holonomicMoveFC(Vector3D((error as Vector2D).normalize() * velocity.radius(), control.z))
         else holonomicMoveFC(control)
         return abs(error.heading) < minErrorAngleCurrent && error.radius() < minErrorDistanceCurrent
@@ -290,7 +307,7 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
         if ((targetPoint - originPoint).radius() <= (lookAheadPoint - originPoint).radius()) {
             if (getError(targetPoint).radius() < lookaheadRadius) return true
             moveLinear(Pose2D(targetPoint, angle))
-        } else moveLinear(Pose2D(lookAheadPoint, angle), Vector3D(getError(targetPoint))*kP_distance-odometry.robotVelocity*kD_distance)
+        } else moveLinear(Pose2D(lookAheadPoint, angle), Vector3D(getError(targetPoint))*kP-odometry.robotVelocity*kD)
         return false
     }
 

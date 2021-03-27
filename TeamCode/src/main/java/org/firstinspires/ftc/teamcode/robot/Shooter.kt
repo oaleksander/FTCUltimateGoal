@@ -52,7 +52,7 @@ class Shooter(private val voltageSupplier: VoltageSupplier) : MultithreadedRobot
     private lateinit var shooterMotor: DcMotorEx
     private lateinit var feeder: ExpansionHubServo
     private val shooterPowerSender = CommandSender({shooterMotor.power = it})
-    private val shooterRegulator = RegulatorPIDVAS({shooterPowerSender.send(it)}, {currentVelocity}, {voltageSupplier.voltage}, {kP}, {kD}, {kI}, {kV}, {kA}, {kS}, {maxI}, {kV_referenceVoltage})
+    private val shooterRegulator = RegulatorPIDVAS({shooterPowerSender.send(it)}, {currentVelocity}, {voltageSupplier.voltage}, {kP}, {kD}, {kI}, {kV}, {kA}, {kS}, {maxI}, {kV_referenceVoltage}, false)
     private val feederPositionSender = CommandSender({feeder.position = it})
     private var shooterMode = Shooter.ShooterMode.OFF
     private var ringsToShoot: Int = 0

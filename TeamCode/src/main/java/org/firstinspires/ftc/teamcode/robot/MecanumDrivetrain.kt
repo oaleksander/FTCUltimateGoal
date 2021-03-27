@@ -38,13 +38,13 @@ class MecanumDrivetrain(private val voltageSupplier: VoltageSupplier) : Multithr
         @JvmField var rotationDiscrepancy = 1.0
         @JvmField var motorControllerMode = MotorControllerMode.EXTERNAL_PID
         @JvmField var secondsToAccelerate = 0.10
-        @JvmField var kP = 45.0
+        @JvmField var kP = 25.0
         @JvmField var kD = 0.0
-        @JvmField var kI = 0.05
-        @JvmField var kV = 15.10
-        @JvmField var kA = 0.0
-        @JvmField var kS = 0.0
-        @JvmField var maxI = 60000000000.0
+        @JvmField var kI = 0.0
+        @JvmField var kV = 13.00
+        @JvmField var kA = 5.0
+        @JvmField var kS = 4500.0
+        @JvmField var maxI = 0.0
         @JvmField var kV_referenceVoltage = 13.0
     }
 
@@ -72,10 +72,14 @@ class MecanumDrivetrain(private val voltageSupplier: VoltageSupplier) : Multithr
     private lateinit var driveRearLeft: DcMotorEx
     private lateinit var driveRearRight: DcMotorEx
 
+    private var mFLPower = .0
+    private var mFRPower = .0
+    private var mRLPower = .0
+    private var mRRPower = .0
     /* Motor controllers */
     private val mFLPowerSender = CommandSender({ driveFrontLeft.power = it })
     private val mFLVelocitySender = CommandSender({ driveFrontLeft.velocity = it })
-    private val mFLReg = RegulatorPIDVAS({ mFLPowerSender.send(it) }, { measuredVelocityFL }, { voltageSupplier.voltage },
+    private val mFLReg = RegulatorPIDVAS({ mFLPower = it }, { measuredVelocityFL }, { voltageSupplier.voltage },
                                          { if (motorControllerMode == MotorControllerMode.EXTERNAL_PID) kP else 0.0 },
                                          { if (motorControllerMode == MotorControllerMode.EXTERNAL_PID) kI else 0.0 },
                                          { if (motorControllerMode == MotorControllerMode.EXTERNAL_PID) kD else 0.0 }, { kV }, { kA },
@@ -84,7 +88,7 @@ class MecanumDrivetrain(private val voltageSupplier: VoltageSupplier) : Multithr
 
     private val mFRPowerSender = CommandSender({ driveFrontRight.power = it })
     private val mFRVelocitySender = CommandSender({ driveFrontRight.velocity = it })
-    private val mFRReg = RegulatorPIDVAS({ mFRPowerSender.send(it) }, { measuredVelocityFR }, { voltageSupplier.voltage },
+    private val mFRReg = RegulatorPIDVAS({ mFRPower = it }, { measuredVelocityFR }, { voltageSupplier.voltage },
                                          { if (motorControllerMode == MotorControllerMode.EXTERNAL_PID) kP else 0.0 },
                                          { if (motorControllerMode == MotorControllerMode.EXTERNAL_PID) kI else 0.0 },
                                          { if (motorControllerMode == MotorControllerMode.EXTERNAL_PID) kD else 0.0 }, { kV }, { kA },
@@ -93,7 +97,7 @@ class MecanumDrivetrain(private val voltageSupplier: VoltageSupplier) : Multithr
 
     private val mRLPowerSender = CommandSender({ driveRearLeft.power = it })
     private val mRLVelocitySender = CommandSender({ driveRearLeft.velocity = it })
-    private val mRLReg = RegulatorPIDVAS({ mRLPowerSender.send(it) }, { measuredVelocityRL }, { voltageSupplier.voltage },
+    private val mRLReg = RegulatorPIDVAS({ mRLPower = it }, { measuredVelocityRL }, { voltageSupplier.voltage },
                                          { if (motorControllerMode == MotorControllerMode.EXTERNAL_PID) kP else 0.0 },
                                          { if (motorControllerMode == MotorControllerMode.EXTERNAL_PID) kI else 0.0 },
                                          { if (motorControllerMode == MotorControllerMode.EXTERNAL_PID) kD else 0.0 }, { kV }, { kA },
@@ -102,7 +106,7 @@ class MecanumDrivetrain(private val voltageSupplier: VoltageSupplier) : Multithr
 
     private val mRRPowerSender = CommandSender({ driveRearRight.power = it })
     private val mRRVelocitySender = CommandSender({ driveRearRight.velocity = it })
-    private val mRRReg = RegulatorPIDVAS({ mRRPowerSender.send(it) }, { measuredVelocityRR }, { voltageSupplier.voltage },
+    private val mRRReg = RegulatorPIDVAS({ mRRPower = it }, { measuredVelocityRR }, { voltageSupplier.voltage },
                                          { if (motorControllerMode == MotorControllerMode.EXTERNAL_PID) kP else 0.0 },
                                          { if (motorControllerMode == MotorControllerMode.EXTERNAL_PID) kI else 0.0 },
                                          { if (motorControllerMode == MotorControllerMode.EXTERNAL_PID) kD else 0.0 }, { kV }, { kA },
@@ -223,6 +227,10 @@ class MecanumDrivetrain(private val voltageSupplier: VoltageSupplier) : Multithr
                 mFRProfiler.setVelocity(targetTickVelocityFR)
                 mRLProfiler.setVelocity(targetTickVelocityRL)
                 mRRProfiler.setVelocity(targetTickVelocityRR)
+                mFLPowerSender.send(mFLPower)
+                mFRPowerSender.send(mFRPower)
+                mRLPowerSender.send(mRLPower)
+                mRRPowerSender.send(mRRPower)
             }
             MotorControllerMode.INTERNAL_PID -> {
                 mFLVelocitySender.send(targetTickVelocityFL)

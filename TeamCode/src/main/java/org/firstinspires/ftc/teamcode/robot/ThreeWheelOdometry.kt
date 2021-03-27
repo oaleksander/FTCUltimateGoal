@@ -22,7 +22,7 @@ class ThreeWheelOdometry : MultithreadedRobotModule(), Odometry {
     @Config
     internal object OdometryConfig {
         @JvmField var forwardMultiplier = 1.00
-        @JvmField var headingMultiplier = 1.01940189866745445606466932397
+        @JvmField var headingMultiplier = 1.0247339369318733914556964693507
         @JvmField var doUseIMU = false
     }
 
@@ -122,8 +122,8 @@ class ThreeWheelOdometry : MultithreadedRobotModule(), Odometry {
     override fun updateExpansionHub() {
         calculatePosition()
         currentYLVelocity = odometerYL.correctedVelocity
-        currentYLVelocity = odometerYR.correctedVelocity
-        currentYLVelocity = odometerX.correctedVelocity
+        currentYRVelocity = odometerYR.correctedVelocity
+        currentXVelocity = odometerX.correctedVelocity
         calculateVelocity()
     }
 

@@ -48,6 +48,7 @@ open class AutoOpMode : LinearOpMode() {
         telemetry.addLine("")
         thereAreTwoGamepads = gamepad2.start || gamepad2.b || thereAreTwoGamepads
         telemetry.addData("OpenCV Stack size", openCVNode.stackSize)
+        //dashboardPacket.put("OpenCV Stack size", openCVNode.stackSize)
         if (thereAreTwoGamepads) telemetry.addLine("Second gamepad detected")
         telemetry.update()
     }

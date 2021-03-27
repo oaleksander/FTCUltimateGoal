@@ -27,7 +27,7 @@ class RegulatorPIDVAS (private val doubleConsumer: DoubleConsumer, private val d
     /*fun updateCoefficients() {
 
     }*/
-    fun update(target: Double) {
+    fun update(target: Double):Double {
         timeDelta = updateTime.seconds() - timeOld
         timeOld = updateTime.seconds()
         currentVelocity = doubleVelocity.asDouble
@@ -54,5 +54,6 @@ class RegulatorPIDVAS (private val doubleConsumer: DoubleConsumer, private val d
         }
         if (!activeBraking && sign(target) != sign(power)) power = 0.0
         doubleConsumer.accept(power)
+        return power
     }
 }
