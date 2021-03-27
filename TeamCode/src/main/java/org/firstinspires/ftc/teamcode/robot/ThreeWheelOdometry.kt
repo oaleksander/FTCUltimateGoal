@@ -120,10 +120,10 @@ class ThreeWheelOdometry : MultithreadedRobotModule(), Odometry {
 
 
     override fun updateExpansionHub() {
+        calculatePosition()
         currentYLVelocity = odometerYL.correctedVelocity
         currentYLVelocity = odometerYR.correctedVelocity
         currentYLVelocity = odometerX.correctedVelocity
-        calculatePosition()
         calculateVelocity()
     }
 
@@ -131,24 +131,27 @@ class ThreeWheelOdometry : MultithreadedRobotModule(), Odometry {
     }
 
     private fun calculatePosition() {
+        val currentYL = odometerYL.currentPosition
+        val currentYR = odometerYR.currentPosition
+        val currentX = odometerX.currentPosition
         val deltaHeading = MathUtil.angleWrap(calculateHeading() - robotCoordinates.heading)
-        var deltaPosition = Vector2D(encoderTicksToDistance(odometerX.currentPosition - xOld) - deltaHeading * odometerXCenterOffset,
-                                     (encoderTicksToDistance(odometerYL.currentPosition - ylOld) + encoderTicksToDistance(
-                                          odometerYR.currentPosition - yrOld)) * 0.5)
+        var deltaPosition = Vector2D(encoderTicksToDistance(currentX - xOld) - deltaHeading * odometerXCenterOffset,
+                                     (encoderTicksToDistance(currentYL - ylOld) + encoderTicksToDistance(
+                                         currentYR - yrOld)) * 0.5)
         if (deltaHeading != 0.0) {   //if deltaAngle = 0 radius of the arc is = Inf which causes model degeneracy
             val arcAngle = deltaHeading * 2
             val arcRadius = deltaPosition.radius() / arcAngle
             deltaPosition = Vector2D(arcRadius * (1 - cos(arcAngle)), arcRadius * sin(arcAngle)).rotatedCW(deltaPosition.aCot())
         }
         robotCoordinates = robotCoordinates.plus(Pose2D(deltaPosition.rotatedCW(robotCoordinates.heading), deltaHeading))
-        ylOld = odometerYL.currentPosition
-        yrOld = odometerYR.currentPosition
-        xOld = odometerX.currentPosition
+        ylOld = currentYL
+        yrOld = currentYR
+        xOld = currentX
     }
     private fun calculateVelocity() {
         val angularVelocity = encoderDifferenceToAngle(currentYLVelocity, currentYRVelocity)
-        robotVelocity = Vector3D(Vector2D(encoderTicksToDistance((currentXVelocity.toInt())) - angularVelocity * odometerXCenterOffset,
-                                          encoderTicksToDistance((currentYLVelocity + currentYRVelocity).toInt() / 2)), angularVelocity).rotatedCW(
+        robotVelocity = Vector3D(encoderTicksToDistance((currentXVelocity.toInt())) - angularVelocity * odometerXCenterOffset,
+                                          encoderTicksToDistance((currentYLVelocity + currentYRVelocity).toInt() / 2), angularVelocity).rotatedCW(
             robotCoordinates.heading)
     }
 
