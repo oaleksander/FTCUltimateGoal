@@ -44,6 +44,7 @@ class RegulatorPIDVAS (private val doubleConsumer: DoubleConsumer, private val d
             power = (P + I + D + V + A + S) / maxInt16
             velocityErrorOld = velocityError
             velocityTargetOld = target
+            if (!activeBraking && sign(target) != sign(power)) power = 0.0
         } else {
             voltageDelta = 0.0
             velocityError = 0.0
@@ -52,7 +53,6 @@ class RegulatorPIDVAS (private val doubleConsumer: DoubleConsumer, private val d
             I = 0.0
             velocityTargetOld = 0.0
         }
-        if (!activeBraking && sign(target) != sign(power)) power = 0.0
         doubleConsumer.accept(power)
         return power
     }
