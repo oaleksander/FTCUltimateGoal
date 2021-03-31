@@ -14,9 +14,7 @@ class MotorAccelerationLimiter constructor(private val motorToControl: DoubleCon
     private var currentVelocity = 0.0
     fun setVelocity(requestedVelocity: Double) {
         currentVelocity += abs(requestedVelocity - currentVelocity).coerceAtMost(abs(loopTime.seconds() * maxAcceleration.asDouble)) * sign(requestedVelocity - currentVelocity)
-        if (requestedVelocity == 0.0) motorToControl.accept(0.0) else motorToControl.accept(
-            currentVelocity
-        )
+        if (requestedVelocity == 0.0) motorToControl.accept(0.0) else motorToControl.accept(currentVelocity)
         loopTime.reset()
     }
 

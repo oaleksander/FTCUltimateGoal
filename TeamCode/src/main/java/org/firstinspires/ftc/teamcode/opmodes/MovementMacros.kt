@@ -90,14 +90,15 @@ object MovementMacros {
                                        error.aCot() - WobblePlacementOffset.aCot()), distanceTolerance = 3.0,
                             angularTolerance = toRadians(3.0))
         val leverServoTimer = ElapsedTime()
+        wobbleManipulator.setAngle(WobbleManipulator.Position.DOWN)
         while (movement.pathFollowerIsActive() && opMode.opModeIsActive()) {
             if (movement.getError(Pose2D(wobblePose, Double.NaN)).radius() < 90) wobbleManipulator.setAngle(
                  WobbleManipulator.Position.DOWN)
             else leverServoTimer.reset()
             spinOnce()
         }
-        wobbleManipulator.setAngle(WobbleManipulator.Position.DOWN)
-        delay(500.0 - leverServoTimer.milliseconds())
+
+        //delay(500.0 - leverServoTimer.milliseconds())
         wobbleManipulator.grabWobble(false)
         delay(300.0)
     }
@@ -155,7 +156,7 @@ object MovementMacros {
         shooter.shootingMode = Shooter.ShooterMode.HIGHGOAL
         movement.pos(highGoalShootingPose)
         val shooterAccelerationTimeout = ElapsedTime()
-        while (opMode.opModeIsActive() && !shooter.isCorrectRpm(10.0) && shooterAccelerationTimeout.seconds() < 1.2) spinOnce()
+        while (opMode.opModeIsActive() && !shooter.isCorrectRpm(100.0) && shooterAccelerationTimeout.seconds() < 1.2) spinOnce()
         shooter.feedRings()
         delay(if (shootOnlyOneRing) shooter.timeToShootOneRing else shooter.timeToShootThreeRings)
         shooter.shootingMode = Shooter.ShooterMode.OFF
@@ -208,7 +209,7 @@ object MovementMacros {
         shooter.shootingMode = Shooter.ShooterMode.POWERSHOT
         for (powerShot in PowerShot.values()) {
             movement.pos(powerShotShootingPose(powerShot))
-            delay(200.0)
+            delay(100.0)
             val shooterAccelerationTimeout = ElapsedTime()
             shooterAccelerationTimeout.reset()
             while (opMode.opModeIsActive() && !shooter.isCorrectRpm() && shooterAccelerationTimeout.seconds() < 2) spinOnce()
@@ -278,7 +279,7 @@ object MovementMacros {
                                distanceTolerance = 5.0, angularTolerance = toRadians(5.0))
                   conveyor.enableConveyor = true
                   movement.pos(Pose2D(ringStackPose - Vector2D(0.0, RingStackFirstRingOffset).rotatedCW(heading), heading + PI),
-                               linearVelocityFraction = .18, distanceTolerance = 5.0, angularTolerance = toRadians(5.0))
+                               linearVelocityFraction = .16, distanceTolerance = 5.0, angularTolerance = toRadians(5.0))
                   //delay(700.0)
                   shootHighGoal()
                   movement.pos(Pose2D(ringStackPose - Vector2D(0.0, RingStackFourthRingOffset).rotatedCW(heading), heading + PI),
