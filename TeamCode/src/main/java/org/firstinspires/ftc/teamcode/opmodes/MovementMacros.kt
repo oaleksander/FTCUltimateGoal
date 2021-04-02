@@ -12,6 +12,7 @@ import org.firstinspires.ftc.teamcode.opmodes.MovementMacros.MovementMacrosConfi
 import org.firstinspires.ftc.teamcode.opmodes.MovementMacros.MovementMacrosConfig.PartnerWobblePoseYOffset
 import org.firstinspires.ftc.teamcode.opmodes.MovementMacros.MovementMacrosConfig.PowerShotShootingAngle
 import org.firstinspires.ftc.teamcode.opmodes.MovementMacros.MovementMacrosConfig.PowerShotShootingDistance
+import org.firstinspires.ftc.teamcode.opmodes.MovementMacros.MovementMacrosConfig.PowerShotShootingOffset
 import org.firstinspires.ftc.teamcode.opmodes.MovementMacros.MovementMacrosConfig.RingStackApproachOffset
 import org.firstinspires.ftc.teamcode.opmodes.MovementMacros.MovementMacrosConfig.RingStackFirstRingOffset
 import org.firstinspires.ftc.teamcode.opmodes.MovementMacros.MovementMacrosConfig.RingStackFourthRingOffset
@@ -51,7 +52,7 @@ object MovementMacros {
         @JvmField var HighGoalShootingDistance = 208.0
         @JvmField var HighGoalShootingAngle = -4.3
         @JvmField var PowerShotShootingDistance = 200.4089
-        @JvmField var PowerShotShootingAngle = -1.3
+        @JvmField var PowerShotShootingAngle = -4.3
         @JvmField var RingStackApproachOffset = 68.0
         @JvmField var RingStackFirstRingOffset = 5.0
         @JvmField var RingStackFourthRingOffset = -15.0
@@ -59,11 +60,12 @@ object MovementMacros {
         @JvmField var RobotYBackLength = 29.85498
         @JvmField var RobotYFrontLength = 37.2
         @JvmField var ParkingTolerance = 5.0
+        @JvmField var PowerShotShootingOffset = -7.0
         //TODO Servo travel times
     }
 
     fun avoidRingStack() {
-        movement.pos(Pose2D(odometry.robotCoordinates.x + 15 * sideSign, -60.0, Double.NaN), distanceTolerance = 10.0,
+        movement.pos(Pose2D(odometry.robotCoordinates.x + 30 * sideSign, -60.0, Double.NaN), distanceTolerance = 20.0,
                      angularTolerance = .5)
     }
 
@@ -191,7 +193,7 @@ object MovementMacros {
     private fun powerShotShootingPose(powerShot: PowerShot): Pose2D {
         val heading = Range.clip(movement.getError(Pose2D(powerShotPose(PowerShot.MEDIUM), Double.NaN)).aCot(), toRadians(-17.0),
                                  toRadians(17.0))
-        val shootingCoordinates = powerShotPose(PowerShot.MEDIUM).minus(Vector2D(0.0, PowerShotShootingDistance).rotatedCW(heading))
+        val shootingCoordinates = powerShotPose(PowerShot.MEDIUM).minus(Vector2D(-PowerShotShootingOffset, PowerShotShootingDistance).rotatedCW(heading))
         return when (powerShot) {
              PowerShot.LEFT -> Pose2D(shootingCoordinates,
                                       heading + toRadians(PowerShotShootingAngle) + powerShotPose(PowerShot.LEFT).minus(

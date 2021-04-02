@@ -18,7 +18,14 @@ class Encoder(private val motor: DcMotorEx, var direction: Direction) {
     enum class Direction(val multiplier: Int) {
         FORWARD(1), REVERSE(-1);
     }
-
+    private val CPS_STEP = 0x10000
+    private fun inverseOverflow(input: Double, estimate: Double): Double {
+        var real = input
+        while (abs(estimate - real) > CPS_STEP / 2.0) {
+            real += sign(estimate - real) * CPS_STEP
+        }
+        return real
+    }
     private var velocityEstimates = MovingStatistics(5)
 
     private val clock: ElapsedTime = ElapsedTime()
@@ -44,17 +51,6 @@ class Encoder(private val motor: DcMotorEx, var direction: Direction) {
         }
     val correctedVelocity: Double
         get() = inverseOverflow(rawVelocity, velocityEstimates.mean)
-
-    companion object {
-        private const val CPS_STEP = 0x10000
-        private fun inverseOverflow(input: Double, estimate: Double): Double {
-            var real = input
-            while (abs(estimate - real) > CPS_STEP / 2.0) {
-                real += sign(estimate - real) * CPS_STEP
-            }
-            return real
-        }
-    }
 
     init {
         lastPosition = 0
