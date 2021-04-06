@@ -15,6 +15,7 @@ import org.firstinspires.ftc.teamcode.opmodes.MovementMacros.MovementMacrosConfi
 import org.firstinspires.ftc.teamcode.opmodes.MovementMacros.MovementMacrosConfig.PowerShotShootingOffset
 import org.firstinspires.ftc.teamcode.opmodes.MovementMacros.MovementMacrosConfig.RingStackApproachOffset
 import org.firstinspires.ftc.teamcode.opmodes.MovementMacros.MovementMacrosConfig.RingStackFirstRingOffset
+import org.firstinspires.ftc.teamcode.opmodes.MovementMacros.MovementMacrosConfig.RingStackFirstRingOffsetFromFour
 import org.firstinspires.ftc.teamcode.opmodes.MovementMacros.MovementMacrosConfig.RingStackFourthRingOffset
 import org.firstinspires.ftc.teamcode.opmodes.MovementMacros.MovementMacrosConfig.RobotYBackLength
 import org.firstinspires.ftc.teamcode.opmodes.MovementMacros.MovementMacrosConfig.RobotYFrontLength
@@ -55,6 +56,7 @@ object MovementMacros {
         @JvmField var PowerShotShootingAngle = -4.3
         @JvmField var RingStackApproachOffset = 68.0
         @JvmField var RingStackFirstRingOffset = 5.0
+        @JvmField var RingStackFirstRingOffsetFromFour = 5.0
         @JvmField var RingStackFourthRingOffset = -15.0
         @JvmField var ParkLineY = 26.462
         @JvmField var RobotYBackLength = 29.85498
@@ -280,7 +282,7 @@ object MovementMacros {
                   movement.pos(Pose2D(ringStackPose - Vector2D(0.0, RingStackApproachOffset).rotatedCW(heading), heading + PI),
                                distanceTolerance = 5.0, angularTolerance = toRadians(5.0))
                   conveyor.enableConveyor = true
-                  movement.pos(Pose2D(ringStackPose - Vector2D(0.0, RingStackFirstRingOffset).rotatedCW(heading), heading + PI),
+                  movement.pos(Pose2D(ringStackPose - Vector2D(0.0, RingStackFirstRingOffsetFromFour).rotatedCW(heading), heading + PI),
                                linearVelocityFraction = .16, distanceTolerance = 5.0, angularTolerance = toRadians(5.0))
                   //delay(700.0)
                   shootHighGoal()
@@ -320,7 +322,14 @@ object MovementMacros {
             delay(20.0)
         }
     }
-
+    private val ringsPowerShot: Vector2D
+        get() = Vector2D(-10.0 * sideSign, 170.0)
+    fun pickupRingsAfterPowerShots() {
+        movement.pos(Pose2D(ringsPowerShot, PI/2 * sideSign))
+        conveyor.enableConveyor = true
+        movement.pos(Pose2D(ringsPowerShot + Vector2D(60.0 * sideSign, 0.0), PI/2 * sideSign))
+        conveyor.enableConveyor = false
+    }
     /*
         @Deprecated("")
         fun shootTargets() {
