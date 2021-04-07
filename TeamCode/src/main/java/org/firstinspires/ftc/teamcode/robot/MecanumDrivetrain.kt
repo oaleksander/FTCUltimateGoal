@@ -41,9 +41,9 @@ class MecanumDrivetrain(private val voltageSupplier: VoltageSupplier) : Multithr
         @JvmField var kP = 15.0
         @JvmField var kD = 0.0
         @JvmField var kI = 0.7
-        @JvmField var kV = 11.56
+        @JvmField var kV = 13.56
         @JvmField var kA = 5.0
-        @JvmField var kS = 4500.0
+        @JvmField var kS = 1300.0
         @JvmField var maxI = 32767.0
         @JvmField var kV_referenceVoltage = 13.0
     }

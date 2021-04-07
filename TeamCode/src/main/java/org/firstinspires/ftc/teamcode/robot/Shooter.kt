@@ -37,8 +37,8 @@ class Shooter(private val voltageSupplier: VoltageSupplier) : MultithreadedRobot
         @JvmField var kP = 186.0
         @JvmField var kI = 1.77
         @JvmField var kD = 0.0
-        @JvmField var kV = 13.56
-        @JvmField var kA = 1.0
+        @JvmField var kV = 13.06
+        @JvmField var kA = 2.0
         @JvmField var kS = 3000.0
         @JvmField var maxI = 16384.0
         @JvmField var kV_referenceVoltage = 12.485
