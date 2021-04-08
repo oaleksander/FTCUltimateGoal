@@ -137,8 +137,16 @@ object MovementMacros {
 
     fun shooting() {
         when {
-            sideSign * xSign == 1 -> shootHighGoal()
-            else -> shootPowerShotDynamic()
+            sideSign * xSign == 1 -> {
+                shootHighGoal()
+                moveWobble()
+            }
+            else -> {
+                shootPowerShotDynamic()
+                pickupRingsAfterPowerShots()
+                moveWobble()
+                shootHighGoal()
+            }
         }
     }
 
@@ -323,11 +331,11 @@ object MovementMacros {
         }
     }
     private val ringsPowerShot: Vector2D
-        get() = Vector2D(-10.0 * sideSign, 170.0)
+        get() = Vector2D(-10.0 * xSign, 170.0)
     fun pickupRingsAfterPowerShots() {
-        movement.pos(Pose2D(ringsPowerShot, PI/2 * sideSign))
+        movement.pos(Pose2D(ringsPowerShot, -PI / 2 * xSign))
         conveyor.enableConveyor = true
-        movement.pos(Pose2D(ringsPowerShot + Vector2D(60.0 * sideSign, 0.0), PI/2 * sideSign))
+        movement.pos(Pose2D(ringsPowerShot + Vector2D(60.0 * xSign, 0.0), -PI / 2 * xSign))
         conveyor.enableConveyor = false
     }
     /*
