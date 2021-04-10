@@ -331,7 +331,7 @@ object MovementMacros {
         }
     }
     private val ringsPowerShot: Vector2D
-        get() = Vector2D(-10.0 * xSign, 170.0)
+        get() = Vector2D(-10.0 * xSign, 160.0)
     fun pickupRingsAfterPowerShots() {
         movement.pos(Pose2D(ringsPowerShot, -PI / 2 * xSign))
         conveyor.enableConveyor = true

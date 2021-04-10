@@ -34,12 +34,12 @@ class Shooter(private val voltageSupplier: VoltageSupplier) : MultithreadedRobot
         @JvmField var highRpm = 3800.0
         @JvmField var feederClose = 0.23
         @JvmField var feederOpen = 0.49
-        @JvmField var kP = 186.0
-        @JvmField var kI = 1.77
-        @JvmField var kD = 0.0
-        @JvmField var kV = 13.06
-        @JvmField var kA = 2.0
-        @JvmField var kS = 3000.0
+        @JvmField var kP = 72.0
+        @JvmField var kI = 0.07
+        @JvmField var kD = 3.0
+        @JvmField var kV = 11.55
+        @JvmField var kA = 1.0
+        @JvmField var kS = 2500.0
         @JvmField var maxI = 16384.0
         @JvmField var kV_referenceVoltage = 12.485
     }
@@ -52,7 +52,7 @@ class Shooter(private val voltageSupplier: VoltageSupplier) : MultithreadedRobot
     private lateinit var shooterMotor: DcMotorEx
     private lateinit var feeder: ExpansionHubServo
     private val shooterPowerSender = CommandSender({shooterMotor.power = it})
-    private val shooterRegulator = RegulatorPIDVAS({shooterPowerSender.send(it)}, {currentVelocity}, {voltageSupplier.voltage}, {kP}, {kD}, {kI}, {kV}, {kA}, {kS}, {maxI}, {kV_referenceVoltage}, false)
+    private val shooterRegulator = RegulatorPIDVAS({shooterPowerSender.send(it)}, {currentVelocity}, {voltageSupplier.voltage}, {kP}, {kI}, {kD}, {kV}, {kA}, {kS}, {maxI}, {kV_referenceVoltage}, false)
     private val feederPositionSender = CommandSender({feeder.position = it})
     private var shooterMode = Shooter.ShooterMode.OFF
     private var ringsToShoot: Int = 0
