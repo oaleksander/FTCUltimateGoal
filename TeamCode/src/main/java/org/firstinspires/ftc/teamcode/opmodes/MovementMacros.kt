@@ -52,7 +52,7 @@ object MovementMacros {
         @JvmField var PartnerWobblePoseYOffset = 0.0
         @JvmField var HighGoalShootingDistance = 208.0
         @JvmField var HighGoalShootingAngle = -4.3
-        @JvmField var PowerShotShootingDistance = 200.4089
+        @JvmField var PowerShotShootingDistance = 196.4089
         @JvmField var PowerShotShootingAngle = -4.3
         @JvmField var RingStackApproachOffset = 68.0
         @JvmField var RingStackFirstRingOffset = 5.0
@@ -331,11 +331,11 @@ object MovementMacros {
         }
     }
     private val ringsPowerShot: Vector2D
-        get() = Vector2D(-10.0 * xSign, 160.0)
+        get() = Vector2D(-10.0 * xSign, 130.0)
     fun pickupRingsAfterPowerShots() {
         movement.pos(Pose2D(ringsPowerShot, -PI / 2 * xSign))
         conveyor.enableConveyor = true
-        movement.pos(Pose2D(ringsPowerShot + Vector2D(60.0 * xSign, 0.0), -PI / 2 * xSign))
+        movement.pos(Pose2D(ringsPowerShot + Vector2D(60.0 * xSign, 0.0), -PI / 2 * xSign), linearVelocityFraction = 0.3)
         conveyor.enableConveyor = false
     }
     /*

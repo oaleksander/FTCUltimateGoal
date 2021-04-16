@@ -29,20 +29,20 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
     @Config
     internal object MovementConfig {
         @JvmField var lookaheadRadius = 45.72
-        @JvmField var kP_distance = 6.2
+        @JvmField var kP_distance = 8.5
         @JvmField var kD_distance = .0
-        @JvmField var kI_distance = 3.1
-        @JvmField var kP_angle = 25.0
+        @JvmField var kI_distance = 4.9
+        @JvmField var kP_angle = 10.0
         @JvmField var kD_angle = .0
-        @JvmField var kI_angle = 22.6
+        @JvmField var kI_angle = 6.6
         //@JvmField TODO separate coeffs on angle and distance
         //var kP_angle = 3.6
         //@JvmField
         //var kD_angle = 0.15
         //@JvmField
         //var kI_angle = 0.6
-        @JvmField var antiWindupFraction_distance = .15
-        @JvmField var antiWindupFraction_angle = .15
+        @JvmField var antiWindupFraction_distance = .55
+        @JvmField var antiWindupFraction_angle = .55
         @JvmField var minErrorDistanceDefault = 1.5
         @JvmField var minErrorAngleDefault = Math.toRadians(0.4)
     }

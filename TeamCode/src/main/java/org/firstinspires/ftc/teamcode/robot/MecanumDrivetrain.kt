@@ -38,9 +38,9 @@ class MecanumDrivetrain(private val voltageSupplier: VoltageSupplier) : Multithr
         @JvmField var rotationDiscrepancy = 1.0
         @JvmField var motorControllerMode = MotorControllerMode.EXTERNAL_PID
         @JvmField var secondsToAccelerate = 0.10
-        @JvmField var kP = 15.0
+        @JvmField var kP = 19.0
         @JvmField var kD = 0.0
-        @JvmField var kI = 0.7
+        @JvmField var kI = 0.8
         @JvmField var kV = 13.56
         @JvmField var kA = 5.0
         @JvmField var kS = 1300.0
