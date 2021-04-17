@@ -19,6 +19,7 @@ object WoENrobot {
     val conveyor = Conveyor()
     val shooter = Shooter(voltageSupplier)
     val telemetryDebugging = TelemetryDebugging()
+    val ledStrip = LedStrip()
     val ai = AI()
      /*
     val odometry = FakeDrivetrainOdometry()
@@ -40,6 +41,7 @@ object WoENrobot {
         conveyor,
         shooter,
         telemetryDebugging,
+        ledStrip,
         ai) //
 
 

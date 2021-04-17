@@ -60,7 +60,7 @@ class MecanumDrivetrain(private val voltageSupplier: VoltageSupplier) : Multithr
     private val sidewaysMultiplier
         get() = forwardMultiplier * DrivetrainConfig.strafingMultiplier
     private val turnMultiplier
-        get() = radiansToEncoderTicksMultiplier * (wheelCenterOffset.x + wheelCenterOffset.y) * DrivetrainConfig.rotationDiscrepancy / wheelRadius
+        get() = radiansToEncoderTicksMultiplier * (wheelCenterOffset.x + wheelCenterOffset.y) * DrivetrainConfig.rotationDiscrepancy / (wheelRadius * gearRatio)
     private val maxMotorTickVelocity
         get() = DrivetrainConfig.achievableMaxVeloictyFraction * theoreticalMaxTickVelocity
     private val minMotorTickVelocity
