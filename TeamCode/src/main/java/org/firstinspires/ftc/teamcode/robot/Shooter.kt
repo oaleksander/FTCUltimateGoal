@@ -28,10 +28,10 @@ class Shooter(private val voltageSupplier: VoltageSupplier) : MultithreadedRobot
 
     @Config
     internal object ShooterConfig {
-        @JvmField var servoTime = 58
-        @JvmField var servoReturnMultiplier = 3.4
-        @JvmField var lowRpm = 3150.0
-        @JvmField var highRpm = 3800.0
+        @JvmField var servoTime = 59
+        @JvmField var servoReturnMultiplier = 3.5
+        @JvmField var lowRpm = 3000.0
+        @JvmField var highRpm = 3600.0
         @JvmField var feederClose = 0.23
         @JvmField var feederOpen = 0.39
         @JvmField var kP = 95.0
@@ -40,7 +40,7 @@ class Shooter(private val voltageSupplier: VoltageSupplier) : MultithreadedRobot
         @JvmField var kV = 14.06
         @JvmField var kA = 2.0
         @JvmField var kS = 2400.0
-        @JvmField var maxI = 81920.0
+        @JvmField var maxI = 8192.0
         @JvmField var kV_referenceVoltage = 12.485
     }
 

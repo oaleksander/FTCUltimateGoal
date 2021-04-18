@@ -19,7 +19,7 @@ class Auto_Default : AutoOpMode() {
         //shootHighGoal()
        // pickupRingsAfterPowerShots()
        // shootHighGoal()
-       // moveWobble()
+        moveWobble()
         pickupRings()
         park()
     }

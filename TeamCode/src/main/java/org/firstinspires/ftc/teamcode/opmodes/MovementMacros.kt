@@ -35,6 +35,7 @@ import org.firstinspires.ftc.teamcode.superclasses.Shooter
 import org.firstinspires.ftc.teamcode.superclasses.WobbleManipulator
 import java.lang.Math.toRadians
 import kotlin.math.PI
+import kotlin.math.abs
 
 object MovementMacros {
 
@@ -50,19 +51,19 @@ object MovementMacros {
     internal object MovementMacrosConfig {
         @JvmField var WobblePlacementOffset = Vector2D(11.8425, 39.25) //Vector2D(11.8425,33.25);
         @JvmField var PartnerWobblePoseYOffset = 0.0
-        @JvmField var HighGoalShootingDistance = 208.0
-        @JvmField var HighGoalShootingAngle = -4.3
-        @JvmField var PowerShotShootingDistance = 196.4089
-        @JvmField var PowerShotShootingAngle = -4.3
-        @JvmField var RingStackApproachOffset = 68.0
+        @JvmField var HighGoalShootingDistance = 204.0
+        @JvmField var HighGoalShootingAngle = -8.3
+        @JvmField var PowerShotShootingDistance = 200.0
+        @JvmField var PowerShotShootingAngle = -6.69
+        @JvmField var RingStackApproachOffset = 30.0
         @JvmField var RingStackFirstRingOffset = 5.0
-        @JvmField var RingStackFirstRingOffsetFromFour = 5.0
-        @JvmField var RingStackFourthRingOffset = -15.0
+        @JvmField var RingStackFirstRingOffsetFromFour = -2.0
+        @JvmField var RingStackFourthRingOffset = -20.0
         @JvmField var ParkLineY = 26.462
         @JvmField var RobotYBackLength = 29.85498
         @JvmField var RobotYFrontLength = 37.2
         @JvmField var ParkingTolerance = 5.0
-        @JvmField var PowerShotShootingOffset = -7.0
+        @JvmField var PowerShotShootingOffset = -0.0
         //TODO Servo travel times
     }
 
@@ -91,8 +92,8 @@ object MovementMacros {
         val wobblePose = wobblePose
         val error: Vector2D = movement.getError(Pose2D(wobblePose, Double.NaN))
         movement.followPath(MotionTask(wobblePose.minus(Vector2D(0.0, WobblePlacementOffset.radius()).rotatedCW(error.aCot())),
-                                       error.aCot() - WobblePlacementOffset.aCot()), distanceTolerance = 3.0,
-                            angularTolerance = toRadians(3.0))
+                                       error.aCot() - WobblePlacementOffset.aCot()), distanceTolerance = 4.0,
+                            angularTolerance = toRadians(4.0))
         val leverServoTimer = ElapsedTime()
         wobbleManipulator.setAngle(WobbleManipulator.Position.DOWN)
         while (movement.pathFollowerIsActive() && opMode.opModeIsActive()) {
@@ -139,13 +140,13 @@ object MovementMacros {
         when {
             sideSign * xSign == 1 -> {
                 shootHighGoal()
-                moveWobble()
+            //    moveWobble()
             }
             else -> {
                 shootPowerShotDynamic()
-                pickupRingsAfterPowerShots()
-                moveWobble()
-                shootHighGoal()
+              //  pickupRingsAfterPowerShots()
+               // moveWobble()
+                //shootHighGoal()
             }
         }
     }
@@ -165,6 +166,7 @@ object MovementMacros {
         }
 
     fun shootHighGoal(shootOnlyOneRing: Boolean = false) {
+        wobbleManipulator.setAngle(WobbleManipulator.Position.UP)
         shooter.shootingMode = Shooter.ShooterMode.HIGHGOAL
         movement.pos(highGoalShootingPose)
         val shooterAccelerationTimeout = ElapsedTime()
@@ -218,13 +220,13 @@ object MovementMacros {
     }
 
     fun shootPowerShotDynamic() {
+        wobbleManipulator.setAngle(WobbleManipulator.Position.UP)
         shooter.shootingMode = Shooter.ShooterMode.POWERSHOT
         for (powerShot in PowerShot.values()) {
             movement.pos(powerShotShootingPose(powerShot))
-            delay(100.0)
             val shooterAccelerationTimeout = ElapsedTime()
             shooterAccelerationTimeout.reset()
-            while (opMode.opModeIsActive() && !shooter.isCorrectRpm() && shooterAccelerationTimeout.seconds() < 2) spinOnce()
+            while (opMode.opModeIsActive() && shooterAccelerationTimeout.seconds() < 2 && (!shooter.isCorrectRpm()  || abs(odometry.robotVelocity.z)>0.1)) spinOnce()
             shooter.feedRing()
             delay(shooter.timeToShootOneRing)
         }
@@ -281,21 +283,21 @@ object MovementMacros {
     */
 
     private val ringStackPose: Vector2D
-        get() = Vector2D(90.3747 * xSign - 7.0, -56.9019)
+        get() = Vector2D(90.3747 * xSign - 8.5, -56.9019)
 
     fun pickupRings(pickWobbleBetweenRings: Boolean = false) {
         val heading = movement.getError(Pose2D(ringStackPose, Double.NaN)).aCot()
         when (openCVNode.stackSize) {
              StackSize.FOUR -> {
                   movement.pos(Pose2D(ringStackPose - Vector2D(0.0, RingStackApproachOffset).rotatedCW(heading), heading + PI),
-                               distanceTolerance = 5.0, angularTolerance = toRadians(5.0))
+                               distanceTolerance = 25.0, angularTolerance = toRadians(5.0))
                   conveyor.enableConveyor = true
                   movement.pos(Pose2D(ringStackPose - Vector2D(0.0, RingStackFirstRingOffsetFromFour).rotatedCW(heading), heading + PI),
                                linearVelocityFraction = .16, distanceTolerance = 5.0, angularTolerance = toRadians(5.0))
                   //delay(700.0)
                   shootHighGoal()
                   movement.pos(Pose2D(ringStackPose - Vector2D(0.0, RingStackFourthRingOffset).rotatedCW(heading), heading + PI),
-                               linearVelocityFraction = .35, distanceTolerance = 3.0, angularTolerance = toRadians(3.0))
+                               linearVelocityFraction = .35, distanceTolerance = 4.0, angularTolerance = toRadians(4.0))
                   if (pickWobbleBetweenRings) pickSecondWobble()
                   ///else delay(750.0)
                   shootHighGoal()
@@ -303,10 +305,10 @@ object MovementMacros {
              StackSize.ONE -> {
                   conveyor.enableConveyor = true
                   movement.pos(Pose2D(ringStackPose - Vector2D(0.0, RingStackFirstRingOffset).rotatedCW(heading), heading + PI),
-                               linearVelocityFraction = .7, distanceTolerance = 3.0, angularTolerance = toRadians(3.0))
+                               linearVelocityFraction = .7, distanceTolerance = 4.0, angularTolerance = toRadians(4.0))
                   if (pickWobbleBetweenRings) pickSecondWobble()
                   //else delay(500.0)
-                  shootHighGoal(shootOnlyOneRing = true)
+                  shootHighGoal()
              }
              StackSize.ZERO -> {
                   if (pickWobbleBetweenRings) pickSecondWobble()

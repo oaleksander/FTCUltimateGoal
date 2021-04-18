@@ -78,7 +78,7 @@ class LedStrip: MultithreadedRobotModule(), LedStrip {
                 setPowerLed1.send(0.0)
                 setPowerLed2.send(0.0)
             }
-            shooter.isCorrectRpm() -> {
+            shooter.isCorrectRpm(150.0) -> {
                 setPowerLed1.send(1.0)
                 setPowerLed2.send(0.0)
             }

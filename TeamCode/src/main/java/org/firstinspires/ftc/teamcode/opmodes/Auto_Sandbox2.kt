@@ -11,9 +11,9 @@ import kotlin.math.PI
 class Auto_Sandbox2 : AutoOpMode() {
     override fun main() {
         while (opModeIsActive()) {
-            movement.pos(Pose2D(startPosition.x, startPosition.y+50.0, 0.0))
-            movement.pos(Pose2D(startPosition.x, startPosition.y+50.0, PI/2))
-            //movement.pos(Pose2D(startPosition.x, startPosition.y, Math.toRadians(0.0)))
+            movement.pos(Pose2D(startPosition.x, startPosition.y+200.0, 0.0))
+            //movement.pos(Pose2D(startPosition.x, startPosition.y+50.0, PI/2))
+            movement.pos(Pose2D(startPosition.x, startPosition.y, 0.0))
             // shootPOWERSHOTAngle()
         }
         //shootPowerShotDynamic()

@@ -13,6 +13,7 @@ import org.firstinspires.ftc.teamcode.robot.WoENrobot.movement
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.odometry
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.runTime
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.shooter
+import org.firstinspires.ftc.teamcode.robot.WoENrobot.voltageSupplier
 import org.firstinspires.ftc.teamcode.superclasses.MultithreadedRobotModule
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.math.cos
@@ -87,6 +88,7 @@ class TelemetryDebugging : MultithreadedRobotModule() {
                         dashboardPacket.put("Loop frequency", loopFrequency)
                         dashboardPacket.put("CH Loop frequency", controlHubLoopFrequency)
                         dashboardPacket.put("EH Loop frequency", expansionHubloopFrequency)
+                        dashboardPacket.put("Battery Voltage", voltageSupplier.voltage)
                         dashboardPacket.put("Head", Math.toDegrees(robotPosition.heading))
                         dashboardPacket.put("Flywheel RPM", shooter.currentRpm)
                         dashboardPacket.put("Flywheel target", shooter.rpmTarget)

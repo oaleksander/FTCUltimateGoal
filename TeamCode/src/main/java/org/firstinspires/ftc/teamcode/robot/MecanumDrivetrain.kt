@@ -33,17 +33,17 @@ class MecanumDrivetrain(private val voltageSupplier: VoltageSupplier) : Multithr
     @Config
     internal object DrivetrainConfig {
         @JvmField var achievableMaxVeloictyFraction = 0.885
-        @JvmField var achievableMinVelocityFraction = 0.065
-        @JvmField var strafingMultiplier = 1.25
-        @JvmField var rotationDiscrepancy = 1.0
+        @JvmField var achievableMinVelocityFraction = 0.07
+        @JvmField var strafingMultiplier = 1.3
+        @JvmField var rotationDiscrepancy = 2.8
         @JvmField var motorControllerMode = MotorControllerMode.EXTERNAL_PID
         @JvmField var secondsToAccelerate = 0.10
-        @JvmField var kP = 19.0
+        @JvmField var kP = 27.0
         @JvmField var kD = 0.0
-        @JvmField var kI = 0.8
-        @JvmField var kV = 13.56
-        @JvmField var kA = 5.0
-        @JvmField var kS = 1300.0
+        @JvmField var kI = 0.5
+        @JvmField var kV = 14.46
+        @JvmField var kA = .0
+        @JvmField var kS = 1400.0
         @JvmField var maxI = 32767.0
         @JvmField var kV_referenceVoltage = 13.0
     }
@@ -144,7 +144,7 @@ class MecanumDrivetrain(private val voltageSupplier: VoltageSupplier) : Multithr
                 }
             }
         }
-        setMotor0PowerBehaviors(DcMotor.ZeroPowerBehavior.BRAKE)
+        setMotor0PowerBehaviors(DcMotor.ZeroPowerBehavior.FLOAT)
         targetVelocity = Vector3D(.0, .0, .0)
     }
 

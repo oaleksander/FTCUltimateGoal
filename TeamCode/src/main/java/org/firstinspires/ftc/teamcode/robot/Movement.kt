@@ -29,22 +29,16 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
     @Config
     internal object MovementConfig {
         @JvmField var lookaheadRadius = 45.72
-        @JvmField var kP_distance = 8.5
-        @JvmField var kD_distance = .0
-        @JvmField var kI_distance = 4.9
-        @JvmField var kP_angle = 10.0
+        @JvmField var kP_distance = 4.5
+        @JvmField var kD_distance = 1.0
+        @JvmField var kI_distance = 1.5
+        @JvmField var kP_angle = 4.5
         @JvmField var kD_angle = .0
-        @JvmField var kI_angle = 6.6
-        //@JvmField TODO separate coeffs on angle and distance
-        //var kP_angle = 3.6
-        //@JvmField
-        //var kD_angle = 0.15
-        //@JvmField
-        //var kI_angle = 0.6
-        @JvmField var antiWindupFraction_distance = .55
-        @JvmField var antiWindupFraction_angle = .55
+        @JvmField var kI_angle = 1.5
+        @JvmField var antiWindupFraction_distance = .09
+        @JvmField var antiWindupFraction_angle = .09
         @JvmField var minErrorDistanceDefault = 1.5
-        @JvmField var minErrorAngleDefault = Math.toRadians(0.4)
+        @JvmField var minErrorAngleDefault = Math.toRadians(0.400)
     }
 
     val kP: Vector3D
@@ -70,6 +64,7 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
     var previousTarget = Pose2D()
     var previousError = Pose2D()
     var integralError = Vector3D()
+    var previousVelocity = Vector3D()
     var requestedVelocityPercent = Vector3D(0.0, 0.0, 0.0)
     private var actionOnCompletionExecutor = Thread()
     private val pathFollowingTimer = ElapsedTime()
@@ -242,7 +237,9 @@ class Movement(private val odometry: Odometry, private val drivetrain: Drivetrai
      */
     private fun moveLinear(target: Pose2D, velocity: Vector2D? = null): Boolean {
         val error = getError(target)
-        val diffError = odometry.robotVelocity * -1.0
+        val currentVelocity = odometry.robotVelocity
+        val diffError = (currentVelocity + previousVelocity) * -0.5
+        previousVelocity = currentVelocity
         if (target == previousTarget && velocity == null) {
             integralError += Vector3D((error.x + previousError.x) * 0.5, (error.y + previousError.y) * 0.5,
                                       MathUtil.angleAverage(error.heading, previousError.heading)) * moveControllerTimer.seconds()

@@ -31,12 +31,13 @@ class RegulatorPIDVAS (private val doubleConsumer: DoubleConsumer, private val d
         timeDelta = updateTime.seconds() - timeOld
         timeOld = updateTime.seconds()
         currentVelocity = doubleVelocity.asDouble
-        if (target != 0.0) {
+        if (target != 0.0 || activeBraking) {
             voltageDelta = kV_referenceVoltage.asDouble / doubleSupplier.asDouble
             velocityError = target - currentVelocity
             P = velocityError * kP.asDouble
             D = (velocityError - velocityErrorOld) * kD.asDouble / timeDelta
             I += (kI.asDouble * velocityError) * timeDelta
+            if(target == 0.0) I = .0
             if (abs(I) > maxI.asDouble) I = sign(I) * maxI.asDouble
             V = kV.asDouble * target * voltageDelta
             A = kA.asDouble * (target - velocityTargetOld) / timeDelta * voltageDelta
