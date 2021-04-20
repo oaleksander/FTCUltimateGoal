@@ -16,9 +16,6 @@ class Auto_Default : AutoOpMode() {
     override fun main() {
         avoidRingStack()
         shooting()
-        //shootHighGoal()
-       // pickupRingsAfterPowerShots()
-       // shootHighGoal()
         moveWobble()
         pickupRings()
         park()

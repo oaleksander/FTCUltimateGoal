@@ -17,6 +17,8 @@ class LedStrip: MultithreadedRobotModule(), LedStrip {
     private lateinit var ledStrip1: DcMotorEx
     private lateinit var ledStrip2: DcMotorEx
     private val ledTime = ElapsedTime()
+    private val ledOnOffTime = ElapsedTime()
+    private val timeout = 1010.0
     private val setPowerLed1 = CommandSender({ p: Double -> ledStrip1.power = p })
     private val setPowerLed2 = CommandSender({ p: Double -> ledStrip2.power = p })
 
@@ -31,6 +33,7 @@ class LedStrip: MultithreadedRobotModule(), LedStrip {
         ledStrip2.mode = DcMotor.RunMode.STOP_AND_RESET_ENCODER
         ledStrip2.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
         ledTime.reset()
+        ledOnOffTime.reset()
     }
 
     override fun updateControlHub() {
@@ -38,7 +41,10 @@ class LedStrip: MultithreadedRobotModule(), LedStrip {
     }
 
     override fun updateExpansionHub() {
-        setLedMode(LedMode.INFORMSHOOTER)
+        if (ledOnOffTime.milliseconds() > timeout) {
+            ledOnOffTime.reset()
+            setLedMode(LedMode.INFORMSHOOTER)
+        }
     }
 
     override fun updateOther() {
