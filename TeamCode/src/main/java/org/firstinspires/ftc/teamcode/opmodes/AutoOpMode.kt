@@ -5,7 +5,9 @@ import com.qualcomm.robotcore.util.Range
 import org.firstinspires.ftc.teamcode.math.Pose2D
 import org.firstinspires.ftc.teamcode.misc.HSVRGB
 import org.firstinspires.ftc.teamcode.misc.SinglePressButton
+import org.firstinspires.ftc.teamcode.robot.LedStrip
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.fullInitWithCV
+import org.firstinspires.ftc.teamcode.robot.WoENrobot.ledStrip
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.movement
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.odometry
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.openCVNode
@@ -51,6 +53,7 @@ open class AutoOpMode : LinearOpMode() {
         //dashboardPacket.put("OpenCV Stack size", openCVNode.stackSize)
         if (thereAreTwoGamepads) telemetry.addLine("Second gamepad detected")
         telemetry.update()
+        ledStrip.updateExpansionHub()
     }
 
     override fun runOpMode() {
@@ -65,6 +68,7 @@ open class AutoOpMode : LinearOpMode() {
             main()
         } finally {
             setLedColors(0, 128, 128)
+            ledStrip.updateExpansionHub()
             telemetry.addData("Status", "Program finished ($runtime)")
             telemetry.update()
         }

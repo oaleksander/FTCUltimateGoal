@@ -41,9 +41,14 @@ class LedStrip: MultithreadedRobotModule(), LedStrip {
     }
 
     override fun updateExpansionHub() {
-        if (ledOnOffTime.milliseconds() > timeout) {
-            ledOnOffTime.reset()
-            setLedMode(LedMode.INFORMSHOOTER)
+        if (opMode.opModeIsActive()) {
+            if (ledOnOffTime.milliseconds() > timeout) {
+                ledOnOffTime.reset()
+                setLedMode(LedMode.INFORMSHOOTER)
+            }
+        }
+        else {
+            setLedMode(LedMode.SMOOTHLY)
         }
     }
 
