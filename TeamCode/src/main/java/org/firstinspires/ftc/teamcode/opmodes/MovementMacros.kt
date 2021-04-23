@@ -51,11 +51,11 @@ object MovementMacros {
     internal object MovementMacrosConfig {
         @JvmField var WobblePlacementOffset = Vector2D(11.8425, 39.25) //Vector2D(11.8425,33.25);
         @JvmField var PartnerWobblePoseYOffset = 0.0
-        @JvmField var HighGoalShootingDistance = 204.0
-        @JvmField var HighGoalShootingAngle = -8.3
+        @JvmField var HighGoalShootingDistance = 207.5 // 210
+        @JvmField var HighGoalShootingAngle = -5.3
         @JvmField var PowerShotShootingDistance = 200.0
         @JvmField var PowerShotShootingAngle = -6.69
-        @JvmField var RingStackApproachOffset = 30.0
+        @JvmField var RingStackApproachOffset = 40.0
         @JvmField var RingStackFirstRingOffset = 5.0
         @JvmField var RingStackFirstRingOffsetFromFour = -2.0
         @JvmField var RingStackFourthRingOffset = -20.0
@@ -178,13 +178,13 @@ object MovementMacros {
 
 
     fun shootHighGoalAsync() {
-       //. shooter.shootingMode = Shooter.ShooterMode.HIGHGOAL
+        shooter.shootingMode = Shooter.ShooterMode.HIGHGOAL
         movement.followPath(MotionTask(highGoalShootingPose) {
             val shooterAccelerationTimeout = ElapsedTime()
             while (opMode.opModeIsActive() && !shooter.isCorrectRpm() && shooterAccelerationTimeout.seconds() < 1.2 && movement.pathFollowerIsActive())
                 spinOnce()
-            //if (movement.pathFollowerIsActive())
-        shooter.feedRings()
+            if (movement.pathFollowerIsActive())
+                shooter.feedRings()
         })
         //  while(movement.pathFollowerIsActive()&&getOpMode().opModeIsActive()) {spinOnce();}
     }

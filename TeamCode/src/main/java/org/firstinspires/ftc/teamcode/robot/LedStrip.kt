@@ -90,12 +90,12 @@ class LedStrip: MultithreadedRobotModule(), LedStrip {
                 setPowerLed2.send(0.0)
             }
             shooter.isCorrectRpm(150.0) -> {
-                setPowerLed1.send(1.0)
-                setPowerLed2.send(0.0)
+                setPowerLed2.send(1.0)
+                setPowerLed1.send(0.0)
             }
             else -> {
-                setPowerLed1.send(0.0)
-                setPowerLed2.send(1.0)
+                setPowerLed2.send(0.0)
+                setPowerLed1.send(1.0)
             }
         }
     }
@@ -123,6 +123,9 @@ class LedStrip: MultithreadedRobotModule(), LedStrip {
                   offLed(setPowerLed1)
                   offLed(setPowerLed2)
              }
+            LedMode.SMOOTHLY2 -> {
+
+            }
         }
     }
 }

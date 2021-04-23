@@ -15,6 +15,7 @@ import org.firstinspires.ftc.teamcode.opmodes.MovementMacros.shooting
 class Auto_Default : AutoOpMode() {
     override fun main() {
         avoidRingStack()
+        //shootHighGoal()
         shooting()
         moveWobble()
         pickupRings()
