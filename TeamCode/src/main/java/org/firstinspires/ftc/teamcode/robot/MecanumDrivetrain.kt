@@ -210,10 +210,10 @@ class MecanumDrivetrain(private val voltageSupplier: VoltageSupplier) : Multithr
             targetTickVelocityRL /= maxabs
             targetTickVelocityRR /= maxabs
         }
-        targetTickVelocityFL = limitMinSpeed(targetTickVelocityFL)
-        targetTickVelocityFR = limitMinSpeed(targetTickVelocityFR)
-        targetTickVelocityRL = limitMinSpeed(targetTickVelocityRL)
-        targetTickVelocityRR = limitMinSpeed(targetTickVelocityRR)
+        targetTickVelocityFL = limitMinSpeed(targetTickVelocityFL) * kV_referenceVoltage / voltageSupplier.voltage
+        targetTickVelocityFR = limitMinSpeed(targetTickVelocityFR) * kV_referenceVoltage / voltageSupplier.voltage
+        targetTickVelocityRL = limitMinSpeed(targetTickVelocityRL) * kV_referenceVoltage / voltageSupplier.voltage
+        targetTickVelocityRR = limitMinSpeed(targetTickVelocityRR) * kV_referenceVoltage / voltageSupplier.voltage
 
         when (motorControllerMode) {
             MotorControllerMode.FEEDFORWARD -> {
