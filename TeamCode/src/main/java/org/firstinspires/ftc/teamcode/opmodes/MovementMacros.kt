@@ -51,10 +51,10 @@ object MovementMacros {
     internal object MovementMacrosConfig {
         @JvmField var WobblePlacementOffset = Vector2D(11.8425, 39.25) //Vector2D(11.8425,33.25);
         @JvmField var PartnerWobblePoseYOffset = 0.0
-        @JvmField var HighGoalShootingDistance = 207.5 // 210
-        @JvmField var HighGoalShootingAngle = -5.3
+        @JvmField var HighGoalShootingDistance = 217.5 // 210
+        @JvmField var HighGoalShootingAngle = -2.8
         @JvmField var PowerShotShootingDistance = 200.0
-        @JvmField var PowerShotShootingAngle = -6.69
+        @JvmField var PowerShotShootingAngle = -5.69
         @JvmField var RingStackApproachOffset = 40.0
         @JvmField var RingStackFirstRingOffset = 5.0
         @JvmField var RingStackFirstRingOffsetFromFour = -2.0
@@ -68,7 +68,7 @@ object MovementMacros {
     }
 
     fun avoidRingStack() {
-        movement.pos(Pose2D(odometry.robotCoordinates.x + 30 * sideSign, -60.0, Double.NaN), distanceTolerance = 20.0,
+        movement.pos(Pose2D(odometry.robotCoordinates.x + 25 * sideSign, -60.0, Double.NaN), distanceTolerance = 20.0,
                      angularTolerance = .5)
     }
 
@@ -79,7 +79,7 @@ object MovementMacros {
         get() = when (openCVNode.stackSize) {
              StackSize.FOUR -> Vector2D(xSign * 150.3809, 150.2761)
              StackSize.ONE -> Vector2D(xSign * 89.9835, 90.3346)
-            else -> Vector2D(xSign * 150.3809, 30.1596)
+            else -> Vector2D(xSign * 150.3809, 35.1596)
         }
 
     private val partnerWobblePose: Vector2D
