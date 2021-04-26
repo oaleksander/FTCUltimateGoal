@@ -47,7 +47,7 @@ class Conveyor : MultithreadedRobotModule(), Conveyor {
         @JvmField var stackDetectionTimeout = 1000.0
         @JvmField var stackDetectionReverseTime = 600.0
         @JvmField var distanceThreshold = 5.46
-        @JvmField var currentThreshold = 4.0
+        @JvmField var currentThreshold = 3.5
     }
 
     override fun initialize() {

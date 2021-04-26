@@ -52,7 +52,7 @@ object MovementMacros {
         @JvmField var WobblePlacementOffset = Vector2D(11.8425, 39.25) //Vector2D(11.8425,33.25);
         @JvmField var PartnerWobblePoseYOffset = 0.0
         @JvmField var HighGoalShootingDistance = 217.5 // 210
-        @JvmField var HighGoalShootingAngle = -2.8
+        @JvmField var HighGoalShootingAngle = -5.8
         @JvmField var PowerShotShootingDistance = 200.0
         @JvmField var PowerShotShootingAngle = -5.69
         @JvmField var RingStackApproachOffset = 40.0
@@ -283,7 +283,7 @@ object MovementMacros {
     */
 
     private val ringStackPose: Vector2D
-        get() = Vector2D(90.3747 * xSign - 8.5, -56.9019)
+        get() = Vector2D(90.3747 * xSign - 7.5, -56.9019)
 
     fun pickupRings(pickWobbleBetweenRings: Boolean = false) {
         val heading = movement.getError(Pose2D(ringStackPose, Double.NaN)).aCot()
