@@ -65,14 +65,14 @@ class Conveyor : MultithreadedRobotModule(), Conveyor {
         conveyor.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
     }
 
-
-    private fun getDistance(): Double {
-        if (distanceQueryTimer.milliseconds() > distanceQueryTimeout) {
-            lastKnownDistance = sensorDistance.getDistance(DistanceUnit.CM)
-            distanceQueryTimer.reset()
+    private val distance: Double
+        get() {
+            if (distanceQueryTimer.milliseconds() > distanceQueryTimeout) {
+                lastKnownDistance = sensorDistance.getDistance(DistanceUnit.CM)
+                distanceQueryTimer.reset()
+            }
+            return lastKnownDistance
         }
-        return lastKnownDistance
-    }
 
     private val conveyorMotorCurrent: Double
         get() {
@@ -85,7 +85,7 @@ class Conveyor : MultithreadedRobotModule(), Conveyor {
         }
 
     override fun updateControlHub() {
-        if (!forceReverse && !(reverseBeforeStop && !enableConveyor) && enableFullStackStopping) if (getDistance() >= ConveyorConfig.distanceThreshold) {
+        if (!forceReverse && !(reverseBeforeStop && !enableConveyor) && enableFullStackStopping) if (distance >= ConveyorConfig.distanceThreshold) {
             stackDetectionTimer.reset() //Full collector detection
         }
     }

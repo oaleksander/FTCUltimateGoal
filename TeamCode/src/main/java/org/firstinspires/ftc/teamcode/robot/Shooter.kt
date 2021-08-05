@@ -101,7 +101,7 @@ class Shooter(private val voltageSupplier: VoltageSupplier) : MultithreadedRobot
     }
 
     override fun updateExpansionHub() {
-        currentVelocity = getMotorVelocity()
+        currentVelocity = motorVelocity
         currentRpm = currentVelocity * ticksToRpmMultiplier
         shooterRegulator.update(motorVelocityTarget)
     }
@@ -119,8 +119,10 @@ class Shooter(private val voltageSupplier: VoltageSupplier) : MultithreadedRobot
             motorVelocityTarget = rpmTarget * 0.4
         }
     }
-
-    private fun getMotorVelocity(): Double = shooterMotor.velocity //* 2.5
+    private val motorVelocity: Double
+        get() {
+            return shooterMotor.velocity
+        }
 
     var shootingMode: Shooter.ShooterMode
         get() = shooterMode

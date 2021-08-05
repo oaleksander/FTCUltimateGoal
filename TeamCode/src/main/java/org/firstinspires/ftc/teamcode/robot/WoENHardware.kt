@@ -43,8 +43,6 @@ object WoENHardware {
     lateinit var controlHubIMU: BNO055IMU
     lateinit var imu2: BNO055IMU
 
-
-    @JvmOverloads
     fun assignHardware(hwMap: HardwareMap = OpModeManagerImpl.getOpModeManagerOfActivity(
          AppUtil.getInstance().rootActivity).hardwareMap) {
 

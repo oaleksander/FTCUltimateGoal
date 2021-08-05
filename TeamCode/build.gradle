@@ -18,14 +18,12 @@ apply from: '../build.dependencies.gradle'
 repositories {
     maven { url "https://maven.0x778.tk" }
     mavenCentral()
-
-    jcenter()
 }
 
 dependencies {
     implementation project(':FtcRobotController')
     annotationProcessor files('lib/OpModeAnnotationProcessor.jar')
-    implementation 'org.jetbrains:annotations:16.0.2'
+    implementation 'org.jetbrains:annotations:21.0.1'
     implementation 'org.openftc:rev-extensions-2:1.2'
     implementation 'org.openftc:easyopencv:1.4.4'
     // implementation 'com.spartronics4915.lib:ftc265:2.1.2'
