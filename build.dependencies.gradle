@@ -4,6 +4,7 @@ apply plugin: 'kotlin-android'
 
 
 repositories {
+    mavenCentral()
     maven { url = 'https://maven.brott.dev/' }
     google() // Needed for androidx
  //   jcenter()  // Needed for tensorflow-lite
