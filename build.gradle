@@ -34,9 +34,9 @@ allprojects {
 repositories {
     mavenCentral()
 
-    flatDir {
+   /* flatDir {
         dirs '../libs'
-    }
+    }*/
 }
 
 dependencies {
