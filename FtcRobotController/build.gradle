@@ -20,7 +20,7 @@ android {
         sourceCompatibility "1.8"
         targetCompatibility "1.8"
     }
-    ndkVersion '22.1.7171670'
+    ndkVersion '23.0.7599858'
     buildToolsVersion '31.0.0'
 }
 
