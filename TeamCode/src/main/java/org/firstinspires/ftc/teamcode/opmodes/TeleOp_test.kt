@@ -25,7 +25,7 @@ class TeleOp_test : LinearOpMode() {
         /* Shooter */
         val shooterOnOffSwitch = ButtonSwitch { gamepad1.start }
         val shooterSpeedSwitch = ButtonSwitch { gamepad1.dpad_left }
-        val threeRingPresser = SinglePressButton { gamepad1.right_stick_button }
+        val threeRingPresser = SinglePressButton { gamepad1.right_trigger>.1f }
 
         while (opModeIsActive()) {
             /* Auto Shooting */
@@ -51,7 +51,7 @@ class TeleOp_test : LinearOpMode() {
             /* Drivetrain */
             movement.doActiveBraking = false
             movement.humanSetVelocity(gamepad1.left_stick_x.toDouble(), -gamepad1.left_stick_y.toDouble(),
-                                      if (gamepad1.right_bumper) 0.25 else gamepad1.right_trigger.toDouble() - if (gamepad1.left_bumper) 0.25 else gamepad1.left_trigger.toDouble())
+                gamepad1.right_stick_x.toDouble())
         }
     }
 }
